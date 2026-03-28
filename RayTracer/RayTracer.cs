@@ -1,4 +1,4 @@
-﻿using TracerLib;
+using TracerLib;
 
 Color[,] colorMatrix = new Color[2, 3];
 
@@ -49,3 +49,42 @@ catch (ArgumentException err1)
 }
 */
 //Console.WriteLine($"Prova: {w}x{h}");
+
+
+
+
+///////////////////////////////////////////////////////////////
+//Simone's Main:
+/*
+using System;
+using Colors;
+using Hdr;
+using Exception;
+
+class Program
+{
+    static void Main()
+    {
+        Console.WriteLine("Hello world!");
+
+        /* try
+         {
+             var x = 5.0f;
+             var y = 1.0f;
+             var result = x / y;
+             if (y == 0)
+             {
+                 throw new ZeroDivision("Impossibile dividere per zero!");
+             }
+             Console.WriteLine($"Il risultato della tua operazione è: {result}");
+         }
+         catch (ZeroDivision er)
+         {
+             Console.WriteLine(er.Message);
+         }
+         */
+
+    }
+}
+*/
+

@@ -482,6 +482,14 @@ $RECYCLE.BIN/
 *.swp
 
 
+
+
+
+
+
+
+
+
 ###### From here to the end copied from https://www.toptal.com/developers/gitignore/api/csharp,rider,dotnetcore ######
  
 ### DotnetCore ###

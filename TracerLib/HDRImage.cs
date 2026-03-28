@@ -1,8 +1,14 @@
 using System.Diagnostics;
-using System.Drawing;
-using System.Reflection;
 
+/*
+ * using Colors;
+   using System.Diagnostics;
+   using System.Text;
+   using Exception;
+ */
 namespace TracerLib;
+
+namespace Hdr;
 
 public class HDRImage
 {
@@ -36,10 +42,11 @@ public class HDRImage
         get => _pixels;
         set => _pixels = value;
     }*/
-    //al posto che scrivere i metodi get e set e le variabili private si può fare tutto in un solo colpo così
-    public int Height { get; set; }
+
+    //Variables HDR image
     public int Width { get; set; }
-    public Color[] Pixels { get; set; }
+    public int Height { get; set; }
+    public Color[]? Pixels { get; set; } //Controllare nullable
 
     //con i controlli invece viene
     /*private int width;
@@ -55,6 +62,12 @@ public class HDRImage
      }
 
      */
+    
+    //Checker per la validità delle coordinate
+    public bool _AreCoordinatesValid(int column, int row)
+    {
+        return column >= 0 && column < Width && row >= 0 && row < Height;
+    }
 
     //index and range for the pixels 1D vector with the type indexer
     public Color this[Index index]
@@ -62,10 +75,12 @@ public class HDRImage
         get => Pixels[index];
         set => Pixels[index] = value;
     }
+
     public Color[] this[Range range] => Pixels[range];
 
-    public int Offset(int column, int row)
+    public int PixelOffset(int column, int row)
     {
+        Debug.Assert(_AreCoordinatesValid(column, row));
         return row * Width + column;
     }
 
@@ -73,16 +88,17 @@ public class HDRImage
     //Attention: the matrix elements are indexed by giving first the colums and then the row!
     public Color this[int column, int row]
     {
-        get => Pixels[Offset(column, row)];
-        set => Pixels[Offset(column, row)] = value;
+        //Debug.Assert(_AreCoordinatesValid(column,row));
+        get => Pixels[PixelOffset(column, row)];
+        set => Pixels[PixelOffset(column, row)] = value;
     }
 
-    //Constructors
+    //Begin - Constructors 
     public HDRImage(int width, int height)
     {
         Width = width;
         Height = height;
-        Pixels = new Color[width * height];
+        Pixels = new Color[Width * Height];
     }
 
     public HDRImage(int width, int height,
@@ -113,6 +129,23 @@ public class HDRImage
     }
     */
 
+    //Costruttore immagine Hdr a partire da una stream
+    public HDRImage(Stream stream)
+    {
+        // read_pfm_file(stream);
+    }
+
+    //Costruttore immagine Hdr a partire da un file
+    public HDRImage(string fileName)
+    {
+        using (Stream filestream = File.OpenRead(fileName))
+        {
+            // read_pfm_file(filestream);
+        }
+    }
+
+    //End - Constructors
+
     public void Print()
     {
         Console.WriteLine("Height: {0}, Width: {1}", Height, Width);
@@ -138,11 +171,15 @@ public class HDRImage
         }
     }
 
-    //non so quando usarla
-    public bool _AreCoordinatesValid(int column, int row)
+    
+
+    /*//io preferisco che le funzioni vengano chiamate are... o is... ma è questione di gusto se
+     //non sei d'accordo va bene anche _ValidCoord. Meglio togliere i trattini bassi tra le parole
+     //se vogliamo seguire la convenzione. Almeno io ho capito così cercando su internet.
+    public bool _Valid_coord( int x, int y)
     {
-        return column >= 0 && column < Width && row >= 0 && row < Height;
-    }
+        return x >= 0 && x < Width && y >= 0 && y < Height;
+    }*/
 
     public static void _Parse_img_size(in string stringImgSize, out int width, out int height)
     {
@@ -186,7 +223,115 @@ public class HDRImage
         return endian;
     }
 
-/*
+
+    public float ReadFloat(Stream stream, bool bigEndian = true)
+    {
+        var value = new byte[4];
+        var totalRead = 0;
+
+        while (totalRead < 4)
+        {
+            var bytesRead = stream.Read(value, totalRead, 4 - totalRead);
+
+            if (bytesRead == 0)
+            {
+                throw new InvalidPfmFileFormat("Impossibile leggere i file binari dai dati");
+            }
+
+            totalRead += bytesRead;
+        }
+
+        if (BitConverter.IsLittleEndian != bigEndian)
+        {
+            Array.Reverse(value);
+        }
+
+        return BitConverter.ToSingle(value, 0);
+    }
+
+    public static void WriteFloat(Stream outputstream, float value)
+    {
+        var seq = BitConverter.GetBytes(value);
+        outputstream.Write(seq, 0, seq.Length);
+    }
+
+    /* public HdrImage read_pfm_file(Stream stream)
+     {
+         StreamReader sr = new StreamReader(stream);
+         var magic = sr.ReadLine();
+         if (magic != "PF")
+         {
+             throw new InvalidPfmFileFormat("Invalid magic in PFM file");
+         }
+
+         var imgSize = sr.ReadLine();
+         var width, height = _parse_img_size(imgSize);
+
+         var endiannessLine = sr.ReadLine();
+         var endianness = _parse_endianness(endiannessLine);
+
+         var result = new HdrImage(width, height);
+         var color = new Color();
+         for (int i = height-1; i >= 0; i--){
+             for (int j = 0; j <= width; j++){
+                 color.R = ReadFloat(stream, endianness);
+                 color.G = ReadFloat(stream, endianness);
+                 color.B = ReadFloat(stream, endianness);
+                 result.Set_pixel(j, i, color);
+             }
+         }
+
+         return result;
+     } */
+
+    public static void write_pfm_file(HdrImage img, double endian, string filename)
+    {
+        using (Stream filestream = File.OpenWrite(filename))
+        {
+            var header = Encoding.ASCII.GetBytes($"PF\n{img.Width} {img.Height}\n{endian}\n");
+            filestream.Write(header, 0, header.Length);
+
+            for (int i = img.Height - 1; i >= 0; i--)
+            {
+                for (int j = 0; j <= img.Width; j++)
+                {
+                    var color = img.Get_pixel(j, i);
+                    WriteFloat(filestream, color.R);
+                    WriteFloat(filestream, color.G);
+                    WriteFloat(filestream, color.B);
+                }
+            }
+        }
+    }
+
+    // Oveloading write_pfm con stream
+    public static void write_pfm_file(HdrImage img, double endian, Stream filestream)
+    {
+        var header = Encoding.ASCII.GetBytes($"PF\n{img.Width} {img.Height}\n{endian}\n");
+        filestream.Write(header, 0, header.Length);
+
+        for (int i = img.Height - 1; i >= 0; i--)
+        {
+            for (int j = 0; j <= img.Width; j++)
+            {
+                var color = img.Get_pixel(j, i);
+                WriteFloat(filestream, color.R);
+                WriteFloat(filestream, color.G);
+                WriteFloat(filestream, color.B);
+            }
+        }
+    }
+
+    public void _Normalize(float factor, float? average_luminosity = null)
+    {
+        average_luminosity ??= AverageLuminosity();
+        foreach (Color color in Pixels)
+        {
+            color = color * (factor / average_luminosity);
+        }
+    }
+    
+    /*(Giacomo)
     public float _AverageLuminosity(float delta = 1e-10f)
     {
         float sum = 0;
@@ -202,14 +347,4 @@ public class HDRImage
         return (float)Math.Pow(10, sum / Pixels.Length);
     }
     */
-
-    public void _Normalize(float factor, float? average_luminosity = null)
-    {
-        average_luminosity ??= AverageLuminosity();
-        foreach(Color color in Pixels)
-        {
-            color = color * (factor/average_luminosity);
-        }
-    }
-
 }
