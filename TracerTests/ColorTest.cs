@@ -84,9 +84,17 @@ public class ColorTest
     }
 
     [Fact]
-    public void Test_Luminosity()
+    public void TestLuminosityShirleyMorley()
     {
-        var a = new Color(5.0f, 6.0f, 7.0f);
-        Assert.Equal(6.0f, a.Luminosity());
+        Color a = new Color(5.0f, 6.0f, 7.0f);
+        Assert.Equal(6.0f, a.LuminosityShirleyMorley()); //forse è meglio usare la funzione are close per i float?
+    }
+
+    [Fact]
+    public void TestLuminosityWeightedAverage()
+    {
+        Color a = new Color(41.0f, 65.7f, 23.83f);
+        //41.0*0.2126 + 65.7*0.7152 + 23.83*0.0722 = 8.7166 + 46.98864 + 1.720526 = 57.425766
+        Assert.True(Functions.AreClose(57.425766f, a.LuminosityWeightedAverage()));
     }
 }

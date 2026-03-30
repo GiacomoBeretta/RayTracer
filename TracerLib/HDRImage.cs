@@ -1,15 +1,20 @@
-using System.Diagnostics;
+///
+/// This file is release under ... license. See LICENSE.md
+///
 
+namespace TracerLib;
+using System.Diagnostics; //For the debug.assert
+using System.Text; //for the Encoding.ASCII.GetBytes
 /*
  * using Colors;
-   using System.Diagnostics;
-   using System.Text;
    using Exception;
  */
-namespace TracerLib;
 
-namespace Hdr;
-
+/// <summary>
+/// An HDRImage is essentially a matrix of colors with RGB floats (see the Color class)
+/// with a Width and a Height of type integer and a one dimensional (for efficient reason) vector called Pixels
+/// Attention: the matrix elements are indexed by giving first the colums and then the row!
+/// </summary>
 public class HDRImage
 {
     //provare a mettere delle verifiche sulle funzioni get e set
@@ -17,8 +22,14 @@ public class HDRImage
     //e set pixel verifichino che row e column siano positivi con
     //la funzione validCoordinates. E vedere se il programma non
     //rallenta troppo
-
-
+    
+    
+    
+    //non sapevo se tenere i membri privati con le funzioni get e set
+    //oppure usare le proprietà pubbliche che forse è più o meno la stessa cosa
+    //ma si scrivono meno righe di codice.
+    //Forse però con le proprietà come le ho scritte io non si possono mettere i controlli.
+    
     /*private int _width;
     private int _height;
     private Color[] _pixels;
@@ -63,9 +74,17 @@ public class HDRImage
 
      */
     
-    //Checker per la validità delle coordinate
+    /// <summary>
+    /// Checks for the validity of the coordinates
+    /// </summary>
+    /// <param name="column"></param>
+    /// <param name="row"></param>
+    /// <returns></returns>
     public bool _AreCoordinatesValid(int column, int row)
     {
+        Console.WriteLine("ok2");
+        Console.WriteLine("column: {0}, row: {1}", column, row);
+        Console.WriteLine("Width: {0}, Height: {1}", Width, Height);
         return column >= 0 && column < Width && row >= 0 && row < Height;
     }
 
@@ -78,19 +97,31 @@ public class HDRImage
 
     public Color[] this[Range range] => Pixels[range];
 
-    public int PixelOffset(int column, int row)
+    /// <summary>
+    /// gives the index integer for the one dimensional vector, given the column and row of the corresponding matrix
+    /// </summary>
+    /// <param name="column"></param>
+    /// <param name="row"></param>
+    /// <returns></returns>
+    public int _PixelOffset(int column, int row)
     {
         Debug.Assert(_AreCoordinatesValid(column, row));
+        Console.WriteLine("ok");
         return row * Width + column;
     }
-
-    //index for the pixels "matrix"
-    //Attention: the matrix elements are indexed by giving first the colums and then the row!
+    
+    
+    //così non si riesce a mettere l'assert
+    /// <summary>
+    /// gives the Color at the indexes (column, row) of the corresponding matrix
+    /// </summary>
+    /// <param name="column"></param>
+    /// <param name="row"></param>
     public Color this[int column, int row]
     {
         //Debug.Assert(_AreCoordinatesValid(column,row));
-        get => Pixels[PixelOffset(column, row)];
-        set => Pixels[PixelOffset(column, row)] = value;
+        get => Pixels[_PixelOffset(column, row)];
+        set => Pixels[_PixelOffset(column, row)] = value;
     }
 
     //Begin - Constructors 
@@ -104,13 +135,14 @@ public class HDRImage
     public HDRImage(int width, int height,
         in Color[] colorVector) //capire come mai senza aver messo public allo struct color dava errore
     {
-        Debug.Assert(colorVector.Length == width * height); //da mettere nel main?
+        Debug.Assert(colorVector.Length == width * height);
         Width = width;
         Height = height;
         Pixels = colorVector;
     }
-
-    /* da rifinire i controlli
+    
+    /*costruttore che prende una matrice con *due* indici
+     da rifinire i controlli
     public HDRImage(int width, int height,
         in Color[,] colorMatrixColumnsPerRows)
     {
@@ -146,6 +178,9 @@ public class HDRImage
 
     //End - Constructors
 
+    /// <summary>
+    /// prints the color matrix
+    /// </summary>
     public void Print()
     {
         Console.WriteLine("Height: {0}, Width: {1}", Height, Width);
@@ -163,16 +198,14 @@ public class HDRImage
             Console.Write($"{i}\t");
             for (int j = 0; j < Width; j++)
             {
-                Pixels[i * Width + j].Print();
+                Pixels[_PixelOffset(j,i)].Print();
                 Console.Write("\t");
             }
 
             Console.WriteLine("");
         }
     }
-
     
-
     /*//io preferisco che le funzioni vengano chiamate are... o is... ma è questione di gusto se
      //non sei d'accordo va bene anche _ValidCoord. Meglio togliere i trattini bassi tra le parole
      //se vogliamo seguire la convenzione. Almeno io ho capito così cercando su internet.
@@ -181,12 +214,20 @@ public class HDRImage
         return x >= 0 && x < Width && y >= 0 && y < Height;
     }*/
 
-    public static void _Parse_img_size(in string stringImgSize, out int width, out int height)
+    //cambiare il tipo di eccezione
+    /// <summary>
+    /// returns the values of width and height (as reference values) that were written in the string stringImgSize 
+    /// </summary>
+    /// <param name="stringImgSize"></param>
+    /// <param name="width"></param>
+    /// <param name="height"></param>
+    /// <exception cref="ArgumentException"></exception>
+    public static void _ParseImgSize(in string stringImgSize, out int width, out int height)
     {
         string[] stringSizeArray = stringImgSize.Split(" ");
         if (stringSizeArray.Length != 2)
         {
-            throw new ArgumentException(
+            throw new InvalidPfmFileFormat(
                 "there isn't the right number of sizes: there must be two sizes width and height.");
         }
 
@@ -195,29 +236,44 @@ public class HDRImage
             width = int.Parse(stringSizeArray[0]);
             height = int.Parse(stringSizeArray[1]);
         }
-        catch (ArgumentException)
+        catch (ArgumentException ex)
         {
-            throw new ArgumentException("The size is not made of two ints.");
+            throw new InvalidPfmFileFormat("The size is not made of two ints.", ex);
         }
 
         if (width < 0)
         {
-            throw new ArgumentException("width must be greater than zero.");
+            throw new InvalidPfmFileFormat("width must be greater than zero.");
         }
 
         if (height < 0)
         {
-            throw new ArgumentException("height must be greater than zero.");
+            throw new InvalidPfmFileFormat("height must be greater than zero.");
         }
     }
 
     //rivedere se restituire un float o un int
-    public static int _Parse_endianness(string stringEndianness)
+    /// <summary>
+    /// returns the endianness written in the string stringEndianness as 1.0 or -1.0
+    /// </summary>
+    /// <param name="stringEndianness"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentException"></exception>
+    public static int _ParseEndianness(string stringEndianness)
     {
-        int endian = (int)float.Parse(stringEndianness);
+        int endian;
+        try
+        {
+            endian = (int)float.Parse(stringEndianness);
+        }
+        catch (FormatException ex)
+        {
+            throw new InvalidPfmFileFormat(ex.Message);
+        }
+        
         if (endian != 1 && endian != -1)
         {
-            throw new ArgumentException("The endianness must be written as 1.0 or -1.0");
+            throw new InvalidPfmFileFormat("The endianness must be written as 1.0 or -1.0");
         }
 
         return endian;
@@ -284,7 +340,7 @@ public class HDRImage
          return result;
      } */
 
-    public static void write_pfm_file(HdrImage img, double endian, string filename)
+    public static void write_pfm_file(HDRImage img, double endian, string filename)
     {
         using (Stream filestream = File.OpenWrite(filename))
         {
@@ -295,7 +351,7 @@ public class HDRImage
             {
                 for (int j = 0; j <= img.Width; j++)
                 {
-                    var color = img.Get_pixel(j, i);
+                    var color = img[j, i];
                     WriteFloat(filestream, color.R);
                     WriteFloat(filestream, color.G);
                     WriteFloat(filestream, color.B);
@@ -305,7 +361,7 @@ public class HDRImage
     }
 
     // Oveloading write_pfm con stream
-    public static void write_pfm_file(HdrImage img, double endian, Stream filestream)
+    public static void write_pfm_file(HDRImage img, double endian, Stream filestream)
     {
         var header = Encoding.ASCII.GetBytes($"PF\n{img.Width} {img.Height}\n{endian}\n");
         filestream.Write(header, 0, header.Length);
@@ -314,7 +370,7 @@ public class HDRImage
         {
             for (int j = 0; j <= img.Width; j++)
             {
-                var color = img.Get_pixel(j, i);
+                var color = img[j,i];
                 WriteFloat(filestream, color.R);
                 WriteFloat(filestream, color.G);
                 WriteFloat(filestream, color.B);
@@ -322,14 +378,21 @@ public class HDRImage
         }
     }
 
-    public void _Normalize(float factor, float? average_luminosity = null)
+    /// <summary>
+    /// normalizes the RGB values of each pixel by the average luminosity computed by the AverageLuminosity function
+    /// and by another empirical number (here called factor)
+    /// </summary>
+    /// <param name="factor"></param>
+    /// <param name="averageLuminosity"></param>
+   /* public void _Normalize(float factor, float? averageLuminosity = null)
     {
-        average_luminosity ??= AverageLuminosity();
+        //if averageLuminosity is null compute it with the _AverageLuminosity function
+        averageLuminosity ??= _AverageLuminosity();
         foreach (Color color in Pixels)
         {
-            color = color * (factor / average_luminosity);
+            color = color * (factor / averageLuminosity);
         }
-    }
+    }*/
     
     /*(Giacomo)
     public float _AverageLuminosity(float delta = 1e-10f)
@@ -341,10 +404,10 @@ public class HDRImage
             //perceived value of luminosity follows a logarithmic scale
             //so we must use a logarithmic average
             //delta is needed to avoid singular values for the logarithm
-            sum += (float)Math.Log10(delta + color.Luminosity());
+            sum += MathF.Log10(delta + color.Luminosity());
         }
 
-        return (float)Math.Pow(10, sum / Pixels.Length);
+        return MathF.Pow(10, sum / Pixels.Length);
     }
     */
 }

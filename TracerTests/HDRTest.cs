@@ -23,12 +23,12 @@ public class HDRTest
         Assert.False(image1._AreCoordinatesValid(2, -1));
 
         var image2 = new HDRImage(100, 100);
-        Assert.True(image2._Valid_coord(53, 68));
-        Assert.False(image2._Valid_coord(200, 39));
+        Assert.True(image2._AreCoordinatesValid(53, 68));
+        Assert.False(image2._AreCoordinatesValid(200, 39));
     }
 
     [Fact]
-    public void TestIndex()
+    public void Test1DIndex()
     {
         int width = 10;
         int height = 4;
@@ -41,7 +41,7 @@ public class HDRTest
         {
             for (int j = 0; j < height; j++)
             {
-                offset = image.Offset(i, j);
+                offset = image._PixelOffset(i, j);
                 red = offset;
                 green = offset * 2;
                 blue = offset * 3;
@@ -54,17 +54,43 @@ public class HDRTest
     }
 
     [Fact]
-    public void TestOffset()
+    public void TestPixelOffset()
     {
-        HDRImage image = new HDRImage(5, 13);
+        HDRImage image1 = new HDRImage(5, 13);
 
-        Assert.Equal(0, image.Offset(0, 0));
-        Assert.Equal(2, image.Offset(2, 0));
-        Assert.Equal(10, image.Offset(0, 2));
-        Assert.Equal(29, image.Offset(9, 4));
+        Assert.Equal(0, image1._PixelOffset(0, 0));
+        Assert.Equal(2, image1._PixelOffset(2, 0));
+        Assert.Equal(10, image1._PixelOffset(0, 2));
+        Assert.Equal(29, image1._PixelOffset(4, 5));
 
-        var image2 = new HDImage(100, 100);
-        Assert.Equal(203, image2.pixel_offset(3, 2));
+        var image2 = new HDRImage(100, 100);
+        Assert.Equal(203, image2._PixelOffset(3, 2));
+    }
+
+    [Fact]
+    public void Test2DIndex()
+    {
+        int width = 15;
+        int height = 20;
+        HDRImage image = new HDRImage(width, height);
+
+        Color[] colors = new Color[width * height];
+        float red, green, blue;
+        int offset = 0;
+        for (int i = 0; i < width; i++)
+        {
+            for (int j = 0; j < height; j++)
+            {
+                offset = image._PixelOffset(i, j);
+                red = offset * 3;
+                green = offset;
+                blue = offset * 4;
+                colors[offset] = new Color(red, green, blue);
+            }
+        }
+
+        image.Pixels = colors;
+        Assert.Equal(new Color(246, 82, 328), image[7, 5]);
     }
 
     //da rivedere dopo aver visto meglio le lambda functions
@@ -75,71 +101,58 @@ public class HDRTest
         string imgSize;
 
         imgSize = "1 3 8";
-        Assert.Throws<ArgumentException>(() => HDRImage._parse_img_size(imgSize, out width, out height));
+        Assert.Throws<InvalidPfmFileFormat>(() => HDRImage._ParseImgSize(imgSize, out width, out height));
 
         imgSize = "a  b";
-        Assert.Throws<ArgumentException>(() => HDRImage._parse_img_size(imgSize, out width, out height));
+        Assert.Throws<InvalidPfmFileFormat>(() => HDRImage._ParseImgSize(imgSize, out width, out height));
 
         imgSize = "-1 23";
-        Assert.Throws<ArgumentException>(() => HDRImage._parse_img_size(imgSize, out width, out height));
+        Assert.Throws<InvalidPfmFileFormat>(() => HDRImage._ParseImgSize(imgSize, out width, out height));
 
         imgSize = "5 -8";
-        Assert.Throws<ArgumentException>(() => HDRImage._parse_img_size(imgSize, out width, out height));
+        Assert.Throws<InvalidPfmFileFormat>(() => HDRImage._ParseImgSize(imgSize, out width, out height));
 
         imgSize = "-5 -8";
-        Assert.Throws<ArgumentException>(() => HDRImage._parse_img_size(imgSize, out width, out height));
+        Assert.Throws<InvalidPfmFileFormat>(() => HDRImage._ParseImgSize(imgSize, out width, out height));
 
         imgSize = "41 78";
-        HDRImage._parse_img_size(imgSize, out width, out height);
+        HDRImage._ParseImgSize(imgSize, out width, out height);
         Assert.Equal(41, width);
         Assert.Equal(78, height);
     }
 
-/*
-    imgSize = "1 2 3";
-    try
-    {
-        HDRImage._parse_img_size(imgSize, out width, out height);
-    }
-    catch
-
-(ArgumentException)
-{
-}
-
-imgSize = "-1 2";
-try
-{
-    HDRImage._parse_img_size(imgSize, out width, out height);
-}
-catch (ArgumentException)
-{
-}
-*/
     [Fact]
     public void TestParseEndianness()
     {
         string endianness;
 
         endianness = "1 .0";
-        Assert.Throws<FormatException>(() => HDRImage.Parse_endianness(endianness));
+        Assert.Throws<InvalidPfmFileFormat>(() => HDRImage._ParseEndianness(endianness));
         endianness = "zws";
-        Assert.Throws<FormatException>(() => HDRImage.Parse_endianness(endianness));
+        Assert.Throws<InvalidPfmFileFormat>(() => HDRImage._ParseEndianness(endianness));
         endianness = "2.0";
-        Assert.Throws<ArgumentException>(() => HDRImage.Parse_endianness(endianness));
+        Assert.Throws<InvalidPfmFileFormat>(() => HDRImage._ParseEndianness(endianness));
         endianness = "0";
-        Assert.Throws<ArgumentException>(() => HDRImage.Parse_endianness(endianness));
+        Assert.Throws<InvalidPfmFileFormat>(() => HDRImage._ParseEndianness(endianness));
         endianness = "-2.0";
-        Assert.Throws<ArgumentException>(() => HDRImage.Parse_endianness(endianness));
+        Assert.Throws<InvalidPfmFileFormat>(() => HDRImage._ParseEndianness(endianness));
 
         endianness = "1.0";
-        Assert.Equal(1, HDRImage.Parse_endianness(endianness));
+        Assert.Equal(1, HDRImage._ParseEndianness(endianness));
         endianness = "-1.0";
-        Assert.Equal(-1, HDRImage.Parse_endianness(endianness));
+        Assert.Equal(-1, HDRImage._ParseEndianness(endianness));
     }
 
+    //test readfloat
 
-    /* [Fact]
+    //test write float
+
+    //test write_pfm_file
+
+    //test Oveloading write_pfm con stream
+
+    /* TestAverageLuminosityShirleyMorley
+     [Fact]
      public void TestAverageLuminosityShirleyMorley()
      {
          HDRImage image1 = new HDRImage(1, 2);
@@ -154,4 +167,17 @@ catch (ArgumentException)
          image2[2] = new Color(0, 0, 0); // Luminosity
          //Assert.Equal(10, image2.AverageLuminosity(delta:1e-3f));
      }*/
+
+/*    [Fact]
+    public void TestNormalize()
+    {
+        HDRImage image = new HDRImage(2, 1);
+        image[0]=new Color(5, 10, 15);
+        image[1] = new Color(500, 1000, 1500);
+
+        image._Normalize(1000);
+        Assert.True(Color._AreCloseColor(image[0], new Color(0.5e2f, 1.0e2f, 1.5e2f)));
+        Assert.True(Color._AreCloseColor(image[1], new Color(0.5e4f, 1.0e4f, 1.5e4f)));
+    }
+*/
 }
