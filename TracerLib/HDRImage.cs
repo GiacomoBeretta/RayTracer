@@ -380,34 +380,62 @@ public class HDRImage
 
     /// <summary>
     /// normalizes the RGB values of each pixel by the average luminosity computed by the AverageLuminosity function
-    /// and by another empirical number (here called factor)
+    /// and by another empirical number (here called factor).
+    /// The int luminosityFunction tells which of function of the color class to use to compute the luminosity of the pixel
     /// </summary>
     /// <param name="factor"></param>
     /// <param name="averageLuminosity"></param>
-   /* public void _Normalize(float factor, float? averageLuminosity = null)
+    /*public void _Normalize(float factor, int luminosityFunction, float? averageLuminosity = null, float delta = 1e-10f)
     {
         //if averageLuminosity is null compute it with the _AverageLuminosity function
-        averageLuminosity ??= _AverageLuminosity();
+        averageLuminosity ??= _AverageLuminosity(luminosityFunction, delta);
         foreach (Color color in Pixels)
         {
             color = color * (factor / averageLuminosity);
         }
     }*/
     
-    /*(Giacomo)
-    public float _AverageLuminosity(float delta = 1e-10f)
+    //(Giacomo)
+    /// <summary>
+    /// Computes the average luminosity of the entire image,
+    /// using a particular luminosity function of the Color class based on the value of the int luminosityFunction parameter
+    /// </summary>
+    /// <param name="luminosityFunction"></param>
+    /// <param name="delta"></param>
+    /// <returns></returns>
+    public float _AverageLuminosity(int luminosityFunction, float delta = 1e-10f)
     {
         float sum = 0;
-
-        foreach (Color color in Pixels)
+        //perceived value of luminosity follows a logarithmic scale
+        //so we must use a logarithmic average
+        //delta is needed to avoid singular values for the logarithm
+        if (luminosityFunction == 0)
         {
-            //perceived value of luminosity follows a logarithmic scale
-            //so we must use a logarithmic average
-            //delta is needed to avoid singular values for the logarithm
-            sum += MathF.Log10(delta + color.Luminosity());
-        }
+            foreach (Color color in Pixels)
+            {
+                sum += MathF.Log10(delta + color.LuminosityShirleyMorley());
+            }
 
-        return MathF.Pow(10, sum / Pixels.Length);
+            return MathF.Pow(10, sum / Pixels.Length);
+        }
+        else//(luminosityFunction == 1)
+        {
+            foreach (Color color in Pixels)
+            {
+                sum += MathF.Log10(delta + color.LuminosityWeightedAverage());
+            }
+
+            return MathF.Pow(10, sum / Pixels.Length);
+        }
     }
-    */
+
+    public void ToLDR(float gamma)
+        {
+            HDRImage image = new HDRImage(Width, Height);
+            foreach (Color color in Pixels)
+            {
+                color.To8BitRGB(gamma);
+            }
+        }
+    }
 }

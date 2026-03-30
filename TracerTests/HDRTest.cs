@@ -151,7 +151,9 @@ public class HDRTest
 
     //test Oveloading write_pfm con stream
 
-    /* TestAverageLuminosityShirleyMorley
+    
+    /*
+    //TestAverageLuminosityShirleyMorley
      [Fact]
      public void TestAverageLuminosityShirleyMorley()
      {
@@ -159,25 +161,46 @@ public class HDRTest
          image1[0] = new Color(5, 10, 15); //Luminosity = 10.0
          image1[1] = new Color(500, 1000, 1500); //Luminosity = 1000.0
 
-         Assert.Equal(100.0, image1.AverageLuminosity(delta:0.0f));
+         Assert.Equal(100.0, image1._AverageLuminosity(0,delta:0.0f));
 
          HDRImage image2 = new HDRImage(1, 3);
          image2[0] = new Color(1, 0, 2); //Luminosity = 1
          image2[1] = new Color(1550000, 1300000, 1700000); //Luminosity = 1000000
          image2[2] = new Color(0, 0, 0); // Luminosity
          //Assert.Equal(10, image2.AverageLuminosity(delta:1e-3f));
-     }*/
+     }
+     
+     [Fact]
+     public void TestAverageLuminosityWeighted()
+     {
+         HDRImage image = new HDRImage(1, 3);
+         image[0] = new Color(4.1f, 2.0f, 11); //Luminosity = 3.09626
+         image[1] = new Color(33.6f, 83, 27.2f); //Luminosity = 68.4688
+         image[2] = new Color(0.3f, 44.9f, 9.3f); // Luminosity = 32.84772
+         Assert.True(Functions.AreClose(19.0961195f, image._AverageLuminosity(1,0));
+     }
 
-/*    [Fact]
-    public void TestNormalize()
+    [Fact]
+    public void TestNormalizeShirleyMorley()
     {
         HDRImage image = new HDRImage(2, 1);
         image[0]=new Color(5, 10, 15);
         image[1] = new Color(500, 1000, 1500);
 
-        image._Normalize(1000);
+        image._Normalize(1000, 0);
         Assert.True(Color._AreCloseColor(image[0], new Color(0.5e2f, 1.0e2f, 1.5e2f)));
         Assert.True(Color._AreCloseColor(image[1], new Color(0.5e4f, 1.0e4f, 1.5e4f)));
     }
-*/
+
+    [Fact]
+    public void TestNormalizeWeighted()
+    {
+        HDRImage image = new HDRImage(2, 1);
+        image[0]=new Color(102.5f, 233.4f, 140.8f); // Luminosity = 32.84772
+        image[1] = new Color(1683.7f, 2380.2f, 3400.6f);// Luminosity = 32.84772
+        //averageLuminosityWeighted = 677.19147515
+        image._Normalize(1,1, delta:0);
+        Assert.True(Color._AreCloseColor(image[0], new Color(0.1513604f, 0.3446588f,0.2079176f )));
+        Assert.True(Color._AreCloseColor(image[1], new Color(2.4862983f, 3.5148109f, 5.0216226f )));
+    }*/
 }
