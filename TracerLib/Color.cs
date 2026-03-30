@@ -2,7 +2,7 @@
 /// This file is release under ... license. See LICENSE.md
 /// 
 
-//using System.Diagnostics;
+using System.Diagnostics;
 
 namespace TracerLib;
 //namespace Colors; //questo lo mettiamo?
@@ -96,7 +96,7 @@ public struct Color
     /// <param name="c2"></param>
     /// <param name="epsilon"></param>
     /// <returns></returns>
-    public static bool _AreCloseColor(in Color c1, in Color c2, float epsilon = 1e-3f)
+    public static bool _AreCloseColor(in Color c1, in Color c2, float epsilon = 1e-5f)
     {
         return Functions.AreClose(c1.R, c2.R, epsilon)
                && Functions.AreClose(c1.G, c2.G, epsilon)
@@ -132,10 +132,18 @@ public struct Color
         return w_R * R + w_G * G + w_B * B;
     }
 
-    public void To8BitRGB(float gamma)
+    /// <summary>
+    /// returns the corresponding sRGB triple corrected by the characteristc gamma factor of the display
+    /// </summary>
+    /// <param name="gamma"></param>
+    /// <returns></returns>
+    public Color To8BitRGB(float gamma)
     {
-        R = (float)Math.Round(255*MathF.Pow(R, 1.0f/gamma));
-        G = (float)Math.Round(255*MathF.Pow(G, 1.0f/gamma));
-        B = (float)Math.Round(255*MathF.Pow(B, 1.0f/gamma));
+        //Debug.Assert(float.IsPositive()); 
+        float r = (float)Math.Round(255*MathF.Pow(R, 1.0f/gamma));
+        float g = (float)Math.Round(255*MathF.Pow(G, 1.0f/gamma));
+        float b = (float)Math.Round(255*MathF.Pow(B, 1.0f/gamma));
+
+        return new Color(r,g,b);
     }
 }

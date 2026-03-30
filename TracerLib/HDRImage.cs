@@ -3,6 +3,7 @@
 ///
 
 namespace TracerLib;
+
 using System.Diagnostics; //For the debug.assert
 using System.Text; //for the Encoding.ASCII.GetBytes
 /*
@@ -22,14 +23,13 @@ public class HDRImage
     //e set pixel verifichino che row e column siano positivi con
     //la funzione validCoordinates. E vedere se il programma non
     //rallenta troppo
-    
-    
-    
+
+
     //non sapevo se tenere i membri privati con le funzioni get e set
     //oppure usare le proprietà pubbliche che forse è più o meno la stessa cosa
     //ma si scrivono meno righe di codice.
     //Forse però con le proprietà come le ho scritte io non si possono mettere i controlli.
-    
+
     /*private int _width;
     private int _height;
     private Color[] _pixels;
@@ -73,7 +73,7 @@ public class HDRImage
      }
 
      */
-    
+
     /// <summary>
     /// Checks for the validity of the coordinates
     /// </summary>
@@ -109,8 +109,8 @@ public class HDRImage
         Console.WriteLine("ok");
         return row * Width + column;
     }
-    
-    
+
+
     //così non si riesce a mettere l'assert
     /// <summary>
     /// gives the Color at the indexes (column, row) of the corresponding matrix
@@ -140,7 +140,7 @@ public class HDRImage
         Height = height;
         Pixels = colorVector;
     }
-    
+
     /*costruttore che prende una matrice con *due* indici
      da rifinire i controlli
     public HDRImage(int width, int height,
@@ -198,14 +198,14 @@ public class HDRImage
             Console.Write($"{i}\t");
             for (int j = 0; j < Width; j++)
             {
-                Pixels[_PixelOffset(j,i)].Print();
+                Pixels[_PixelOffset(j, i)].Print();
                 Console.Write("\t");
             }
 
             Console.WriteLine("");
         }
     }
-    
+
     /*//io preferisco che le funzioni vengano chiamate are... o is... ma è questione di gusto se
      //non sei d'accordo va bene anche _ValidCoord. Meglio togliere i trattini bassi tra le parole
      //se vogliamo seguire la convenzione. Almeno io ho capito così cercando su internet.
@@ -270,7 +270,7 @@ public class HDRImage
         {
             throw new InvalidPfmFileFormat(ex.Message);
         }
-        
+
         if (endian != 1 && endian != -1)
         {
             throw new InvalidPfmFileFormat("The endianness must be written as 1.0 or -1.0");
@@ -370,7 +370,7 @@ public class HDRImage
         {
             for (int j = 0; j <= img.Width; j++)
             {
-                var color = img[j,i];
+                var color = img[j, i];
                 WriteFloat(filestream, color.R);
                 WriteFloat(filestream, color.G);
                 WriteFloat(filestream, color.B);
@@ -394,7 +394,7 @@ public class HDRImage
             color = color * (factor / averageLuminosity);
         }
     }*/
-    
+
     //(Giacomo)
     /// <summary>
     /// Computes the average luminosity of the entire image,
@@ -418,7 +418,7 @@ public class HDRImage
 
             return MathF.Pow(10, sum / Pixels.Length);
         }
-        else//(luminosityFunction == 1)
+        else //(luminosityFunction == 1)
         {
             foreach (Color color in Pixels)
             {
@@ -429,13 +429,18 @@ public class HDRImage
         }
     }
 
-    public void ToLDR(float gamma)
+    /// <summary>
+    /// returns the corresponding LDR image
+    /// </summary>
+    /// <param name="gamma"></param>
+    public HDRImage ToLDR(float gamma)
+    {
+        HDRImage image = new HDRImage(Width, Height, Pixels); //forse è meglio usare un copy constructor?
+        for (int i = 0; i < Pixels.Length; i++)
         {
-            HDRImage image = new HDRImage(Width, Height);
-            foreach (Color color in Pixels)
-            {
-                color.To8BitRGB(gamma);
-            }
+            image[i] = Pixels[i].To8BitRGB(gamma);
         }
+
+        return image;
     }
 }

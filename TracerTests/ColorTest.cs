@@ -97,4 +97,12 @@ public class ColorTest
         //41.0*0.2126 + 65.7*0.7152 + 23.83*0.0722 = 8.7166 + 46.98864 + 1.720526 = 57.425766
         Assert.True(Functions.AreClose(57.425766f, a.LuminosityWeightedAverage()));
     }
+
+    [Fact]
+    public void TestTo8BitRGB()
+    {
+        float gamma = 2;
+        Color a =  new Color(0.3726f, 0.472f, 0.2204f);
+        Assert.Equal(new Color(156, 175,120), a.To8BitRGB(gamma));
+    }
 }
