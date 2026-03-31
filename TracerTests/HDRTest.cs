@@ -204,6 +204,8 @@ public class HDRTest
         Assert.True(Color._AreCloseColor(image[1], new Color(2.4862983f, 3.5148109f, 5.0216226f )));
     }*/
 
+    
+    
     [Fact]
     public void TestToLDR()
     {
