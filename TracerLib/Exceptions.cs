@@ -1,8 +1,11 @@
-namespace Exception;
+namespace TracerLib;
+//namespace Exception;
 
 public class InvalidPfmFileFormat : FormatException
 {
-    public InvalidPfmFileFormat(string error) : base (error) { }
+    public InvalidPfmFileFormat() : base() { }
+    public InvalidPfmFileFormat(string errorMessage) : base (errorMessage) { }
+    public InvalidPfmFileFormat(string message, Exception inner) : base(message, inner) { }
 }
 
 /* public class ZeroDivision : ArithmeticException
