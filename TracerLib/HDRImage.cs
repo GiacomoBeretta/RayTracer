@@ -1,5 +1,6 @@
 ﻿﻿using Colors;
  using System.Diagnostics;
+ using System.Diagnostics.CodeAnalysis;
  using System.Text;
  using Exception;
 
@@ -156,6 +157,27 @@ public class HdrImage
                      WriteFloat(filestream, color.B);
                  }
              }
+     }
+
+     public float average_luminosity(float delta = 1e-10f)
+     {
+         var sum = 0.0f;
+         foreach (var pixel in Pixels)
+         {
+             sum += MathF.Log10(delta + pixel.Luminosity());
+         }
+
+         return MathF.Pow(10, sum / Pixels.Length);
+     }
+
+     public void Clamp_Image()
+     {
+         for (int i = 0; i < Pixels.Length; i++)
+         {
+             Pixels[i].R = Color._Clamp(Pixels[i].R);
+             Pixels[i].G = Color._Clamp(Pixels[i].G);
+             Pixels[i].B = Color._Clamp(Pixels[i].B);
+         }
      }
      
 }

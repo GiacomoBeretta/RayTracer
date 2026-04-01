@@ -41,5 +41,10 @@ public struct Color
     {
         return (MathF.Max(MathF.Max(this.R, this.G), this.B) + MathF.Min(MathF.Min(this.R, this.G), this.B)) / 2;
     }
+
+    public static float _Clamp(float x)
+    {
+        return x / (x + 1);
+    }
     
 }
