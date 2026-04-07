@@ -1,8 +1,8 @@
 ///
 /// This file is release under ... license. See LICENSE.md
 /// 
+
 namespace TracerLib;
-//namespace Colors; //questo lo mettiamo?
 
 //rivedere dopo aver letto di try-except (per l'operatore *)
 //forse è meglio passare by value per efficienza certi argomenti, meglio chiedere a Tomasi
@@ -12,9 +12,9 @@ namespace TracerLib;
 /// A Color type is identified by 3 float positive values R,G,B.
 /// Some basic implemented operations: sum, product of a color by a scalar, product between 2 colors.
 /// </summary>
-/* public readonly struct Color
+public readonly struct Color
 {
-    //private readonly float _R, _G, _B;
+    private readonly float _R, _G, _B;
 
     public Color(float r, float g, float b)
     {
@@ -38,20 +38,20 @@ namespace TracerLib;
     {
         get { return _B; }
     }
-*/
-public struct Color
+
+/*public struct Color
 {
     public float R { get; set; }
     public float G { get; set; }
     public float B { get; set; }
-    
+
     public Color(float r, float g, float b)
     {
         R = r;
         G = g;
         B = b;
-    }
-    
+    }*/
+
     public static Color operator +(in Color c1, in Color c2)
     {
         return new Color(c1.R + c2.R, c1.G + c2.G, c1.B + c2.B);
@@ -105,9 +105,13 @@ public struct Color
             return MathF.Abs(a.R - b.R) < epsilon && MathF.Abs(a.G - b.G) < epsilon && MathF.Abs(a.B - b.B) < epsilon;
         }*/
 
-    public void Print()
+    /// <summary>
+    /// return a formatted string with the RGB colors.
+    /// </summary>
+    /// <returns></returns>
+    public override string ToString()
     {
-        Console.Write($"({R}, {G}, {B})");
+        return $"({R}, {G}, {B})";
     }
 
     // public bool _AreColorsValid(float R, float G, float B)
@@ -115,7 +119,7 @@ public struct Color
     //     return R >= 0 && G >= 0 && B >= 0;
     // }
 
-    public float LuminosityShirleyMorley() //RIVEDERE THIS
+    public float LuminosityShirleyMorley()
     {
         return (MathF.Max(MathF.Max(R, G), B) + MathF.Min(MathF.Min(R, G), B)) / 2.0f;
     }
@@ -129,6 +133,11 @@ public struct Color
         return w_R * R + w_G * G + w_B * B;
     }
 
+    public static float _Clamp(float x)
+    {
+        return x / (x + 1);
+    }
+
     /// <summary>
     /// returns the corresponding sRGB triple corrected by the characteristc gamma factor of the display
     /// </summary>
@@ -137,15 +146,10 @@ public struct Color
     public Color To8BitRGB(float gamma)
     {
         //Debug.Assert(float.IsPositive()); 
-        float r = (float)Math.Round(255*MathF.Pow(R, 1.0f/gamma));
-        float g = (float)Math.Round(255*MathF.Pow(G, 1.0f/gamma));
-        float b = (float)Math.Round(255*MathF.Pow(B, 1.0f/gamma));
+        float r = (float)Math.Round(255 * MathF.Pow(R, 1.0f / gamma));
+        float g = (float)Math.Round(255 * MathF.Pow(G, 1.0f / gamma));
+        float b = (float)Math.Round(255 * MathF.Pow(B, 1.0f / gamma));
 
-        return new Color(r,g,b);
+        return new Color(r, g, b);
     }
-    public static float _Clamp(float x)
-    {
-        return x / (x + 1);
-    }
-    
 }
