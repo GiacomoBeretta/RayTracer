@@ -84,6 +84,14 @@ public class ColorTest
     }
 
     [Fact]
+    public void TestToString()
+    {
+        Color a = new Color(2,9,5);
+        Console.WriteLine(a.ToString());
+        Assert.Equal("(2,9,5)", a.ToString());
+    }
+
+    [Fact]
     public void TestLuminosityShirleyMorley()
     {
         Color a = new Color(5.0f, 6.0f, 7.0f);
@@ -98,6 +106,8 @@ public class ColorTest
         Assert.True(Functions.AreClose(57.425766f, a.LuminosityWeightedAverage()));
     }
 
+    //test clamp
+    
     [Fact]
     public void TestTo8BitRGB()
     {
