@@ -3,58 +3,91 @@
 /// 
 
 using TracerLib;
-
-// sul libro c'è scritto
-// You can handle multiple exception types with multiple catch clauses (again, this
-// example could be written with explicit argument checking rather than exception
-// handling)
-// esempio:
-// try
-// {
-//  int y = Calc (0);
-//  Console.WriteLine (y);
-// }
-// catch (DivideByZeroException ex)
-// {
-//  Console.WriteLine ("x cannot be zero");
-// }
-// Console.WriteLine ("program completed");
-// int Calc (int x) => 10 / x;
-// This is a simple example to illustrate exception handling. We
-// could deal with this particular scenario better in practice by
-// checking explicitly for the divisor being zero before calling
-// Calc.
-// Checking for preventable errors is preferable to relying on
-// try/catch blocks because exceptions are relatively expensive
-// to handle, taking hundreds of clock cycles or more.
-
-//allora non ho capito quando usare le eccezioni
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats; //for the Rgb24 Pixel Format
 
 public static class RayTracer
 {
+    public static string InputFileName = "";
+    public static string OutputFileName = "";
+    public static float AFactor = 1.0f;
+    public static float Gamma = 1.0f;
+    
     public static int Main(string[] args)
+    {
+        /*
+         * Tomasi qui ha scritto così
+           try:
+               parameters.parse_command_line(argv)
+           except RuntimeError as err:
+               print("Error: ", err)
+               return
+            ma non ho capito perché mettere un try except. Tanto se non funziona verrà lanciata l'eccezione comunque
+            e il programma andrà in crash lo stesso, no?
+         */
+        ParseArgs(args);
+        
+        /* suggerimento della lezione 4 in python
+         * with open(parameters.input_pfm_file_name, "rb") as inpf:
+               img = hdrimages.read_pfm_image(inpf)
+
+           print(f'File "{parameters.input_pfm_file_name}" has been read from disk.')
+
+           img.normalize_image(factor=parameters.factor)
+           img.clamp_image()
+
+           # Same as above: use try…except to produce a human-readable message
+           # if something goes wrong
+           with open(parameters.output_png_file_name, "wb") as outf:
+               img.write_ldr_image(stream=outf, format="PNG", gamma=parameters.gamma)
+
+           print(f'File "{parameters.output_png_file_name}" has been written to disk.')
+         */
+         
+        //suggerimento della lezione 4 in c#
+         // Create a sRGB bitmap
+           var bitmap = new Image<Rgb24>(Configuration.Default, width, height);
+
+           // The bitmap can be used as a matrix. To draw the pixels in the bitmap
+           // just use the syntax "bitmap[x, y]" like the following:
+           bitmap[SOMEX, SOMEY] = new Rgb24(255, 255, 128); // Three "Byte" values!
+
+           // Save the bitmap as a PNG file
+           using (Stream fileStream = File.OpenWrite("output.png")) {
+               bitmap.Save(fileStream, new PngEncoder());
+           }
+         */
+        return 0;
+    }
+    
+    public static void ParseArgs(string[] args)
     {
         if (args.Length != 4)
         {
-            Console.WriteLine("Usage: main input_file.pfm a_factor gamma output_file.png");
-            return 1;
+            throw new ArgumentOutOfRangeException(nameof(args),
+                "Usage: main inputFileName.pfm aFactor gamma outputFileName.png");
         }
-        Console.WriteLine($"{args[0]}, {args[1]},{args[2]},{args[3]}, {args[4]}");
-        try
+        
+        InputFileName = args[0];
+        
+        if(!Single.TryParse(args[1], out AFactor))
         {
-            string inputFileName = args[1];
-            float factor = float.Parse(args[2]);
-            float gamma = float.Parse(args[3]);
-            string outputFileName = args[4];
+            throw new ArgumentException($"Invalid aFactor ('{args[1]}'). It must be a floating number.", nameof(AFactor));
         }
-        catch (ArgumentException ex)
+
+        if (!Single.TryParse(args[2], out Gamma))
         {
-            throw new ArgumentException("Usage: main input_file.pfm a_factor gamma output_file.png\n" +
-                                        "the a_factor and gamma must be floating numbers.", ex);
+            throw new ArgumentException($"Invalid gamma ('{args[2]}'). It must be a floating number.", nameof(Gamma));
+
         }
-        return 0;
+
+        OutputFileName = args[3];
+        
+        Console.WriteLine($"I parametri passati sono: InputFileName={args[0]}, aFactor={args[1]}, gamma={args[2]}, OutputFileName={args[3]}");
     }
 }
+
+
 /*///////////////////////inizio prova Giacomo
 Color[,] colorMatrix = new Color[2, 3];
 
@@ -89,7 +122,7 @@ image[1, 1].Print();
 Color color1 = new Color(387, 129, 530);
 image[0] = color1;
 image.Print();
-//////////////////////////////fine prova Giacomo*/ 
+//////////////////////////////fine prova Giacomo*/
 
 
 /*
@@ -106,8 +139,6 @@ catch (ArgumentException err1)
 }
 */
 //Console.WriteLine($"Prova: {w}x{h}");
-
-
 
 
 ///////////////////////////////////////////////////////////////
@@ -140,6 +171,3 @@ class Program
              Console.WriteLine(er.Message);
          }
          */
-
-
-
