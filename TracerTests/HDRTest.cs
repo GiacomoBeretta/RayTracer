@@ -1,13 +1,7 @@
-using Xunit;
 using TracerLib;
 
-/*
-  *using Colors;
-   using Hdr;
- */
 namespace TracerTests;
 
-// namespace Hdr.Test;
 public class HDRTest
 {
     [Fact]
@@ -36,7 +30,7 @@ public class HDRTest
 
         Color[] colors = new Color[width * height];
         float red, green, blue;
-        int offset = 0;
+        int offset;
         for (int i = 0; i < width; i++)
         {
             for (int j = 0; j < height; j++)
@@ -53,6 +47,7 @@ public class HDRTest
         Assert.Equal(new Color(4, 8, 12), image[4]);
     }
 
+    //aggiungere test per l'exception
     [Fact]
     public void TestPixelOffset()
     {
@@ -138,9 +133,9 @@ public class HDRTest
         Assert.Throws<InvalidPfmFileFormat>(() => HDRImage._ParseEndianness(endianness));
 
         endianness = "1.0";
-        Assert.Equal(1, HDRImage._ParseEndianness(endianness));
+        Assert.True(HDRImage._ParseEndianness(endianness));
         endianness = "-1.0";
-        Assert.Equal(-1, HDRImage._ParseEndianness(endianness));
+        Assert.False(HDRImage._ParseEndianness(endianness));
     }
 
     //test readfloat
@@ -203,36 +198,34 @@ public class HDRTest
         Assert.True(Color._AreCloseColor(image[0], new Color(0.1513604f, 0.3446588f,0.2079176f )));
         Assert.True(Color._AreCloseColor(image[1], new Color(2.4862983f, 3.5148109f, 5.0216226f )));
     }*/
-
-    
     
     [Fact]
     public void TestToLDR()
     {
         float gamma = 3.6f;
 
-        HDRImage imageHDR = new HDRImage(3, 1);
-        imageHDR[0] = new Color(0.883f, 0.2102f, 0.3775f);
-        imageHDR[1] = new Color(0.2381f, 0.9324f, 0.4467f);
-        imageHDR[2] = new Color(0.1941f, 0.5728f, 0.9483f);
+        HDRImage imageHDR = new HDRImage(3, 1)
+        {
+            [0] = new Color(0.883f, 0.2102f, 0.3775f),
+            [1] = new Color(0.2381f, 0.9324f, 0.4467f),
+            [2] = new Color(0.1941f, 0.5728f, 0.9483f)
+        };
         HDRImage imageLDR = imageHDR.ToLDR(gamma);
-        imageHDR[0].Print();
-        imageHDR[1].Print();
-        imageHDR[2].Print();
         Assert.Equal(new Color(246, 165, 195), imageHDR[0]);
         Assert.Equal(new Color(171, 250, 204), imageHDR[1]);
         Assert.Equal(new Color(162, 218, 251), imageHDR[2]);
     }
 
-    [Fact]
+   [Fact]
     public void TestClampImage()
     {
-        var img = new HdrImage(2, 1);
-        
-        img.Set_pixel(0, 0, new Color(0.5f, 1.0f, 1.5f));
-        img.Set_pixel(1, 0, new Color(50.0f, 100.0f, 150.0f));
-        
-        img.Clamp_Image();
+        var img = new HDRImage(2, 1)
+        {
+            [0, 0] = new Color(0.5f, 1.0f, 1.5f),
+            [1, 0] = new Color(50.0f, 100.0f, 150.0f)
+        };
+
+        img.ClampImage();
 
         foreach (var pixel in img.Pixels)
         {
