@@ -1,5 +1,5 @@
 # What is RayTracer
-RayTracer is a program for creating photorealistic images
+RayTracer is a simple program for creating photorealistic images
 
 # Examples of usage
 
