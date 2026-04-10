@@ -2,6 +2,8 @@
 /// This file is release under ... license. See LICENSE.md
 /// 
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace TracerLib;
 
 //rivedere dopo aver letto di try-except (per l'operatore *)
@@ -12,46 +14,31 @@ namespace TracerLib;
 /// A Color type is identified by 3 float positive values R,G,B.
 /// Some basic implemented operations: sum, product of a color by a scalar, product between 2 colors.
 /// </summary>
-public readonly struct Color
-{
-    private readonly float _R, _G, _B;
-
-    public Color(float r, float g, float b)
-    {
-        _R = r;
-        _G = g;
-        _B = b;
-    }
-
-//non so se mettere anche i set, nel caso bisogna cambiare la classe che per ora è del tipo readonly
-    public float R
-    {
-        get { return _R; }
-    }
-
-    public float G
-    {
-        get { return _G; }
-    }
-
-    public float B
-    {
-        get { return _B; }
-    }
-
-/*public struct Color
+public struct Color
 {
     public float R { get; set; }
     public float G { get; set; }
     public float B { get; set; }
-
+    
     public Color(float r, float g, float b)
     {
+        if (r < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(r), r, nameof(r) + " must be non-negative");
+        }
+        if (g < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(g), g, nameof(g) + " must be non-negative");
+        }
+        if (b < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(b), b, nameof(b) + " must be non-negative");
+        }
         R = r;
         G = g;
         B = b;
-    }*/
-
+    }
+    
     public static Color operator +(in Color c1, in Color c2)
     {
         return new Color(c1.R + c2.R, c1.G + c2.G, c1.B + c2.B);
@@ -67,7 +54,7 @@ public readonly struct Color
         return a * b;
     }
 
-    //prodotto di Hadamard
+    // Hadamard's Product
     public static Color operator *(in Color c1, in Color c2)
     {
         return new Color(c1.R * c2.R, c1.G * c2.G, c1.B * c2.B);
@@ -79,6 +66,7 @@ public readonly struct Color
     /// <param name="c1"></param>
     /// <param name="c2"></param>
     /// <returns></returns>
+    [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
     public static bool _AreSameColor(in Color c1, in Color c2)
     {
         return c1.R == c2.R
@@ -100,10 +88,10 @@ public readonly struct Color
                && Functions.AreClose(c1.B, c2.B, epsilon);
     }
 
-    /*   public static bool _are_close(Color a, Color b, float epsilon = 1e-5f)
-        {
-            return MathF.Abs(a.R - b.R) < epsilon && MathF.Abs(a.G - b.G) < epsilon && MathF.Abs(a.B - b.B) < epsilon;
-        }*/
+/*   public static bool _are_close(Color a, Color b, float epsilon = 1e-5f)
+    {
+        return MathF.Abs(a.R - b.R) < epsilon && MathF.Abs(a.G - b.G) < epsilon && MathF.Abs(a.B - b.B) < epsilon;
+    }*/
 
     /// <summary>
     /// return a formatted string with the RGB colors.
@@ -114,38 +102,63 @@ public readonly struct Color
         return $"({R}, {G}, {B})";
     }
 
-    // public bool _AreColorsValid(float R, float G, float B)
-    // {
-    //     return R >= 0 && G >= 0 && B >= 0;
-    // }
+// public bool _AreColorsValid(float R, float G, float B)
+// {
+//     return R >= 0 && G >= 0 && B >= 0;
+// }
 
+    /// <summary>
+    /// returns the luminosity of a pixel using the formula given by Shirley and Morley in their book
+    /// </summary>
+    /// <returns></returns>
     public float LuminosityShirleyMorley()
     {
         return (MathF.Max(MathF.Max(R, G), B) + MathF.Min(MathF.Min(R, G), B)) / 2.0f;
     }
-
+    
+    /// <summary>
+    /// returns the luminosity of a pixel using the ITU-R BT.709 standard
+    /// see https://en.wikipedia.org/wiki/Rec._709
+    /// </summary>
+    /// <returns></returns>
     public float LuminosityWeightedAverage() //VERIFICARE I PESI
     {
-        float w_R = 0.2126f;
-        float w_G = 0.7152f;
-        float w_B = 0.0722f; //the weights sum to 1
+        const float wR = 0.2126f;
+        const float wG = 0.7152f;
+        const float wB = 0.0722f; //the weights sum to 1
         //return (w_R*R + w_G*G + w_B*B)/(w_R+w_G+w_B);
-        return w_R * R + w_G * G + w_B * B;
+        return wR * R + wG * G + wB * B;
     }
 
-    public static float _Clamp(float x)
+    /// <summary>
+    /// limits the value of x under 1
+    /// </summary>
+    /// <param name="x"></param>
+    /// <returns></returns>
+    private static float _Clamp(float x)
     {
         return x / (x + 1);
     }
 
     /// <summary>
-    /// returns the corresponding sRGB triple corrected by the characteristc gamma factor of the display
+    /// limits the values of RGB under 1
+    /// and resize a potential too bright pixel
+    /// </summary>
+    public void _Clamp()
+    {
+        R = Color._Clamp(R);
+        G = Color._Clamp(G);
+        B = Color._Clamp(B);
+    }
+
+    /// <summary>
+    /// returns the corresponding sRGB triple corrected by the characteristic gamma factor of the display
     /// </summary>
     /// <param name="gamma"></param>
     /// <returns></returns>
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     public Color To8BitRGB(float gamma)
     {
-        //Debug.Assert(float.IsPositive()); 
         float r = (float)Math.Round(255 * MathF.Pow(R, 1.0f / gamma));
         float g = (float)Math.Round(255 * MathF.Pow(G, 1.0f / gamma));
         float b = (float)Math.Round(255 * MathF.Pow(B, 1.0f / gamma));

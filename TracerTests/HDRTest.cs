@@ -1,14 +1,16 @@
+using System.Diagnostics.CodeAnalysis;
 using TracerLib;
 
 namespace TracerTests;
 
+[SuppressMessage("ReSharper", "InconsistentNaming")]
 public class HDRTest
 {
     [Fact]
     public void TestAreCoordinatesValid()
     {
         HDRImage image1 = new HDRImage(4, 10);
-        Assert.True(image1._AreCoordinatesValid(0, 0));
+       Assert.True(image1._AreCoordinatesValid(0, 0));
         Assert.True(image1._AreCoordinatesValid(3, 2));
         Assert.True(image1._AreCoordinatesValid(3, 9));
         Assert.False(image1._AreCoordinatesValid(4, 1));
@@ -20,7 +22,26 @@ public class HDRTest
         Assert.True(image2._AreCoordinatesValid(53, 68));
         Assert.False(image2._AreCoordinatesValid(200, 39));
     }
-
+    
+    [Fact]
+    public void TestCheckCoordinates()
+    {
+        HDRImage image1 = new HDRImage(6, 11);
+        Assert.Throws<ArgumentOutOfRangeException>(() => image1._CheckCoordinates(-1, 0));
+        Assert.Throws<ArgumentOutOfRangeException>(() => image1._CheckCoordinates(0, -1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => image1._CheckCoordinates(6, 2));
+        Assert.Throws<ArgumentOutOfRangeException>(() => image1._CheckCoordinates(4, 11));
+    }
+    
+    [Fact]
+    public void TestCheckWidthHeight()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() => HDRImage._CheckWidthHeight(-5, 2));
+        Assert.Throws<ArgumentOutOfRangeException>(() => HDRImage._CheckWidthHeight(0, 2));
+        Assert.Throws<ArgumentOutOfRangeException>(() => HDRImage._CheckWidthHeight(1, -7));
+        Assert.Throws<ArgumentOutOfRangeException>(() => HDRImage._CheckWidthHeight(6, 0));
+    }
+    
     [Fact]
     public void Test1DIndex()
     {
@@ -45,13 +66,24 @@ public class HDRTest
 
         image.Pixels = colors;
         Assert.Equal(new Color(4, 8, 12), image[4]);
-    }
+        Assert.Equal(new Color(39, 78, 117), image[^1]);
 
-    //aggiungere test per l'exception
+        Color[] colorArray = new Color[3];
+        colorArray[0] = new Color(7, 14, 21);
+        colorArray[1] = new Color(8, 16, 24);
+        colorArray[2] = new Color(9, 18, 27);
+        Assert.Equal(colorArray, image[7..10]);
+    }
+    
     [Fact]
     public void TestPixelOffset()
     {
         HDRImage image1 = new HDRImage(5, 13);
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => image1._PixelOffset(-1, 0));
+        Assert.Throws<ArgumentOutOfRangeException>(() => image1._PixelOffset(0, -1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => image1._PixelOffset(1, 13));
+        Assert.Throws<ArgumentOutOfRangeException>(() => image1._PixelOffset(5, 2));
 
         Assert.Equal(0, image1._PixelOffset(0, 0));
         Assert.Equal(2, image1._PixelOffset(2, 0));
@@ -87,8 +119,33 @@ public class HDRTest
         image.Pixels = colors;
         Assert.Equal(new Color(246, 82, 328), image[7, 5]);
     }
+    
+    [Fact]
+    public void TestConstructorWithColorArray()
+    {
+        Color[] colors = null;
+        Assert.Throws<ArgumentNullException>(() => new HDRImage(10, 10, colors));
 
-    //da rivedere dopo aver visto meglio le lambda functions
+        colors = new Color[99];
+        Assert.Throws<ArgumentException>(() => new HDRImage(10, 10, colors));
+    }
+
+    //test constructor from stream and from filename
+    
+    [Fact]
+    public void TestToString()
+    {
+        HDRImage image = new HDRImage(2, 1);
+        image.Pixels[0] = new Color(3, 7, 10);
+        image.Pixels[1] = new Color(4, 21, 15);
+        string str = "Height: 1, Width: 2\n" +
+                     "Pixel's matrix:\n" +
+                     "\tColumns ->\n" +
+                     "Rows\t0\t1\n" +
+                     "0\t(3, 7, 10)\t(4, 21, 15)\n";
+        Assert.Equal(str, image.ToString());
+    }
+    
     [Fact]
     public void TestParseImgSize()
     {
@@ -115,7 +172,7 @@ public class HDRTest
         Assert.Equal(41, width);
         Assert.Equal(78, height);
     }
-
+    
     [Fact]
     public void TestParseEndianness()
     {
@@ -138,85 +195,68 @@ public class HDRTest
         Assert.False(HDRImage._ParseEndianness(endianness));
     }
 
-    //test readfloat
+    //test read float
 
     //test write float
+    
+    //test read pfm file (2)
 
-    //test write_pfm_file
+    //test write_pfm_file (2)
+    
+    [Fact]
+    public void TestAverageLuminosityShirleyMorley()
+    {
+        HDRImage image1 = new HDRImage(1, 2);
+        image1[0] = new Color(5, 10, 15); //Luminosity = 10.0
+        image1[1] = new Color(500, 1000, 1500); //Luminosity = 1000.0
 
-    //test Oveloading write_pfm con stream
+        Assert.Equal(100.0, image1._AverageLuminosity(0, delta: 0.0f));
 
-
-    /*
-    //TestAverageLuminosityShirleyMorley
-     [Fact]
-     public void TestAverageLuminosityShirleyMorley()
-     {
-         HDRImage image1 = new HDRImage(1, 2);
-         image1[0] = new Color(5, 10, 15); //Luminosity = 10.0
-         image1[1] = new Color(500, 1000, 1500); //Luminosity = 1000.0
-
-         Assert.Equal(100.0, image1._AverageLuminosity(0,delta:0.0f));
-
-         HDRImage image2 = new HDRImage(1, 3);
-         image2[0] = new Color(1, 0, 2); //Luminosity = 1
-         image2[1] = new Color(1550000, 1300000, 1700000); //Luminosity = 1000000
-         image2[2] = new Color(0, 0, 0); // Luminosity
-         //Assert.Equal(10, image2.AverageLuminosity(delta:1e-3f));
-     }
-
-     [Fact]
-     public void TestAverageLuminosityWeighted()
-     {
-         HDRImage image = new HDRImage(1, 3);
-         image[0] = new Color(4.1f, 2.0f, 11); //Luminosity = 3.09626
-         image[1] = new Color(33.6f, 83, 27.2f); //Luminosity = 68.4688
-         image[2] = new Color(0.3f, 44.9f, 9.3f); // Luminosity = 32.84772
-         Assert.True(Functions.AreClose(19.0961195f, image._AverageLuminosity(1,0));
-     }
-
+        HDRImage image2 = new HDRImage(1, 3);
+        image2[0] = new Color(1, 0, 2); //Luminosity = 1
+        image2[1] = new Color(300000, 1550000, 1700000); //Luminosity = 1000000
+        image2[2] = new Color(0, 0, 0); // Luminosity = 0
+        Assert.True(Functions.AreClose(10.00333f, image2._AverageLuminosity(0, delta:1e-3f), 1e-5f));
+    }
+    
+    [Fact]
+    public void TestAverageLuminosityWeighted()
+    {
+        HDRImage image = new HDRImage(1, 3);
+        image[0] = new Color(4.1f, 2.0f, 11); //Luminosity = 3.09626
+        image[1] = new Color(33.6f, 83, 27.2f); //Luminosity = 68.4688
+        image[2] = new Color(0.3f, 44.9f, 9.3f); // Luminosity = 32.84772
+        Assert.True(Functions.AreClose(19.0961195f, image._AverageLuminosity(1, 0), 1e-5f));
+    }
+    
     [Fact]
     public void TestNormalizeShirleyMorley()
     {
         HDRImage image = new HDRImage(2, 1);
-        image[0]=new Color(5, 10, 15);
-        image[1] = new Color(500, 1000, 1500);
-
+        image[0] = new Color(5, 10, 15); // luminosity = 10
+        image[1] = new Color(500, 1000, 1500); // luminosity = 1000
+        // log10(average luminosity) ~= ( log10(10) + log10(1000) ) / 2 = 2
+        // average luminosity = 10^2 = 100
+        // factor/averageluminosity = 1000/100=10
         image._Normalize(1000, 0);
-        Assert.True(Color._AreCloseColor(image[0], new Color(0.5e2f, 1.0e2f, 1.5e2f)));
-        Assert.True(Color._AreCloseColor(image[1], new Color(0.5e4f, 1.0e4f, 1.5e4f)));
+        Assert.True(Color._AreCloseColor(image[0], new Color(50, 100, 150)));
+        Assert.True(Color._AreCloseColor(image[1], new Color(5000, 10000, 15000)));
     }
-
+    
     [Fact]
     public void TestNormalizeWeighted()
     {
         HDRImage image = new HDRImage(2, 1);
-        image[0]=new Color(102.5f, 233.4f, 140.8f); // Luminosity = 32.84772
-        image[1] = new Color(1683.7f, 2380.2f, 3400.6f);// Luminosity = 32.84772
+        image[0] = new Color(102.5f, 233.4f, 140.8f); // Luminosity = 32.84772
+        image[1] = new Color(1683.7f, 2380.2f, 3400.6f); // Luminosity = 32.84772
         //averageLuminosityWeighted = 677.19147515
-        image._Normalize(1,1, delta:0);
-        Assert.True(Color._AreCloseColor(image[0], new Color(0.1513604f, 0.3446588f,0.2079176f )));
-        Assert.True(Color._AreCloseColor(image[1], new Color(2.4862983f, 3.5148109f, 5.0216226f )));
-    }*/
-    
-    [Fact]
-    public void TestToLDR()
-    {
-        float gamma = 3.6f;
-
-        HDRImage imageHDR = new HDRImage(3, 1)
-        {
-            [0] = new Color(0.883f, 0.2102f, 0.3775f),
-            [1] = new Color(0.2381f, 0.9324f, 0.4467f),
-            [2] = new Color(0.1941f, 0.5728f, 0.9483f)
-        };
-        HDRImage imageLDR = imageHDR.ToLDR(gamma);
-        Assert.Equal(new Color(246, 165, 195), imageHDR[0]);
-        Assert.Equal(new Color(171, 250, 204), imageHDR[1]);
-        Assert.Equal(new Color(162, 218, 251), imageHDR[2]);
+        image._Normalize(1, 1, delta: 0);
+        Assert.True(Color._AreCloseColor(image[0], new Color(0.1513604f, 0.3446588f, 0.2079176f)));
+        Assert.True(Color._AreCloseColor(image[1], new Color(2.4862983f, 3.5148109f, 5.0216226f)));
     }
-
-   [Fact]
+    
+    // ??
+    [Fact]
     public void TestClampImage()
     {
         var img = new HDRImage(2, 1)
@@ -225,7 +265,7 @@ public class HDRTest
             [1, 0] = new Color(50.0f, 100.0f, 150.0f)
         };
 
-        img.ClampImage();
+        img._ClampImage();
 
         foreach (var pixel in img.Pixels)
         {
@@ -235,4 +275,26 @@ public class HDRTest
         }
     }
     
+    [Fact]
+    public void TestTo8BitRGB()
+    {
+        float gamma = 3.6f;
+
+        HDRImage image = new HDRImage(3, 1)
+        {
+            [0] = new Color(0.883f, 0.2102f, 0.3775f),
+            [1] = new Color(0.2381f, 0.9324f, 0.4467f),
+            [2] = new Color(0.1941f, 0.5728f, 0.9483f)
+        };
+        image._ImageTo8BitRGB(gamma);
+        Assert.Equal(new Color(246, 165, 195), image[0]);
+        Assert.Equal(new Color(171, 250, 204), image[1]);
+        Assert.Equal(new Color(162, 218, 251), image[2]);
+    }
+
+    [Fact]
+    public void TestCreateLDR()
+    {
+        
+    }
 }
