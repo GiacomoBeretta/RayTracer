@@ -30,8 +30,15 @@ public class HDRImage
     //rallenta troppo
 
     //Variables HDR image
-    private int Width { get; set; }
-    private int Height { get; set; }
+    public int Width {
+        get; 
+        private set; }
+
+    public int Height
+    {
+        get;
+        private set;
+    }
     public Color[] Pixels { get; set; } //Controllare nullable (Color[])?
 
     //con i controlli invece viene
