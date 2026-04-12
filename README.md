@@ -16,5 +16,6 @@ This Program was tested only in Ubuntu 24.04 LTS, so it's not guaranteed it will
 Giacomo Beretta, Simone Selmi
 
 # License
+See the file LICENSE.md
 
 # State of the project
