@@ -27,6 +27,8 @@ public class HDRTest
     public void TestCheckCoordinates()
     {
         HDRImage image1 = new HDRImage(6, 11);
+        image1._CheckCoordinates(0, 0);
+        image1._CheckCoordinates(5, 10);
         Assert.Throws<ArgumentOutOfRangeException>(() => image1._CheckCoordinates(-1, 0));
         Assert.Throws<ArgumentOutOfRangeException>(() => image1._CheckCoordinates(0, -1));
         Assert.Throws<ArgumentOutOfRangeException>(() => image1._CheckCoordinates(6, 2));
@@ -36,10 +38,21 @@ public class HDRTest
     [Fact]
     public void TestCheckWidthHeight()
     {
+        HDRImage._CheckWidthHeight(1,1);
+        HDRImage._CheckWidthHeight(190,201);
         Assert.Throws<ArgumentOutOfRangeException>(() => HDRImage._CheckWidthHeight(-5, 2));
         Assert.Throws<ArgumentOutOfRangeException>(() => HDRImage._CheckWidthHeight(0, 2));
         Assert.Throws<ArgumentOutOfRangeException>(() => HDRImage._CheckWidthHeight(1, -7));
         Assert.Throws<ArgumentOutOfRangeException>(() => HDRImage._CheckWidthHeight(6, 0));
+    }
+
+    [Fact]
+    public void TestCheckPixels()
+    {
+        HDRImage._CheckPixels(1,1, new Color[1]);
+        HDRImage._CheckPixels(5,2, new Color[10]);
+        Assert.Throws<ArgumentNullException>(() => HDRImage._CheckPixels(1, 2, null));
+        Assert.Throws<ArgumentException>(() => HDRImage._CheckPixels(10, 91, new Color[911]));
     }
 
     [Fact]
@@ -154,16 +167,16 @@ public class HDRTest
         colors[1] = new Color(5, 3, 9);
         HDRImage image = new HDRImage(2, 1, colors);
         HDRImage copy = image.Clone();
-        
+
         Assert.Equal(image.Width, copy.Width);
         Assert.Equal(image.Height, copy.Height);
         Assert.Equal(image.Pixels, copy.Pixels);
-        
+
         Assert.NotEqual(image, copy);
         image[0] = colors[1];
         Assert.NotEqual(image.Pixels, copy.Pixels);
     }
-    
+
     [Fact]
     public void TestParseImgSize()
     {
@@ -256,7 +269,7 @@ public class HDRTest
         // log10(average luminosity) ~= ( log10(10) + log10(1000) ) / 2 = 2
         // average luminosity = 10^2 = 100
         // factor/averageluminosity = 1000/100=10
-        image._Normalize(1000, 0);
+        image._Normalize(0, 1000);
         Assert.True(Color._AreCloseColor(image[0], new Color(50, 100, 150)));
         Assert.True(Color._AreCloseColor(image[1], new Color(5000, 10000, 15000)));
     }
@@ -324,11 +337,11 @@ public class HDRTest
         float delta = 0;
         HDRImage hdrImage = new HDRImage(3, 1, colorVector);
 
-        HDRImage ldrImage = hdrImage.CreateLDR(factor, luminosityFunction, gamma, delta);
-        hdrImage._Normalize(factor, luminosityFunction, delta);
+        HDRImage ldrImage = hdrImage.CreateLDR(luminosityFunction, factor, gamma, delta);
+        hdrImage._Normalize(luminosityFunction, factor, delta);
         hdrImage._ClampImage();
         hdrImage._ImageTo8BitRGB(gamma);
-        
+
         Assert.Equal(hdrImage.Width, ldrImage.Width);
         Assert.Equal(hdrImage.Height, ldrImage.Height);
         Assert.Equal(hdrImage.Pixels, ldrImage.Pixels);
@@ -337,8 +350,5 @@ public class HDRTest
     [Fact]
     public void TestWritePNG()
     {
-        
     }
-    
-    
 }

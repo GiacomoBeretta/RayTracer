@@ -14,22 +14,26 @@ public static class RayTracer
 
     public static int Main(string[] args)
     {
-        /*
-            non ho capito perché mettere un try except. Tanto se non funziona verrà lanciata l'eccezione comunque
-            e il programma andrà in crash lo stesso, no?
-         */
-        try
+/*        try
         {
             ParseArgs(args);
         }
         catch (ArgumentException e)
         {
-            Console.WriteLine(e.Message);
+            Console.WriteLine("Error: " + e.Message);
             return 1;
-        }
+        }*/
 
-        Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory);
+        string currentPath = AppDomain.CurrentDomain.BaseDirectory;
+        string pfmFilePath = Path.Combine(currentPath, "../../../../TracerTests/reference_be.pfm");
+        string pngFilePathShirley = Path.Combine(currentPath, "../../../../TracerTests/referenceShirley.png");
+        string pngFilePathWeighted = Path.Combine(currentPath, "../../../../TracerTests/referenceWeighted.png");
+        HDRImage hdrImage = HDRImage.ReadPFM_File(pfmFilePath);
+        hdrImage.Print();
+        hdrImage.WritePNG(pngFilePathShirley, 0, AFactor, Gamma);
+        hdrImage.WritePNG(pngFilePathWeighted, 1, AFactor, Gamma);
         
+
         /* suggerimento della lezione 4 in python
          * with open(parameters.input_pfm_file_name, "rb") as inpf:
            img = hdrimages.read_pfm_image(inpf)
@@ -55,7 +59,7 @@ public static class RayTracer
         if (args.Length != 4)
         {
             throw new ArgumentOutOfRangeException(nameof(args),
-                "Usage: main inputFileName.pfm aFactor gamma outputFileName.png");
+                "Usage: dotnet run inputFileName.pfm aFactor gamma outputFileName.png");
         }
 
         InputFileName = args[0];

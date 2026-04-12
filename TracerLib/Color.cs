@@ -39,23 +39,23 @@ public struct Color
         B = b;
     }
     
-    public static Color operator +(in Color c1, in Color c2)
+    public static Color operator +(Color c1, Color c2)
     {
         return new Color(c1.R + c2.R, c1.G + c2.G, c1.B + c2.B);
     }
 
-    public static Color operator *(in Color a, float alpha)
+    public static Color operator *(Color a, float alpha)
     {
         return new Color(a.R * alpha, a.G * alpha, a.B * alpha);
     }
 
-    public static Color operator *(float b, in Color a)
+    public static Color operator *(float b, Color a)
     {
         return a * b;
     }
 
     // Hadamard's Product
-    public static Color operator *(in Color c1, in Color c2)
+    public static Color operator *(Color c1, Color c2)
     {
         return new Color(c1.R * c2.R, c1.G * c2.G, c1.B * c2.B);
     }
@@ -67,7 +67,7 @@ public struct Color
     /// <param name="c2"></param>
     /// <returns></returns>
     [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
-    public static bool _AreSameColor(in Color c1, in Color c2)
+    public static bool _AreSameColor(Color c1, Color c2)
     {
         return c1.R == c2.R
                && c1.G == c2.G
@@ -81,7 +81,7 @@ public struct Color
     /// <param name="c2"></param>
     /// <param name="epsilon"></param>
     /// <returns></returns>
-    public static bool _AreCloseColor(in Color c1, in Color c2, float epsilon = 1e-5f)
+    public static bool _AreCloseColor(Color c1, Color c2, float epsilon = 1e-5f)
     {
         return Functions.AreClose(c1.R, c2.R, epsilon)
                && Functions.AreClose(c1.G, c2.G, epsilon)

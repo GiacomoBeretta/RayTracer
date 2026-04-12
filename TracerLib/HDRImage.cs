@@ -6,7 +6,8 @@
 //forse si possono mettere i i membri privati e rendere la classe dei test una friend?
 
 using System.Diagnostics.CodeAnalysis; // per sopprimere i messaggi di errore
-using System.Globalization; //per il metodo cultureInfo e quindi per risolvere il problema dell'1.0 che viene letto come 10
+using
+    System.Globalization; //per il metodo cultureInfo e quindi per risolvere il problema dell'1.0 che viene letto come 10
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats; //for the Rgb24 Pixel Format
 
@@ -30,15 +31,9 @@ public class HDRImage
     //rallenta troppo
 
     //Variables HDR image
-    public int Width {
-        get; 
-        private set; }
+    public int Width { get; private set; }
 
-    public int Height
-    {
-        get;
-        private set;
-    }
+    public int Height { get; private set; }
     public Color[] Pixels { get; set; } //Controllare nullable (Color[])?
 
     //con i controlli invece viene
@@ -109,6 +104,16 @@ public class HDRImage
         }
     }
 
+    public static void _CheckPixels(int width, int height, Color[] colorVector)
+    {
+        ArgumentNullException.ThrowIfNull(colorVector);
+        if (colorVector.Length != width * height)
+        {
+            throw new ArgumentException("the Length of the colorVector and the width and height passed don't match",
+                nameof(colorVector));
+        }
+    }
+
     //vedere se anche per questo indice si possono mettere dei controlli
     //index and range for the pixels 1D vector with the type indexer
     public Color this[Index index]
@@ -154,18 +159,11 @@ public class HDRImage
         Pixels = new Color[Width * Height];
     }
 
-
-    //Così colorVector è modificabile da fuori, (forse serve un copy constructor?)
     public HDRImage(int width, int height,
-        in Color[] colorVector) //capire come mai senza aver messo public allo struct color dava errore
+        in Color[] colorVector)
     {
         _CheckWidthHeight(width, height);
-        ArgumentNullException.ThrowIfNull(colorVector); // da provare;
-        if (colorVector.Length != width * height)
-        {
-            throw new ArgumentException("the Length of the colorVector and the width and height passed don't match",
-                nameof(colorVector));
-        }
+        _CheckPixels(width, height, colorVector);
 
         Width = width;
         Height = height;
@@ -235,6 +233,11 @@ public class HDRImage
         }
 
         return str;
+    }
+
+    public void Print()
+    {
+        Console.WriteLine(this.ToString());
     }
 
     /// <summary>
@@ -356,7 +359,7 @@ public class HDRImage
         int width;
         int height;
         StreamReader sr = new StreamReader(stream);
-        var magic = sr.ReadLine(); //perché magic?
+        var magic = sr.ReadLine();
         if (magic != "PF")
         {
             throw new InvalidPfmFileFormat("Invalid magic in PFM file");
@@ -459,11 +462,11 @@ public class HDRImage
     /// and by another empirical number (here called factor).
     /// The int luminosityFunction tells which of function of the color class to use to compute the luminosity of the pixel
     /// </summary>
-    /// <param name="factor"></param>
     /// <param name="luminosityFunction"></param>
+    /// <param name="factor"></param>
     /// <param name="averageLuminosity"></param>
     /// <param name="delta"></param>
-    public void _Normalize(float factor, int luminosityFunction, float? averageLuminosity = null, float delta = 1e-10f)
+    public void _Normalize(int luminosityFunction, float factor, float? averageLuminosity = null, float delta = 1e-10f)
     {
         //if averageLuminosity is null compute it with the _AverageLuminosity function
         averageLuminosity ??= _AverageLuminosity(luminosityFunction, delta);
@@ -505,17 +508,17 @@ public class HDRImage
     /// It accounts for the gamma correction of the display and of the empirical factor here named "factor"
     /// The luminosityFunction parameter allow to choose between some possible ways to compute the luminosity of a pixel 
     /// </summary>
-    /// <param name="factor"></param>
     /// <param name="luminosityFunction"></param>
+    /// <param name="factor"></param>
     /// <param name="gamma"></param>
     /// <param name="averageLuminosity"></param>
     /// <param name="delta"></param>
     /// <returns></returns>
-    public HDRImage CreateLDR(float factor, int luminosityFunction, float gamma, float? averageLuminosity = null,
+    public HDRImage CreateLDR(int luminosityFunction, float factor, float gamma, float? averageLuminosity = null,
         float delta = 1e-10f)
     {
         HDRImage image = this.Clone();
-        image._Normalize(factor, luminosityFunction, averageLuminosity, delta);
+        image._Normalize(luminosityFunction, factor, averageLuminosity, delta);
         image._ClampImage();
         image._ImageTo8BitRGB(gamma);
         return image;
@@ -526,16 +529,16 @@ public class HDRImage
     /// Writes on the outputStream the corresponding LDR image
     /// </summary>
     /// <param name="outputStream"></param>
-    /// <param name="factor"></param>
     /// <param name="luminosityFunction"></param>
+    /// <param name="factor"></param>
     /// <param name="gamma"></param>
     /// <param name="averageLuminosity"></param>
     /// <param name="delta"></param>
-    public void WritePNG(Stream outputStream, float factor, int luminosityFunction, float gamma,
+    public void WritePNG(Stream outputStream, int luminosityFunction, float factor, float gamma,
         float? averageLuminosity = null,
         float delta = 1e-10f)
     {
-        HDRImage LDRimage = this.CreateLDR(factor, luminosityFunction, gamma, averageLuminosity, delta);
+        HDRImage LDRimage = this.CreateLDR(luminosityFunction, factor, gamma, averageLuminosity, delta);
 
         Image<Rgb24> bitmap = new Image<Rgb24>(Configuration.Default, Width, Height);
 
@@ -556,18 +559,18 @@ public class HDRImage
     /// Creates a PNG file of the corresponding LDR image
     /// </summary>
     /// <param name="filename"></param>
-    /// <param name="factor"></param>
     /// <param name="luminosityFunction"></param>
+    /// <param name="factor"></param>
     /// <param name="gamma"></param>
     /// <param name="averageLuminosity"></param>
     /// <param name="delta"></param>
-    public void WritePNG(string filename, float factor, int luminosityFunction, float gamma,
+    public void WritePNG(string filename, int luminosityFunction, float factor, float gamma,
         float? averageLuminosity = null,
         float delta = 1e-10f)
     {
         using (Stream fileStream = File.OpenWrite(filename))
         {
-            this.WritePNG(fileStream, factor, luminosityFunction, gamma, averageLuminosity, delta);
+            this.WritePNG(fileStream, luminosityFunction, factor, gamma, averageLuminosity, delta);
         }
     }
 }
