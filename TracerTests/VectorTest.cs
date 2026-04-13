@@ -8,8 +8,7 @@ public class VectorTest
     public void TestToString()
     {
         Vector v = new Vector(3, 5, 2);
-        string str = "(3, 5, 2)";
-        Assert.Equal(str, v.ToString());
+        Assert.Equal("(3, 5, 2)", v.ToString());
     }
 
     [Fact]
@@ -62,11 +61,11 @@ public class VectorTest
     [Fact]
     public void TestScalarProduct()
     {
-        Vector v1 = new Vector(8,5,38);
-        Vector v2 = new Vector(-1,2,10);
+        Vector v1 = new Vector(8, 5, 38);
+        Vector v2 = new Vector(-1, 2, 10);
         Assert.Equal(382, v1 * v2);
-        
-        Vector v3 = new Vector(1.5f,-4.35f,5.9f);
+
+        Vector v3 = new Vector(1.5f, -4.35f, 5.9f);
         Assert.True(Functions.AreClose(214.45f, v1 * v3));
     }
 
@@ -75,7 +74,7 @@ public class VectorTest
     {
         Vector v1 = new Vector(1, 2, 3);
         Vector v2 = new Vector(-3, 6, -21);
-        
+
         Assert.Equal(new Vector(-60, 12, 12), Vector.CrossProduct(v1, v2));
     }
 
@@ -90,7 +89,7 @@ public class VectorTest
     public void TestNorm()
     {
         Vector v1 = new Vector(4.4f, 519.34f, 19.6f);
-        Assert.True(Functions.AreClose( 519.72834789f, v1.Norm(), 1e-3f));
+        Assert.True(Functions.AreClose(519.72834789f, v1.Norm(), 1e-3f));
     }
 
     [Fact]
@@ -98,6 +97,6 @@ public class VectorTest
     {
         Vector v = new Vector(82.5f, 7.1f, 91.43f);
         v.Normalize();
-        Assert.True(Vector._AreVectorsClose(new Vector(0.668809f,0.05755812f,0.741202f), v));
+        Assert.True(Vector._AreVectorsClose(new Vector(0.668809f, 0.05755812f, 0.741202f), v));
     }
 }

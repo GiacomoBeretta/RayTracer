@@ -1,6 +1,6 @@
 namespace TracerTests;
 
-public class TrasformationTest
+public class TransformationTest
 {
     
 }
