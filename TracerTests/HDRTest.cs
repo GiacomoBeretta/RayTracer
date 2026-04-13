@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using TracerLib;
 
-namespace TracerTests;
+//namespace TracerTests;
 
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 public class HDRTest
@@ -270,8 +270,8 @@ public class HDRTest
         // average luminosity = 10^2 = 100
         // factor/averageluminosity = 1000/100=10
         image._Normalize(0, 1000);
-        Assert.True(Color._AreCloseColor(image[0], new Color(50, 100, 150)));
-        Assert.True(Color._AreCloseColor(image[1], new Color(5000, 10000, 15000)));
+        Assert.True(Color._AreColorsClose(image[0], new Color(50, 100, 150)));
+        Assert.True(Color._AreColorsClose(image[1], new Color(5000, 10000, 15000)));
     }
 
     [Fact]
@@ -282,8 +282,8 @@ public class HDRTest
         image[1] = new Color(1683.7f, 2380.2f, 3400.6f); // Luminosity = 32.84772
         //averageLuminosityWeighted = 677.19147515
         image._Normalize(1, 1, delta: 0);
-        Assert.True(Color._AreCloseColor(image[0], new Color(0.1513604f, 0.3446588f, 0.2079176f)));
-        Assert.True(Color._AreCloseColor(image[1], new Color(2.4862983f, 3.5148109f, 5.0216226f)));
+        Assert.True(Color._AreColorsClose(image[0], new Color(0.1513604f, 0.3446588f, 0.2079176f)));
+        Assert.True(Color._AreColorsClose(image[1], new Color(2.4862983f, 3.5148109f, 5.0216226f)));
     }
 
     // ??

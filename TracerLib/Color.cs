@@ -19,26 +19,29 @@ public struct Color
     public float R { get; set; }
     public float G { get; set; }
     public float B { get; set; }
-    
+
     public Color(float r, float g, float b)
     {
         if (r < 0)
         {
             throw new ArgumentOutOfRangeException(nameof(r), r, nameof(r) + " must be non-negative");
         }
+
         if (g < 0)
         {
             throw new ArgumentOutOfRangeException(nameof(g), g, nameof(g) + " must be non-negative");
         }
+
         if (b < 0)
         {
             throw new ArgumentOutOfRangeException(nameof(b), b, nameof(b) + " must be non-negative");
         }
+
         R = r;
         G = g;
         B = b;
     }
-    
+
     public static Color operator +(Color c1, Color c2)
     {
         return new Color(c1.R + c2.R, c1.G + c2.G, c1.B + c2.B);
@@ -49,9 +52,9 @@ public struct Color
         return new Color(a.R * alpha, a.G * alpha, a.B * alpha);
     }
 
-    public static Color operator *(float b, Color a)
+    public static Color operator *(float alpha, Color a)
     {
-        return a * b;
+        return a * alpha;
     }
 
     // Hadamard's Product
@@ -81,7 +84,7 @@ public struct Color
     /// <param name="c2"></param>
     /// <param name="epsilon"></param>
     /// <returns></returns>
-    public static bool _AreCloseColor(Color c1, Color c2, float epsilon = 1e-5f)
+    public static bool _AreColorsClose(Color c1, Color c2, float epsilon = 1e-5f)
     {
         return Functions.AreClose(c1.R, c2.R, epsilon)
                && Functions.AreClose(c1.G, c2.G, epsilon)
@@ -102,6 +105,11 @@ public struct Color
         return $"({R}, {G}, {B})";
     }
 
+    public void Print()
+    {
+        Console.WriteLine(ToString());
+    }
+
 // public bool _AreColorsValid(float R, float G, float B)
 // {
 //     return R >= 0 && G >= 0 && B >= 0;
@@ -115,7 +123,7 @@ public struct Color
     {
         return (MathF.Max(MathF.Max(R, G), B) + MathF.Min(MathF.Min(R, G), B)) / 2.0f;
     }
-    
+
     /// <summary>
     /// returns the luminosity of a pixel using the ITU-R BT.709 standard
     /// see https://en.wikipedia.org/wiki/Rec._709

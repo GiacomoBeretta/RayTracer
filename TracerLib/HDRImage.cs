@@ -477,6 +477,7 @@ public class HDRImage
         }
     }
 
+
     /// <summary>
     /// resizes the RGB values of each pixel under 1,
     /// it also scales possible bright spots.
