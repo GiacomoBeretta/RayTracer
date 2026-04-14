@@ -109,7 +109,7 @@ public class HDRImage
         ArgumentNullException.ThrowIfNull(colorVector);
         if (colorVector.Length != width * height)
         {
-            throw new ArgumentException("the Length of the colorVector and the width and height passed don't match",
+            throw new ArgumentException("the Length of the colorVector and the width and height passed do not match",
                 nameof(colorVector));
         }
     }
