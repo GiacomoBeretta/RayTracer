@@ -1,3 +1,4 @@
+using System.Runtime.Serialization.Json;
 using TracerLib;
 using Xunit.Abstractions;
 
@@ -50,6 +51,12 @@ public class TransformationTest
         Assert.Equal(m, t.M);
         Assert.Equal(invM, t.InvM);
     }
+
+    /*[Fact]
+    public void TestConstructorTranslation()
+    {
+        
+    }*/
 
     [Fact]
     public void Test1DIndex()
@@ -181,29 +188,64 @@ public class TransformationTest
     {
         float[] m =
         [
-            1,2,3,4,
-            5,6,7,8,
-            9,10,11,12,
-            13,14,15,16
+            1, 2, 3, 4,
+            5, 6, 7, 8,
+            9, 10, 11, 12,
+            13, 14, 15, 16
         ];
 
         float[] invM =
         [
-            0,0,0,0,
-            0,0,0,0,
-            0,0,0,0,
-            0,0,0,0
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0
         ];
 
-        Assert.Throws<ArgumentException>(()=>new Transformation(m, invM));
+        Assert.Throws<ArgumentException>(() => new Transformation(m, invM));
     }
 
     [Fact]
     public void TestAreTransformationsClose()
     {
-        
+        float[] m =
+        [
+            1.0f, 2.0f, 3.0f, 4.0f,
+            5.0f, 6.0f, 7.0f, 8.0f,
+            9.0f, 9.0f, 8.0f, 7.0f,
+            6.0f, 5.0f, 4.0f, 1.0f,
+        ];
+        float[] invm =
+        [
+            -3.75f, 2.75f, -1, 0,
+            4.375f, -3.875f, 2.0f, -0.5f,
+            0.5f, 0.5f, -1.0f, 1.0f,
+            -1.375f, 0.875f, 0.0f, -0.5f,
+        ];
+
+        Transformation t1 = new Transformation(m, invm);
+        Transformation t2 = new Transformation(m, invm);
+
+        float[] mat =
+        [
+            3, -23.25f, 9, 4,
+            4, 6, 2, 7,
+            -2, -10, -2, 12,
+            1.4f, 17, 0, 3.589f
+        ];
+
+        float[] invMat =
+        [
+            -0.112625f, 0.410949f, -0.0958651f, -0.355464f,
+            0.00648398f, -0.0342974f, -0.00511954f, 0.0767848f,
+            0.159527f, -0.226542f, -0.00866817f, 0.293034f,
+            0.0132203f, 0.00215331f, 0.0616448f, 0.0535824f
+        ];
+        Transformation t3 = new Transformation(mat, invMat);
+
+        Assert.False(Transformation.AreTransformationsClose(t1, t3));
     }
-    
+
     [Fact]
     public void TestToString()
     {
@@ -230,4 +272,115 @@ public class TransformationTest
                      + "(1.40,\t17.00,\t0.00,\t3.59))\n";
         Assert.Equal(str, t.ToString());
     }
+
+    [Fact]
+    public void TestInverse()
+    {
+        float[] m1 =
+        [
+            1.0f, 2.0f, 3.0f, 4.0f,
+            5.0f, 6.0f, 7.0f, 8.0f,
+            9.0f, 9.0f, 8.0f, 7.0f,
+            6.0f, 5.0f, 4.0f, 1.0f,
+        ];
+        float[] invM1 =
+        [
+            -3.75f, 2.75f, -1, 0,
+            4.375f, -3.875f, 2.0f, -0.5f,
+            0.5f, 0.5f, -1.0f, 1.0f,
+            -1.375f, 0.875f, 0.0f, -0.5f,
+        ];
+        Transformation t1 = new Transformation(m1, invM1);
+
+        float[] m2 =
+        [
+            -3.75f, 2.75f, -1, 0,
+            4.375f, -3.875f, 2.0f, -0.5f,
+            0.5f, 0.5f, -1.0f, 1.0f,
+            -1.375f, 0.875f, 0.0f, -0.5f,
+        ];
+
+        float[] invM2 =
+        [
+            1.0f, 2.0f, 3.0f, 4.0f,
+            5.0f, 6.0f, 7.0f, 8.0f,
+            9.0f, 9.0f, 8.0f, 7.0f,
+            6.0f, 5.0f, 4.0f, 1.0f,
+        ];
+        Transformation t2 = new Transformation(m2, invM2);
+
+        Assert.True(Transformation.AreTransformationsClose(t1, t2.Inverse()));
+    }
+
+    [Fact]
+    public void TestProductTransformations()
+    {
+        float[] m1 =
+        [
+            1.0f, 2.0f, 3.0f, 4.0f,
+            5.0f, 6.0f, 7.0f, 8.0f,
+            9.0f, 9.0f, 8.0f, 7.0f,
+            6.0f, 5.0f, 4.0f, 1.0f
+        ];
+        float[] invm1 =
+        [
+            -3.75f, 2.75f, -1, 0,
+            4.375f, -3.875f, 2.0f, -0.5f,
+            0.5f, 0.5f, -1.0f, 1.0f,
+            -1.375f, 0.875f, 0.0f, -0.5f
+        ];
+        Transformation t1 = new Transformation(m1, invm1);
+
+        float[] m2 =
+        [
+            3.0f, 5.0f, 2.0f, 4.0f,
+            4.0f, 1.0f, 0.0f, 5.0f,
+            6.0f, 3.0f, 2.0f, 0.0f,
+            1.0f, 4.0f, 2.0f, 1.0f
+        ];
+        float[] invm2 =
+        [
+            0.4f, -0.2f, 0.2f, -0.6f,
+            2.9f, -1.7f, 0.2f, -3.1f,
+            -5.55f, 3.15f, -0.4f, 6.45f,
+            -0.9f, 0.7f, -0.2f, 1.1f
+        ];
+        Transformation t2 = new Transformation(m2, invm2);
+
+        float[] product =
+        [
+            33.0f, 32.0f, 16.0f, 18.0f,
+            89.0f, 84.0f, 40.0f, 58.0f,
+            118.0f, 106.0f, 48.0f, 88.0f,
+            63.0f, 51.0f, 22.0f, 50.0f
+        ];
+        float[] invProduct =
+        [
+            -1.45f, 1.45f, -1.0f, 0.6f,
+            -13.95f, 11.95f, -6.5f, 2.6f,
+            25.525f, -22.025f, 12.25f, -5.2f,
+            4.825f, -4.325f, 2.5f, -1.1f
+        ];
+        Transformation t3 = new Transformation(product, invProduct);
+
+        Assert.True(Transformation.AreTransformationsClose(t3,t1*t2));
+    }
+
+    /*[Fact]
+    public void TestProductVector()
+    {
+        
+    }
+
+    [Fact]
+    public void TestProductPoint()
+    {
+        
+    }
+
+    [Fact]
+    public void TestProductNormal()
+    {
+        
+    }*/
 }
