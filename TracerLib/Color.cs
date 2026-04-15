@@ -97,7 +97,7 @@ public struct Color
     }*/
 
     /// <summary>
-    /// return a formatted string with the RGB colors.
+    /// Return a formatted string with the RGB colors.
     /// </summary>
     /// <returns></returns>
     public override string ToString()
@@ -116,7 +116,7 @@ public struct Color
 // }
 
     /// <summary>
-    /// returns the luminosity of a pixel using the formula given by Shirley and Morley in their book
+    /// Returns the luminosity of a pixel using the formula given by Shirley and Morley in their book
     /// </summary>
     /// <returns></returns>
     public float LuminosityShirleyMorley()
@@ -125,7 +125,7 @@ public struct Color
     }
 
     /// <summary>
-    /// returns the luminosity of a pixel using the ITU-R BT.709 standard
+    /// Returns the luminosity of a pixel using the ITU-R BT.709 standard
     /// see https://en.wikipedia.org/wiki/Rec._709
     /// </summary>
     /// <returns></returns>
@@ -139,7 +139,7 @@ public struct Color
     }
 
     /// <summary>
-    /// limits the value of x under 1
+    /// Clamps the value of x under 1
     /// </summary>
     /// <param name="x"></param>
     /// <returns></returns>
@@ -149,7 +149,7 @@ public struct Color
     }
 
     /// <summary>
-    /// limits the values of RGB under 1
+    /// Clamps the values of RGB under 1
     /// and resize a potential too bright pixel
     /// </summary>
     public void _Clamp()
@@ -160,7 +160,7 @@ public struct Color
     }
 
     /// <summary>
-    /// returns the corresponding sRGB triple corrected by the characteristic gamma factor of the display
+    /// Returns the corresponding sRGB triple corrected by the characteristic gamma factor of the display
     /// </summary>
     /// <param name="gamma"></param>
     /// <returns></returns>

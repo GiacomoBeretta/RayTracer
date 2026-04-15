@@ -13,7 +13,6 @@ using SixLabors.ImageSharp.PixelFormats; //for the Rgb24 Pixel Format
 
 namespace TracerLib;
 
-//using System.Diagnostics; //For the debug.assert
 using System.Text; //for the Encoding.ASCII.GetBytes
 
 /// <summary>
@@ -34,6 +33,7 @@ public class HDRImage
     public int Width { get; private set; }
 
     public int Height { get; private set; }
+    
     public Color[] Pixels { get; set; } //Controllare nullable (Color[])?
 
     //con i controlli invece viene
@@ -62,7 +62,7 @@ public class HDRImage
     }
 
     /// <summary>
-    /// checks whether the column or the row are negative
+    /// Checks whether the column or the row are negative
     /// or greater than or equal to the Width and Height values
     /// and throws an exception in either case
     /// </summary>
@@ -85,7 +85,7 @@ public class HDRImage
     }
 
     /// <summary>
-    /// checks whether the width or height are negative and throws an exception in either case
+    /// Checks whether the width or height are negative and throws an exception in either case
     /// </summary>
     /// <param name="width"></param>
     /// <param name="height"></param>
@@ -126,7 +126,7 @@ public class HDRImage
 
     //forse è troppo mettere l'eccezione per offset?
     /// <summary>
-    /// gives the index integer for the one dimensional vector,
+    /// Gives the index integer for the one dimensional vector,
     /// given the column and row of the corresponding matrix
     /// </summary>
     /// <param name="column"></param>
@@ -140,7 +140,7 @@ public class HDRImage
 
     //vedere come mettere un controllo con l'eccezione
     /// <summary>
-    /// gives the Color at the indexes (column, row) of the corresponding matrix
+    /// Gives the Color at the indexes (column, row) of the corresponding matrix
     /// </summary>
     /// <param name="column"></param>
     /// <param name="row"></param>
@@ -189,7 +189,7 @@ public class HDRImage
         }
     }
 
-    //copy constructor
+    //Copy constructor
     protected HDRImage(HDRImage other)
     {
         Width = other.Width;
@@ -204,7 +204,7 @@ public class HDRImage
     //Constructors - End
 
     /// <summary>
-    /// returns a  string that displays the color matrix.
+    /// Returns a  string that displays the color matrix.
     /// It can be useful to print it.
     /// </summary>
     public override string ToString()
@@ -241,7 +241,7 @@ public class HDRImage
     }
 
     /// <summary>
-    /// returns a clone of this HDRImage
+    /// Returns a clone of this HDRImage
     /// </summary>
     /// <returns></returns>
     public HDRImage Clone()
@@ -252,7 +252,7 @@ public class HDRImage
     //Methods for Read and Write PFM files - Begin
 
     /// <summary>
-    /// returns the values of width and height (as reference values) that were written in the string stringImgSize 
+    /// Returns the values of width and height (as reference values) that were written in the string stringImgSize 
     /// </summary>
     /// <param name="stringImgSize"></param>
     /// <param name="width"></param>
@@ -289,7 +289,7 @@ public class HDRImage
     }
 
     /// <summary>
-    /// returns the endianness (true = Big Endian, false = Little Endian)
+    /// Returns the endianness (true = Big Endian, false = Little Endian)
     /// written in the string stringEndianness as 1.0 or -1.0
     /// </summary>
     /// <param name="stringEndianness"></param>
@@ -458,7 +458,7 @@ public class HDRImage
     }
 
     /// <summary>
-    /// normalizes the RGB values of each pixel by the average luminosity computed by the AverageLuminosity function
+    /// Normalizes the RGB values of each pixel by the average luminosity computed by the AverageLuminosity function
     /// and by another empirical number (here called factor).
     /// The int luminosityFunction tells which of function of the color class to use to compute the luminosity of the pixel
     /// </summary>
@@ -479,7 +479,7 @@ public class HDRImage
 
 
     /// <summary>
-    /// resizes the RGB values of each pixel under 1,
+    /// Resizes the RGB values of each pixel under 1,
     /// it also scales possible bright spots.
     /// </summary>
     public void _ClampImage()
@@ -505,7 +505,7 @@ public class HDRImage
 
     //Questa non è tecnicamente un'HDR. Rivedere in futuro
     /// <summary>
-    /// returns the corresponding LDR image
+    /// Returns the corresponding LDR image
     /// It accounts for the gamma correction of the display and of the empirical factor here named "factor"
     /// The luminosityFunction parameter allow to choose between some possible ways to compute the luminosity of a pixel 
     /// </summary>
