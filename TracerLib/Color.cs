@@ -146,4 +146,10 @@ public struct Color
 
         return new Color(r,g,b);
     }
+    
+    public static float _Clamp(float x)
+    {
+        return x / (x + 1);
+    }
+    
 }

@@ -138,9 +138,9 @@ public class HDRTest
         Assert.Throws<InvalidPfmFileFormat>(() => HDRImage._ParseEndianness(endianness));
 
         endianness = "1.0";
-        Assert.Equal(1, HDRImage._ParseEndianness(endianness));
+        Assert.True( HDRImage._ParseEndianness(endianness));
         endianness = "-1.0";
-        Assert.Equal(-1, HDRImage._ParseEndianness(endianness));
+        Assert.True( HDRImage._ParseEndianness(endianness));
     }
 
     //test readfloat
@@ -204,7 +204,62 @@ public class HDRTest
         Assert.True(Color._AreCloseColor(image[1], new Color(2.4862983f, 3.5148109f, 5.0216226f )));
     }*/
 
-    
+     [Fact]
+    public void TestReadPFM_File()  //Rivedi
+    {
+        var LE_REFERENCE_BYTES = new byte[]
+        { 
+            0x50, 0x46, 0x0a, 0x33, 0x20, 0x32, 0x0a, 0x2d, 0x31, 0x2e, 0x30, 0x0a,
+            0x00, 0x00, 0xc8, 0x42, 0x00, 0x00, 0x48, 0x43, 0x00, 0x00, 0x96, 0x43,
+            0x00, 0x00, 0xc8, 0x43, 0x00, 0x00, 0xfa, 0x43, 0x00, 0x00, 0x16, 0x44,
+            0x00, 0x00, 0x2f, 0x44, 0x00, 0x00, 0x48, 0x44, 0x00, 0x00, 0x61, 0x44,
+            0x00, 0x00, 0x20, 0x41, 0x00, 0x00, 0xa0, 0x41, 0x00, 0x00, 0xf0, 0x41,
+            0x00, 0x00, 0x20, 0x42, 0x00, 0x00, 0x48, 0x42, 0x00, 0x00, 0x70, 0x42,
+            0x00, 0x00, 0x8c, 0x42, 0x00, 0x00, 0xa0, 0x42, 0x00, 0x00, 0xb4, 0x42
+        };
+
+        var BE_REFERENCE_BYTES = new byte[]
+        {
+            0x50, 0x46, 0x0a, 0x33, 0x20, 0x32, 0x0a, 0x31, 0x2e, 0x30, 0x0a, 0x42,
+            0xc8, 0x00, 0x00, 0x43, 0x48, 0x00, 0x00, 0x43, 0x96, 0x00, 0x00, 0x43,
+            0xc8, 0x00, 0x00, 0x43, 0xfa, 0x00, 0x00, 0x44, 0x16, 0x00, 0x00, 0x44,
+            0x2f, 0x00, 0x00, 0x44, 0x48, 0x00, 0x00, 0x44, 0x61, 0x00, 0x00, 0x41,
+            0x20, 0x00, 0x00, 0x41, 0xa0, 0x00, 0x00, 0x41, 0xf0, 0x00, 0x00, 0x42,
+            0x20, 0x00, 0x00, 0x42, 0x48, 0x00, 0x00, 0x42, 0x70, 0x00, 0x00, 0x42,
+            0x8c, 0x00, 0x00, 0x42, 0xa0, 0x00, 0x00, 0x42, 0xb4, 0x00, 0x00
+        };
+
+        using (Stream reference_bytes = new MemoryStream(LE_REFERENCE_BYTES))
+        {
+            var img = new HDRImage(reference_bytes);
+            
+            Assert.Equal(2, img.Height);
+            Assert.Equal(3, img.Width); 
+            
+            Assert.True(Color._AreCloseColor(img[0,0],new Color(10f, 20f, 30f)));
+            Assert.True(Color._AreCloseColor(img[1,0],new Color(40f, 50f, 60f)));
+            Assert.True(Color._AreCloseColor(img[2,0],new Color(70f, 80f, 90f)));
+            Assert.True(Color._AreCloseColor(img[0,1],new Color(100f, 200f, 300f)));
+            Assert.True(Color._AreCloseColor(img[1,1],new Color(400f, 500f, 600f)));
+            Assert.True(Color._AreCloseColor(img[2,1],new Color(700f, 800f, 900f)));
+        }
+        
+        using (Stream reference_bytes = new MemoryStream(BE_REFERENCE_BYTES))
+        {
+            var img = new HDRImage(reference_bytes);
+                    
+            Assert.Equal(2, img.Height);
+            Assert.Equal(3, img.Width); 
+                    
+            Assert.True(Color._AreCloseColor(img[0,0],new Color(10f, 20f, 30f)));
+            Assert.True(Color._AreCloseColor(img[1,0],new Color(40f, 50f, 60f)));
+            Assert.True(Color._AreCloseColor(img[2,0],new Color(70f, 80f, 90f)));
+            Assert.True(Color._AreCloseColor(img[0,1],new Color(100f, 200f, 300f)));
+            Assert.True(Color._AreCloseColor(img[1,1],new Color(400f, 500f, 600f)));
+            Assert.True(Color._AreCloseColor(img[2,1],new Color(700f, 800f, 900f)));
+        }
+        
+    }
     
     [Fact]
     public void TestToLDR()
@@ -222,5 +277,23 @@ public class HDRTest
         Assert.Equal(new Color(246, 165, 195), imageHDR[0]);
         Assert.Equal(new Color(171, 250, 204), imageHDR[1]);
         Assert.Equal(new Color(162, 218, 251), imageHDR[2]);
+    }
+    
+    [Fact]
+    public void TestClampImage()
+    {
+        var img = new HDRImage(2, 1);
+        
+        img[0,0] = new Color(0.5f, 1.0f, 1.5f);
+        img[1,0] = new Color(50.0f, 100.0f, 150.0f);
+        
+        img.Clamp_Image();
+
+        foreach (var pixel in img.Pixels)
+        {
+            Assert.True(pixel.R is >= 0 and <= 1);
+            Assert.True(pixel.G is >= 0 and <= 1);
+            Assert.True(pixel.B is >= 0 and <= 1);
+        }
     }
 }
