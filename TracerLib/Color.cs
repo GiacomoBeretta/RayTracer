@@ -1,6 +1,4 @@
-///
-/// This file is release under ... license. See LICENSE.md
-/// 
+// This file is release under EUPL_v1.2 license. See LICENSE.md
 
 using System.Diagnostics.CodeAnalysis;
 

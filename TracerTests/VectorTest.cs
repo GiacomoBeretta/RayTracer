@@ -1,4 +1,4 @@
-//namespace TracerTests;
+namespace VectorTests;
 
 using TracerLib;
 

@@ -1,6 +1,8 @@
-using System.Runtime.Serialization;
+// This file is release under EUPL_v1.2 license. See LICENSE.md
+
 //forse è meglio cambiare nome ai membri di HomMatrix e Transformation,
 //per ora hanno entrambi M
+
 namespace TracerLib;
 
 /// <summary>
@@ -176,7 +178,7 @@ public struct HomMatrix
         //on the invMatrix that now is an identity matrix, the result is exactly
         //the inverse of mat.
 
-        //The following operations woul
+        //The following operations
 
         return invMatrix;
     }*/
@@ -194,6 +196,7 @@ public struct HomMatrix
         {
             for (int j = 0; j < 4; j++)
             {
+                m3[i * 4 + j] = 0;
                 for (int k = 0; k < 4; k++)
                 {
                     m3[i * 4 + j] += m1[i * 4 + k] * m2[j + k * 4];
@@ -240,6 +243,7 @@ public struct Transformation
     {
         this.M = m;
         this.InvM = invM;
+        _CheckConsistency();
     }
 
     public Transformation(float[] m, float[] invM)
@@ -257,6 +261,7 @@ public struct Transformation
     {
         M = new HomMatrix(k);
         InvM = new HomMatrix(-k);
+        _CheckConsistency();
     }
 
     /// <summary>
@@ -269,6 +274,7 @@ public struct Transformation
     {
         M = new HomMatrix(scaleX, scaleY, scaleZ);
         InvM = new HomMatrix(1.0f / scaleX, 1.0f / scaleY, 1.0f / scaleZ);
+        _CheckConsistency();
     }
 
     /// <summary>
@@ -287,14 +293,14 @@ public struct Transformation
     /// </summary>
     /// <param name="index"></param>
     public float this[Index index] => M[index];
-    
+
     /// <summary>
     /// 2D read only index for the matrix M
     /// </summary>
     /// <param name="row"></param>
     /// <param name="col"></param>
     public float this[int row, int col] => M[M._MatrixOffset(row, col)];
-    
+
     /// <summary>
     /// Returns if the product of the matrix M and its inverse InvM is (close) to the identity.
     /// </summary>
@@ -360,9 +366,9 @@ public struct Transformation
     /// <returns></returns>
     public static Transformation operator *(Transformation t1, Transformation t2)
     {
-        HomMatrix m3 = t1.M * t2.M;
-        HomMatrix invm3 = t2.InvM * t1.InvM;
-        return new Transformation(m3, invm3);
+        HomMatrix prod = t1.M * t2.M;
+        HomMatrix invProd = t2.InvM * t1.InvM;
+        return new Transformation(prod, invProd);
     }
 
     /// <summary>

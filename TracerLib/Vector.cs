@@ -1,6 +1,8 @@
+// This file is release under EUPL_v1.2 license. See LICENSE.md
+
 namespace TracerLib;
 
-//forse è meglio fare dei template per le funzioni, così che vector e point ecc. abbiano già i metodi implementati?
+//Forse è meglio fare dei template per le funzioni, così che vector e point ecc. abbiano già i metodi implementati?
 
 public struct Vector
 {

@@ -1,6 +1,4 @@
-///
-/// This file is release under ... license. See LICENSE.md
-///
+// This file is release under EUPL_v1.2 license. See LICENSE.md
 
 //implementare dei controlli per i constructor e in altre funzioni se necessario, vediamo cosa dice Tomasi in proposito.
 //forse si possono mettere i i membri privati e rendere la classe dei test una friend?

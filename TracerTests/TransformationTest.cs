@@ -1,8 +1,7 @@
-using System.Runtime.Serialization.Json;
 using TracerLib;
-using Xunit.Abstractions;
 
-//namespace TracerTests;
+namespace TransformationTests;
+
 public class HomMatrixTests
 {
     [Fact]
@@ -47,14 +46,14 @@ public class HomMatrixTests
             0, 0, 0, 1
         ];
         HomMatrix expected = new HomMatrix(expectedArray);
-        Assert.Equal(expected, actual);
+        Assert.Equal(expectedArray, actual.M);
     }
 
     [Fact]
     public void TestConstructorScale()
     {
         float x = 6.2f;
-        float y = 4.932f;
+        float y = 4.93f;
         float z = 912.01f;
         HomMatrix actual = new HomMatrix(x, y, z);
         float[] expectedArray =
@@ -65,7 +64,7 @@ public class HomMatrixTests
             0, 0, 0, 1
         ];
         HomMatrix expected = new HomMatrix(expectedArray);
-        Assert.Equal(expected, actual);
+        Assert.Equal(expected.M, actual.M);
     }
 
     [Fact]
@@ -78,13 +77,13 @@ public class HomMatrixTests
             9, 6, 7, 1002,
             1, 0, 0, 4.0f
         ];
-        HomMatrix M = new HomMatrix(m);
+        HomMatrix matrix = new HomMatrix(m);
 
-        Assert.Equal(2, M[0]);
-        Assert.Equal(0.3f, M[3]);
-        Assert.Equal(7, M[11]);
-        Assert.Equal(9, M[8]);
-        Assert.Equal(4.0f, M[15]);
+        Assert.Equal(2, matrix[0]);
+        Assert.Equal(0.3f, matrix[3]);
+        Assert.Equal(1002, matrix[11]);
+        Assert.Equal(9, matrix[8]);
+        Assert.Equal(4.0f, matrix[15]);
     }
 
     [Fact]
@@ -93,7 +92,7 @@ public class HomMatrixTests
         float[] m1 =
         [
             3, 5, 2, 8.3f,
-            9.0f, 32.5920f, 9,
+            9.0f, 32.5920f, 9, 45,
             102.56921f, 39, 0, 0,
             1, 2, 5, 7
         ];
@@ -101,7 +100,7 @@ public class HomMatrixTests
         float[] m2 =
         [
             3, 5, 2, 8.3f,
-            9.0f, 32.5920f, 9,
+            9.0f, 32.5920f, 9, 45,
             102.56921f, 39, 0, 0,
             1, 2, 5, 7.0001f
         ];
@@ -110,7 +109,7 @@ public class HomMatrixTests
         HomMatrix matrix2 = new HomMatrix(m2);
 
         Assert.True(HomMatrix.AreMatrixClose(matrix1, matrix2, 1e-3f));
-        Assert.False(HomMatrix.AreMatrixClose(matrix1, matrix2, 1e-5f));
+        Assert.False(HomMatrix.AreMatrixClose(matrix1, matrix2)); // epsilon = 1e-5f
     }
 
     [Fact]
@@ -220,19 +219,18 @@ public class HomMatrixTests
         ];
         HomMatrix productMatrix = new HomMatrix(product);
 
-        Assert.Equal(productMatrix, matrix1 * matrix2);
+        Assert.Equal(productMatrix.M, (matrix1 * matrix2).M);
     }
 }
 
-
 public class TransformationTest
 {
-    private readonly ITestOutputHelper _testOutputHelper;
+    /*private readonly ITestOutputHelper _testOutputHelper;
 
     public TransformationTest(ITestOutputHelper testOutputHelper)
     {
         _testOutputHelper = testOutputHelper;
-    }
+    }*/
 
     [Fact]
     public void TestConstructor()
@@ -247,8 +245,8 @@ public class TransformationTest
 
         HomMatrix identityMatrix = new HomMatrix(identity);
         Transformation t = new Transformation();
-        Assert.Equal(identityMatrix, t.M);
-        Assert.Equal(identityMatrix, t.InvM);
+        Assert.Equal(identityMatrix.M, t.M.M);
+        Assert.Equal(identityMatrix.M, t.InvM.M);
     }
 
     [Fact]
@@ -342,7 +340,7 @@ public class TransformationTest
         [
             1 / x, 0, 0, 0,
             0, 1 / y, 0, 0,
-            0, 0, 1 / z, 1,
+            0, 0, 1 / z, 0,
             0, 0, 0, 1
         ];
 
@@ -470,7 +468,7 @@ public class TransformationTest
             9.0f, 9.0f, 8.0f, 7.0f,
             6.0f, 5.0f, 4.0f, 1.0f,
         ];
-        float[] invm =
+        float[] invM =
         [
             -3.75f, 2.75f, -1, 0,
             4.375f, -3.875f, 2.0f, -0.5f,
@@ -478,8 +476,10 @@ public class TransformationTest
             -1.375f, 0.875f, 0.0f, -0.5f,
         ];
 
-        Transformation t1 = new Transformation(m, invm);
-        Transformation t2 = new Transformation(m, invm);
+        Transformation t1 = new Transformation(m, invM);
+        Transformation t2 = new Transformation(m, invM);
+
+        Assert.Equal(t1.M.M, t2.M.M);
 
         float[] mat =
         [
@@ -577,14 +577,14 @@ public class TransformationTest
             9.0f, 9.0f, 8.0f, 7.0f,
             6.0f, 5.0f, 4.0f, 1.0f
         ];
-        float[] invm1 =
+        float[] invM1 =
         [
             -3.75f, 2.75f, -1, 0,
             4.375f, -3.875f, 2.0f, -0.5f,
             0.5f, 0.5f, -1.0f, 1.0f,
             -1.375f, 0.875f, 0.0f, -0.5f
         ];
-        Transformation t1 = new Transformation(m1, invm1);
+        Transformation t1 = new Transformation(m1, invM1);
 
         float[] m2 =
         [
@@ -593,14 +593,14 @@ public class TransformationTest
             6.0f, 3.0f, 2.0f, 0.0f,
             1.0f, 4.0f, 2.0f, 1.0f
         ];
-        float[] invm2 =
+        float[] invM2 =
         [
             0.4f, -0.2f, 0.2f, -0.6f,
             2.9f, -1.7f, 0.2f, -3.1f,
             -5.55f, 3.15f, -0.4f, 6.45f,
             -0.9f, 0.7f, -0.2f, 1.1f
         ];
-        Transformation t2 = new Transformation(m2, invm2);
+        Transformation t2 = new Transformation(m2, invM2);
 
         float[] product =
         [
@@ -632,14 +632,14 @@ public class TransformationTest
             9.0f, 9.0f, 8.0f, 7.0f,
             0.0f, 0.0f, 0.0f, 1.0f,
         ];
-        float[] invm =
+        float[] invM =
         [
             -3.75f, 2.75f, -1, 0,
             5.75f, -4.75f, 2.0f, 1.0f,
             -2.25f, 2.25f, -1.0f, -2.0f,
             0.0f, 0.0f, 0.0f, 1.0f,
         ];
-        Transformation t = new Transformation(m, invm);
+        Transformation t = new Transformation(m, invM);
 
         Vector expected = new Vector(14.0f, 38.0f, 51.0f);
 
@@ -664,14 +664,14 @@ public class TransformationTest
             9.0f, 9.0f, 8.0f, 7.0f,
             0.0f, 0.0f, 0.0f, 1.0f,
         ];
-        float[] invm =
+        float[] invM =
         [
             -3.75f, 2.75f, -1, 0,
             5.75f, -4.75f, 2.0f, 1.0f,
             -2.25f, 2.25f, -1.0f, -2.0f,
             0.0f, 0.0f, 0.0f, 1.0f,
         ];
-        Transformation t = new Transformation(m, invm);
+        Transformation t = new Transformation(m, invM);
 
         Point expected = new Point(18.0f, 46.0f, 58.0f);
 
@@ -690,14 +690,14 @@ public class TransformationTest
             9.0f, 9.0f, 8.0f, 7.0f,
             0.0f, 0.0f, 0.0f, 1.0f,
         ];
-        float[] invm =
+        float[] invM =
         [
             -3.75f, 2.75f, -1, 0,
             5.75f, -4.75f, 2.0f, 1.0f,
             -2.25f, 2.25f, -1.0f, -2.0f,
             0.0f, 0.0f, 0.0f, 1.0f,
         ];
-        Transformation t = new Transformation(m, invm);
+        Transformation t = new Transformation(m, invM);
 
         Normal expected = new Normal(-8.75f, 7.75f, -3.0f);
 
