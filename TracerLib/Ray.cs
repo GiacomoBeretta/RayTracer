@@ -4,11 +4,11 @@ public struct Ray
 {
     public Point Origin { get; set; }
     public Vector Dir { get; set; }
-    public float Tmin { get; private set; } = 1e-5f;
-    public float Tmax { get; private set; } = float.PositiveInfinity;
-    public int Depth { get; private set; } = 0;
+    public float Tmin { get; private set; } 
+    public float Tmax { get; private set; } 
+    public int Depth { get; private set; }
 
-    public Ray(Point origin, Vector dir, float tmin, float tmax, int depth)
+    public Ray(Point origin, Vector dir, float tmin = 1e-5f, float tmax = float.PositiveInfinity, int depth = 0)
     {
         Origin = origin;
         Dir = dir;
@@ -17,9 +17,9 @@ public struct Ray
         Depth = depth;
     }
 
-    public static bool _AreRayClose(Ray r1, Ray r2, float epsilon = 1e-5f)
+    public static bool _AreCloseRay(Ray r1, Ray r2)
     {
-        return Vector._AreVectorsClose(r1.Dir, r2.Dir) && Point._ArePointClose(r1.Origin, r2.Origin);  
+        return Vector._AreVectorsClose(r1.Dir, r2.Dir) && Point._AreClosePoint(r1.Origin, r2.Origin);  
     }
 
     public Point At(float t)
