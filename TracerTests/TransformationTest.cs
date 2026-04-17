@@ -347,6 +347,71 @@ public class TransformationTest
         Transformation t = new Transformation(x, y, z);
         Assert.Equal(expectedArray, t.M.M);
         Assert.Equal(expectedArrayInv, t.InvM.M);
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => new Transformation(0, 1, 3));
+        Assert.Throws<ArgumentOutOfRangeException>(() => new Transformation(3, 0, 23));
+        Assert.Throws<ArgumentOutOfRangeException>(() => new Transformation(302, 29, 0));
+        Assert.Throws<ArgumentOutOfRangeException>(() => new Transformation(0, 0, 0));
+    }
+
+    [Fact]
+    public void TestConstructorRotationMainAxes()
+    {
+        char axis = 'z';
+        float alpha = MathF.PI / 2;
+        float[] m =
+        [
+            0, -1, 0, 0,
+            1, 0, 0, 0,
+            0, 0, 1, 0,
+            0, 0, 0, 1
+        ];
+        float[] invM =
+        [
+            0, 1, 0, 0,
+            -1, 0, 0, 0,
+            0, 0, 1, 0,
+            0, 0, 0, 1
+        ];
+
+        Transformation t = new Transformation(axis, alpha);
+        Assert.True(Functions.AreArrayClose(m, t.M.M));
+        Assert.True(Functions.AreArrayClose(invM, t.InvM.M));
+
+        axis = 'y';
+        alpha = MathF.PI;
+        m = invM =
+        [
+            -1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, -1, 0,
+            0, 0, 0, 1
+        ];
+        t = new Transformation(axis, alpha);
+        Assert.True(Functions.AreArrayClose(m, t.M.M));
+        Assert.True(Functions.AreArrayClose(invM, t.InvM.M));
+
+        axis = 'x';
+        alpha = MathF.PI * 1.5f;
+        m =
+        [
+            1, 0, 0, 0,
+            0, 0, 1, 0,
+            0, -1, 0, 0,
+            0, 0, 0, 1
+        ];
+        invM =
+        [
+            1, 0, 0, 0,
+            0, 0, -1, 0,
+            0, 1, 0, 0,
+            0, 0, 0, 1
+        ];
+        t = new Transformation(axis, alpha);
+        Assert.True(Functions.AreArrayClose(m, t.M.M));
+        Assert.True(Functions.AreArrayClose(invM, t.InvM.M));
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => new Transformation('a', alpha));
     }
 
     [Fact]

@@ -272,13 +272,90 @@ public struct Transformation
     /// <param name="scaleZ"></param>
     public Transformation(float scaleX, float scaleY, float scaleZ)
     {
+        if (scaleX == 0 || scaleY == 0 || scaleZ == 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(scaleX) + ", " + nameof(scaleY) + ", " + nameof(scaleZ) +
+                                                  " must be different from zero");
+        }
+
         M = new HomMatrix(scaleX, scaleY, scaleZ);
         InvM = new HomMatrix(1.0f / scaleX, 1.0f / scaleY, 1.0f / scaleZ);
         _CheckConsistency();
     }
 
     /// <summary>
-    /// Constructs a rotation transformation,
+    /// Constructs a rotation around one of the x,y,z axis
+    /// </summary>
+    /// <param name="axis"></param>
+    /// <param name="angle"></param>
+    public Transformation(char axis, float angle)
+    {
+        if (axis != 'x' && axis != 'y' && axis != 'z')
+        {
+            throw new ArgumentOutOfRangeException(nameof(axis), axis, nameof(axis) + " must be one of x,y,z");
+        }
+
+        float c = MathF.Cos(angle);
+        float s = MathF.Sin(angle);
+
+        switch (axis)
+        {
+            case 'x':
+
+                M = new HomMatrix
+                ([
+                    1, 0, 0, 0,
+                    0, c, -s, 0,
+                    0, s, c, 0,
+                    0, 0, 0, 1
+                ]);
+                InvM = new HomMatrix
+                ([
+                    1, 0, 0, 0,
+                    0, c, s, 0,
+                    0, -s, c, 0,
+                    0, 0, 0, 1
+                ]);
+                break;
+            case 'y':
+                M = new HomMatrix
+                ([
+                    c, 0, -s, 0,
+                    0, 1, 0, 0,
+                    s, 0, c, 0,
+                    0, 0, 0, 1
+                ]);
+                InvM = new HomMatrix
+                ([
+                    c, 0, s, 0,
+                    0, 1, 0, 0,
+                    -s, 0, c, 0,
+                    0, 0, 0, 1
+                ]);
+                break;
+            case 'z':
+                M = new HomMatrix
+                ([
+                    c, -s, 0, 0,
+                    s, c, 0, 0,
+                    0, 0, 1, 0,
+                    0, 0, 0, 1
+                ]);
+                InvM = new HomMatrix
+                ([
+                    c, s, 0, 0,
+                    -s, c, 0, 0,
+                    0, 0, 1, 0,
+                    0, 0, 0, 1
+                ]);
+                break;
+        }
+
+        _CheckConsistency();
+    }
+
+    /// <summary>
+    /// Constructs a generic rotation transformation,
     /// with the axis and angle of rotation passed as arguments.
     /// </summary>
     /// <param name="axis"></param>
