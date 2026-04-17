@@ -175,7 +175,16 @@ public class HDRImage
     //Costruttore immagine Hdr a partire da una stream
     public HDRImage(Stream stream)
     {
-        ReadPFM_File(stream);
+        var img = ReadPFM_File(stream);
+        
+        Width = img.Width;
+        Height = img.Height;
+        Pixels = new Color[Width * Height];
+        for (int i = 0; i < Pixels.Length; i++)
+        {
+            Pixels[i] = img.Pixels[i];
+        }
+        
     }
 
     //Costruttore immagine Hdr a partire da un file
