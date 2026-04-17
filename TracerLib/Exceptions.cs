@@ -3,6 +3,9 @@
 namespace TracerLib;
 //namespace Exception;
 
+/// <summary>
+/// The class <c>InvalidPfmFileFormat</c> inherit from the FormatException's class and is used in the error management during the reading/writing of a file.pfm
+/// </summary>
 public class InvalidPfmFileFormat : FormatException
 {
     public InvalidPfmFileFormat(string errorMessage) : base (errorMessage) { }

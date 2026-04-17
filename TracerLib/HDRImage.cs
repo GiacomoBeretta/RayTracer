@@ -102,6 +102,14 @@ public class HDRImage
         }
     }
 
+    /// <summary>
+    /// Checks if the Pixel's lenght matches the number of elements in the HDRImage's matrix
+    /// </summary>
+    /// <param name="width"></param>
+    /// <param name="height"></param>
+    /// <param name="colorVector"></param>
+    /// <exception cref="ArgumentNullException"></exception>
+    /// <exception cref="ArgumentException"></exception>
     public static void _CheckPixels(int width, int height, Color[] colorVector)
     {
         ArgumentNullException.ThrowIfNull(colorVector);
@@ -114,6 +122,10 @@ public class HDRImage
 
     //vedere se anche per questo indice si possono mettere dei controlli
     //index and range for the pixels 1D vector with the type indexer
+    /// <summary>
+    /// Return the <c>Color</c> given by the i-th element of the 1D Pixel's array
+    /// </summary>
+    /// <param name="index"></param>
     public Color this[Index index]
     {
         get => Pixels[index];
@@ -192,7 +204,15 @@ public class HDRImage
     {
         using (Stream filestream = File.OpenRead(fileName))
         {
-            // read_pfm_file(filestream);
+            var img = ReadPFM_File(filestream);
+            
+            Width = img.Width;
+            Height = img.Height;
+            Pixels = new Color[Width * Height];
+            for (int i = 0; i < Pixels.Length; i++)
+            {
+                Pixels[i] = img.Pixels[i];
+            }
         }
     }
 
@@ -242,6 +262,9 @@ public class HDRImage
         return str;
     }
 
+    /// <summary>
+    /// Print the string converted HDRImage 
+    /// </summary>
     public void Print()
     {
         Console.WriteLine(this.ToString());
@@ -330,6 +353,13 @@ public class HDRImage
     }
 
     //forse è meglio mettere static anche ReadFloat (prima non lo era)?
+    /// <summary>
+    /// Return the float value of the <c>Color</c> encoded as 4 bytes
+    /// </summary>
+    /// <param name="stream"></param>
+    /// <param name="bigEndian"></param>
+    /// <returns></returns>
+    /// <exception cref="InvalidPfmFileFormat"></exception>
     public static float ReadFloat(Stream stream, bool bigEndian = true)
     {
         var value = new byte[4];

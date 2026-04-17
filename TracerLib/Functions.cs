@@ -4,11 +4,26 @@ namespace TracerLib;
 
 public static class Functions
 {
+    /// <summary>
+    /// Closeness criterion between to float scalar
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <param name="epsilon"></param>
+    /// <returns></returns>
     public static bool AreClose(float a, float b, float epsilon = 1e-5f)
     {
         return MathF.Abs(a - b) < epsilon;
     }
     
+    /// <summary>
+    /// Closeness criterion between two float array
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <param name="epsilon"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
     public static bool AreArrayClose(float[] a, float[] b, float epsilon = 1e-5f)
     {
         int length = a.Length;
