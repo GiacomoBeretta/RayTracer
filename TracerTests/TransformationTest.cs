@@ -45,7 +45,6 @@ public class HomMatrixTests
             0, 0, 1, k.Z,
             0, 0, 0, 1
         ];
-        HomMatrix expected = new HomMatrix(expectedArray);
         Assert.Equal(expectedArray, actual.M);
     }
 

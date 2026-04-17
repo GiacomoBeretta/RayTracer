@@ -66,6 +66,7 @@ public struct HomMatrix
         ];
     }
 
+    /*
     /// <summary>
     /// Constructs a rotation transformation,
     /// with the axis and angle of rotation passed as arguments.
@@ -77,6 +78,10 @@ public struct HomMatrix
     }*/
     //Constructors - End
 
+    /// <summary>
+    /// 1D index for the M matrix
+    /// </summary>
+    /// <param name="index"></param>
     public float this[Index index]
     {
         get => M[index];
@@ -155,6 +160,7 @@ public struct HomMatrix
         Console.WriteLine(ToString());
     }
 
+    /*
     //come si fa?
     //non posso essere sicuro che la matrice che ottengo sia l'inversa per via delle operazioni sui float
     /// <summary>
@@ -354,6 +360,7 @@ public struct Transformation
         _CheckConsistency();
     }
 
+    /*
     /// <summary>
     /// Constructs a generic rotation transformation,
     /// with the axis and angle of rotation passed as arguments.
@@ -465,7 +472,7 @@ public struct Transformation
         );
         return v2;
     }
-
+    
     /*
     /// <summary>
     /// Returns the transformed point obtained by multiplying the matrix by the point (matrix–vector multiplication).
@@ -492,7 +499,7 @@ public struct Transformation
         {
             return p2 * (1.0f / w);
         }
-    }
+    }*/
 
     /// <summary>
     /// Returns the transformed normal,
@@ -510,5 +517,5 @@ public struct Transformation
             t.InvM[2] * n1.X + t.InvM[6] * n1.Y + t.InvM[10] * n1.Z
         );
         return n2;
-    }*/
+    }
 }
