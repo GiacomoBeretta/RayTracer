@@ -53,7 +53,7 @@ public struct Vector
 
     public static Vector operator *(float a, Vector v1)
     {
-        return v1 * a;
+        return new Vector(v1.X * a, v1.Y * a, v1.Z * a);
     }
 
     public static float operator *(Vector v1, Vector v2)
@@ -61,10 +61,10 @@ public struct Vector
         return v1.X * v2.X + v1.Y * v2.Y + v1.Z * v2.Z;
     }
     
-    /*public static Normal CrossProduct(Vector v1, Vector v2)
+    public static Normal CrossProduct(Vector v1, Vector v2)
     {
         return new Normal(v1.Y * v2.Z - v1.Z * v2.Y, v1.Z * v2.X - v1.X * v2.Z, v1.X * v2.Y - v1.Y * v2.X);
-    }*/
+    }
 
     public float SquaredNorm()
     {
@@ -84,8 +84,8 @@ public struct Vector
         Z = Z / norm;
     }
 
-    /*public Normal ToNormal()
+    public Normal ToNormal()
     {
         return new Normal(X, Y, Z);    
-    }*/
+    }
 }

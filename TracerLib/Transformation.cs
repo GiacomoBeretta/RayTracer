@@ -326,16 +326,16 @@ public struct Transformation
             case 'y':
                 M = new HomMatrix
                 ([
-                    c, 0, -s, 0,
+                    c, 0, s, 0,
                     0, 1, 0, 0,
-                    s, 0, c, 0,
+                    -s, 0, c, 0,
                     0, 0, 0, 1
                 ]);
                 InvM = new HomMatrix
                 ([
-                    c, 0, s, 0,
+                    c, 0, -s, 0,
                     0, 1, 0, 0,
-                    -s, 0, c, 0,
+                    s, 0, c, 0,
                     0, 0, 0, 1
                 ]);
                 break;
@@ -473,7 +473,6 @@ public struct Transformation
         return v2;
     }
     
-    /*
     /// <summary>
     /// Returns the transformed point obtained by multiplying the matrix by the point (matrix–vector multiplication).
     /// We use homogeneous coordinates, so the points have their 4th coordinate equal to 1.
@@ -499,7 +498,7 @@ public struct Transformation
         {
             return p2 * (1.0f / w);
         }
-    }*/
+    }
 
     /// <summary>
     /// Returns the transformed normal,

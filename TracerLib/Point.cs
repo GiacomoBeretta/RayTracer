@@ -33,7 +33,12 @@ public struct Point
 
     public static Point operator +(in Vector a, in Point b)
     {
-        return b + a;
+        return new Point(a.X + b.X, a.Y + b.Y, a.Z + b.Z);
+    }
+
+    public static Point operator -(Point p)
+    {
+        return new Point(-p.X, -p.Y, -p.Z);
     }
 
     public static Vector operator -(in Point a, in Point b)
@@ -44,6 +49,16 @@ public struct Point
     public static Point operator -(in Point a, in Vector b)
     {
         return new Point(a.X - b.X, a.Y - b.Y, a.Z - b.Z);
+    }
+
+    public static Point operator *(Point p, float alpha)
+    {
+        return new Point(p.X * alpha, p.Y * alpha, p.Z * alpha);
+    }
+
+    public static Point operator *(float alpha, Point p)
+    {
+        return new Point(p.X * alpha, p.Y * alpha, p.Z * alpha);
     }
 
     public Vector ToVector()

@@ -716,7 +716,7 @@ public class TransformationTest
          */
     }
 
-/*
+
     [Fact]
     public void TestProductPoint()
     {
@@ -768,5 +768,4 @@ public class TransformationTest
         Assert.Equal(expected, t * n);
         //are close se non funziona
     }
-    */
 }
