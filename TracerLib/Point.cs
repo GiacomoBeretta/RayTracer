@@ -21,6 +21,11 @@ public struct Point
         return point;
     }
 
+    public void Print()
+    {
+        Console.WriteLine(ToString());
+    }
+
     public static bool _AreClosePoint(Point a, Point b)
     {
         return Functions.AreClose(a.X, b.X) && Functions.AreClose(a.Y, b.Y) && Functions.AreClose(a.Z, b.Z);
@@ -65,5 +70,4 @@ public struct Point
     {
         return new Vector(this.X, this.Y, this.Z);
     }
-
 }

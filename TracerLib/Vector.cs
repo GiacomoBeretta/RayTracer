@@ -24,6 +24,11 @@ public struct Vector
         return $"({X}, {Y}, {Z})";
     }
 
+    public void Print()
+    {
+        Console.WriteLine(ToString());
+    }
+
     public static bool _AreVectorsClose(Vector v1, Vector v2, float epsilon = 1e-5f)
     {
         return Functions.AreClose(v1.X, v2.X, epsilon)
@@ -51,6 +56,7 @@ public struct Vector
         return new Vector(v1.X * a, v1.Y * a, v1.Z * a);
     }
 
+    //è meglio usare v1*a o scrivere di nuovo v1.X*a, v1.Y*a, v1.Z*a?
     public static Vector operator *(float a, Vector v1)
     {
         return new Vector(v1.X * a, v1.Y * a, v1.Z * a);
@@ -71,6 +77,10 @@ public struct Vector
         return X * X + Y * Y + Z * Z;
     }
 
+    /// <summary>
+    /// If you want to compute the squared norm, use the SquaredNorm method, is more efficient.
+    /// </summary>
+    /// <returns></returns>
     public float Norm()
     {
         return MathF.Sqrt(X * X + Y * Y + Z * Z);
@@ -84,6 +94,10 @@ public struct Vector
         Z = Z / norm;
     }
 
+    /// <summary>
+    /// Returns a normal vector that has the same x,y,z values
+    /// </summary>
+    /// <returns></returns>
     public Normal ToNormal()
     {
         return new Normal(X, Y, Z);    

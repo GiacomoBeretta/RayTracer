@@ -2,7 +2,7 @@
 
 namespace TracerLib;
 
-public class Normal
+public struct Normal
 {
     public float X { get; }
     public float Y { get; }
@@ -13,6 +13,16 @@ public class Normal
         X = x;
         Y = y;
         Z = z;
+    }
+
+    public override string ToString()
+    {
+        return $"({X}, {Y}, {Z})";
+    }
+
+    public void Print()
+    {
+        Console.WriteLine(ToString());
     }
 
     public static bool _AreCloseNormal(Normal a, Normal b)
@@ -29,7 +39,7 @@ public class Normal
     {
         return new Normal(a * n.X, a * n.Y, a * n.Z);
     }
-    
+
     public static Normal operator *(float a, Normal n)
     {
         return n * a;
@@ -39,7 +49,7 @@ public class Normal
     {
         return n.X * v.X + n.Y * v.Y + n.Z * v.Z;
     }
-    
+
     public static float operator *(Vector v, Normal n)
     {
         return n * v;
@@ -47,17 +57,17 @@ public class Normal
 
     public static Vector CrossProduct(Vector v, Normal n)
     {
-        return new Vector(v.Y*n.Z - v.Z*n.Y, v.Z*n.X - v.X*n.Z, v.X*n.Y - v.Y*n.X);
+        return new Vector(v.Y * n.Z - v.Z * n.Y, v.Z * n.X - v.X * n.Z, v.X * n.Y - v.Y * n.X);
     }
 
     public static Vector CrossProduct(Normal n, Vector v)
     {
-        return new Vector(n.Y*v.Z - n.Z*v.Y, n.Z*v.X - n.X*v.Z, n.X*v.Y - n.Y*v.X);
+        return new Vector(n.Y * v.Z - n.Z * v.Y, n.Z * v.X - n.X * v.Z, n.X * v.Y - n.Y * v.X);
     }
 
     public static Vector CrossProduct(Normal n, Normal v)
     {
-        return new Vector(n.Y*v.Z - n.Z*v.Y, n.Z*v.X - n.X*v.Z, n.X*v.Y - n.Y*v.X);
+        return new Vector(n.Y * v.Z - n.Z * v.Y, n.Z * v.X - n.X * v.Z, n.X * v.Y - n.Y * v.X);
     }
 
     public float SquaredNorm()
@@ -65,6 +75,10 @@ public class Normal
         return MathF.Pow(this.X, 2) + MathF.Pow(this.Y, 2) + MathF.Pow(this.Z, 2);
     }
 
+    /// <summary>
+    /// If you want to compute the squared norm, use the SquaredNorm method, is more efficient.
+    /// </summary>
+    /// <returns></returns>
     public float Norm()
     {
         return MathF.Sqrt(this.SquaredNorm());
@@ -74,6 +88,4 @@ public class Normal
     {
         return new Normal(this.X, this.Y, this.Z) * (1 / this.Norm());
     }
-    
-    
 }

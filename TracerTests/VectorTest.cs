@@ -69,15 +69,15 @@ public class VectorTest
         Assert.True(Functions.AreClose(214.45f, v1 * v3));
     }
 
-    /*
     [Fact]
     public void TestCrossProduct()
     {
         Vector v1 = new Vector(1, 2, 3);
-        Vector v2 = new Vector(-3, 6, -21);
+        Vector v2 = new Vector(4, 6, 8);
 
-        Assert.Equal(new Vector(-60, 12, 12), Vector.CrossProduct(v1, v2));
-    }*/
+        Assert.Equal(new Normal(-2, 4, -2), Vector.CrossProduct(v1, v2));
+        Assert.Equal(new Normal(2, -4, 2), Vector.CrossProduct(v2, v1));
+    }
 
     [Fact]
     public void TestSquaredNorm()
@@ -99,5 +99,13 @@ public class VectorTest
         Vector v = new Vector(82.5f, 7.1f, 91.43f);
         v.Normalize();
         Assert.True(Vector._AreVectorsClose(new Vector(0.668809f, 0.05755812f, 0.741202f), v));
+    }
+
+    [Fact]
+    public void TestToNormal()
+    {
+        Vector v = new Vector(3, 5, 20);
+        Normal n = new Normal(3, 5, 20);
+        Assert.Equal(n, v.ToNormal());
     }
 }
