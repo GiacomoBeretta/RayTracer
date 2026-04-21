@@ -126,4 +126,6 @@ public class ColorTest
         Color a =  new Color(0.3726f, 0.472f, 0.2204f);
         Assert.Equal(new Color(156, 175,120), a.To8BitRGB(gamma));
     }
+    
+    //Aggiungere test clamp
 }
