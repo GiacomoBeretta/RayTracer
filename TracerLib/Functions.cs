@@ -5,7 +5,7 @@ namespace TracerLib;
 public static class Functions
 {
     /// <summary>
-    /// Closeness criterion between to float scalar
+    /// Closeness criterion between two float scalars
     /// </summary>
     /// <param name="a"></param>
     /// <param name="b"></param>
@@ -17,7 +17,7 @@ public static class Functions
     }
     
     /// <summary>
-    /// Closeness criterion between two float array
+    /// Closeness criterion between two float arrays
     /// </summary>
     /// <param name="a"></param>
     /// <param name="b"></param>

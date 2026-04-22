@@ -19,7 +19,7 @@ public struct Color
     public float B { get; set; }
 
     /// <summary>
-    /// Basic <c>Color</c> constructor which accept 3 positive parameters: R,G,B 
+    /// Basic <c>Color</c> constructor which accepts 3 positive parameters: R,G,B 
     /// </summary>
     /// <param name="r"></param>
     /// <param name="g"></param>
@@ -129,7 +129,7 @@ public struct Color
     }*/
 
     /// <summary>
-    /// Return a formatted string with the RGB colors.
+    /// Returns a formatted string with the RGB colors.
     /// </summary>
     /// <returns></returns>
     public override string ToString()
@@ -138,7 +138,7 @@ public struct Color
     }
     
     /// <summary>
-    /// Print the formatted string with RGB colors
+    /// Prints the formatted string with RGB colors
     /// </summary>
     /// <returns></returns>
     public void Print()

@@ -133,7 +133,7 @@ public class HDRImage
     //vedere se anche per questo indice si possono mettere dei controlli
     //index and range for the pixels 1D vector with the type indexer
     /// <summary>
-    /// Return the <c>Color</c> given by the i-th element of the 1D Pixel's array
+    /// Returns the <c>Color</c> given by the i-th element of the 1D Pixel's array
     /// </summary>
     /// <param name="index"></param>
     public Color this[Index index]
@@ -269,7 +269,7 @@ public class HDRImage
     }
 
     /// <summary>
-    /// Print the string converted HDRImage 
+    /// Prints the string converted HDRImage 
     /// </summary>
     public void Print()
     {
@@ -389,7 +389,7 @@ public class HDRImage
     }
 
     /// <summary>
-    /// Return the float value of the <c>Color</c> encoded as 4 bytes
+    /// Returns the float value of the <c>Color</c> encoded as 4 bytes
     /// </summary>
     /// <param name="br"></param>
     /// <param name="bigEndian"></param>
