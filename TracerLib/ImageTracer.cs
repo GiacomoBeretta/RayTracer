@@ -14,6 +14,12 @@ public class ImageTracer
     private HDRImage image;
     private ICamera camera;
 
+    public ImageTracer(HDRImage image, ICamera camera)
+    {
+        this.image = image;
+        this.camera = camera;
+    }
+
     /// <summary>
     /// Returns the Ray that passes through the pixel at (column, row).
     /// Since a pixel is not a point uPixel and vPixel are the coordinates inside the pixel at which the ray will be fired.
