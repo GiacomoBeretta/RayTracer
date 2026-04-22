@@ -21,6 +21,11 @@ public struct Point
         return point;
     }
 
+    public void Print()
+    {
+        Console.WriteLine(ToString());
+    }
+
     public static bool _AreClosePoint(Point a, Point b)
     {
         return Functions.AreClose(a.X, b.X) && Functions.AreClose(a.Y, b.Y) && Functions.AreClose(a.Z, b.Z);
@@ -33,7 +38,12 @@ public struct Point
 
     public static Point operator +(in Vector a, in Point b)
     {
-        return b + a;
+        return new Point(a.X + b.X, a.Y + b.Y, a.Z + b.Z);
+    }
+
+    public static Point operator -(Point p)
+    {
+        return new Point(-p.X, -p.Y, -p.Z);
     }
 
     public static Vector operator -(in Point a, in Point b)
@@ -45,20 +55,19 @@ public struct Point
     {
         return new Point(a.X - b.X, a.Y - b.Y, a.Z - b.Z);
     }
-
-    public static Point operator *(Point a, float f)
-    {
-        return new Point(a.X * f, a.Y * f, a.Z * f);
-    }
     
-    public static Point operator *(float f, Point a)
+    public static Point operator *(Point p, float alpha)
     {
-        return new Point(a.X * f, a.Y * f, a.Z * f);
+        return new Point(p.X * alpha, p.Y * alpha, p.Z * alpha);
+    }
+
+    public static Point operator *(float alpha, Point p)
+    {
+        return new Point(p.X * alpha, p.Y * alpha, p.Z * alpha);
     }
 
     public Vector ToVector()
     {
         return new Vector(this.X, this.Y, this.Z);
     }
-
 }

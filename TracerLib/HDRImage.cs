@@ -9,6 +9,8 @@ using
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats; //for the Rgb24 Pixel Format
 
+using System.Globalization;
+
 namespace TracerLib;
 
 using System.Text; //for the Encoding.ASCII.GetBytes
@@ -17,6 +19,7 @@ using System.Text; //for the Encoding.ASCII.GetBytes
 /// An HDRImage is essentially a matrix of colors with RGB floats (see the Color class)
 /// with a Width and a Height of type integer and a one dimensional (for efficiency reason) vector called Pixels
 /// Attention: the matrix elements are indexed by giving first the column and then the row!
+/// The first pixel is the one at the top left.
 /// </summary>
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 public class HDRImage
@@ -28,8 +31,15 @@ public class HDRImage
     //rallenta troppo
 
     //Variables HDR image
+    
+    /// <summary>
+    /// Width of the matrix of pixels.
+    /// </summary>
     public int Width { get; private set; }
 
+    /// <summary>
+    /// Height of the matrix of pixels.
+    /// </summary>
     public int Height { get; private set; }
     
     public Color[] Pixels { get; set; } //Controllare nullable (Color[])?
@@ -101,7 +111,7 @@ public class HDRImage
                 nameof(height) + " must be greater than zero");
         }
     }
-
+    
     /// <summary>
     /// Checks if the Pixel's lenght matches the number of elements in the HDRImage's matrix
     /// </summary>
@@ -110,7 +120,7 @@ public class HDRImage
     /// <param name="colorVector"></param>
     /// <exception cref="ArgumentNullException"></exception>
     /// <exception cref="ArgumentException"></exception>
-    public static void _CheckPixels(int width, int height, Color[] colorVector)
+    public static void _CheckPixels(int width, int height, in Color[] colorVector)
     {
         ArgumentNullException.ThrowIfNull(colorVector);
         if (colorVector.Length != width * height)
@@ -183,8 +193,7 @@ public class HDRImage
             Pixels[i] = colorVector[i];
         }
     }
-
-    //Costruttore immagine Hdr a partire da una stream
+    
     public HDRImage(Stream stream)
     {
         var img = ReadPFM_File(stream);
@@ -196,10 +205,8 @@ public class HDRImage
         {
             Pixels[i] = img.Pixels[i];
         }
-        
     }
-
-    //Costruttore immagine Hdr a partire da un file
+    
     public HDRImage(string fileName)
     {
         using (Stream filestream = File.OpenRead(fileName))
@@ -217,7 +224,7 @@ public class HDRImage
     }
 
     //Copy constructor
-    protected HDRImage(HDRImage other)
+    protected HDRImage( HDRImage other)
     {
         Width = other.Width;
         Height = other.Height;
@@ -231,8 +238,7 @@ public class HDRImage
     //Constructors - End
 
     /// <summary>
-    /// Returns a  string that displays the color matrix.
-    /// It can be useful to print it.
+    /// Returns a string that displays the color matrix.
     /// </summary>
     public override string ToString()
     {
@@ -288,9 +294,9 @@ public class HDRImage
     /// <param name="width"></param>
     /// <param name="height"></param>
     /// <exception cref="ArgumentException"></exception>
-    public static void _ParseImgSize(in string stringImgSize, out int width, out int height)
+    public static void _ParseImgSize(string stringImgSize, out int width, out int height)
     {
-        string[] stringSizeArray = stringImgSize.Split(" ");
+        string[] stringSizeArray = stringImgSize.Split(' ', StringSplitOptions.RemoveEmptyEntries);
         if (stringSizeArray.Length != 2)
         {
             throw new InvalidPfmFileFormat(
@@ -299,8 +305,8 @@ public class HDRImage
 
         try
         {
-            width = int.Parse(stringSizeArray[0]);
-            height = int.Parse(stringSizeArray[1]);
+            width = int.Parse(stringSizeArray[0], CultureInfo.InvariantCulture);
+            height = int.Parse(stringSizeArray[1], CultureInfo.InvariantCulture);
         }
         catch (ArgumentException ex)
         {
@@ -353,36 +359,58 @@ public class HDRImage
     }
 
     //forse è meglio mettere static anche ReadFloat (prima non lo era)?
+    
+    public string _ReadLine(BinaryReader br)
+    {
+        var bytes = new List<byte>();
+
+        while (true)
+        {
+            byte b;
+
+            try
+            {
+                b = br.ReadByte();
+            }
+            catch (EndOfStreamException)
+            {
+                if (bytes.Count == 0)
+                    return null;
+                break;
+            }
+
+            if (b == '\n')
+                break;
+
+            if (b != '\r')
+                bytes.Add(b);
+        }
+
+        return Encoding.ASCII.GetString(bytes.ToArray());
+    }
+
     /// <summary>
     /// Return the float value of the <c>Color</c> encoded as 4 bytes
     /// </summary>
-    /// <param name="stream"></param>
+    /// <param name="br"></param>
     /// <param name="bigEndian"></param>
     /// <returns></returns>
     /// <exception cref="InvalidPfmFileFormat"></exception>
-    public static float ReadFloat(Stream stream, bool bigEndian = true)
+    public float _ReadFloat(BinaryReader br, bool bigEndian = true)
     {
-        var value = new byte[4];
-        var totalRead = 0;
+        var bytes = br.ReadBytes(4);
 
-        while (totalRead < 4)
+        if (bytes.Length < 4)
         {
-            var bytesRead = stream.Read(value, totalRead, 4 - totalRead);
-
-            if (bytesRead == 0)
-            {
-                throw new InvalidPfmFileFormat("Impossibile leggere i file binari dai dati");
-            }
-
-            totalRead += bytesRead;
+            throw new InvalidPfmFileFormat("Unexpected end of file");
         }
-
-        if (BitConverter.IsLittleEndian != bigEndian)
+        
+        if (BitConverter.IsLittleEndian == bigEndian)
         {
-            Array.Reverse(value);
+            Array.Reverse(bytes);
         }
-
-        return BitConverter.ToSingle(value, 0);
+        
+        return BitConverter.ToSingle(bytes, 0);
     }
 
     public static void WriteFloat(Stream outputstream, float value)
@@ -390,46 +418,65 @@ public class HDRImage
         var seq = BitConverter.GetBytes(value);
         outputstream.Write(seq, 0, seq.Length);
     }
-
-    public static HDRImage ReadPFM_File(Stream stream)
-    {
-        int width;
-        int height;
-        StreamReader sr = new StreamReader(stream);
-        var magic = sr.ReadLine();
-        if (magic != "PF")
-        {
-            throw new InvalidPfmFileFormat("Invalid magic in PFM file");
-        }
-
-        var imgSize = sr.ReadLine();
-        _ParseImgSize(imgSize, out width, out height);
-
-        var endiannessLine = sr.ReadLine();
-        var endianness = _ParseEndianness(endiannessLine);
-
-        var result = new HDRImage(width, height);
-        var color = new Color();
-        for (int i = height - 1; i >= 0; i--)
-        {
-            for (int j = 0; j <= width; j++)
+    
+    public HDRImage ReadPFM_File(Stream stream)
+       {
+            using var br = new BinaryReader(stream);
+            var magic = _ReadLine(br);
+            if (magic != "PF")
             {
-                color.R = ReadFloat(stream, endianness);
-                color.G = ReadFloat(stream, endianness);
-                color.B = ReadFloat(stream, endianness);
-                result[j, i] = color;
+                throw new InvalidPfmFileFormat("Invalid magic in PFM file");
             }
+
+            var imgSize = _ReadLine(br);
+            if (imgSize == null)
+            {
+                throw new InvalidPfmFileFormat("Missing image size line");
+            }
+
+            _ParseImgSize(imgSize, out var width, out var height);
+
+            var endiannessLine = _ReadLine(br);
+            if (endiannessLine == null)
+            {
+                throw new InvalidPfmFileFormat("Missing endiannes line");
+            }
+            var endianness = _ParseEndianness(endiannessLine);
+            
+            /*Console.WriteLine($"POS BEFORE PIXELS: {br.BaseStream.Position}");
+            long expectedBytes = width * height * 3 * 4;
+            Console.WriteLine($"EXPECTED PIXEL BYTES: {expectedBytes}"); */
+
+            var result = new HDRImage(width, height);
+            //Console.WriteLine($"Width = {result.Width}, Height = {result.Height}");
+           
+            for (int i = height-1; i >= 0; i--){
+                for (int j = 0; j <= width-1; j++){
+                    //Console.WriteLine($"Column = {j}, Row = {i}");
+                    //Console.WriteLine($"Offset = {result._PixelOffset(j,i)}");
+                    //Console.WriteLine($"Offset 2 = {i * result.Width + j}");
+                    var color = new Color
+                    {
+                        R = _ReadFloat(br, endianness),
+                        G = _ReadFloat(br, endianness),
+                        B = _ReadFloat(br, endianness)
+                    };
+                    result[j, i]= color;
+                }
+            }
+
+            //if (result.Pixels != null) Console.WriteLine($"W={result.Width}, H={result.Height}, Pixels={result.Pixels.Length}");
+
+            return result;
         }
-
-        return result;
-    }
-
-    public static HDRImage ReadPFM_File(string filename)
+    
+    /*public static HDRImage ReadPFM_File(string filename)
     {
         return ReadPFM_File(File.OpenRead(filename));
-    }
+    }*/
 
     //io la cambierei il nome in WritePFM e basta
+    // Oveloading write_pfm con stream
     public static void WritePFM_File(HDRImage img, double endian, Stream filestream)
     {
         var header = Encoding.ASCII.GetBytes($"PF\n{img.Width} {img.Height}\n{endian}\n");
@@ -498,6 +545,7 @@ public class HDRImage
     /// Normalizes the RGB values of each pixel by the average luminosity computed by the AverageLuminosity function
     /// and by another empirical number (here called factor).
     /// The int luminosityFunction tells which of function of the color class to use to compute the luminosity of the pixel
+    /// averageLuminosity is an optional parameter you can use if you've already computed it previously.
     /// </summary>
     /// <param name="luminosityFunction"></param>
     /// <param name="factor"></param>
@@ -513,7 +561,6 @@ public class HDRImage
             Pixels[i] = Pixels[i] * (factor / (float)averageLuminosity);
         }
     }
-
 
     /// <summary>
     /// Resizes the RGB values of each pixel under 1,
@@ -544,7 +591,8 @@ public class HDRImage
     /// <summary>
     /// Returns the corresponding LDR image
     /// It accounts for the gamma correction of the display and of the empirical factor here named "factor"
-    /// The luminosityFunction parameter allow to choose between some possible ways to compute the luminosity of a pixel 
+    /// The luminosityFunction parameter allow to choose between some possible ways to compute the luminosity of a pixel.
+    /// averageLuminosity is an optional parameter you can use if you've already computed it previously.
     /// </summary>
     /// <param name="luminosityFunction"></param>
     /// <param name="factor"></param>
@@ -561,10 +609,14 @@ public class HDRImage
         image._ImageTo8BitRGB(gamma);
         return image;
     }
+
     // Methods for conversion to an LDR Image - End
 
     /// <summary>
-    /// Writes on the outputStream the corresponding LDR image
+    /// Writes on the outputStream the corresponding LDR image.
+    /// It accounts for the gamma correction of the display and of the empirical factor here named "factor".
+    /// The luminosityFunction parameter allow to choose between some possible ways to compute the luminosity of a pixel.
+    /// averageLuminosity is an optional parameter you can use if you've already computed it previously.
     /// </summary>
     /// <param name="outputStream"></param>
     /// <param name="luminosityFunction"></param>
@@ -595,18 +647,20 @@ public class HDRImage
 
     /// <summary>
     /// Creates a PNG file of the corresponding LDR image
+    /// It accounts for the gamma correction of the display and of the empirical factor here named "factor"
+    /// The luminosityFunction parameter allow to choose between some possible ways to compute the luminosity of a pixel
     /// </summary>
-    /// <param name="filename"></param>
+    /// <param name="outputFilename"></param>
     /// <param name="luminosityFunction"></param>
     /// <param name="factor"></param>
     /// <param name="gamma"></param>
     /// <param name="averageLuminosity"></param>
     /// <param name="delta"></param>
-    public void WritePNG(string filename, int luminosityFunction, float factor, float gamma,
+    public void WritePNG(string outputFilename, int luminosityFunction, float factor, float gamma,
         float? averageLuminosity = null,
         float delta = 1e-10f)
     {
-        using (Stream fileStream = File.OpenWrite(filename))
+        using (Stream fileStream = File.OpenWrite(outputFilename))
         {
             this.WritePNG(fileStream, luminosityFunction, factor, gamma, averageLuminosity, delta);
         }

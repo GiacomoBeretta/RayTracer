@@ -66,8 +66,9 @@ public struct HomMatrix
         ];
     }
 
+    /*
     /// <summary>
-    /// Constructs a rotation transformation,
+    /// Constructs a general rotation transformation,
     /// with the axis and angle of rotation passed as arguments.
     /// </summary>
     /// <param name="axis"></param>
@@ -77,17 +78,22 @@ public struct HomMatrix
     }*/
     //Constructors - End
 
+    /// <summary>
+    /// 1D index for the M matrix
+    /// </summary>
+    /// <param name="index"></param>
     public float this[Index index]
     {
         get => M[index];
         private set => M[index] = value;
     }
-
-    public static bool AreMatrixClose(HomMatrix a, HomMatrix b, float epsilon = 1e-5f)
+    
+    public float this[int row, int col]
     {
-        return Functions.AreArrayClose(a.M, b.M, epsilon);
+        get => M[_MatrixOffset(row, col)];
+        set => M[_MatrixOffset(row, col)] = value;
     }
-
+    
     /// <summary>
     /// Checks that the row and col are non-negative and less than 16
     /// </summary>
@@ -115,10 +121,9 @@ public struct HomMatrix
         return row * 4 + col;
     }
 
-    public float this[int row, int col]
+    public static bool AreMatrixClose(HomMatrix a, HomMatrix b, float epsilon = 1e-5f)
     {
-        get => M[_MatrixOffset(row, col)];
-        set => M[_MatrixOffset(row, col)] = value;
+        return Functions.AreArrayClose(a.M, b.M, epsilon);
     }
 
     public override string ToString()
@@ -155,34 +160,22 @@ public struct HomMatrix
         Console.WriteLine(ToString());
     }
 
-    //come si fa?
-    //non posso essere sicuro che la matrice che ottengo sia l'inversa per via delle operazioni sui float
+    /*
     /// <summary>
     /// Returns the inverse of the matrix passed as argument using the Gauss elimination method
-    /// We suppose that matrix is invertible.
     /// </summary>
     /// <param name="mat"></param>
     /// <returns></returns>
     /*public static float[] ComputeInverse(float[] mat)
     {
-        //Initialize invMatrix as identity Matrix
-        float[] invMatrix = new float[9];
-        for (int i = 0; i < 16; i++)
-        {
-            invMatrix[i] = 0;
+        float determinant = Determinant();
+        if(determinant == 0){
+            throw new Exception;
         }
-
-        invMatrix[0] = invMatrix[5] = invMatrix[10] = invMatrix[15] = 1.0f;
-
-        //We execute the same operations, that transforms mat into an identity matrix,
-        //on the invMatrix that now is an identity matrix, the result is exactly
-        //the inverse of mat.
-
-        //The following operations
-
         return invMatrix;
     }*/
 
+    //si può forse ottimizzare dato che l'ultima riga è 0,0,0,1?
     /// <summary>
     /// Returns the product of the 2 homogeneous matrices.
     /// </summary>
@@ -209,8 +202,9 @@ public struct HomMatrix
 }
 
 /// <summary>
-/// A Transformation is a 4x4 matrix that represents
+/// A Transformation represents
 /// scaling transformations, rotations and translations.
+/// It has two properties, the 4x4 homogeneous matrix and its inverse.
 /// </summary>
 public struct Transformation
 {
@@ -239,7 +233,7 @@ public struct Transformation
          _CheckConsistency();
      }*/
 
-    public Transformation(HomMatrix m, HomMatrix invM)
+    public Transformation(in HomMatrix m, in HomMatrix invM)
     {
         this.M = m;
         this.InvM = invM;
@@ -272,13 +266,91 @@ public struct Transformation
     /// <param name="scaleZ"></param>
     public Transformation(float scaleX, float scaleY, float scaleZ)
     {
+        if (scaleX == 0 || scaleY == 0 || scaleZ == 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(scaleX) + ", " + nameof(scaleY) + ", " + nameof(scaleZ) +
+                                                  " must be different from zero");
+        }
+
         M = new HomMatrix(scaleX, scaleY, scaleZ);
         InvM = new HomMatrix(1.0f / scaleX, 1.0f / scaleY, 1.0f / scaleZ);
         _CheckConsistency();
     }
 
     /// <summary>
-    /// Constructs a rotation transformation,
+    /// Constructs a rotation around one of the x,y,z axis
+    /// </summary>
+    /// <param name="axis"></param>
+    /// <param name="angle"></param>
+    public Transformation(char axis, float angle)
+    {
+        if (axis != 'x' && axis != 'y' && axis != 'z')
+        {
+            throw new ArgumentOutOfRangeException(nameof(axis), axis, nameof(axis) + " must be one of x,y,z");
+        }
+
+        float c = MathF.Cos(angle);
+        float s = MathF.Sin(angle);
+
+        switch (axis)
+        {
+            case 'x':
+
+                M = new HomMatrix
+                ([
+                    1, 0, 0, 0,
+                    0, c, -s, 0,
+                    0, s, c, 0,
+                    0, 0, 0, 1
+                ]);
+                InvM = new HomMatrix
+                ([
+                    1, 0, 0, 0,
+                    0, c, s, 0,
+                    0, -s, c, 0,
+                    0, 0, 0, 1
+                ]);
+                break;
+            case 'y':
+                M = new HomMatrix
+                ([
+                    c, 0, s, 0,
+                    0, 1, 0, 0,
+                    -s, 0, c, 0,
+                    0, 0, 0, 1
+                ]);
+                InvM = new HomMatrix
+                ([
+                    c, 0, -s, 0,
+                    0, 1, 0, 0,
+                    s, 0, c, 0,
+                    0, 0, 0, 1
+                ]);
+                break;
+            case 'z':
+                M = new HomMatrix
+                ([
+                    c, -s, 0, 0,
+                    s, c, 0, 0,
+                    0, 0, 1, 0,
+                    0, 0, 0, 1
+                ]);
+                InvM = new HomMatrix
+                ([
+                    c, s, 0, 0,
+                    -s, c, 0, 0,
+                    0, 0, 1, 0,
+                    0, 0, 0, 1
+                ]);
+                break;
+        }
+
+        _CheckConsistency();
+    }
+
+    /*
+    /// <summary>
+    /// Constructs a generic rotation transformation,
     /// with the axis and angle of rotation passed as arguments.
     /// </summary>
     /// <param name="axis"></param>
@@ -324,7 +396,7 @@ public struct Transformation
         }
     }
 
-    public static bool AreTransformationsClose(Transformation t1, Transformation t2, float epsilon = 1e-5f)
+    public static bool AreTransformationsClose(in Transformation t1, in Transformation t2, float epsilon = 1e-5f)
     {
         return HomMatrix.AreMatrixClose(t1.M, t2.M, epsilon)
                && HomMatrix.AreMatrixClose(t1.InvM, t2.InvM, epsilon);
@@ -364,7 +436,7 @@ public struct Transformation
     /// <param name="t1"></param>
     /// <param name="t2"></param>
     /// <returns></returns>
-    public static Transformation operator *(Transformation t1, Transformation t2)
+    public static Transformation operator *(in Transformation t1, in Transformation t2)
     {
         HomMatrix prod = t1.M * t2.M;
         HomMatrix invProd = t2.InvM * t1.InvM;
@@ -378,7 +450,7 @@ public struct Transformation
     /// <param name="t"></param>
     /// <param name="v"></param>
     /// <returns></returns>
-    public static Vector operator *(Transformation t, Vector v)
+    public static Vector operator *(in Transformation t, Vector v)
     {
         Vector v2 = new Vector
         (
@@ -388,7 +460,6 @@ public struct Transformation
         );
         return v2;
     }
-    
     /// <summary>
     /// Returns the transformed point obtained by multiplying the matrix by the point (matrix–vector multiplication).
     /// We use homogeneous coordinates, so the points have their 4th coordinate equal to 1.
@@ -396,7 +467,7 @@ public struct Transformation
     /// <param name="t"></param>
     /// <param name="p1"></param>
     /// <returns></returns>
-    public static Point operator *(Transformation t, Point p1)
+    public static Point operator *(in Transformation t, Point p1)
     {
         Point p2 = new Point
         (
@@ -423,7 +494,7 @@ public struct Transformation
     /// <param name="t"></param>
     /// <param name="n1"></param>
     /// <returns></returns>
-    public static Normal operator *(Transformation t, Normal n1)
+    public static Normal operator *(in Transformation t, Normal n1)
     {
         Normal n2 = new Normal
         (

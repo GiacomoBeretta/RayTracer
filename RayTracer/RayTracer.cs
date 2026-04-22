@@ -12,7 +12,7 @@ public static class RayTracer
 
     public static int Main(string[] args)
     {
-/*        try
+        try
         {
             ParseArgs(args);
         }
@@ -20,7 +20,7 @@ public static class RayTracer
         {
             Console.WriteLine("Error: " + e.Message);
             return 1;
-        }*/
+        }
 
         string currentPath = AppDomain.CurrentDomain.BaseDirectory;
         string pfmFilePath = Path.Combine(currentPath, "../../../../TracerTests/reference_be.pfm");

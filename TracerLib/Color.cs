@@ -4,9 +4,9 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace TracerLib;
 
-//rivedere dopo aver letto di try-except (per l'operatore *)
+//forse un controllo sul prodotto per scalare è troppo?
 //forse è meglio passare by value per efficienza certi argomenti, meglio chiedere a Tomasi
-//magari si può migliorare la classe usando i primary constructor?
+//magari si può migliorare lo struct usando i primary constructor?
 
 /// <summary>
 /// A Color type is identified by 3 float positive values R,G,B.
@@ -66,6 +66,10 @@ public struct Color
     /// <returns></returns>
     public static Color operator *(Color a, float alpha)
     {
+        if (alpha < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(alpha), alpha, nameof(alpha) + " must be non-negative");
+        }
         return new Color(a.R * alpha, a.G * alpha, a.B * alpha);
     }
     
@@ -118,8 +122,8 @@ public struct Color
                && Functions.AreClose(c1.G, c2.G, epsilon)
                && Functions.AreClose(c1.B, c2.B, epsilon);
     }
-
-/*   public static bool _are_close(Color a, Color b, float epsilon = 1e-5f)
+    
+    /*   public static bool _are_close(Color a, Color b, float epsilon = 1e-5f)
     {
         return MathF.Abs(a.R - b.R) < epsilon && MathF.Abs(a.G - b.G) < epsilon && MathF.Abs(a.B - b.B) < epsilon;
     }*/
@@ -142,10 +146,10 @@ public struct Color
         Console.WriteLine(ToString());
     }
 
-// public bool _AreColorsValid(float R, float G, float B)
-// {
-//     return R >= 0 && G >= 0 && B >= 0;
-// }
+    // public bool _AreColorsValid(float R, float G, float B)
+    // {
+    //     return R >= 0 && G >= 0 && B >= 0;
+    // }
 
     /// <summary>
     /// Returns the luminosity of a pixel using the formula given by Shirley and Morley in their book
@@ -199,10 +203,21 @@ public struct Color
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public Color To8BitRGB(float gamma)
     {
+<<<<<<< HEAD
         var r = (float)Math.Round(255 * MathF.Pow(R, 1.0f / gamma));
         var g = (float)Math.Round(255 * MathF.Pow(G, 1.0f / gamma));
         var b = (float)Math.Round(255 * MathF.Pow(B, 1.0f / gamma));
+=======
+        if (gamma <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(gamma), gamma, nameof(gamma) + " must be greater than 0");
+        }
+        float r = (float)Math.Round(255 * MathF.Pow(R, 1.0f / gamma));
+        float g = (float)Math.Round(255 * MathF.Pow(G, 1.0f / gamma));
+        float b = (float)Math.Round(255 * MathF.Pow(B, 1.0f / gamma));
+>>>>>>> geometry
 
         return new Color(r, g, b);
     }
+    
 }

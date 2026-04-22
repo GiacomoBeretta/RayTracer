@@ -25,13 +25,26 @@ public class NormalTest
     }
 
     [Fact]
-    public void NormalVectorProduct()
+    public void NormalVectorProductTest()
     {
         var n = new Normal(1.0f, 2.0f, 3.0f);
         var v = new Vector(4.0f, 5.0f, 6.0f);
         
         Assert.True(Functions.AreClose(32.0f , n * v));
         Assert.True(Functions.AreClose(32.0f , v * n));
+    }
+
+    [Fact]
+    public void NormalVectorCrossTest()
+    {
+        var n = new Normal(1.0f, 2.0f, 3.0f);
+        var v = new Vector(4.0f, 5.0f, 6.0f);
+        var n2 = new Normal(7.0f, 8.0f, 9.0f);
+        
+        Assert.True(Vector._AreVectorsClose(new Vector(-3.0f,6f,-3f), Normal.CrossProduct(n,v)));
+        Assert.True(Vector._AreVectorsClose(new Vector(3.0f,-6.0f,3.0f), Normal.CrossProduct(v,n)));
+        Assert.True(Vector._AreVectorsClose(new Vector(6.0f,-12.0f,6.0f), Normal.CrossProduct(n2,n)));
+        Assert.True(Vector._AreVectorsClose(new Vector(6.0f,-12.0f,6.0f), Normal.CrossProduct(n2,n)));
     }
 
     //Prima di proseguire con i test del proddoto vettore occorre implementare la _AreCloseVector
