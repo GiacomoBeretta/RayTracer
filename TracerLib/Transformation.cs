@@ -279,6 +279,7 @@ public struct Transformation
 
     /// <summary>
     /// Constructs a rotation around one of the x,y,z axis
+    /// The angle is in radian
     /// </summary>
     /// <param name="axis"></param>
     /// <param name="angle"></param>

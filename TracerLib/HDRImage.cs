@@ -437,10 +437,13 @@ public class HDRImage
             return result;
         }
     
-    /*public static HDRImage ReadPFM_File(string filename)
+    public static HDRImage ReadPFM_File(string filename)
     {
-        return ReadPFM_File(File.OpenRead(filename));
-    }*/
+        using (Stream filestream = File.OpenRead(filename))
+        {
+            return ReadPFM_File(filestream);
+        }
+    }
 
     //io la cambierei il nome in WritePFM e basta
     // Oveloading write_pfm con stream
