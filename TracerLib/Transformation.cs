@@ -388,8 +388,7 @@ public struct Transformation
         );
         return v2;
     }
-
-    /*
+    
     /// <summary>
     /// Returns the transformed point obtained by multiplying the matrix by the point (matrix–vector multiplication).
     /// We use homogeneous coordinates, so the points have their 4th coordinate equal to 1.
@@ -433,5 +432,5 @@ public struct Transformation
             t.InvM[2] * n1.X + t.InvM[6] * n1.Y + t.InvM[10] * n1.Z
         );
         return n2;
-    }*/
+    }
 }

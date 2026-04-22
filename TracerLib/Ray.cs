@@ -26,5 +26,10 @@ public struct Ray
     {
         return this.Origin + this.Dir * t; 
     }
+
+    public static Ray operator *(Ray r, Transformation t)
+    {
+        return new Ray(t * r.Origin, t * r.Dir);
+    }
     
 }

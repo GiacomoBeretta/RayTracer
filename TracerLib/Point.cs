@@ -46,6 +46,16 @@ public struct Point
         return new Point(a.X - b.X, a.Y - b.Y, a.Z - b.Z);
     }
 
+    public static Point operator *(Point a, float f)
+    {
+        return new Point(a.X * f, a.Y * f, a.Z * f);
+    }
+    
+    public static Point operator *(float f, Point a)
+    {
+        return new Point(a.X * f, a.Y * f, a.Z * f);
+    }
+
     public Vector ToVector()
     {
         return new Vector(this.X, this.Y, this.Z);
