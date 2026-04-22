@@ -1,7 +1,7 @@
 // This file is release under EUPL_v1.2 license. See LICENSE.md
 
 //forse è meglio cambiare nome ai membri di HomMatrix e Transformation,
-//per ora hanno entrambi M
+//per ora hanno entrambi 
 
 namespace TracerLib;
 
