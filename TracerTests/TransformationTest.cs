@@ -45,7 +45,6 @@ public class HomMatrixTests
             0, 0, 1, k.Z,
             0, 0, 0, 1
         ];
-        HomMatrix expected = new HomMatrix(expectedArray);
         Assert.Equal(expectedArray, actual.M);
     }
 
@@ -149,6 +148,7 @@ public class HomMatrixTests
         Assert.Equal(9, matrix._MatrixOffset(2, 1));
         Assert.Equal(10, matrix._MatrixOffset(2, 2));
         Assert.Equal(15, matrix._MatrixOffset(3, 3));
+        Assert.Throws<ArgumentOutOfRangeException>(() => matrix._MatrixOffset(-1, 16));        
     }
 
     [Fact]
@@ -347,6 +347,71 @@ public class TransformationTest
         Transformation t = new Transformation(x, y, z);
         Assert.Equal(expectedArray, t.M.M);
         Assert.Equal(expectedArrayInv, t.InvM.M);
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => new Transformation(0, 1, 3));
+        Assert.Throws<ArgumentOutOfRangeException>(() => new Transformation(3, 0, 23));
+        Assert.Throws<ArgumentOutOfRangeException>(() => new Transformation(302, 29, 0));
+        Assert.Throws<ArgumentOutOfRangeException>(() => new Transformation(0, 0, 0));
+    }
+
+    [Fact]
+    public void TestConstructorRotationMainAxes()
+    {
+        char axis = 'z';
+        float alpha = MathF.PI / 2;
+        float[] m =
+        [
+            0, -1, 0, 0,
+            1, 0, 0, 0,
+            0, 0, 1, 0,
+            0, 0, 0, 1
+        ];
+        float[] invM =
+        [
+            0, 1, 0, 0,
+            -1, 0, 0, 0,
+            0, 0, 1, 0,
+            0, 0, 0, 1
+        ];
+
+        Transformation t = new Transformation(axis, alpha);
+        Assert.True(Functions.AreArrayClose(m, t.M.M));
+        Assert.True(Functions.AreArrayClose(invM, t.InvM.M));
+
+        axis = 'y';
+        alpha = MathF.PI;
+        m = invM =
+        [
+            -1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, -1, 0,
+            0, 0, 0, 1
+        ];
+        t = new Transformation(axis, alpha);
+        Assert.True(Functions.AreArrayClose(m, t.M.M));
+        Assert.True(Functions.AreArrayClose(invM, t.InvM.M));
+
+        axis = 'x';
+        alpha = MathF.PI * 1.5f;
+        m =
+        [
+            1, 0, 0, 0,
+            0, 0, 1, 0,
+            0, -1, 0, 0,
+            0, 0, 0, 1
+        ];
+        invM =
+        [
+            1, 0, 0, 0,
+            0, 0, -1, 0,
+            0, 1, 0, 0,
+            0, 0, 0, 1
+        ];
+        t = new Transformation(axis, alpha);
+        Assert.True(Functions.AreArrayClose(m, t.M.M));
+        Assert.True(Functions.AreArrayClose(invM, t.InvM.M));
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => new Transformation('a', alpha));
     }
 
     [Fact]
@@ -644,15 +709,9 @@ public class TransformationTest
         Vector expected = new Vector(14.0f, 38.0f, 51.0f);
 
         Assert.Equal(expected, t * v);
-        //are close se non funziona
-        /*
-
-           expected_n = Normal(-8.75, 7.75, -3.0)
-           assert expected_n.is_close(m * Normal(3.0, 2.0, 4.0))
-         */
     }
 
-/*
+
     [Fact]
     public void TestProductPoint()
     {
@@ -676,13 +735,12 @@ public class TransformationTest
         Point expected = new Point(18.0f, 46.0f, 58.0f);
 
         Assert.Equal(expected, t * p);
-        //are close se non funziona
     }
 
     [Fact]
     public void TestProductNormal()
     {
-        Normal n = new Normal(1, 2, 3);
+        Normal n = new Normal(3, 2, 4);
         float[] m =
         [
             1.0f, 2.0f, 3.0f, 4.0f,
@@ -698,11 +756,7 @@ public class TransformationTest
             0.0f, 0.0f, 0.0f, 1.0f,
         ];
         Transformation t = new Transformation(m, invM);
-
         Normal expected = new Normal(-8.75f, 7.75f, -3.0f);
-
         Assert.Equal(expected, t * n);
-        //are close se non funziona
     }
-    */
 }

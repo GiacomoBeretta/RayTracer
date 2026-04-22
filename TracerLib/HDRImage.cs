@@ -19,6 +19,7 @@ using System.Text; //for the Encoding.ASCII.GetBytes
 /// An HDRImage is essentially a matrix of colors with RGB floats (see the Color class)
 /// with a Width and a Height of type integer and a one dimensional (for efficiency reason) vector called Pixels
 /// Attention: the matrix elements are indexed by giving first the column and then the row!
+/// The first pixel is the one at the top left.
 /// </summary>
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 public class HDRImage
@@ -30,8 +31,15 @@ public class HDRImage
     //rallenta troppo
 
     //Variables HDR image
+    
+    /// <summary>
+    /// Width of the matrix of pixels.
+    /// </summary>
     public int Width { get; private set; }
 
+    /// <summary>
+    /// Height of the matrix of pixels.
+    /// </summary>
     public int Height { get; private set; }
     
     public Color[] Pixels { get; set; } //Controllare nullable (Color[])?
@@ -104,7 +112,7 @@ public class HDRImage
         }
     }
 
-    public static void _CheckPixels(int width, int height, Color[] colorVector)
+    public static void _CheckPixels(int width, int height, in Color[] colorVector)
     {
         ArgumentNullException.ThrowIfNull(colorVector);
         if (colorVector.Length != width * height)
@@ -173,8 +181,7 @@ public class HDRImage
             Pixels[i] = colorVector[i];
         }
     }
-
-    //Costruttore immagine Hdr a partire da una stream
+    
     public HDRImage(Stream stream)
     {
         var img = ReadPFM_File(stream);
@@ -187,8 +194,7 @@ public class HDRImage
             Pixels[i] = img.Pixels[i];
         }
     }
-
-    //Costruttore immagine Hdr a partire da un file
+    
     public HDRImage(string fileName)
     {
         using (Stream filestream = File.OpenRead(fileName))
@@ -198,7 +204,7 @@ public class HDRImage
     }
 
     //Copy constructor
-    protected HDRImage(HDRImage other)
+    protected HDRImage( HDRImage other)
     {
         Width = other.Width;
         Height = other.Height;
@@ -212,8 +218,7 @@ public class HDRImage
     //Constructors - End
 
     /// <summary>
-    /// Returns a  string that displays the color matrix.
-    /// It can be useful to print it.
+    /// Returns a string that displays the color matrix.
     /// </summary>
     public override string ToString()
     {
@@ -266,7 +271,7 @@ public class HDRImage
     /// <param name="width"></param>
     /// <param name="height"></param>
     /// <exception cref="ArgumentException"></exception>
-    public static void _ParseImgSize(in string stringImgSize, out int width, out int height)
+    public static void _ParseImgSize(string stringImgSize, out int width, out int height)
     {
         string[] stringSizeArray = stringImgSize.Split(' ', StringSplitOptions.RemoveEmptyEntries);
         if (stringSizeArray.Length != 2)
@@ -510,6 +515,7 @@ public class HDRImage
     /// Normalizes the RGB values of each pixel by the average luminosity computed by the AverageLuminosity function
     /// and by another empirical number (here called factor).
     /// The int luminosityFunction tells which of function of the color class to use to compute the luminosity of the pixel
+    /// averageLuminosity is an optional parameter you can use if you've already computed it previously.
     /// </summary>
     /// <param name="luminosityFunction"></param>
     /// <param name="factor"></param>
@@ -525,7 +531,6 @@ public class HDRImage
             Pixels[i] = Pixels[i] * (factor / (float)averageLuminosity);
         }
     }
-
 
     /// <summary>
     /// Resizes the RGB values of each pixel under 1,
@@ -556,7 +561,8 @@ public class HDRImage
     /// <summary>
     /// Returns the corresponding LDR image
     /// It accounts for the gamma correction of the display and of the empirical factor here named "factor"
-    /// The luminosityFunction parameter allow to choose between some possible ways to compute the luminosity of a pixel 
+    /// The luminosityFunction parameter allow to choose between some possible ways to compute the luminosity of a pixel.
+    /// averageLuminosity is an optional parameter you can use if you've already computed it previously.
     /// </summary>
     /// <param name="luminosityFunction"></param>
     /// <param name="factor"></param>
@@ -577,7 +583,10 @@ public class HDRImage
     // Methods for conversion to an LDR Image - End
 
     /// <summary>
-    /// Writes on the outputStream the corresponding LDR image
+    /// Writes on the outputStream the corresponding LDR image.
+    /// It accounts for the gamma correction of the display and of the empirical factor here named "factor".
+    /// The luminosityFunction parameter allow to choose between some possible ways to compute the luminosity of a pixel.
+    /// averageLuminosity is an optional parameter you can use if you've already computed it previously.
     /// </summary>
     /// <param name="outputStream"></param>
     /// <param name="luminosityFunction"></param>
@@ -608,18 +617,20 @@ public class HDRImage
 
     /// <summary>
     /// Creates a PNG file of the corresponding LDR image
+    /// It accounts for the gamma correction of the display and of the empirical factor here named "factor"
+    /// The luminosityFunction parameter allow to choose between some possible ways to compute the luminosity of a pixel
     /// </summary>
-    /// <param name="filename"></param>
+    /// <param name="outputFilename"></param>
     /// <param name="luminosityFunction"></param>
     /// <param name="factor"></param>
     /// <param name="gamma"></param>
     /// <param name="averageLuminosity"></param>
     /// <param name="delta"></param>
-    public void WritePNG(string filename, int luminosityFunction, float factor, float gamma,
+    public void WritePNG(string outputFilename, int luminosityFunction, float factor, float gamma,
         float? averageLuminosity = null,
         float delta = 1e-10f)
     {
-        using (Stream fileStream = File.OpenWrite(filename))
+        using (Stream fileStream = File.OpenWrite(outputFilename))
         {
             this.WritePNG(fileStream, luminosityFunction, factor, gamma, averageLuminosity, delta);
         }
