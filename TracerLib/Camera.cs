@@ -21,13 +21,13 @@ public struct OrthogonalCamera : ICamera
         return new Ray(); //Da modificare 
     } 
     
-    public struct PrespectiveCamera: ICamera
+    public struct PerspectiveCamera: ICamera
     {
         public float Distance { get; set; }
         public float AspectRatio { get; set; }
         public Transformation Transformation { get; set; }
 
-        public PrespectiveCamera(float distance, float aspectRatio, Transformation transformation)
+        public PerspectiveCamera(float distance, float aspectRatio, Transformation transformation)
         {
             Distance = distance;
             AspectRatio = aspectRatio;
