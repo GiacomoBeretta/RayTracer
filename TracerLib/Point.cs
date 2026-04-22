@@ -26,7 +26,7 @@ public struct Point
         Console.WriteLine(ToString());
     }
 
-    public static bool _AreClosePoint(Point a, Point b)
+    public static bool _ArePointsClose(Point a, Point b)
     {
         return Functions.AreClose(a.X, b.X) && Functions.AreClose(a.Y, b.Y) && Functions.AreClose(a.Z, b.Z);
     }
