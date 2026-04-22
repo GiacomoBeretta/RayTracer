@@ -20,6 +20,6 @@ public class RayTest
     {
         var ray = new Ray(new Point(1.0f, 2.0f, 3.0f), new Vector(6.0f, 5.0f, 4.0f));
         var traslation = new Transformation(new Vector(10.0f, 11.0f, 12.0f));
-        var rotation = new Transformation()
+        var rotation = new Transformation('x', MathF.PI);
     }
 }
