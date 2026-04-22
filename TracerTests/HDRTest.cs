@@ -407,5 +407,4 @@ public class HDRTest
     public void TestWritePNG()
     {
     }
-    
 }

@@ -359,7 +359,6 @@ public class HDRImage
     }
 
     //forse è meglio mettere static anche ReadFloat (prima non lo era)?
-    
     public string _ReadLine(BinaryReader br)
     {
         var bytes = new List<byte>();
@@ -469,14 +468,12 @@ public class HDRImage
 
             return result;
         }
-    
     /*public static HDRImage ReadPFM_File(string filename)
     {
         return ReadPFM_File(File.OpenRead(filename));
     }*/
 
     //io la cambierei il nome in WritePFM e basta
-    // Oveloading write_pfm con stream
     public static void WritePFM_File(HDRImage img, double endian, Stream filestream)
     {
         var header = Encoding.ASCII.GetBytes($"PF\n{img.Width} {img.Height}\n{endian}\n");
@@ -610,6 +607,14 @@ public class HDRImage
         return image;
     }
 
+    
+    public void Clamp_Image()
+    {
+        for (int i = 0; i < Pixels.Length; i++)
+        {
+            Pixels[i]._Clamp();
+        }
+    }
     // Methods for conversion to an LDR Image - End
 
     /// <summary>

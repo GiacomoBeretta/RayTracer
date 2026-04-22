@@ -203,11 +203,6 @@ public struct Color
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public Color To8BitRGB(float gamma)
     {
-<<<<<<< HEAD
-        var r = (float)Math.Round(255 * MathF.Pow(R, 1.0f / gamma));
-        var g = (float)Math.Round(255 * MathF.Pow(G, 1.0f / gamma));
-        var b = (float)Math.Round(255 * MathF.Pow(B, 1.0f / gamma));
-=======
         if (gamma <= 0)
         {
             throw new ArgumentOutOfRangeException(nameof(gamma), gamma, nameof(gamma) + " must be greater than 0");
@@ -215,7 +210,7 @@ public struct Color
         float r = (float)Math.Round(255 * MathF.Pow(R, 1.0f / gamma));
         float g = (float)Math.Round(255 * MathF.Pow(G, 1.0f / gamma));
         float b = (float)Math.Round(255 * MathF.Pow(B, 1.0f / gamma));
->>>>>>> geometry
+
 
         return new Color(r, g, b);
     }
