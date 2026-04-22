@@ -2,7 +2,7 @@ namespace TracerLib;
 
 public interface ICamera
 {
-    Ray FireRay(float u, float v);
+    public Ray FireRay(float u, float v);
 }
 
 public struct OrthogonalCamera : ICamera
