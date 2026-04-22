@@ -99,7 +99,7 @@ public struct Color
     }*/
 
     /// <summary>
-    /// Return a formatted string with the RGB colors.
+    /// Returns a formatted string with the RGB colors.
     /// </summary>
     /// <returns></returns>
     public override string ToString()

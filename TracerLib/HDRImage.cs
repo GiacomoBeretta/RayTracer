@@ -1,15 +1,12 @@
 // This file is release under EUPL_v1.2 license. See LICENSE.md
 
 //implementare dei controlli per i constructor e in altre funzioni se necessario, vediamo cosa dice Tomasi in proposito.
-//forse si possono mettere i i membri privati e rendere la classe dei test una friend?
+//forse si possono mettere i membri privati e rendere la classe dei test una friend?
 
 using System.Diagnostics.CodeAnalysis; // per sopprimere i messaggi di errore
-using
-    System.Globalization; //per il metodo cultureInfo e quindi per risolvere il problema dell'1.0 che viene letto come 10
+using System.Globalization; //per il metodo cultureInfo e quindi per risolvere il problema dell'1.0 che viene letto come 10
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats; //for the Rgb24 Pixel Format
-
-using System.Globalization;
 
 namespace TracerLib;
 
@@ -608,7 +605,7 @@ public class HDRImage
             {
                 //the Rgb format requires 3 numbers of the type byte
                 //so we must convert the RGB values to bytes
-                bitmap[i, j] = new Rgb24((byte)this[i, j].R, (byte)this[i, j].G, (byte)this[i, j].B);
+                bitmap[i, j] = new Rgb24((byte)LDRimage[i, j].R, (byte)LDRimage[i, j].G, (byte)LDRimage[i, j].B);
             }
         }
 
