@@ -23,23 +23,21 @@ public struct OrthogonalCamera : ICamera
     }
 }
 
-public struct PerspectiveCamera: ICamera
-    {
-        public float Distance { get; set; }
-        public float AspectRatio { get; set; }
-        public Transformation Transformation { get; set; }
+public struct PerspectiveCamera : ICamera
+{
+    public float Distance { get; set; }
+    public float AspectRatio { get; set; }
+    public Transformation Transformation { get; set; }
 
-        public PerspectiveCamera(float distance, float aspectRatio, Transformation transformation)
-        {
-            Distance = distance;
-            AspectRatio = aspectRatio;
-            Transformation = transformation;
-        }
-        
-        public Ray FireRay(float u, float v)
-        {
-            return new Ray();
-        }
+    public PerspectiveCamera(float distance, float aspectRatio, Transformation transformation)
+    {
+        Distance = distance;
+        AspectRatio = aspectRatio;
+        Transformation = transformation;
     }
-    
+
+    public Ray FireRay(float u, float v)
+    {
+        return new Ray();
+    }
 }
