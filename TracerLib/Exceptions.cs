@@ -1,9 +1,10 @@
+// This file is release under EUPL_v1.2 license. See LICENSE.md
+
 namespace TracerLib;
 //namespace Exception;
 
 public class InvalidPfmFileFormat : FormatException
 {
-    public InvalidPfmFileFormat() : base() { }
     public InvalidPfmFileFormat(string errorMessage) : base (errorMessage) { }
     public InvalidPfmFileFormat(string message, Exception inner) : base(message, inner) { }
 }
