@@ -2,6 +2,7 @@ namespace TracerLib;
 
 public interface ICamera
 {
+    public float AspectRatio { get; set; }
     public Ray FireRay(float u, float v);
 }
 
