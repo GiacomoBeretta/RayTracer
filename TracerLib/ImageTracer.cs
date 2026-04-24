@@ -21,19 +21,20 @@ public class ImageTracer
     }
 
     /// <summary>
-    /// Returns the Ray that passes through the pixel at (column, row).
+    /// Returns the <c>Ray</c> that passes through the pixel at (column, row).
     /// Since a pixel is not a point uPixel and vPixel are the coordinates inside the pixel at which the ray will be fired.
     /// If (uPixel, vPixel)=(0,0) it means the ray will be fired at the left bottom angle of the pixel
+    /// See <c>Camera</c> for more information
     /// </summary>
     /// <param name="column"></param>
     /// <param name="row"></param>
     /// <param name="uPixel"></param>
     /// <param name="vPixel"></param>
     /// <returns></returns>
-    public Ray FireRay(int column, int row, float uPixel=0.5f, float vPixel=0.5f)
+    public Ray FireRay(int column, int row, float uPixel = 0.5f, float vPixel = 0.5f)
     {
-        float u = (column + uPixel)/(image.Width - 1);
-        float v = (row + vPixel)/(image.Height -1);
+        float u = (column + uPixel) / image.Width;
+        float v = 1 - (1 + row - vPixel) / image.Height; //(image.Height - 1 - row + vPixel) / image.Height;
         return camera.FireRay(u, v);
     }
 
