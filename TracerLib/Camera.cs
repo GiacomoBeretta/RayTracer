@@ -37,6 +37,13 @@ public struct PerspectiveCamera: ICamera
             Transformation = transformation;
         }
         
+        /// <summary>
+        /// Returns a <c>Ray</c> starting at (-d, 0, 0) and directed toward the point defined by normalized screen coordinates (u, v).
+        /// u and v are in [0, 1], mapped to screen space: x ∈ [-R, R] (R = aspect ratio) and y ∈ [-1, 1].
+        /// </summary>
+        /// <param name="u"></param>
+        /// <param name="v"></param>
+        /// <returns></returns>
         public Ray FireRay(float u, float v)
         {
             var origin = new Point(-this.Distance, 0.0f, 0.0f);
