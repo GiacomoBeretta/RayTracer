@@ -19,7 +19,8 @@ public class ImageTracer
         this.image = image;
         this.camera = camera;
     }
-
+    
+    //attenzione che Tomasi ha una formula diversa: da chiedere!!
     /// <summary>
     /// Returns the <c>Ray</c> that passes through the pixel at (column, row).
     /// Since a pixel is not a point uPixel and vPixel are the coordinates inside the pixel at which the ray will be fired.
@@ -33,8 +34,8 @@ public class ImageTracer
     /// <returns></returns>
     public Ray FireRay(int column, int row, float uPixel = 0.5f, float vPixel = 0.5f)
     {
-        float u = (column + uPixel) / image.Width;
-        float v = 1 - (1 + row - vPixel) / image.Height; //(image.Height - 1 - row + vPixel) / image.Height;
+        float u = (column + uPixel) / image.Width; 
+        float v = 1 - (1 + row - vPixel) / image.Height; //equivale a (image.Height - 1 - row + vPixel) / image.Height;
         return camera.FireRay(u, v);
     }
 
