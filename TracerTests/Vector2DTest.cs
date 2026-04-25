@@ -5,6 +5,14 @@ namespace TracerTests;
 public class Vector2DTest
 {
     [Fact]
+    public void TestConstructor()
+    {
+        Vector2D v1 = new Vector2D(9.33409f, 5.67803f);
+        Assert.Equal(9.33409f, v1.U);
+        Assert.Equal(5.67803f, v1.V);
+    }
+    
+    [Fact]
     public void TestToString()
     {
         Vector2D v = new Vector2D(3, 5);
