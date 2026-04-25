@@ -1,6 +1,6 @@
 using TracerLib;
 
-namespace TransformationTests;
+namespace TracerTests;
 
 public class HomMatrixTests
 {

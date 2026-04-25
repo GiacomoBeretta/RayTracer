@@ -1,6 +1,6 @@
 using TracerLib;
 
-namespace FunctionsTests;
+namespace TracerTests;
 
 public class FunctionsTest
 {

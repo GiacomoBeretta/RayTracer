@@ -1,6 +1,6 @@
-namespace VectorTests;
-
 using TracerLib;
+
+namespace TracerTests;
 
 public class VectorTest
 {

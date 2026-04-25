@@ -1,6 +1,6 @@
 using TracerLib;
 
-namespace ColorTests;
+namespace TracerTests;
 //Per avviare un test occorre solo premere il triangolo verde accanto a ogni singolo test (oppure accanto alla classe test per farli tutti)
 
 public class ColorTest
