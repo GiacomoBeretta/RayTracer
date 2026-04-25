@@ -4,8 +4,7 @@
 // Forse si possono mettere i membri privati e rendere la classe dei test una friend?
 
 using System.Diagnostics.CodeAnalysis; // per sopprimere i messaggi di errore
-using
-    System.Globalization; //per il metodo cultureInfo e quindi per risolvere il problema dell'1.0 che viene letto come 10
+using System.Globalization; //per il metodo cultureInfo e quindi per risolvere il problema dell'1.0 che viene letto come 10
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats; //for the Rgb24 Pixel Format
 
@@ -409,7 +408,7 @@ public class HDRImage
         return BitConverter.ToSingle(bytes, 0);
     }
 
-    public static void WriteFloat(Stream outputstream, float value)
+    public static void _WriteFloat(Stream outputstream, float value)
     {
         var seq = BitConverter.GetBytes(value);
         outputstream.Write(seq, 0, seq.Length);
@@ -488,9 +487,9 @@ public class HDRImage
             for (int j = 0; j <= img.Width; j++)
             {
                 var color = img[j, i];
-                WriteFloat(filestream, color.R);
-                WriteFloat(filestream, color.G);
-                WriteFloat(filestream, color.B);
+                _WriteFloat(filestream, color.R);
+                _WriteFloat(filestream, color.G);
+                _WriteFloat(filestream, color.B);
             }
         }
     }
