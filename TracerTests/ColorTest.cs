@@ -31,7 +31,7 @@ public class ColorTest
     }
 
     [Fact]
-    public void TestScalarProduct()
+    public void TestProductWithFloat()
     {
         Color c1 = new Color(1, 22, 333);
         float a = 2f;
