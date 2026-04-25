@@ -4,7 +4,7 @@ using TracerLib;
 namespace TracerTests;
 
 [SuppressMessage("ReSharper", "InconsistentNaming")]
-public class HDRTest
+public class HDRImageTest
 {
     [Fact]
     public void TestAreCoordinatesValid()
