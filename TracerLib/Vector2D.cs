@@ -7,9 +7,9 @@ namespace TracerLib;
 /// </summary>
 public struct Vector2D
 {
-    private float U { get; set; }
+    public float U { get; private set; }
 
-    private float V { get; set; }
+    public float V { get; private set; }
 
     public Vector2D(float u, float v)
     {
