@@ -2,6 +2,9 @@
 
 namespace TracerLib;
 
+/// <summary>
+/// A 2D Vector to represent a point of a <c>Shape</c> surface
+/// </summary>
 public struct Vector2D
 {
     private float U { get; set; }
