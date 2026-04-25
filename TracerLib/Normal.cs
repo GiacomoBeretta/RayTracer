@@ -49,9 +49,9 @@ public struct Normal
     /// Returns the negated <c>Normal</c> vector
     /// </summary>
     /// <returns></returns>
-    public Normal _NormalNegation()
+    public static Normal operator-(Normal n)
     {
-        return new Normal(-this.X, -this.Y, -this.Z);
+        return new Normal(-n.X, -n.Y, -n.Z);
     }
 
     /// <summary>
