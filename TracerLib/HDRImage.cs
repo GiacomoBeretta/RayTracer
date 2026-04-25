@@ -1,15 +1,12 @@
 // This file is release under EUPL_v1.2 license. See LICENSE.md
 
-//implementare dei controlli per i constructor e in altre funzioni se necessario, vediamo cosa dice Tomasi in proposito.
-//forse si possono mettere i i membri privati e rendere la classe dei test una friend?
+// Implementare dei controlli per i constructor e in altre funzioni se necessario, vediamo cosa dice Tomasi in proposito.
+// Forse si possono mettere i membri privati e rendere la classe dei test una friend?
 
 using System.Diagnostics.CodeAnalysis; // per sopprimere i messaggi di errore
-using
-    System.Globalization; //per il metodo cultureInfo e quindi per risolvere il problema dell'1.0 che viene letto come 10
+using System.Globalization; //per il metodo cultureInfo e quindi per risolvere il problema dell'1.0 che viene letto come 10
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats; //for the Rgb24 Pixel Format
-
-using System.Globalization;
 
 namespace TracerLib;
 
@@ -199,7 +196,7 @@ public class HDRImage
     {
         using (Stream filestream = File.OpenRead(fileName))
         {
-            // read_pfm_file(filestream);
+            //read_pfm_file(filestream);
         }
     }
 
@@ -336,7 +333,7 @@ public class HDRImage
     }
 
     //forse è meglio mettere static anche ReadFloat (prima non lo era)?
-    public string _ReadLine(BinaryReader br)
+    public static string _ReadLine(BinaryReader br)
     {
         var bytes = new List<byte>();
 
@@ -365,7 +362,7 @@ public class HDRImage
         return Encoding.ASCII.GetString(bytes.ToArray());
     }
 
-    public float _ReadFloat(BinaryReader br, bool bigEndian = true)
+    public static float _ReadFloat(BinaryReader br, bool bigEndian = true)
     {
         var bytes = br.ReadBytes(4);
 
@@ -388,7 +385,7 @@ public class HDRImage
         outputstream.Write(seq, 0, seq.Length);
     }
     
-    public HDRImage ReadPFM_File(Stream stream)
+    public static HDRImage ReadPFM_File(Stream stream)
        {
             using var br = new BinaryReader(stream);
             var magic = _ReadLine(br);
@@ -408,7 +405,7 @@ public class HDRImage
             var endiannessLine = _ReadLine(br);
             if (endiannessLine == null)
             {
-                throw new InvalidPfmFileFormat("Missing endiannes line");
+                throw new InvalidPfmFileFormat("Missing endianness line");
             }
             var endianness = _ParseEndianness(endiannessLine);
             
@@ -438,12 +435,14 @@ public class HDRImage
 
             return result;
         }
-
-    // Oveloading write_pfm con stream
-    /*public static HDRImage ReadPFM_File(string filename)
+    
+    public static HDRImage ReadPFM_File(string filename)
     {
-        return ReadPFM_File(File.OpenRead(filename));
-    }*/
+        using (Stream filestream = File.OpenRead(filename))
+        {
+            return ReadPFM_File(filestream);
+        }
+    }
 
     //io la cambierei il nome in WritePFM e basta
     public static void WritePFM_File(HDRImage img, double endian, Stream filestream)
@@ -556,7 +555,7 @@ public class HDRImage
         }
     }
 
-    //Questa non è tecnicamente un'HDR. Rivedere in futuro
+    //Questa non è tecnicamente un HDR. Rivedere in futuro
     /// <summary>
     /// Returns the corresponding LDR image
     /// It accounts for the gamma correction of the display and of the empirical factor here named "factor"
@@ -578,16 +577,7 @@ public class HDRImage
         image._ImageTo8BitRGB(gamma);
         return image;
     }
-    
-    public void Clamp_Image()
-    {
-        for (int i = 0; i < Pixels.Length; i++)
-        {
-            Pixels[i].R = Color._Clamp(Pixels[i].R);
-            Pixels[i].G = Color._Clamp(Pixels[i].G);
-            Pixels[i].B = Color._Clamp(Pixels[i].B);
-        }
-    }
+
     // Methods for conversion to an LDR Image - End
 
     /// <summary>
@@ -616,7 +606,7 @@ public class HDRImage
             {
                 //the Rgb format requires 3 numbers of the type byte
                 //so we must convert the RGB values to bytes
-                bitmap[i, j] = new Rgb24((byte)this[i, j].R, (byte)this[i, j].G, (byte)this[i, j].B);
+                bitmap[i, j] = new Rgb24((byte)LDRimage[i, j].R, (byte)LDRimage[i, j].G, (byte)LDRimage[i, j].B);
             }
         }
 

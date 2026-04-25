@@ -99,7 +99,7 @@ public struct Color
     }*/
 
     /// <summary>
-    /// Return a formatted string with the RGB colors.
+    /// Returns a formatted string with the RGB colors.
     /// </summary>
     /// <returns></returns>
     public override string ToString()
@@ -178,11 +178,6 @@ public struct Color
         float b = (float)Math.Round(255 * MathF.Pow(B, 1.0f / gamma));
 
         return new Color(r, g, b);
-    }
-    
-    public static float _Clamp(float x)
-    {
-        return x / (x + 1);
     }
     
 }

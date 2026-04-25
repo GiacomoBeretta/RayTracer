@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using TracerLib;
 
-//namespace TracerTests;
+namespace TracerTests;
 
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 public class HDRTest
@@ -221,9 +221,9 @@ public class HDRTest
         Assert.Throws<InvalidPfmFileFormat>(() => HDRImage._ParseEndianness(endianness));
 
         endianness = "1.0";
-        Assert.True( HDRImage._ParseEndianness(endianness));
+        Assert.True(HDRImage._ParseEndianness(endianness));
         endianness = "-1.0";
-        Assert.False( HDRImage._ParseEndianness(endianness));
+        Assert.False(HDRImage._ParseEndianness(endianness));
     }
 
     //test read float
