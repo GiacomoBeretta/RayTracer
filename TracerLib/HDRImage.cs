@@ -305,7 +305,7 @@ public class HDRImage
             width = int.Parse(stringSizeArray[0], CultureInfo.InvariantCulture);
             height = int.Parse(stringSizeArray[1], CultureInfo.InvariantCulture);
         }
-        catch (ArgumentException ex)
+        catch (FormatException ex)
         {
             throw new InvalidPfmFileFormat("The size is not made of two ints.", ex);
         }
