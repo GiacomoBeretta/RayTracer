@@ -31,7 +31,7 @@ public class RayTest
         var ray = new Ray(new Point(1.0f, 2.0f, 3.0f), new Vector(6.0f, 5.0f, 4.0f));
         var translation = new Transformation(new Vector(10.0f, 11.0f, 12.0f));
         var rotation = new Transformation('x', MathF.PI/2);
-        var transformed = ray * (translation * rotation);
+        var transformed = (translation * rotation) * ray;
         
         Assert.True(Point._ArePointsClose(new Point(11.0f, 8.0f, 14.0f), transformed.Origin));
         Assert.True(Vector._AreVectorsClose(new Vector(6.0f, -4.0f, 5.0f), transformed.Dir));
