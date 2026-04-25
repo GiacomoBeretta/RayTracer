@@ -1,0 +1,32 @@
+// This file is release under EUPL_v1.2 license. See LICENSE.md
+
+namespace TracerLib;
+
+public struct Vector2D
+{
+    private float U { get; set; }
+
+    private float V { get; set; }
+
+    public Vector2D(float u, float v)
+    {
+        U = u;
+        V = v;
+    }
+
+    public override string ToString()
+    {
+        return $"({U}, {V})";
+    }
+
+    public void Print()
+    {
+        Console.WriteLine(ToString());
+    }
+
+    public static bool _AreVectorsClose(Vector2D v1, Vector2D v2, float epsilon = 1e-5f)
+    {
+        return Functions.AreClose(v1.U, v2.U, epsilon)
+               && Functions.AreClose(v1.V, v2.V, epsilon);
+    }
+}
