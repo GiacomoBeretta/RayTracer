@@ -4,7 +4,8 @@
 // Forse si possono mettere i membri privati e rendere la classe dei test una friend?
 
 using System.Diagnostics.CodeAnalysis; // per sopprimere i messaggi di errore
-using System.Globalization; //per il metodo cultureInfo e quindi per risolvere il problema dell'1.0 che viene letto come 10
+using
+    System.Globalization; //per il metodo cultureInfo e quindi per risolvere il problema dell'1.0 che viene letto come 10
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats; //for the Rgb24 Pixel Format
 
@@ -28,7 +29,7 @@ public class HDRImage
     //rallenta troppo
 
     //Variables HDR image
-    
+
     /// <summary>
     /// Width of the matrix of pixels.
     /// </summary>
@@ -38,7 +39,7 @@ public class HDRImage
     /// Height of the matrix of pixels.
     /// </summary>
     public int Height { get; private set; }
-    
+
     public Color[] Pixels { get; set; } //Controllare nullable (Color[])?
 
     //con i controlli invece viene
@@ -109,6 +110,14 @@ public class HDRImage
         }
     }
 
+    /// <summary>
+    /// Checks if the Pixel's lenght matches the number of elements in the HDRImage's matrix
+    /// </summary>
+    /// <param name="width"></param>
+    /// <param name="height"></param>
+    /// <param name="colorVector"></param>
+    /// <exception cref="ArgumentNullException"></exception>
+    /// <exception cref="ArgumentException"></exception>
     public static void _CheckPixels(int width, int height, in Color[] colorVector)
     {
         ArgumentNullException.ThrowIfNull(colorVector);
@@ -121,6 +130,10 @@ public class HDRImage
 
     //vedere se anche per questo indice si possono mettere dei controlli
     //index and range for the pixels 1D vector with the type indexer
+    /// <summary>
+    /// Returns the <c>Color</c> given by the i-th element of the 1D Pixel's array
+    /// </summary>
+    /// <param name="index"></param>
     public Color this[Index index]
     {
         get => Pixels[index];
@@ -178,11 +191,11 @@ public class HDRImage
             Pixels[i] = colorVector[i];
         }
     }
-    
+
     public HDRImage(Stream stream)
     {
         var img = ReadPFM_File(stream);
-        
+
         Width = img.Width;
         Height = img.Height;
         Pixels = new Color[Width * Height];
@@ -191,17 +204,25 @@ public class HDRImage
             Pixels[i] = img.Pixels[i];
         }
     }
-    
+
     public HDRImage(string fileName)
     {
         using (Stream filestream = File.OpenRead(fileName))
         {
-            //read_pfm_file(filestream);
+            var img = ReadPFM_File(filestream);
+
+            Width = img.Width;
+            Height = img.Height;
+            Pixels = new Color[Width * Height];
+            for (int i = 0; i < Pixels.Length; i++)
+            {
+                Pixels[i] = img.Pixels[i];
+            }
         }
     }
 
     //Copy constructor
-    protected HDRImage( HDRImage other)
+    protected HDRImage(HDRImage other)
     {
         Width = other.Width;
         Height = other.Height;
@@ -245,6 +266,9 @@ public class HDRImage
         return str;
     }
 
+    /// <summary>
+    /// Prints the string converted HDRImage 
+    /// </summary>
     public void Print()
     {
         Console.WriteLine(this.ToString());
@@ -332,7 +356,6 @@ public class HDRImage
         else return false;
     }
 
-    //forse è meglio mettere static anche ReadFloat (prima non lo era)?
     public static string _ReadLine(BinaryReader br)
     {
         var bytes = new List<byte>();
@@ -362,6 +385,13 @@ public class HDRImage
         return Encoding.ASCII.GetString(bytes.ToArray());
     }
 
+    /// <summary>
+    /// Returns the float value of the <c>Color</c> encoded as 4 bytes
+    /// </summary>
+    /// <param name="br"></param>
+    /// <param name="bigEndian"></param>
+    /// <returns></returns>
+    /// <exception cref="InvalidPfmFileFormat"></exception>
     public static float _ReadFloat(BinaryReader br, bool bigEndian = true)
     {
         var bytes = br.ReadBytes(4);
@@ -370,12 +400,12 @@ public class HDRImage
         {
             throw new InvalidPfmFileFormat("Unexpected end of file");
         }
-        
+
         if (BitConverter.IsLittleEndian == bigEndian)
         {
             Array.Reverse(bytes);
         }
-        
+
         return BitConverter.ToSingle(bytes, 0);
     }
 
@@ -384,58 +414,61 @@ public class HDRImage
         var seq = BitConverter.GetBytes(value);
         outputstream.Write(seq, 0, seq.Length);
     }
-    
+
     public static HDRImage ReadPFM_File(Stream stream)
-       {
-            using var br = new BinaryReader(stream);
-            var magic = _ReadLine(br);
-            if (magic != "PF")
-            {
-                throw new InvalidPfmFileFormat("Invalid magic in PFM file");
-            }
-
-            var imgSize = _ReadLine(br);
-            if (imgSize == null)
-            {
-                throw new InvalidPfmFileFormat("Missing image size line");
-            }
-
-            _ParseImgSize(imgSize, out var width, out var height);
-
-            var endiannessLine = _ReadLine(br);
-            if (endiannessLine == null)
-            {
-                throw new InvalidPfmFileFormat("Missing endianness line");
-            }
-            var endianness = _ParseEndianness(endiannessLine);
-            
-            /*Console.WriteLine($"POS BEFORE PIXELS: {br.BaseStream.Position}");
-            long expectedBytes = width * height * 3 * 4;
-            Console.WriteLine($"EXPECTED PIXEL BYTES: {expectedBytes}"); */
-
-            var result = new HDRImage(width, height);
-            //Console.WriteLine($"Width = {result.Width}, Height = {result.Height}");
-           
-            for (int i = height-1; i >= 0; i--){
-                for (int j = 0; j <= width-1; j++){
-                    //Console.WriteLine($"Column = {j}, Row = {i}");
-                    //Console.WriteLine($"Offset = {result._PixelOffset(j,i)}");
-                    //Console.WriteLine($"Offset 2 = {i * result.Width + j}");
-                    var color = new Color
-                    {
-                        R = _ReadFloat(br, endianness),
-                        G = _ReadFloat(br, endianness),
-                        B = _ReadFloat(br, endianness)
-                    };
-                    result[j, i]= color;
-                }
-            }
-
-            //if (result.Pixels != null) Console.WriteLine($"W={result.Width}, H={result.Height}, Pixels={result.Pixels.Length}");
-
-            return result;
+    {
+        using var br = new BinaryReader(stream);
+        var magic = _ReadLine(br);
+        if (magic != "PF")
+        {
+            throw new InvalidPfmFileFormat("Invalid magic in PFM file");
         }
-    
+
+        var imgSize = _ReadLine(br);
+        if (imgSize == null)
+        {
+            throw new InvalidPfmFileFormat("Missing image size line");
+        }
+
+        _ParseImgSize(imgSize, out var width, out var height);
+
+        var endiannessLine = _ReadLine(br);
+        if (endiannessLine == null)
+        {
+            throw new InvalidPfmFileFormat("Missing endianness line");
+        }
+
+        var endianness = _ParseEndianness(endiannessLine);
+
+        /*Console.WriteLine($"POS BEFORE PIXELS: {br.BaseStream.Position}");
+        long expectedBytes = width * height * 3 * 4;
+        Console.WriteLine($"EXPECTED PIXEL BYTES: {expectedBytes}"); */
+
+        var result = new HDRImage(width, height);
+        //Console.WriteLine($"Width = {result.Width}, Height = {result.Height}");
+
+        for (int i = height - 1; i >= 0; i--)
+        {
+            for (int j = 0; j <= width - 1; j++)
+            {
+                //Console.WriteLine($"Column = {j}, Row = {i}");
+                //Console.WriteLine($"Offset = {result._PixelOffset(j,i)}");
+                //Console.WriteLine($"Offset 2 = {i * result.Width + j}");
+                var color = new Color
+                {
+                    R = _ReadFloat(br, endianness),
+                    G = _ReadFloat(br, endianness),
+                    B = _ReadFloat(br, endianness)
+                };
+                result[j, i] = color;
+            }
+        }
+
+        //if (result.Pixels != null) Console.WriteLine($"W={result.Width}, H={result.Height}, Pixels={result.Pixels.Length}");
+
+        return result;
+    }
+
     public static HDRImage ReadPFM_File(string filename)
     {
         using (Stream filestream = File.OpenRead(filename))
@@ -576,6 +609,14 @@ public class HDRImage
         image._ClampImage();
         image._ImageTo8BitRGB(gamma);
         return image;
+    }
+
+    public void Clamp_Image()
+    {
+        for (int i = 0; i < Pixels.Length; i++)
+        {
+            Pixels[i]._Clamp();
+        }
     }
 
     // Methods for conversion to an LDR Image - End

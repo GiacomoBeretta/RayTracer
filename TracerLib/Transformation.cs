@@ -1,7 +1,7 @@
 // This file is release under EUPL_v1.2 license. See LICENSE.md
 
 //forse è meglio cambiare nome ai membri di HomMatrix e Transformation,
-//per ora hanno entrambi M
+//per ora hanno entrambi 
 
 namespace TracerLib;
 
@@ -461,7 +461,6 @@ public struct Transformation
         );
         return v2;
     }
-
     /// <summary>
     /// Returns the transformed point obtained by multiplying the matrix by the point (matrix–vector multiplication).
     /// We use homogeneous coordinates, so the points have their 4th coordinate equal to 1.

@@ -13,8 +13,8 @@ public class PointTest
         Assert.Equal(new Point(102.0f, 104.0f, 106.0f), p + v);
         Assert.Equal(new Point(102.0f, 104.0f, 106.0f), v + p);
         
-        Assert.True(Point._AreClosePoint(new Point(102.0f, 104.0f, 106.0f), p + v));
-        Assert.True(Point._AreClosePoint(new Point(102.0f, 104.0f, 106.0f), v + p));
+        Assert.True(Point._ArePointsClose(new Point(102.0f, 104.0f, 106.0f), p + v));
+        Assert.True(Point._ArePointsClose(new Point(102.0f, 104.0f, 106.0f), v + p));
     }
 
     [Fact]
@@ -36,7 +36,7 @@ public class PointTest
         
         Assert.Equal(new Point(98.0f, 100.0f, 102.0f), p - v);
         
-        Assert.True(Point._AreClosePoint(new Point(98.0f, 100.0f, 102.0f), p - v));
+        Assert.True(Point._ArePointsClose(new Point(98.0f, 100.0f, 102.0f), p - v));
     }
 
     [Fact]

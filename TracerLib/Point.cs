@@ -26,7 +26,7 @@ public struct Point
         Console.WriteLine(ToString());
     }
 
-    public static bool _AreClosePoint(Point a, Point b)
+    public static bool _ArePointsClose(Point a, Point b)
     {
         return Functions.AreClose(a.X, b.X) && Functions.AreClose(a.Y, b.Y) && Functions.AreClose(a.Z, b.Z);
     }
@@ -55,7 +55,7 @@ public struct Point
     {
         return new Point(a.X - b.X, a.Y - b.Y, a.Z - b.Z);
     }
-
+    
     public static Point operator *(Point p, float alpha)
     {
         return new Point(p.X * alpha, p.Y * alpha, p.Z * alpha);

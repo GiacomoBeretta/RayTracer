@@ -18,6 +18,13 @@ public struct Color
     public float G { get; set; }
     public float B { get; set; }
 
+    /// <summary>
+    /// Basic <c>Color</c> constructor which accepts 3 positive parameters: R,G,B 
+    /// </summary>
+    /// <param name="r"></param>
+    /// <param name="g"></param>
+    /// <param name="b"></param>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
     public Color(float r, float g, float b)
     {
         if (r < 0)
@@ -40,11 +47,23 @@ public struct Color
         B = b;
     }
 
+    /// <summary>
+    /// Sum per component between two <c>Color</c>
+    /// </summary>
+    /// <param name="c1"></param>
+    /// <param name="c2"></param>
+    /// <returns></returns>
     public static Color operator +(Color c1, Color c2)
     {
         return new Color(c1.R + c2.R, c1.G + c2.G, c1.B + c2.B);
     }
 
+    /// <summary>
+    /// Product between a <c>Color</c> and a float scalar
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="alpha"></param>
+    /// <returns></returns>
     public static Color operator *(Color a, float alpha)
     {
         if (alpha < 0)
@@ -53,13 +72,24 @@ public struct Color
         }
         return new Color(a.R * alpha, a.G * alpha, a.B * alpha);
     }
-
+    
+    /// <summary>
+    /// Product between a <c>Color</c> and a float scalar
+    /// </summary>
+    /// <param name="alpha"></param>
+    /// <param name="a"></param>
+    /// <returns></returns>
     public static Color operator *(float alpha, Color a)
     {
         return a * alpha;
     }
 
-    // Hadamard's Product
+    /// <summary>
+    /// Hadamard's product: Product oper component between two <c>Color</c>
+    /// </summary>
+    /// <param name="c1"></param>
+    /// <param name="c2"></param>
+    /// <returns></returns>
     public static Color operator *(Color c1, Color c2)
     {
         return new Color(c1.R * c2.R, c1.G * c2.G, c1.B * c2.B);
@@ -106,7 +136,11 @@ public struct Color
     {
         return $"({R}, {G}, {B})";
     }
-
+    
+    /// <summary>
+    /// Prints the formatted string with RGB colors
+    /// </summary>
+    /// <returns></returns>
     public void Print()
     {
         Console.WriteLine(ToString());
@@ -176,6 +210,7 @@ public struct Color
         float r = (float)Math.Round(255 * MathF.Pow(R, 1.0f / gamma));
         float g = (float)Math.Round(255 * MathF.Pow(G, 1.0f / gamma));
         float b = (float)Math.Round(255 * MathF.Pow(B, 1.0f / gamma));
+
 
         return new Color(r, g, b);
     }
