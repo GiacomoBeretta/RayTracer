@@ -24,6 +24,21 @@ public struct Ray
         return Vector._AreVectorsClose(r1.Dir, r2.Dir,epsilon) && Point._ArePointsClose(r1.Origin, r2.Origin,epsilon);
     }
 
+    public override string ToString()
+    {
+        return "Ray:\n" + 
+               "Origin = " + Origin + "\n" +
+               "Dir = " + Dir + "\n" +
+               "Tmin = "+ Tmin + "\n" +
+               "Tmax = " + Tmax + "\n"+
+               "Depth = " + Depth;
+    }
+
+    public void Print()
+    {
+        Console.WriteLine(ToString());
+    }
+    
     public Point At(float t)
     {
         return this.Origin + this.Dir * t;
