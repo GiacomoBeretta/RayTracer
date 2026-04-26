@@ -58,6 +58,14 @@ public class Sphere : Shape
         return new Vector2D(MathF.Atan2(p.Y, p.X) / (2 * MathF.PI), MathF.Acos(p.Z) / MathF.PI);
     }
     
+    /// <summary>
+    /// Returns a <c>HitRecord</c> object if there is an intersection between the <c>Ray</c> passed as argument
+    /// and *this* shape, otherwise returns a null value.
+    /// See <c>HitRecord</c> for more information.
+    /// (For the sphere the (U,V) coordinates are longitude and colatitude, normalized).
+    /// </summary>
+    /// <param name="ray"></param>
+    /// <returns></returns>
     public override HitRecord? RayIntersection(Ray ray)
     {
         // instead of transforming the sphere to represent all sorts of ellipsoids
