@@ -12,6 +12,7 @@ public static class RayTracer
 
     public static int Main(string[] args)
     {
+        /*
         try
         {
             ParseArgs(args);
@@ -20,10 +21,10 @@ public static class RayTracer
         {
             Console.WriteLine("Error: " + e.Message);
             return 1;
-        }
+        }*/
 
         string currentPath = AppDomain.CurrentDomain.BaseDirectory; // directory in which you find the executable
-        string pfmFilePath = Path.Combine(currentPath, "../../../../TracerTests/reference_be.pfm");
+        string pfmFilePath = Path.Combine(currentPath, "../../../../TracerTests/reference_le.pfm");
         string pngFilePathShirley = Path.Combine(currentPath, "../../../../TracerTests/referenceShirley.png");
         string pngFilePathWeighted = Path.Combine(currentPath, "../../../../TracerTests/referenceWeighted.png");
         HDRImage hdrImage = HDRImage.ReadPFM_File(pfmFilePath);
