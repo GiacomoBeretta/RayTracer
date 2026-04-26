@@ -92,5 +92,21 @@ public class SphereTest
         Assert.Equal(new Vector2D(0, 0), hit?.SurfacePoint);
         Assert.Equal(ray, hit?.IncomingRay);
         Assert.Equal(1, hit?.T);
+        
+        Ray ray2 = new Ray(new Point(13, 0, 0), new Vector(-1, 0, 0));
+        hit = sphere.RayIntersection(ray2);
+        Assert.Equal(new Point(11, 0, 0), hit?.WorldPoint);
+        Assert.Equal(new Normal(1, 0, 0), hit?.SurfaceNormal);
+        Assert.Equal(new Vector2D(0, 0.5f), hit?.SurfacePoint);
+        Assert.Equal(ray2, hit?.IncomingRay);
+        Assert.Equal(2, hit?.T);
+        
+        Ray ray3 = new Ray(new Point(0, 0, 2), new Vector(0, 0, -1));
+        hit = sphere.RayIntersection(ray3);
+        Assert.Null(hit);
+        
+        Ray ray4 = new Ray(new Point(-10, 0, 0), new Vector(0, 0, -1));
+        hit = sphere.RayIntersection(ray4);
+        Assert.Null(hit);
     }
 }
