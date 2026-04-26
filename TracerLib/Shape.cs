@@ -37,7 +37,7 @@ public class Sphere : Shape
 
     /// <summary>
     /// Returns the normal to the Sphere surface
-    /// depending on the direction dir of the Ray incident on the <c>Point</c> p.
+    /// depending on the direction dir of the Ray incident on the <c>Point</c> p of the unit sphere.
     /// </summary>
     /// <param name="p"></param>
     /// <param name="dir"></param>
@@ -57,7 +57,7 @@ public class Sphere : Shape
     {
         return new Vector2D(MathF.Atan2(p.Y, p.X) / (2 * MathF.PI), MathF.Acos(p.Z) / MathF.PI);
     }
-    
+
     /// <summary>
     /// Returns a <c>HitRecord</c> object if there is an intersection between the <c>Ray</c> passed as argument
     /// and *this* shape, otherwise returns a null value.
@@ -70,9 +70,9 @@ public class Sphere : Shape
     {
         // instead of transforming the sphere to represent all sorts of ellipsoids
         // we transform the ray with the inverse transformation
-        Ray T_ray = (Transform.Inverse()) * ray;
-        Vector dir = T_ray.Dir;
-        Vector origin = T_ray.Origin.ToVector();
+        Ray invRay = (Transform.Inverse()) * ray;
+        Vector dir = invRay.Dir;
+        Vector origin = invRay.Origin.ToVector();
         float delta_4 = (origin * dir) * (origin * dir) - dir.SquaredNorm() * (origin.SquaredNorm() - 1);
         // if delta_4 < 0 there are no intersection, if delta_4 == 0 there is no reflection
         // then we take only one of the two solutions depending on whether they represent
@@ -82,25 +82,31 @@ public class Sphere : Shape
         {
             float sqrt_delta_4 = MathF.Sqrt(delta_4);
             float t1 = -(origin * dir + sqrt_delta_4) / dir.SquaredNorm();
-            if (t1 > T_ray.Tmin && t1 < T_ray.Tmax)
+            if (t1 > invRay.Tmin && t1 < invRay.Tmax)
             {
-                Point p = ray.At(t1);
-                return new HitRecord(p,
-                    Transform * _SphereNormal(p, dir),
-                    _SpherePointToUV(p),
+                Point intersectionPoint = invRay.At(t1); // intersection on the unit sphere
+                return new HitRecord
+                (
+                    Transform * intersectionPoint,  
+                    Transform * _SphereNormal(intersectionPoint, dir),
+                    _SpherePointToUV(intersectionPoint),
                     ray,
-                    t1);
+                    t1
+                );
             }
 
             float t2 = (-(origin * dir) + sqrt_delta_4) / dir.SquaredNorm();
-            if (t2 > T_ray.Tmin && t2 < T_ray.Tmax)
+            if (t2 > invRay.Tmin && t2 < invRay.Tmax)
             {
-                Point p = ray.At(t2);
-                return new HitRecord(p,
-                    Transform * _SphereNormal(p, dir),
-                    _SpherePointToUV(p),
+                Point intersectionPoint = invRay.At(t2); // intersection on the unit sphere
+                return new HitRecord
+                (
+                    Transform * intersectionPoint,
+                    Transform * _SphereNormal(intersectionPoint, dir),
+                    _SpherePointToUV(intersectionPoint),
                     ray,
-                    t2);
+                    t2
+                );
             }
         }
 

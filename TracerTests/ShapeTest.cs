@@ -45,22 +45,52 @@ public class SphereTest
     }
 
     [Fact]
-    public void TestRayIntersection()
+    public void TestRayIntersectionWithUnitSphere()
     {
         Ray ray = new Ray(new Point(0, 0, 2), new Vector(0, 0, -1));
         Sphere sphere = new Sphere();
         HitRecord? hit = sphere.RayIntersection(ray);
         Assert.Equal(new Point(0, 0, 1), hit?.WorldPoint);
         Assert.Equal(new Normal(0,0,1), hit?.SurfaceNormal);
+        Assert.Equal(new Vector2D(0,0), hit?.SurfacePoint);
+        Assert.Equal(ray, hit?.IncomingRay);
+        Assert.Equal(1, hit?.T);
         
         ray = new Ray(new Point(3, 0, 0), new Vector(-1, 0, 0));
         hit = sphere.RayIntersection(ray);
         Assert.Equal(new Point(1, 0, 0), hit?.WorldPoint);
         Assert.Equal(new Normal(1,0,0), hit?.SurfaceNormal);
+        Assert.Equal(new Vector2D(0,0.5f), hit?.SurfacePoint);
+        Assert.Equal(ray, hit?.IncomingRay);
+        Assert.Equal(2, hit?.T);
         
         ray = new Ray(new Point(0, 0, 0), new Vector(1, 0, 0));
         hit = sphere.RayIntersection(ray);
         Assert.Equal(new Point(1, 0, 0), hit?.WorldPoint);
         Assert.Equal(new Normal(-1,0,0), hit?.SurfaceNormal);
+        Assert.Equal(new Vector2D(0,0.5f), hit?.SurfacePoint);
+        Assert.Equal(ray, hit?.IncomingRay);
+        Assert.Equal(1, hit?.T);
+
+        ray = new Ray(new Point(1, 1, 1), new Vector(1, 1, 1));
+        hit = sphere.RayIntersection(ray);
+        Assert.Null(hit);
+    }
+
+    [Fact]
+    public void TestRayIntersectionWithTranslatedSphere()
+    {
+        Ray ray = new Ray(new Point(10, 0, 2), new Vector(0, 0, -1));
+
+        Vector translateVector = new Vector(10, 0, 0);
+        Transformation translate = new Transformation(translateVector);
+        Sphere sphere = new Sphere(translate);
+
+        HitRecord? hit = sphere.RayIntersection(ray);
+        Assert.Equal(new Point(10, 0, 1), hit?.WorldPoint);
+        Assert.Equal(new Normal(0, 0, 1), hit?.SurfaceNormal);
+        Assert.Equal(new Vector2D(0, 0), hit?.SurfacePoint);
+        Assert.Equal(ray, hit?.IncomingRay);
+        Assert.Equal(1, hit?.T);
     }
 }
