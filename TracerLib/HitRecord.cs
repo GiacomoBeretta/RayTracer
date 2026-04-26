@@ -27,4 +27,19 @@ public struct HitRecord
                && Ray._AreRaysClose(hit1.IncomingRay, hit2.IncomingRay,epsilon)
                && Functions.AreClose(hit1.T, hit2.T,epsilon);
     }
+
+    public override string ToString()
+    {
+        return "HitRecord:\n" +
+               "WorldPoint = " + WorldPoint + "\n" +
+               "SurfaceNormal = " + SurfaceNormal + "\n" +
+               "SurfacePoint = " + SurfacePoint + "\n" +
+               "IncomingRay = " + IncomingRay + "\n" +
+               "T = " + T;
+    }
+
+    public void Print()
+    {
+        Console.WriteLine(ToString());
+    }
 }
