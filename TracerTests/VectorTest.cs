@@ -8,7 +8,7 @@ public class VectorTest
     public void TestToString()
     {
         Vector v = new Vector(3, 5, 2);
-        Assert.Equal("(3, 5, 2)", v.ToString());
+        Assert.Equal("Vector(x=3, y=5, z=2)", v.ToString());
     }
 
     [Fact]

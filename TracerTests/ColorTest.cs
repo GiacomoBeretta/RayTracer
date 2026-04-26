@@ -94,7 +94,7 @@ public class ColorTest
     public void TestToString()
     {
         Color a = new Color(2, 9, 5);
-        Assert.Equal("(2, 9, 5)", a.ToString());
+        Assert.Equal("(R=2, G=9, B=5)", a.ToString());
     }
 
     [Fact]

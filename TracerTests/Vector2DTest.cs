@@ -16,7 +16,7 @@ public class Vector2DTest
     public void TestToString()
     {
         Vector2D v = new Vector2D(3, 5);
-        Assert.Equal("(3, 5)", v.ToString());
+        Assert.Equal("Vector2D(u=3, v=5)", v.ToString());
     }
 
     [Fact]
