@@ -49,7 +49,7 @@ public class Sphere : Shape
     }
 
     /// <summary>
-    /// Returns the longitude and colatitude normalized of the <c>Point</c> p.
+    /// Returns the normalized longitude and colatitude of the <c>Point</c> p on the unit sphere.
     /// </summary>
     /// <param name="p"></param>
     /// <returns></returns>
