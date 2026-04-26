@@ -22,14 +22,14 @@ public static class RayTracer
             return 1;
         }
 
-        string currentPath = AppDomain.CurrentDomain.BaseDirectory;
+        string currentPath = AppDomain.CurrentDomain.BaseDirectory; // directory in which you find the executable
         string pfmFilePath = Path.Combine(currentPath, "../../../../TracerTests/reference_be.pfm");
         string pngFilePathShirley = Path.Combine(currentPath, "../../../../TracerTests/referenceShirley.png");
         string pngFilePathWeighted = Path.Combine(currentPath, "../../../../TracerTests/referenceWeighted.png");
-        /*HDRImage hdrImage = HDRImage.ReadPFM_File(pfmFilePath);
+        HDRImage hdrImage = HDRImage.ReadPFM_File(pfmFilePath);
         hdrImage.Print();
         hdrImage.WritePNG(pngFilePathShirley, 0, AFactor, Gamma);
-        hdrImage.WritePNG(pngFilePathWeighted, 1, AFactor, Gamma);*/
+        hdrImage.WritePNG(pngFilePathWeighted, 1, AFactor, Gamma);
         
 
         /* suggerimento della lezione 4 in python
