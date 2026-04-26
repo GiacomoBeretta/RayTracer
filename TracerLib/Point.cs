@@ -26,9 +26,9 @@ public struct Point
         Console.WriteLine(ToString());
     }
 
-    public static bool _ArePointsClose(Point a, Point b)
+    public static bool _ArePointsClose(Point a, Point b, float epsilon=1e-5f)
     {
-        return Functions.AreClose(a.X, b.X) && Functions.AreClose(a.Y, b.Y) && Functions.AreClose(a.Z, b.Z);
+        return Functions.AreClose(a.X, b.X,epsilon) && Functions.AreClose(a.Y, b.Y,epsilon) && Functions.AreClose(a.Z, b.Z,epsilon);
     }
 
     public static Point operator +(in Point a, in Vector b)

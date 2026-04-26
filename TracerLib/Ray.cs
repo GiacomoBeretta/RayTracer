@@ -19,9 +19,9 @@ public struct Ray
         Depth = depth;
     }
 
-    public static bool _AreRaysClose(Ray r1, Ray r2)
+    public static bool _AreRaysClose(Ray r1, Ray r2, float epsilon=1e-5f)
     {
-        return Vector._AreVectorsClose(r1.Dir, r2.Dir) && Point._ArePointsClose(r1.Origin, r2.Origin);
+        return Vector._AreVectorsClose(r1.Dir, r2.Dir,epsilon) && Point._ArePointsClose(r1.Origin, r2.Origin,epsilon);
     }
 
     public Point At(float t)
