@@ -24,18 +24,17 @@ public struct HitRecord
         return Point._ArePointsClose(hit1.WorldPoint, hit2.WorldPoint, epsilon)
                && Normal._AreCloseNormal(hit1.SurfaceNormal, hit2.SurfaceNormal, epsilon)
                && Vector2D._AreVectorsClose(hit1.SurfacePoint, hit2.SurfacePoint, epsilon)
-               && Ray._AreRaysClose(hit1.IncomingRay, hit2.IncomingRay,epsilon)
-               && Functions.AreClose(hit1.T, hit2.T,epsilon);
+               && Ray._AreRaysClose(hit1.IncomingRay, hit2.IncomingRay, epsilon)
+               && Functions.AreClose(hit1.T, hit2.T, epsilon);
     }
 
     public override string ToString()
     {
-        return "HitRecord:\n" +
-               "WorldPoint = " + WorldPoint + "\n" +
-               "SurfaceNormal = " + SurfaceNormal + "\n" +
-               "SurfacePoint = " + SurfacePoint + "\n" +
-               "IncomingRay = " + IncomingRay + "\n" +
-               "T = " + T;
+        return "HitRecord(WorldPoint=" + WorldPoint +
+               ", SurfaceNormal=" + SurfaceNormal +
+               ", SurfacePoint=" + SurfacePoint +
+               ", IncomingRay=" + IncomingRay +
+               ", T=" + T;
     }
 
     public void Print()

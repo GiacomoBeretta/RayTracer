@@ -19,7 +19,7 @@ public struct Vector2D
 
     public override string ToString()
     {
-        return $"({U}, {V})";
+        return $"Vector2D(u={U}, v={V})";
     }
 
     public void Print()

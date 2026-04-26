@@ -134,7 +134,7 @@ public struct Color
     /// <returns></returns>
     public override string ToString()
     {
-        return $"({R}, {G}, {B})";
+        return $"(R={R}, G={G}, B={B})";
     }
     
     /// <summary>
