@@ -113,3 +113,34 @@ public class Sphere : Shape
         return null; //no intersection
     }
 }
+
+public class Plane : Shape
+{
+    public Transformation Transform { get; }
+
+    public Plane()
+    {
+        Transform = new Transformation();
+    }
+
+    public Plane(Transformation transform)
+    {
+        Transform = transform;
+    }
+
+    public Normal _PlaneNormal(Vector dir)
+    {
+        var normal = new Normal(0, 0, 1);
+        return dir.Z < 0 ? normal : -normal;
+    }
+
+    public Vector2D _PlanePointToUV(Point p)
+    {
+        return new Vector2D(p.X - (int)p.X, p.Y - (int)p.Y); //Usare conversione Int oppure MathF.Floor
+    }
+
+    public override HitRecord? RayIntersection(Ray ray)
+    {
+        return null;
+    }
+}
