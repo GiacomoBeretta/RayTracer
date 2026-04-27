@@ -5,14 +5,14 @@ namespace TracerTests;
 public class SphereTest
 {
     [Fact]
-    public void TestConstructor()
+    public void TestSphereConstructor()
     {
         Sphere s = new Sphere();
         Assert.True(Transformation.AreTransformationsClose(new Transformation(), s.Transform));
     }
 
     [Fact]
-    public void TestConstructorWithTransformation()
+    public void TestSphereConstructorWithTransformation()
     {
         Transformation t = new Transformation(2, 7, 0.5f);
         Sphere s = new Sphere(t);
@@ -108,5 +108,37 @@ public class SphereTest
         Ray ray4 = new Ray(new Point(-10, 0, 0), new Vector(0, 0, -1));
         hit = sphere.RayIntersection(ray4);
         Assert.Null(hit);
+    }
+}
+
+public class PlaneTest
+{
+    [Fact]
+    public void TestPlaneConstructor()
+    {
+        var plane = new Plane();
+        
+        Assert.True(Transformation.AreTransformationsClose(new Transformation(), plane.Transform));
+    }
+
+    [Fact]
+    public void TestPlaneConstructorWithTransformation()
+    {
+        var transformation = new Transformation('x', MathF.PI / 2);
+        var plane = new Plane(transformation);
+        
+        Assert.True(Transformation.AreTransformationsClose(transformation, plane.Transform));
+    }
+
+    [Fact]
+    public void TestPlaneNormal()
+    {
+        var plane = new Plane();
+
+        var d1 = new Vector(6, 0, -4);
+        var d2 = new Vector(73, 5, 48);
+        
+        Assert.True(Normal._AreCloseNormal(new Normal(0, 0, 1), plane._PlaneNormal(d1)));
+        Assert.True(Normal._AreCloseNormal(new Normal(0, 0, -1), plane._PlaneNormal(d2)));
     }
 }

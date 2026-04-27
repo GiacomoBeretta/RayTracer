@@ -136,11 +136,27 @@ public class Plane : Shape
 
     public Vector2D _PlanePointToUV(Point p)
     {
-        return new Vector2D(p.X - (int)p.X, p.Y - (int)p.Y); //Usare conversione Int oppure MathF.Floor
+        return new Vector2D(p.X - MathF.Floor(p.X), p.Y - MathF.Floor(p.Y));
     }
 
     public override HitRecord? RayIntersection(Ray ray)
     {
-        return null;
+        var invRay = Transform.Inverse() * ray;
+        var origin = invRay.Origin;
+        var dir = invRay.Dir;
+        var t = -origin.Z / dir.Z;
+
+        if (t > invRay.Tmin && t < invRay.Tmax)
+        {
+            var intersectionPoint = invRay.At(t);
+            return new HitRecord(
+                Transform * intersectionPoint,
+                Transform * _PlaneNormal(dir),
+                _PlanePointToUV(intersectionPoint),
+                ray,
+                t
+                );
+        }
+        return null; //no intersection
     }
 }
