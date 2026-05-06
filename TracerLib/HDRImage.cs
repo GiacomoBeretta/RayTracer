@@ -354,7 +354,12 @@ public class HDRImage
         }
         else return false;
     }
-
+    
+    /// <summary>
+    /// Read a single line of bytes in a PFM file format.
+    /// </summary>
+    /// <param name="br"></param>
+    /// <returns></returns>
     public static string _ReadLine(BinaryReader br)
     {
         var bytes = new List<byte>();
@@ -407,7 +412,7 @@ public class HDRImage
 
         return BitConverter.ToSingle(bytes, 0);
     }
-
+    
     public static void _WriteFloat(Stream outputstream, float value)
     {
         var seq = BitConverter.GetBytes(value);
@@ -608,14 +613,6 @@ public class HDRImage
         image._ClampImage();
         image._ImageTo8BitRGB(gamma);
         return image;
-    }
-
-    public void Clamp_Image()
-    {
-        for (int i = 0; i < Pixels.Length; i++)
-        {
-            Pixels[i]._Clamp();
-        }
     }
 
     // Methods for conversion to an LDR Image - End

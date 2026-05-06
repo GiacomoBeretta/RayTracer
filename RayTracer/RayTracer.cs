@@ -21,39 +21,86 @@ public class RayTracer
         => app.ShowHelp();
 }
 
-[Command(Name = "Demo")]
+/// <summary>
+/// Demo command for raytracing scene generation.
+/// </summary>
+[Command(Name = "Demo", Description = "Generates a simple test image composed of 10 spheres:\n" +
+                                      "eight spheres are placed at the vertices of a cube, and two are positioned at the centers of two faces.\n" +
+                                      "Allows configuration of image resolution and camera orientation via azimuth and zenith angles.\n" +
+                                      "Supports two projection modes: perspective (default) and orthogonal.")]
 class DemoCommand
 {
-    [Argument(0, Description = "Image's width")] public int? width { get; }
-    [Argument(1, Description = "Image's height")] public int? height { get; }
-    [Argument(2, Description = "Observer's azimuthal angle in radian")] public float? theta { get; }
-    [Argument(3, Description = "Observer's zenital angle in radian")] public float? phi { get;  }  
+    [Argument(0, Description = "Image's width")] public int? Width { get; }
+    [Argument(1, Description = "Image's height")] public int? Height { get; }
+    
+    [Option("--theta", Description = "Observer's azimuthal angle in degrees")]
+    public float? Theta { get; }
+    
+    [Option("--phi", Description = "Observer's zenithal angle in degrees")]
+    public float? Phi { get; }
     
     [Option("--orthogonal", Description = "Orthogonal camera. Perspective camera passed by default")]
     public bool Orthogonal { get; }
 
     private void OnExecute()
     {
-        int W = width ?? 500;
-        int H = height ?? 500;
-        float T = theta ?? MathF.PI / 20;
-        float P = phi ?? MathF.PI / 20;
+        var w = Width ?? 500;
+        var h = Height ?? 500;
+        var t = Theta ?? 0;
+        var p = Phi ?? 0;
         
         string currentPath = AppDomain.CurrentDomain.BaseDirectory;
-        string pfmFilePath = Path.Combine(currentPath, "../../../../TracerTests/reference_be.pfm");
+        //string pfmFilePath = Path.Combine(currentPath, "../../../../TracerTests/reference_be.pfm");
         string pngFilePathShirley = Path.Combine(currentPath, "../../../../TracerTests/referenceShirley.png");
-        string pngFilePathWeighted = Path.Combine(currentPath, "../../../../TracerTests/referenceWeighted.png");
+        //string pngFilePathWeighted = Path.Combine(currentPath, "../../../../TracerTests/referenceWeighted.png");
         
-        var image = new HDRImage(W, H);
+        var image = new HDRImage(w, h);
+
+        // PER LA CAMERA APPLICARE LA TRASLAZIONE PER PRIMA (ULTIMA NELLA CONCATENAZIONE)
+        ICamera camera;
 
         if (Orthogonal)
         {
-            var camera = new OrthogonalCamera(transformation:  new Transformation('y', P) * new Transformation('z', T) * new Transformation(new Vector(-1.0f, 0f, 0f)));
+             camera = new OrthogonalCamera(transformation:  new Transformation('y', Functions.DegToRad(p)) * new Transformation('z', Functions.DegToRad(t)) * new Transformation(new Vector(-1.0f, 0f, 0f)));
         }
         else
         {
-            var camera = new PerspectiveCamera(transformation:  new Transformation('y', P) * new Transformation('z', T) * new Transformation(new Vector(-1.0f, 0f, 0f)));
+             camera = new PerspectiveCamera(transformation:  new Transformation('y', Functions.DegToRad(p)) * new Transformation('z', Functions.DegToRad(t)) * new Transformation(new Vector(-1.0f, 0f, 0f)));
         }
+        
+        var tracer = new ImageTracer(image, camera);
+        
+        //PER LE FORME APPLICARE LA TRASLAZIONE PER ULTIMA (PRIMA NELLA CONCATENAZIONE)
+        var s1 = new Sphere( new Transformation(new Vector(0.5f, 0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f));
+        var s2 = new Sphere( new Transformation(new Vector(-0.5f, 0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f));
+        var s3 = new Sphere( new Transformation(new Vector(0.5f, -0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f));
+        var s4 = new Sphere( new Transformation(new Vector(0.5f, 0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f));
+        var s5 = new Sphere( new Transformation(new Vector(-0.5f, -0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f));
+        var s6 = new Sphere( new Transformation(new Vector(0.5f, -0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f));
+        var s7 = new Sphere( new Transformation(new Vector(-0.5f, 0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f));
+        var s8 = new Sphere( new Transformation(new Vector(-0.5f, -0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f));
+        var s9 = new Sphere( new Transformation(new Vector(0f, 0f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f));
+        var s10 = new Sphere( new Transformation(new Vector(0f, 0.5f, 0f)) * new Transformation(0.1f, 0.1f, 0.1f));
+        
+        var shapes = new List<Shape>
+        {
+            s1,
+            s2,
+            s3,
+            s4,
+            s5,
+            s6,
+            s7,
+            s8,
+            s9,
+            s10,
+        };
+
+        var world = new World(shapes);
+
+        tracer.FireAllRays(ray => world.RayIntersection(ray) != null ? new Color(1.0f, 1.0f, 1.0f) : new Color(0.0f, 0.0f, 0.0f));
+
+        image.WritePNG(pngFilePathShirley, 0,1.0f , 1.0f);
             
     }
     
@@ -78,47 +125,6 @@ HDRImage hdrImage = HDRImage.ReadPFM_File(pfmFilePath);
 hdrImage.Print();
 hdrImage.WritePNG(pngFilePathShirley, 0, AFactor, Gamma);
 hdrImage.WritePNG(pngFilePathWeighted, 1, AFactor, Gamma);
-
-var image = new HDRImage(500, 500);
-
-// PER LA CAMERA APPLICARE LA TRASLAZIONE PER PRIMA (ULTIMA NELLA CONCATENAZIONE)
-var camera = new OrthogonalCamera(transformation:  new Transformation('y', MathF.PI/20) * new Transformation('z', MathF.PI/20) * new Transformation(new Vector(-1.0f, 0f, 0f)));
-
-var tracer = new ImageTracer(image, camera);
-
-//PER LE FORME APPLICARE LA TRASLAZIONE PER ULTIMA (PRIMA NELLA CONCATENAZIONE)
-var s1 = new Sphere( new Transformation(new Vector(0.5f, 0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f));
-var s2 = new Sphere( new Transformation(new Vector(-0.5f, 0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f));
-var s3 = new Sphere( new Transformation(new Vector(0.5f, -0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f));
-var s4 = new Sphere( new Transformation(new Vector(0.5f, 0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f));
-var s5 = new Sphere( new Transformation(new Vector(-0.5f, -0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f));
-var s6 = new Sphere( new Transformation(new Vector(0.5f, -0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f));
-var s7 = new Sphere( new Transformation(new Vector(-0.5f, 0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f));
-var s8 = new Sphere( new Transformation(new Vector(-0.5f, -0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f));
-var s9 = new Sphere( new Transformation(new Vector(0f, 0f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f));
-var s10 = new Sphere( new Transformation(new Vector(0f, 0.5f, 0f)) * new Transformation(0.1f, 0.1f, 0.1f));
-
-//var p = new Plane(new Transformation(20f, 20f, 20f));
-
-var shapes = new List<Shape>
-{
-    s1,
-    s2,
-    s3,
-    s4,
-    s5,
-    s6,
-    s7,
-    s8,
-    s9,
-    s10,
-};
-
-var world = new World(shapes);
-
-tracer.FireAllRays(ray => world.RayIntersection(ray) != null ? new Color(1.0f, 1.0f, 1.0f) : new Color(0.0f, 0.0f, 0.0f));
-
-image.WritePNG(pngFilePathShirley, 0,1.0f , 1.0f);
 
 
 /* suggerimento della lezione 4 in python

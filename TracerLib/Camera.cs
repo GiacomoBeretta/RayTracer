@@ -8,6 +8,11 @@ public interface ICamera
     public Ray FireRay(float u, float v);
 }
 
+/// <summary>
+/// Represents an orthogonal (orthographic) camera projection.
+/// In this projection, all rays are parallel to each other and perpendicular to the image plane,
+/// meaning there is no perspective distortion.
+/// </summary>
 public struct OrthogonalCamera : ICamera
 {
     public float AspectRatio { get; set; }
@@ -27,6 +32,12 @@ public struct OrthogonalCamera : ICamera
     }
 }
 
+/// <summary>
+/// Represents a perspective camera projection.
+/// In this model, all rays originate from a single point (the camera position),
+/// creating a vanishing point effect where parallel lines converge in the distance.
+/// Objects appear smaller as their distance from the camera increases, simulating human vision.
+/// </summary>
 public struct PerspectiveCamera : ICamera
 {
     public float Distance { get; set; }

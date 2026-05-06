@@ -141,4 +141,18 @@ public class PlaneTest
         Assert.True(Normal._AreCloseNormal(new Normal(0, 0, 1), plane._PlaneNormal(d1)));
         Assert.True(Normal._AreCloseNormal(new Normal(0, 0, -1), plane._PlaneNormal(d2)));
     }
+
+    [Fact]
+    public void TestPlanePointToUV()
+    {
+        var plane = new Plane();
+
+        var p1 = new Point(0, 0, 1.0f);
+        Assert.True(Functions.AreClose(0, plane._PlanePointToUV(p1).U));
+        Assert.True(Functions.AreClose(0, plane._PlanePointToUV(p1).V));
+
+        var p2 = new Point(2.3f, 5.7f, 0);
+        Assert.True(Functions.AreClose(0.3f, plane._PlanePointToUV(p2).U));
+        Assert.True(Functions.AreClose(0.7f, plane._PlanePointToUV(p2).V));
+    }
 }
