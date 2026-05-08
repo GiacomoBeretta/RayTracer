@@ -10,18 +10,21 @@ on:
 
 jobs:
   build:
-
-    runs-on: ubuntu-latest
     strategy:
       matrix:
-        dotnet-version: [ '8.1.x', '10.0.x' ] # [10.0.107] #[ '8.1.x', '10.0.x' ]
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        dotnet-version: [ '8.0.x', '10.0.x' ]
 
+    runs-on: ${{ matrix.os }}
+    
     steps:
       - uses: actions/checkout@v6
+      
       - name: Setup dotnet ${{ matrix.dotnet-version }}
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ matrix.dotnet-version }}
+          
       # You can test your matrix by printing the current dotnet version
       - name: Display dotnet version
         run: dotnet --version

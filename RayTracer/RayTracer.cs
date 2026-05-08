@@ -48,6 +48,16 @@ class DemoCommand
         var h = Height ?? 500;
         var t = Theta ?? 0;
         var p = Phi ?? 0;
+        /*
+        try
+        {
+            ParseArgs(args);
+        }
+        catch (ArgumentException e)
+        {
+            Console.WriteLine("Error: " + e.Message);
+            return 1;
+        }*/
         
         string currentPath = AppDomain.CurrentDomain.BaseDirectory;
         //string pfmFilePath = Path.Combine(currentPath, "../../../../TracerTests/reference_be.pfm");
