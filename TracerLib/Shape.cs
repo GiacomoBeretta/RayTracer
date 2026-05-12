@@ -13,7 +13,7 @@ public abstract class Shape
     {
         Material = new Material();
     }
-    
+
     /// <summary>
     /// Returns a <c>HitRecord</c> object if there is an intersection between the <c>Ray</c> passed as argument
     /// and *this* shape, otherwise returns a null value.
@@ -26,13 +26,12 @@ public abstract class Shape
     /// <summary>
     /// Returns if the shapes are of the same type
     /// </summary>
-    /// <param name="s1"></param>
-    /// <param name="s2"></param>
+    /// <param name="s"></param>
     /// <param name="epsilon"></param>
     /// <returns></returns>
-    public virtual bool _AreShapesClose(Shape s1, Shape s2, float epsilon =  1e-5f)
+    public virtual bool _IsCloseTo(Shape s, float epsilon = 1e-5f)
     {
-        if (s1.GetType() == s2.GetType())
+        if (GetType() == s.GetType())
         {
             return true;
         }
@@ -62,27 +61,25 @@ public class Sphere : Shape
     /// <summary>
     /// Returns true if the shapes are of type Sphere and if they have the Transform member close within epsilon
     /// </summary>
-    /// <param name="s1"></param>
-    /// <param name="s2"></param>
+    /// <param name="s"></param>
     /// <param name="epsilon"></param>
     /// <returns></returns>
-    public override bool _AreShapesClose(Shape s1, Shape s2, float epsilon =  1e-5f)
+    public override bool _IsCloseTo(Shape s, float epsilon = 1E-05F)
     {
-        if (s1.GetType() != typeof(Sphere) ||  s2.GetType() != typeof(Sphere))
+        if (s.GetType() != typeof(Sphere))
         {
-            throw new ArgumentException("The shapes must be of type Sphere");
+            throw new ArgumentException("The shape must be of type Sphere");
         }
-        
-        Sphere sphere1 = (Sphere)s1;
-        Sphere sphere2 = (Sphere)s2;
-        if (!Transformation.AreTransformationsClose(sphere1.Transform, sphere2.Transform, epsilon))
+
+        Sphere sphere = (Sphere)s;
+        if (!Transformation.AreTransformationsClose(this.Transform, sphere.Transform, epsilon))
         {
             return false;
         }
 
         return true;
     }
-    
+
     /// <summary>
     /// Returns the normal to the Sphere surface
     /// depending on the direction dir of the Ray incident on the <c>Point</c> p of the unit sphere.
@@ -135,7 +132,7 @@ public class Sphere : Shape
                 Point intersectionPoint = invRay.At(t1); // intersection on the unit sphere
                 return new HitRecord
                 (
-                    Transform * intersectionPoint, TODO,  
+                    Transform * intersectionPoint, TODO,
                     Transform * _SphereNormal(intersectionPoint, dir),
                     _SpherePointToUV(intersectionPoint),
                     ray,
@@ -179,21 +176,19 @@ public class Plane : Shape
     /// <summary>
     /// Returns true if the shapes are of type Plane and if they have the Transform member close within epsilon
     /// </summary>
-    /// <param name="s1"></param>
-    /// <param name="s2"></param>
+    /// <param name="s"></param>
     /// <param name="epsilon"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
-    public override bool _AreShapesClose(Shape s1, Shape s2, float epsilon = 1e-5f)
+    public override bool _IsCloseTo(Shape s, float epsilon = 1E-05F)
     {
-        if (s1.GetType() != typeof(Plane) ||  s2.GetType() != typeof(Plane))
+        if (s.GetType() != typeof(Plane) )
         {
             throw new ArgumentException("The shapes must be of type Plane");
         }
-        
-        Plane plane1 = (Plane)s1;
-        Plane plane2 = (Plane)s2;
-        if (!Transformation.AreTransformationsClose(plane1.Transform, plane2.Transform, epsilon))
+
+        Plane plane = (Plane)s;
+        if (!Transformation.AreTransformationsClose(this.Transform, plane.Transform, epsilon))
         {
             return false;
         }
@@ -228,8 +223,9 @@ public class Plane : Shape
                 _PlanePointToUV(intersectionPoint),
                 ray,
                 t
-                );
+            );
         }
+
         return null; //no intersection
     }
 }
