@@ -138,7 +138,7 @@ public class PlaneTest
         var d1 = new Vector(6, 0, -4);
         var d2 = new Vector(73, 5, 48);
         
-        Assert.True(Normal._AreCloseNormal(new Normal(0, 0, 1), plane._PlaneNormal(d1)));
-        Assert.True(Normal._AreCloseNormal(new Normal(0, 0, -1), plane._PlaneNormal(d2)));
+        Assert.True(Normal._AreNormalsClose(new Normal(0, 0, 1), plane._PlaneNormal(d1)));
+        Assert.True(Normal._AreNormalsClose(new Normal(0, 0, -1), plane._PlaneNormal(d2)));
     }
 }

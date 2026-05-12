@@ -29,7 +29,7 @@ public class FunctionsTest
         float[] a = [2, 5.352f, 933, -39.6f];
         float[] b = [2, 5.355f, 933, -39.69f];
 
-        Assert.False(Functions.AreArrayClose(a, b));
-        Assert.True(Functions.AreArrayClose(a, b, 1e-1f));
+        Assert.False(Functions.AreArraysClose(a, b));
+        Assert.True(Functions.AreArraysClose(a, b, 1e-1f));
     }
 }

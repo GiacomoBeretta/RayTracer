@@ -40,7 +40,7 @@ public struct Normal
     /// <param name="a"></param>
     /// <param name="b"></param>
     /// <returns></returns>
-    public static bool _AreCloseNormal(Normal a, Normal b, float epsilon = 1e-5f)
+    public static bool _AreNormalsClose(Normal a, Normal b, float epsilon = 1e-5f)
     {
         return Functions.AreClose(a.X, b.X, epsilon) && Functions.AreClose(a.Y, b.Y, epsilon) &&
                Functions.AreClose(a.Z, b.Z, epsilon);
