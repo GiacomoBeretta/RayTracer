@@ -9,12 +9,7 @@ using McMaster.Extensions.CommandLineUtils;
 [Subcommand(typeof(DemoCommand))]
 public class RayTracer
 {
-    /*public static string InputFileName = "";
-    public static string OutputFileName = "";
-    public static float AFactor = 1.0f;
-    public static float Gamma = 1.0f;*/
-
-    public static int Main(string[] args)
+  public static int Main(string[] args)
         => CommandLineApplication.Execute<RayTracer>(args);
 
     private void OnExecute(CommandLineApplication app)
@@ -33,6 +28,9 @@ class DemoCommand
     [Argument(0, Description = "Image's width")] public int? Width { get; }
     [Argument(1, Description = "Image's height")] public int? Height { get; }
     
+    [Option("--output", Description = "the name of the png file (with the extension)")]
+    public string? OutputFileName { get; }
+    
     [Option("--theta", Description = "Observer's azimuthal angle in degrees")]
     public float? Theta { get; }
     
@@ -42,40 +40,49 @@ class DemoCommand
     [Option("--orthogonal", Description = "Orthogonal camera. Perspective camera passed by default")]
     public bool Orthogonal { get; }
 
+    [Option("--factor", Description = "The empirical factor to render images")]
+    public int? Factor { get; }
+    
+    [Option("--gamma", Description = "The gamma factor characteristic of the screen")]
+    public float? Gamma { get; }
+    
     private void OnExecute()
     {
-        var w = Width ?? 500;
-        var h = Height ?? 500;
-        var t = Theta ?? 0;
-        var p = Phi ?? 0;
-        /*
-        try
-        {
-            ParseArgs(args);
-        }
-        catch (ArgumentException e)
-        {
-            Console.WriteLine("Error: " + e.Message);
-            return 1;
-        }*/
+        var width = Width ?? 500;
+        var height = Height ?? 500;
+        var outputFileName = OutputFileName ?? "referenceShirley.png";
+        var theta = Theta ?? 0;
+        var phi = Phi ?? 0;
+        var factor = Factor ?? 1.0f;
+        var gamma = Gamma ?? 1.0f;
         
+        Console.WriteLine($"width: {width}");
+        Console.WriteLine($"height: {height}");
+        Console.WriteLine($"outputFileName: {outputFileName}");
+        Console.WriteLine($"theta: {theta}");
+        Console.WriteLine($"phi: {phi}");
+        
+        Console.WriteLine("Tone Mapping parameters:")
+        Console.WriteLine($"factor: {factor}");
+        Console.WriteLine($"gamma: {gamma}");
+        
+        theta = Functions.DegToRad(theta);
+        phi = Functions.DegToRad(phi);
         string currentPath = AppDomain.CurrentDomain.BaseDirectory;
-        //string pfmFilePath = Path.Combine(currentPath, "../../../../TracerTests/reference_be.pfm");
-        string pngFilePathShirley = Path.Combine(currentPath, "../../../../TracerTests/referenceShirley.png");
-        //string pngFilePathWeighted = Path.Combine(currentPath, "../../../../TracerTests/referenceWeighted.png");
-        
-        var image = new HDRImage(w, h);
+        string pngFilePath = Path.Combine(currentPath, "../../../../Images/" + outputFileName);
+
+        var image = new HDRImage(width, height);
 
         // PER LA CAMERA APPLICARE LA TRASLAZIONE PER PRIMA (ULTIMA NELLA CONCATENAZIONE)
         ICamera camera;
 
         if (Orthogonal)
         {
-             camera = new OrthogonalCamera(transformation:  new Transformation('y', Functions.DegToRad(p)) * new Transformation('z', Functions.DegToRad(t)) * new Transformation(new Vector(-1.0f, 0f, 0f)));
+             camera = new OrthogonalCamera(transformation:  new Transformation('y', phi) * new Transformation('z', theta) * new Transformation(new Vector(-1.0f, 0f, 0f)));
         }
         else
         {
-             camera = new PerspectiveCamera(transformation:  new Transformation('y', Functions.DegToRad(p)) * new Transformation('z', Functions.DegToRad(t)) * new Transformation(new Vector(-1.0f, 0f, 0f)));
+             camera = new PerspectiveCamera(transformation:  new Transformation('y', phi) * new Transformation('z', theta) * new Transformation(new Vector(-1.0f, 0f, 0f)));
         }
         
         var tracer = new ImageTracer(image, camera);
@@ -109,11 +116,8 @@ class DemoCommand
         var world = new World(shapes);
 
         tracer.FireAllRays(ray => world.RayIntersection(ray) != null ? new Color(1.0f, 1.0f, 1.0f) : new Color(0.0f, 0.0f, 0.0f));
-        image.WritePNG(pngFilePathShirley, 0,1.0f , 1.0f);
-            
+        image.WritePNG(pngFilePath, 0, factor, gamma);
     }
-    
-    
 }
 
 /*try
