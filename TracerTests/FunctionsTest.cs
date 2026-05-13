@@ -32,4 +32,13 @@ public class FunctionsTest
         Assert.False(Functions.AreArraysClose(a, b));
         Assert.True(Functions.AreArraysClose(a, b, 1e-1f));
     }
+
+    [Fact]
+    public void TestDegToRad()
+    {
+        var deg = 180f;
+        
+        Assert.True(Functions.AreClose(Functions.DegToRad(deg), MathF.PI));
+        Assert.False(Functions.AreClose(Functions.DegToRad(deg), 64f));
+    }
 }

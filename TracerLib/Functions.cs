@@ -40,4 +40,14 @@ public static class Functions
 
         return areArrayClose;
     }
+
+    /// <summary>
+    /// Convert a floating point degree into radian
+    /// </summary>
+    /// <param name="deg"></param>
+    /// <returns></returns>
+    public static float DegToRad(float deg)
+    {
+        return deg * MathF.PI / 180f;
+    }
 }

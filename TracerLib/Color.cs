@@ -19,7 +19,7 @@ public struct Color
     public float B { get; set; }
 
     /// <summary>
-    /// Basic <c>Color</c> constructor which accepts 3 positive parameters: R,G,B 
+    /// Basic <c>Color</c> constructor which accepts 3 positive parameters between 0 and 1 : R,G,B 
     /// </summary>
     /// <param name="r"></param>
     /// <param name="g"></param>
@@ -122,11 +122,6 @@ public struct Color
                && Functions.AreClose(c1.G, c2.G, epsilon)
                && Functions.AreClose(c1.B, c2.B, epsilon);
     }
-    
-    /*   public static bool _are_close(Color a, Color b, float epsilon = 1e-5f)
-    {
-        return MathF.Abs(a.R - b.R) < epsilon && MathF.Abs(a.G - b.G) < epsilon && MathF.Abs(a.B - b.B) < epsilon;
-    }*/
 
     /// <summary>
     /// Returns a formatted string with the RGB colors.
