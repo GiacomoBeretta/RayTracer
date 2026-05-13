@@ -1,7 +1,5 @@
 namespace TracerLib;
 
-namespace TracerLib;
-
 //magari è meglio definire Pigment come un delegate (cioè un function object)
 
 public abstract class Pigment
