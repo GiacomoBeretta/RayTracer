@@ -32,4 +32,9 @@ public class World : Shape
         }
         return closest;
     }
+
+    public override bool _IsCloseTo(Shape s, float epsilon = 1E-05f)
+    {
+        throw new NotImplementedException();
+    }
 }
