@@ -29,15 +29,7 @@ public abstract class Shape
     /// <param name="s"></param>
     /// <param name="epsilon"></param>
     /// <returns></returns>
-    public virtual bool _IsCloseTo(Shape s, float epsilon = 1e-5f)
-    {
-        if (GetType() == s.GetType())
-        {
-            return true;
-        }
-
-        return false;
-    }
+    public abstract bool _IsCloseTo(Shape s, float epsilon = 1e-5f);
 }
 
 /// <summary>
@@ -59,7 +51,7 @@ public class Sphere : Shape
     }
 
     /// <summary>
-    /// Returns true if the shapes are of type Sphere and if they have the Transform member close within epsilon
+    /// Returns true if the shape passed as parameter is a Sphere and if it has the Transform member close within epsilon
     /// </summary>
     /// <param name="s"></param>
     /// <param name="epsilon"></param>
@@ -132,7 +124,8 @@ public class Sphere : Shape
                 Point intersectionPoint = invRay.At(t1); // intersection on the unit sphere
                 return new HitRecord
                 (
-                    Transform * intersectionPoint, TODO,
+                    Transform * intersectionPoint,
+                    this,
                     Transform * _SphereNormal(intersectionPoint, dir),
                     _SpherePointToUV(intersectionPoint),
                     ray,
@@ -146,7 +139,8 @@ public class Sphere : Shape
                 Point intersectionPoint = invRay.At(t2); // intersection on the unit sphere
                 return new HitRecord
                 (
-                    Transform * intersectionPoint, TODO,
+                    Transform * intersectionPoint,
+                    this,
                     Transform * _SphereNormal(intersectionPoint, dir),
                     _SpherePointToUV(intersectionPoint),
                     ray,
@@ -174,7 +168,7 @@ public class Plane : Shape
     }
 
     /// <summary>
-    /// Returns true if the shapes are of type Plane and if they have the Transform member close within epsilon
+    /// Returns true if the shape passed as argument is a Plane and if it has the Transform member close within epsilon
     /// </summary>
     /// <param name="s"></param>
     /// <param name="epsilon"></param>
@@ -218,7 +212,8 @@ public class Plane : Shape
         {
             var intersectionPoint = invRay.At(t);
             return new HitRecord(
-                Transform * intersectionPoint, TODO,
+                Transform * intersectionPoint, 
+                this,
                 Transform * _PlaneNormal(dir),
                 _PlanePointToUV(intersectionPoint),
                 ray,
