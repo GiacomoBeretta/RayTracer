@@ -20,6 +20,15 @@ public class SphereTest
     }
 
     [Fact]
+    public void TestIsCloseTo_Sphere()
+    {
+        Sphere sphere1 = new Sphere(new  Transformation(1, 2, 3.000016f));
+        Sphere sphere2 = new Sphere(new  Transformation(1, 2, 3.00001f));
+
+        Assert.True(sphere1._IsCloseTo(sphere2));
+    }
+    
+    [Fact]
     public void TestSphereNormal()
     {
         Sphere sphere = new Sphere();
