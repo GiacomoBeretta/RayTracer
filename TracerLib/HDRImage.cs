@@ -666,7 +666,7 @@ public class HDRImage
         float delta = 1e-10f)
     {
         //using (Stream fileStream = File.OpenWrite(outputFilename))
-        using(Stream fileStream = new FileStream(outputFilename, FileMode.Truncate))
+        using(Stream fileStream = new FileStream(outputFilename, FileMode.Create))
         {
             this.WritePNG(fileStream, luminosityFunction, factor, gamma, averageLuminosity, delta);
         }
