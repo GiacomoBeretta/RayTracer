@@ -14,6 +14,11 @@ public abstract class Shape
         Material = new Material();
     }
 
+    public Shape(Material material)
+    {
+        Material = material;
+    }
+
     /// <summary>
     /// Returns a <c>HitRecord</c> object if there is an intersection between the <c>Ray</c> passed as argument
     /// and *this* shape, otherwise returns a null value.
@@ -48,6 +53,11 @@ public class Sphere : Shape
     public Sphere(Transformation transform)
     {
         this.Transform = transform;
+    }
+
+    public Sphere(Transformation transform, Material material) : base(material)
+    {
+        Transform = transform;
     }
 
     /// <summary>
@@ -163,6 +173,11 @@ public class Plane : Shape
     }
 
     public Plane(Transformation transform)
+    {
+        Transform = transform;
+    }
+
+    public Plane(Transformation transform, Material material) : base(material)
     {
         Transform = transform;
     }

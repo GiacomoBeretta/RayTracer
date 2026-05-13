@@ -75,6 +75,16 @@ public abstract class BRDF
 public class DiffuseBRDF : BRDF
 {
     private float reflectance;
+
+    public DiffuseBRDF()
+    {
+        reflectance = 1;
+    }
+
+    public DiffuseBRDF(float reflectance)
+    {
+        this.reflectance = reflectance;
+    }
     public override Color Eval(Normal normal, Vector Vin, Vector Vout, Vector2D uv)
     {
         return pigment.GetColor(uv) * reflectance * (1.0f/ MathF.PI);
@@ -91,13 +101,22 @@ public class SpecularBRDF : BRDF
 
 public struct Material
 {
-    Pigment pigment;
-    BRDF brdf;
-
+    public Pigment Pigment;
+    public Pigment EmittedRadiance;
+    public BRDF Brdf;
+    
     public Material(Pigment pigment, BRDF brdf)
     {
-        
+        this.Pigment = pigment;
+        this.Brdf = brdf;
+        Color Black = new Color(0, 0, 0);
+        this.EmittedRadiance = new UniformPigment(Black);
     }
-    
-  //  public Pigment EmittedRadiance()
+
+    public Material(Pigment pigment, Pigment emittedRadiance, BRDF brdf)
+    {
+        this.Pigment = pigment;
+        this.EmittedRadiance = emittedRadiance;
+        this.Brdf = brdf;
+    }
 }
