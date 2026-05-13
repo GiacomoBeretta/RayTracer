@@ -109,7 +109,6 @@ class DemoCommand
         var world = new World(shapes);
 
         tracer.FireAllRays(ray => world.RayIntersection(ray) != null ? new Color(1.0f, 1.0f, 1.0f) : new Color(0.0f, 0.0f, 0.0f));
-
         image.WritePNG(pngFilePathShirley, 0,1.0f , 1.0f);
             
     }

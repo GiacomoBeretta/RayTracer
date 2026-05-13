@@ -7,6 +7,13 @@ namespace TracerLib;
 /// </summary>
 public abstract class Shape
 {
+    protected Material Material { get; }
+
+    public Shape()
+    {
+        Material = new Material();
+    }
+
     /// <summary>
     /// Returns a <c>HitRecord</c> object if there is an intersection between the <c>Ray</c> passed as argument
     /// and *this* shape, otherwise returns a null value.
@@ -15,6 +22,14 @@ public abstract class Shape
     /// <param name="ray"></param>
     /// <returns></returns>
     public abstract HitRecord? RayIntersection(Ray ray);
+
+    /// <summary>
+    /// Returns if the shapes are of the same type
+    /// </summary>
+    /// <param name="s"></param>
+    /// <param name="epsilon"></param>
+    /// <returns></returns>
+    public abstract bool _IsCloseTo(Shape s, float epsilon = 1e-5f);
 }
 
 /// <summary>
@@ -33,6 +48,28 @@ public class Sphere : Shape
     public Sphere(Transformation transform)
     {
         this.Transform = transform;
+    }
+
+    /// <summary>
+    /// Returns true if the shape passed as parameter is a Sphere and if it has the Transform member close within epsilon
+    /// </summary>
+    /// <param name="s"></param>
+    /// <param name="epsilon"></param>
+    /// <returns></returns>
+    public override bool _IsCloseTo(Shape s, float epsilon = 1E-05F)
+    {
+        if (s.GetType() != typeof(Sphere))
+        {
+            throw new ArgumentException("The shape must be of type Sphere");
+        }
+
+        Sphere sphere = (Sphere)s;
+        if (!Transformation.AreTransformationsClose(this.Transform, sphere.Transform, epsilon))
+        {
+            return false;
+        }
+
+        return true;
     }
 
     /// <summary>
@@ -87,7 +124,8 @@ public class Sphere : Shape
                 Point intersectionPoint = invRay.At(t1); // intersection on the unit sphere
                 return new HitRecord
                 (
-                    Transform * intersectionPoint,  
+                    Transform * intersectionPoint,
+                    this,
                     Transform * _SphereNormal(intersectionPoint, dir),
                     _SpherePointToUV(intersectionPoint),
                     ray,
@@ -102,6 +140,7 @@ public class Sphere : Shape
                 return new HitRecord
                 (
                     Transform * intersectionPoint,
+                    this,
                     Transform * _SphereNormal(intersectionPoint, dir),
                     _SpherePointToUV(intersectionPoint),
                     ray,
@@ -128,6 +167,29 @@ public class Plane : Shape
         Transform = transform;
     }
 
+    /// <summary>
+    /// Returns true if the shape passed as argument is a Plane and if it has the Transform member close within epsilon
+    /// </summary>
+    /// <param name="s"></param>
+    /// <param name="epsilon"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentException"></exception>
+    public override bool _IsCloseTo(Shape s, float epsilon = 1E-05F)
+    {
+        if (s.GetType() != typeof(Plane) )
+        {
+            throw new ArgumentException("The shapes must be of type Plane");
+        }
+
+        Plane plane = (Plane)s;
+        if (!Transformation.AreTransformationsClose(this.Transform, plane.Transform, epsilon))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
     public Normal _PlaneNormal(Vector dir)
     {
         var normal = new Normal(0, 0, 1);
@@ -150,13 +212,15 @@ public class Plane : Shape
         {
             var intersectionPoint = invRay.At(t);
             return new HitRecord(
-                Transform * intersectionPoint,
+                Transform * intersectionPoint, 
+                this,
                 Transform * _PlaneNormal(dir),
                 _PlanePointToUV(intersectionPoint),
                 ray,
                 t
-                );
+            );
         }
+
         return null; //no intersection
     }
 }

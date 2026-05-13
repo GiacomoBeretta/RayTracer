@@ -24,7 +24,7 @@ public static class Functions
     /// <param name="epsilon"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public static bool AreArrayClose(float[] a, float[] b, float epsilon = 1e-5f)
+    public static bool AreArraysClose(float[] a, float[] b, float epsilon = 1e-5f)
     {
         int length = a.Length;
         if (length != b.Length)
