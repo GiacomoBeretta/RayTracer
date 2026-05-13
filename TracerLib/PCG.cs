@@ -9,12 +9,12 @@ public class PCG
     {
         State = 0;
         Inc = (initSeq << 1) | 1;
-        this.random();
+        this.Random();
         State += initState;
-        this.random();
+        this.Random();
     }
 
-    public uint random()
+    public uint Random()
     {
         var oldstate = State;
 
@@ -22,17 +22,13 @@ public class PCG
 
         var xorshifted = (uint)(((oldstate >> 18) ^ oldstate) >> 27);
 
-        var rot = oldstate >> 59; //Convertire a variabile 32 bit
+        var rot = (int)(oldstate >> 59); 
 
-        //return (uint)((xorshifted >> rot) | (xorshifted << (-rot & 31)));
-
-        uint gizmo = 0;
-
-        return gizmo;
+        return (xorshifted >> rot) | (xorshifted << ((~rot + 1) & 31)); // Rivedere con 32 - rot al posto di ~rot +1
     }
 
-    public float randomFloat()
+    public float RandomFloat()
     {
-        return this.random() / 0x100000000;
+        return this.Random() / 0x100000000;
     }
 }

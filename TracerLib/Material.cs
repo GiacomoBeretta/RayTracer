@@ -4,25 +4,65 @@ namespace TracerLib;
 
 public abstract class Pigment
 {
-    public Color GetColor(Vector2D uv)
-    {
-        return new Color(); //da modificare
-    }
+    public abstract Color GetColor(Vector2D uv);
 }
 
 public class UniformPigment : Pigment
 {
+    public Color Color { get; }
 
-}
+    public UniformPigment(Color color)
+    {
+        Color = color;
+    }
 
-public class CheckeredPigment : Pigment
-{
-
+    public override Color GetColor(Vector2D uv)
+    {
+        return this.Color;
+    }
 }
 
 public class ImagePigment : Pigment
 {
+    public HDRImage Image { get; }
 
+    public ImagePigment(HDRImage image)
+    {
+        Image = image;
+    }
+
+    public override Color GetColor(Vector2D uv)
+    {
+        var col = (int)(uv.U * this.Image.Width);
+        var row = (int)(uv.V * this.Image.Height);
+
+        if (col >= Image.Width) col = Image.Width - 1;
+        if (row >= Image.Height) row = Image.Height - 1;
+        
+        return Image[col, row];
+    }
+}
+
+public class CheckeredPigment : Pigment
+{
+    public Color Color1 { get; }
+    public Color Color2 { get; }
+    public int NumSteps { get; }
+
+    public CheckeredPigment(Color color1, Color color2, int numsteps = 10)
+    {
+        Color1 = color1;
+        Color2 = color2;
+        NumSteps = numsteps;
+    }
+
+    public override Color GetColor(Vector2D uv)
+    {
+        var iu = (int)(MathF.Floor(uv.U * this.NumSteps));
+        var iv = (int)(MathF.Floor(uv.V * this.NumSteps));
+
+        return ((iu % 2) == (iv % 2)) ? this.Color1 : this.Color2;
+    }
 }
 
 public abstract class BRDF
