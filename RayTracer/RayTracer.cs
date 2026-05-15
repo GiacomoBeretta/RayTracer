@@ -61,8 +61,8 @@ class DemoCommand
         Console.WriteLine($"outputFileName: {outputFileName}");
         Console.WriteLine($"theta: {theta}");
         Console.WriteLine($"phi: {phi}");
-        
-        Console.WriteLine("Tone Mapping parameters:")
+
+        Console.WriteLine("Tone Mapping parameters:");
         Console.WriteLine($"factor: {factor}");
         Console.WriteLine($"gamma: {gamma}");
         
