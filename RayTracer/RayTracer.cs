@@ -12,8 +12,11 @@ public class RayTracer
   public static int Main(string[] args)
         => CommandLineApplication.Execute<RayTracer>(args);
 
-    private void OnExecute(CommandLineApplication app)
-        => app.ShowHelp();
+  private void OnExecute(CommandLineApplication app)
+  {
+      Console.WriteLine("ROOT EXECUTED");
+      app.ShowHelp();
+  }
 }
 
 /// <summary>
@@ -29,7 +32,7 @@ class DemoCommand
     [Argument(1, Description = "Image's height")] public int? Height { get; }
     
     [Option("--output", Description = "the name of the png file (with the extension)")]
-    public string? OutputFileName { get; }
+    public string? OutputFileName { get; set; }
     
     [Option("--theta", Description = "Observer's azimuthal angle in degrees")]
     public float? Theta { get; }
@@ -78,11 +81,11 @@ class DemoCommand
 
         if (Orthogonal)
         {
-             camera = new OrthogonalCamera(transformation:  new Transformation('y', phi) * new Transformation('z', theta) * new Transformation(new Vector(-1.0f, 0f, 0f)));
+             camera = new OrthogonalCamera(transformation:  new Transformation('z', phi) * new Transformation('y', theta) * new Transformation(new Vector(-1.0f, 0f, 0f)));
         }
         else
         {
-             camera = new PerspectiveCamera(transformation:  new Transformation('y', phi) * new Transformation('z', theta) * new Transformation(new Vector(-1.0f, 0f, 0f)));
+             camera = new PerspectiveCamera(transformation:  new Transformation('z', phi) * new Transformation('y', theta) * new Transformation(new Vector(-1.0f, 0f, 0f)));
         }
         
         var tracer = new ImageTracer(image, camera);
