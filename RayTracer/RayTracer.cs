@@ -49,12 +49,12 @@ public class DemoCommand
     public string OutputFileName { get; init; } = "referenceShirley.png";
     
     [Option("--theta", Description = "Observer's azimuthal angle in degrees")]
-    [Range(0, 360)]
-    public float Theta { get; init; } = 0;
+    [Range(0.0f, 180.0f)]
+    public float Theta { get; init; } = 0.0f;
 
     [Option("--phi", Description = "Observer's zenithal angle in degrees")]
-    [Range(0, 360)]
-    public float Phi { get; init; } = 0;
+    [Range(0.0f, 360.0f)]
+    public float Phi { get; init; } = 0.0f;
 
     [Option("--projection", Description = "projection used to render the image.")]
     public Projection Projection { get; } = Projection.Perspective;
@@ -64,11 +64,11 @@ public class DemoCommand
     
     //aggiungere range
     [Option("--factor", Description = "The empirical factor to render images")]
-    public int Factor { get; init; } = 1;
+    public float Factor { get; init; } = 1.0f;
 
     //aggiungere range
     [Option("--gamma", Description = "The gamma factor characteristic of the screen")]
-    public float Gamma { get; init; } = 1;
+    public float Gamma { get; init; } = 1.0f;
 
     private void OnExecute()
     {
