@@ -514,19 +514,19 @@ public class HDRImage
     /// <summary>
     /// Computes the average luminosity of the entire image,
     /// using a particular luminosity function of the Color class
-    /// based on the value of the int luminosityFunction parameter
-    /// (0 = Shirley and Morley, 1 = Weighted Average)
+    /// based on the value of the luminosityFunction parameter, see <c>LumFunction</c>
+    /// (Shirley = Shirley and Morley method, Weighted = Weighted Average)
     /// </summary>
     /// <param name="luminosityFunction"></param>
     /// <param name="delta"></param>
     /// <returns></returns>
-    public float _AverageLuminosity(int luminosityFunction, float delta = 1e-10f)
+    public float _AverageLuminosity(LumFunction luminosityFunction, float delta = 1e-10f)
     {
         float sum = 0.0f;
         //perceived value of luminosity follows a logarithmic scale
         //so we must use a logarithmic average
         //delta is needed to avoid singular values for the logarithm
-        if (luminosityFunction == 0)
+        if (luminosityFunction == LumFunction.Shirley)
         {
             foreach (Color color in Pixels)
             {
@@ -535,7 +535,7 @@ public class HDRImage
 
             return MathF.Pow(10, sum / Pixels.Length);
         }
-        else //(luminosityFunction == 1)
+        else //if(luminosityFunction == LumFunction.Weighted)
         {
             foreach (Color color in Pixels)
             {
@@ -549,14 +549,14 @@ public class HDRImage
     /// <summary>
     /// Normalizes the RGB values of each pixel by the average luminosity computed by the AverageLuminosity function
     /// and by another empirical number (here called factor).
-    /// The int luminosityFunction tells which of function of the color class to use to compute the luminosity of the pixel
+    /// The luminosityFunction tells which of function of the color class to use to compute the luminosity of the pixel, see <c>LumFunction</c>
     /// averageLuminosity is an optional parameter you can use if you've already computed it previously.
     /// </summary>
     /// <param name="luminosityFunction"></param>
     /// <param name="factor"></param>
     /// <param name="averageLuminosity"></param>
     /// <param name="delta"></param>
-    public void _Normalize(int luminosityFunction, float factor, float? averageLuminosity = null, float delta = 1e-10f)
+    public void _Normalize(LumFunction luminosityFunction, float factor, float? averageLuminosity = null, float delta = 1e-10f)
     {
         //if averageLuminosity is null compute it with the _AverageLuminosity function
         averageLuminosity ??= _AverageLuminosity(luminosityFunction, delta);
@@ -605,7 +605,7 @@ public class HDRImage
     /// <param name="averageLuminosity"></param>
     /// <param name="delta"></param>
     /// <returns></returns>
-    public HDRImage CreateLDR(int luminosityFunction, float factor, float gamma, float? averageLuminosity = null,
+    public HDRImage CreateLDR(LumFunction luminosityFunction, float factor, float gamma, float? averageLuminosity = null,
         float delta = 1e-10f)
     {
         HDRImage image = this.Clone();
@@ -629,7 +629,7 @@ public class HDRImage
     /// <param name="gamma"></param>
     /// <param name="averageLuminosity"></param>
     /// <param name="delta"></param>
-    public void WritePNG(Stream outputStream, int luminosityFunction, float factor, float gamma,
+    public void WritePNG(Stream outputStream, LumFunction luminosityFunction, float factor, float gamma,
         float? averageLuminosity = null,
         float delta = 1e-10f)
     {
@@ -661,7 +661,7 @@ public class HDRImage
     /// <param name="gamma"></param>
     /// <param name="averageLuminosity"></param>
     /// <param name="delta"></param>
-    public void WritePNG(string outputFilename, int luminosityFunction, float factor, float gamma,
+    public void WritePNG(string outputFilename, LumFunction luminosityFunction, float factor, float gamma,
         float? averageLuminosity = null,
         float delta = 1e-10f)
     {
@@ -671,4 +671,10 @@ public class HDRImage
             this.WritePNG(fileStream, luminosityFunction, factor, gamma, averageLuminosity, delta);
         }
     }
+}
+
+public enum LumFunction
+{
+    Shirley,
+    Weighted
 }

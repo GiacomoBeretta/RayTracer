@@ -35,6 +35,17 @@ public abstract class Shape
     /// <param name="epsilon"></param>
     /// <returns></returns>
     public abstract bool _IsCloseTo(Shape s, float epsilon = 1e-5f);
+
+    public static void CreateONB(Normal normal, out Vector e1, out Vector e2, out Vector e3)
+    {
+        int sign = normal.Z > 0.0f ? 1 : -1;
+        float a = -1.0f / (sign + normal.Z);
+        float b = normal.X * normal.Y * a;
+
+        e1 = new Vector(1.0f + sign * normal.X * normal.X * a, sign * b, -sign * normal.X);
+        e2 = new Vector(b, sign + normal.Y * normal.Y * a, -normal.Y);
+        e3 = new Vector(normal.X, normal.Y, normal.Z);
+    }
 }
 
 /// <summary>
@@ -191,7 +202,7 @@ public class Plane : Shape
     /// <exception cref="ArgumentException"></exception>
     public override bool _IsCloseTo(Shape s, float epsilon = 1E-05F)
     {
-        if (s.GetType() != typeof(Plane) )
+        if (s.GetType() != typeof(Plane))
         {
             throw new ArgumentException("The shapes must be of type Plane");
         }
@@ -227,7 +238,7 @@ public class Plane : Shape
         {
             var intersectionPoint = invRay.At(t);
             return new HitRecord(
-                Transform * intersectionPoint, 
+                Transform * intersectionPoint,
                 this,
                 Transform * _PlaneNormal(dir),
                 _PlanePointToUV(intersectionPoint),

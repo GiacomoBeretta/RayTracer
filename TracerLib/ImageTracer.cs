@@ -59,3 +59,7 @@ public class ImageTracer
         }
     }
 }
+
+delegate Color Renderer(Ray ray);
+    
+    //= ray =>world.RayIntersection(ray) != null ? new Color(1.0f, 1.0f, 1.0f) : new Color(0.0f, 0.0f, 0.0f);
