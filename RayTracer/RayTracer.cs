@@ -4,7 +4,8 @@ using System.ComponentModel;
 using SixLabors.ImageSharp.Processing;
 using TracerLib;
 using McMaster.Extensions.CommandLineUtils;
-using System.ComponentModel.DataAnnotations; // per rendere le opzioni o gli argomenti required
+using System.ComponentModel.DataAnnotations;
+using SixLabors.ImageSharp.Metadata.Profiles.Exif; // per rendere le opzioni o gli argomenti required
 
 
 [Command(Name = "RayTracer")]
@@ -51,36 +52,36 @@ public class DemoCommand
     public RenderFunc Algorithm { get; init; } = RenderFunc.OnOff;      
     
     [Option("--theta", Description = "Observer's azimuthal angle in degrees")]
-    [Range(0, 360)]
-    public float Theta { get; init; } = 0;
+    [Range(0.0f, 180.0f)]
+    public float Theta { get; init; } = 0.0f;
 
     [Option("--phi", Description = "Observer's zenithal angle in degrees")]
-    [Range(0, 360)]
-    public float Phi { get; init; } = 0;
+    [Range(0.0f, 360.0f)]
+    public float Phi { get; init; } = 0.0f;
 
-    [Option("--orthogonal", Description = "Orthogonal camera. Perspective camera passed by default")]
-    public bool Orthogonal { get; }
+    [Option("--projection", Description = "projection used to render the image.")]
+    public Projection Projection { get; } = Projection.Perspective;
 
     [Option("--luminosityFunction", Description = "Luminosity function, options are: shirley (default), weighted")]
     public LumFunction LuminosityFunction { get; init; } = LumFunction.Shirley;
     
     //aggiungere range
     [Option("--factor", Description = "The empirical factor to render images")]
-    public int Factor { get; init; } = 1;
+    public float Factor { get; init; } = 1.0f;
 
     //aggiungere range
     [Option("--gamma", Description = "The gamma factor characteristic of the screen")]
-    public float Gamma { get; init; } = 1;
+    public float Gamma { get; init; } = 1.0f;
 
     private void OnExecute()
     {
         Console.WriteLine($"width: {Width}");
         Console.WriteLine($"height: {Height}");
-        Console.WriteLine($"outputFileName: {OutputFileName} (it is in 'DemoImages/')");
+        Console.WriteLine($"outputFileName: {OutputFileName}");
         Console.WriteLine($"Render's algorithm: {Algorithm}");
         Console.WriteLine($"theta: {Theta}");
         Console.WriteLine($"phi: {Phi}");
-        Console.WriteLine($"projection: {(Orthogonal? "orthogonal" : "perspective")}");
+        Console.WriteLine($"projection: {Projection}");
         Console.WriteLine();
         Console.WriteLine("Tone Mapping parameters:");
         Console.WriteLine($"luminosity function: {LuminosityFunction}");
@@ -91,6 +92,7 @@ public class DemoCommand
         float phiRad = Functions.DegToRad(Phi);
         string currentPath = AppDomain.CurrentDomain.BaseDirectory;
         string pngFilePath = Path.Combine(currentPath, "../../../../DemoImages/" + OutputFileName);
+        if (OutputFileName[^4..] != ".png") pngFilePath += ".png";
 
         var image = new HDRImage(Width, Height);
 
@@ -110,18 +112,22 @@ public class DemoCommand
 
         // PER LA CAMERA APPLICARE LA TRASLAZIONE PER PRIMA (ULTIMA NELLA CONCATENAZIONE)
         ICamera camera;
-
-        if (Orthogonal)
-        {
-            camera = new OrthogonalCamera(transformation: new Transformation('z', phiRad) *
-                                                          new Transformation('y', thetaRad) *
-                                                          new Transformation(new Vector(-1.0f, 0f, 0f)));
-        }
-        else
+        
+        if(Projection == Projection.Perspective)
         {
             camera = new PerspectiveCamera(transformation: new Transformation('z', phiRad) *
                                                            new Transformation('y', thetaRad) *
                                                            new Transformation(new Vector(-1.0f, 0f, 0f)));
+        }
+        else if (Projection == Projection.Orthogonal)
+        {
+            camera = new OrthogonalCamera(transformation: new Transformation('y', phiRad) *
+                                                          new Transformation('z', thetaRad) *
+                                                          new Transformation(new Vector(-1.0f, 0f, 0f)));
+        }
+        else
+        {
+            throw new ArgumentException("Invalid camera mode, accepted orthogonal or perspective");
         }
 
         var tracer = new ImageTracer(image, camera);
@@ -166,8 +172,13 @@ public class DemoCommand
                 world.RayIntersection(ray).Value.Shape.Material.Pigment.GetColor(world.RayIntersection(ray).Value.SurfacePoint) 
                 : new Color(0.0f, 0.0f, 0.0f));
         }
+        else
+        {
+            throw new ArgumentException("Invalid renderer mode, accepted onoff or flat");
+        }
         
-        image.WritePNG(pngFilePath, LuminosityFunction, Factor, Gamma);
+        image.WritePNG(pngFilePath, LuminosityFunction, Factor, Gamma, averageLuminosity: 0.5f);
+        Console.WriteLine("The PNG file has been saved in DemoImages/" + OutputFileName);
     }
 }
 
@@ -202,6 +213,12 @@ public class PfmToPngCommand
         HDRImage image = HDRImage.ReadPFM_File(InputFilePath);
         image.WritePNG(OutputFilePath, LuminosityFunction, Factor, Gamma);
     }
+}
+
+public enum Projection
+{
+    Perspective,
+    Orthogonal
 }
 
 public enum RenderFunc

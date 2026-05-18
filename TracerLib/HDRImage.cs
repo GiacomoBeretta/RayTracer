@@ -662,7 +662,7 @@ public class HDRImage
     /// <param name="averageLuminosity"></param>
     /// <param name="delta"></param>
     public void WritePNG(string outputFilename, LumFunction luminosityFunction, float factor, float gamma,
-        float? averageLuminosity = 0.5f,
+        float? averageLuminosity = null,
         float delta = 1e-10f)
     {
         //using (Stream fileStream = File.OpenWrite(outputFilename))
