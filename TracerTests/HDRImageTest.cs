@@ -257,7 +257,7 @@ public class HDRImageTest
         image[0] = new Color(4.1f, 2.0f, 11); //Luminosity = 3.09626
         image[1] = new Color(33.6f, 83, 27.2f); //Luminosity = 68.4688
         image[2] = new Color(0.3f, 44.9f, 9.3f); // Luminosity = 32.84772
-        Assert.True(Functions.AreClose(19.0961195f, image._AverageLuminosity(1, 0), 1e-5f));
+        Assert.True(Functions.AreClose(19.0961195f, image._AverageLuminosity(LumFunction.Weighted, 0), 1e-5f));
     }
 
     [Fact]
@@ -281,7 +281,7 @@ public class HDRImageTest
         image[0] = new Color(102.5f, 233.4f, 140.8f); // Luminosity = 32.84772
         image[1] = new Color(1683.7f, 2380.2f, 3400.6f); // Luminosity = 32.84772
         //averageLuminosityWeighted = 677.19147515
-        image._Normalize(1, 1, delta: 0);
+        image._Normalize(LumFunction.Weighted, 1, delta: 0);
         Assert.True(Color._AreColorsClose(image[0], new Color(0.1513604f, 0.3446588f, 0.2079176f)));
         Assert.True(Color._AreColorsClose(image[1], new Color(2.4862983f, 3.5148109f, 5.0216226f)));
     }
@@ -388,7 +388,7 @@ public class HDRImageTest
         colorVector[2] = new Color(174, 25.3f, 2773);
 
         float factor = 1;
-        int luminosityFunction = 0;
+        LumFunction luminosityFunction = LumFunction.Shirley;
         float gamma = 2;
         float delta = 0;
         HDRImage hdrImage = new HDRImage(3, 1, colorVector);
