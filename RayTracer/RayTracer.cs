@@ -37,11 +37,11 @@ public class DemoCommand
     public int Height { get; set; } = 500;*/
 
     [Option("--width", Description = "The width of the image")]
-    [Range(1, Int32.MaxValue)]
+    //[Range(1, Int32.MaxValue)]
     public int Width { get; init; } = 500;
 
     [Option("--height", Description = "The height of the image")]
-    [Range(1, Int32.MaxValue)]
+    //[Range(1, Int32.MaxValue)]
     public int Height { get; init; } = 500;
 
     [Option("--output", Description = "The name of the png file")]
@@ -113,14 +113,14 @@ public class DemoCommand
 
         if (Orthogonal)
         {
-            camera = new OrthogonalCamera(transformation: new Transformation('y', phiRad) *
-                                                          new Transformation('z', thetaRad) *
+            camera = new OrthogonalCamera(transformation: new Transformation('z', phiRad) *
+                                                          new Transformation('y', thetaRad) *
                                                           new Transformation(new Vector(-1.0f, 0f, 0f)));
         }
         else
         {
-            camera = new PerspectiveCamera(transformation: new Transformation('y', phiRad) *
-                                                           new Transformation('z', thetaRad) *
+            camera = new PerspectiveCamera(transformation: new Transformation('z', phiRad) *
+                                                           new Transformation('y', thetaRad) *
                                                            new Transformation(new Vector(-1.0f, 0f, 0f)));
         }
 
