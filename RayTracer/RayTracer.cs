@@ -74,7 +74,7 @@ public class DemoCommand
     {
         Console.WriteLine($"width: {Width}");
         Console.WriteLine($"height: {Height}");
-        Console.WriteLine($"outputFileName: {OutputFileName} (it is in 'DemoImages/')");
+        Console.WriteLine($"outputFileName: {OutputFileName}");
         Console.WriteLine($"theta: {Theta}");
         Console.WriteLine($"phi: {Phi}");
         Console.WriteLine($"projection: {Projection}");
@@ -88,6 +88,7 @@ public class DemoCommand
         float phiRad = Functions.DegToRad(Phi);
         string currentPath = AppDomain.CurrentDomain.BaseDirectory;
         string pngFilePath = Path.Combine(currentPath, "../../../../DemoImages/" + OutputFileName);
+        if (OutputFileName[^4..] != ".png") pngFilePath += ".png";
 
         var image = new HDRImage(Width, Height);
 
@@ -140,6 +141,7 @@ public class DemoCommand
         tracer.FireAllRays(ray =>
             world.RayIntersection(ray) != null ? new Color(1.0f, 1.0f, 1.0f) : new Color(0.0f, 0.0f, 0.0f));
         image.WritePNG(pngFilePath, LuminosityFunction, Factor, Gamma);
+        Console.WriteLine("The PNG file has been saved in DemoImages/" + OutputFileName);
     }
 }
 
@@ -181,6 +183,8 @@ public enum Projection
     Perspective,
     Orthogonal
 }
+
+
 /*try
 {
     ParseArgs(args);
