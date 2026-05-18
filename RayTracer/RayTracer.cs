@@ -59,7 +59,7 @@ public class DemoCommand
     public bool Orthogonal { get; }
 
     [Option("--luminosityFunction", Description = "Luminosity function, options are: shirley (default), weighted")]
-    public LumFunction LuminosityFunction { get; set; } = LumFunction.Shirley;
+    public LumFunction LuminosityFunction { get; init; } = LumFunction.Shirley;
     
     //aggiungere range
     [Option("--factor", Description = "The empirical factor to render images")]
@@ -73,7 +73,7 @@ public class DemoCommand
     {
         Console.WriteLine($"width: {Width}");
         Console.WriteLine($"height: {Height}");
-        Console.WriteLine($"outputFileName: {OutputFileName}");
+        Console.WriteLine($"outputFileName: {OutputFileName} (it is in 'DemoImages/')");
         Console.WriteLine($"theta: {Theta}");
         Console.WriteLine($"phi: {Phi}");
         Console.WriteLine($"projection: {(Orthogonal? "orthogonal" : "perspective")}");
@@ -154,7 +154,7 @@ public class PfmToPngCommand
     public required string OutputFilePath { get; init; }
 
     [Option("--luminosityFunction", Description = "Luminosity function, options are: shirley (default), weighted")]
-    public LumFunction LuminosityFunction { get; set; } = LumFunction.Shirley;
+    public LumFunction LuminosityFunction { get; init; } = LumFunction.Shirley;
 
     [Option("--factor", Description = "The empirical factor to render images")]
     public int Factor { get; init; } = 1;
