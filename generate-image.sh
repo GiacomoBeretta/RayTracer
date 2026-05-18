@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if [ $# -lt 5 ]; then
-    echo "Usage: $(basename $0) WIDTH HEIGHT THETA PHI ORTHOGONAL [FACTOR] [GAMMA]"
+if [ $# -lt 4 ]; then
+    echo "Usage: $(basename $0) WIDTH HEIGHT THETA PHI [PROJECTION] [LUMFUNCTION] [FACTOR] [GAMMA]"
     exit 1
 fi
 
@@ -9,18 +9,20 @@ readonly width="$1"
 readonly height="$2"
 readonly theta="$3"
 readonly phi="$4"
-readonly orthogonal="$5"
-readonly factor="${6:-1}"
-readonly gamma="${7:-1}"
+readonly projection="${5:-"perspective"}"
+readonly lumfunction="${6:-"Shirley"}"
+readonly factor="${7:-1}"
+readonly gamma="${8:-1}"
 
-echo "your parameters are:"
-echo "width=$width"
-echo "height=$height"
-echo "theta=$theta"
-echo "phi=$phi"
-echo "orthogonal=$orthogonal"
-echo "factor=$factor"
-echo "gamma=$gamma"
+#echo "your parameters are:"
+#echo "width=$width"
+#echo "height=$height"
+#echo "theta=$theta"
+#echo "phi=$phi"
+#echo "projection=$projection"
+#echo "lumfunction=$lumfunction"
+#echo "factor=$factor"
+#echo "gamma=$gamma"
 
 readonly thetaNNN=$(printf "%03d" "$theta")
 readonly phiNNN=$(printf "%03d" "$phi")
@@ -28,22 +30,18 @@ readonly phiNNN=$(printf "%03d" "$phi")
 readonly pngfile="image_theta${thetaNNN}_phi${phiNNN}.png"
 readonly exePath="./RayTracer/bin/Debug/net10.0/RayTracer"
 
-echo "DEBUG COMMAND:"
-echo "$exePath Demo $width $height --output $pngfile --theta $theta --phi $phi --factor $factor --gamma $gamma"
+#echo outputFilePath="/DemoImages/image_theta${thetaNNN}_phi${phiNNN}.png"
 
-if [ -z "$orthogonal" ]; then
-    time "$exePath" demo "$width" "$height" \
-        --output "$pngfile" \
-        --theta "$theta" \
-        --phi "$phi" \
-        --factor "$factor" \
-        --gamma "$gamma"
-else
-    time "$exePath" demo "$width" "$height" \
-        --output "$pngfile" \
-        --theta "$theta" \
-        --phi "$phi" \
-        --orthogonal \
-        --factor "$factor" \
-        --gamma "$gamma"
-fi
+echo "DEBUG COMMAND"
+echo "$exePath demo --width "$width" --height "$height" --output "$pngfile" --theta "$theta" --phi "$phi" \
+  --projection "$projection" --factor "$factor" --gamma "$gamma""
+
+time "$exePath" demo \
+  --width "$width" \
+  --height "$height" \
+  --output "$pngfile" \
+  --theta "$theta" \
+  --phi "$phi" \
+  --projection "$projection" \
+  --factor "$factor" \
+  --gamma "$gamma"
