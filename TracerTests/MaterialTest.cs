@@ -88,6 +88,23 @@ public class PigmentTest
     }
 }
 
+public class DiffuseBRDF_Test
+{
+    [Fact]
+    public void DiffuseBRDFTest()
+    {
+        PCG pcg = new PCG();
+        Console.WriteLine("ok");
+        Console.WriteLine(pcg.RandomFloat());
+        Console.WriteLine(pcg.RandomFloat());
+        for (int i = 0; i < 10; i++)
+        {
+            float theta = MathF.Acos(pcg.RandomFloat());
+            Console.WriteLine("theta = " + theta);
+        }
+    }
+}
+
 public class MaterialTest
 {
     
