@@ -38,7 +38,7 @@ public class ImagePigment : Pigment
 
         if (col >= Image.Width) col = Image.Width - 1;
         if (row >= Image.Height) row = Image.Height - 1;
-        
+
         return Image[col, row];
     }
 }
@@ -70,6 +70,8 @@ public abstract class BRDF
     protected Pigment pigment;
 
     public abstract Color Eval(Normal normal, Vector Vin, Vector Vout, Vector2D uv);
+
+    public abstract Ray ScatterRay(PCG pcg, Vector Vin, Point interactionPoint, Normal normal, int depth);
 }
 
 public class DiffuseBRDF : BRDF
@@ -85,9 +87,30 @@ public class DiffuseBRDF : BRDF
     {
         this.reflectance = reflectance;
     }
+
     public override Color Eval(Normal normal, Vector Vin, Vector Vout, Vector2D uv)
     {
-        return pigment.GetColor(uv) * reflectance * (1.0f/ MathF.PI);
+        return pigment.GetColor(uv) * reflectance * (1.0f / MathF.PI);
+    }
+
+    //da modificare
+    public override Ray ScatterRay(PCG pcg, Vector Vin, Point interactionPoint, Normal normal, int depth)
+    {
+        Vector e1, e2, e3;
+        Shape.CreateONB(normal, out e1, out e2, out e3);
+
+        float phi = 2 * MathF.PI * pcg.RandomFloat();
+        float cos_theta_sq = pcg.RandomFloat();
+        float cos_theta = MathF.Sqrt(cos_theta_sq);
+        float sin_theta = MathF.Sqrt(1 - cos_theta_sq);
+
+        return new Ray
+        (
+            interactionPoint,
+            new Vector(),
+            tmin: 1e-03f,
+            depth: depth
+        );
     }
 }
 
@@ -97,6 +120,16 @@ public class SpecularBRDF : BRDF
     {
         throw new NotImplementedException();
     }
+
+    //da modificare
+    public override Ray ScatterRay(PCG pcg, Vector Vin, Point interactionPoint, Normal normal, int depth)
+    {
+        Vector e1, e2, e3;
+        Shape.CreateONB(normal, out e1, out e2, out e3);
+        float phi = 2 * MathF.PI * pcg.RandomFloat();
+
+        return new Ray();
+    }
 }
 
 public struct Material
@@ -104,7 +137,7 @@ public struct Material
     public Pigment Pigment;
     public Pigment EmittedRadiance;
     public BRDF Brdf;
-    
+
     public Material(Pigment pigment, BRDF brdf)
     {
         this.Pigment = pigment;
