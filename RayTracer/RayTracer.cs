@@ -4,7 +4,8 @@ using System.ComponentModel;
 using SixLabors.ImageSharp.Processing;
 using TracerLib;
 using McMaster.Extensions.CommandLineUtils;
-using System.ComponentModel.DataAnnotations; // per rendere le opzioni o gli argomenti required
+using System.ComponentModel.DataAnnotations;
+using SixLabors.ImageSharp.Metadata.Profiles.Exif; // per rendere le opzioni o gli argomenti required
 
 
 [Command(Name = "RayTracer")]
@@ -55,8 +56,8 @@ public class DemoCommand
     [Range(0, 360)]
     public float Phi { get; init; } = 0;
 
-    [Option("--orthogonal", Description = "Orthogonal camera. Perspective camera passed by default")]
-    public bool Orthogonal { get; }
+    [Option("--projection", Description = "projection used to render the image.")]
+    public Projection Projection { get; } = Projection.Perspective;
 
     [Option("--luminosityFunction", Description = "Luminosity function, options are: shirley (default), weighted")]
     public LumFunction LuminosityFunction { get; init; } = LumFunction.Shirley;
@@ -76,7 +77,7 @@ public class DemoCommand
         Console.WriteLine($"outputFileName: {OutputFileName} (it is in 'DemoImages/')");
         Console.WriteLine($"theta: {Theta}");
         Console.WriteLine($"phi: {Phi}");
-        Console.WriteLine($"projection: {(Orthogonal? "orthogonal" : "perspective")}");
+        Console.WriteLine($"projection: {Projection}");
         Console.WriteLine();
         Console.WriteLine("Tone Mapping parameters:");
         Console.WriteLine($"luminosity function: {LuminosityFunction}");
@@ -93,17 +94,17 @@ public class DemoCommand
         // PER LA CAMERA APPLICARE LA TRASLAZIONE PER PRIMA (ULTIMA NELLA CONCATENAZIONE)
         ICamera camera;
 
-        if (Orthogonal)
-        {
-            camera = new OrthogonalCamera(transformation: new Transformation('y', phiRad) *
-                                                          new Transformation('z', thetaRad) *
-                                                          new Transformation(new Vector(-1.0f, 0f, 0f)));
-        }
-        else
+        if(Projection == Projection.Perspective)
         {
             camera = new PerspectiveCamera(transformation: new Transformation('y', phiRad) *
                                                            new Transformation('z', thetaRad) *
                                                            new Transformation(new Vector(-1.0f, 0f, 0f)));
+        }
+        else //if (Projection == Projection.Orthogonal)
+        {
+            camera = new OrthogonalCamera(transformation: new Transformation('y', phiRad) *
+                                                          new Transformation('z', thetaRad) *
+                                                          new Transformation(new Vector(-1.0f, 0f, 0f)));
         }
 
         var tracer = new ImageTracer(image, camera);
@@ -175,6 +176,11 @@ public class PfmToPngCommand
     }
 }
 
+public enum Projection
+{
+    Perspective,
+    Orthogonal
+}
 /*try
 {
     ParseArgs(args);
