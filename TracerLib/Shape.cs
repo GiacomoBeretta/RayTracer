@@ -7,7 +7,7 @@ namespace TracerLib;
 /// </summary>
 public abstract class Shape
 {
-    protected Material Material { get; }
+    public Material Material { get; }
 
     public Shape()
     {

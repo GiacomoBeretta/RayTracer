@@ -45,8 +45,11 @@ public class DemoCommand
     [Range(1, Int32.MaxValue)]
     public int Height { get; init; } = 500;
 
-    [Option("--output", Description = "the name of the png file")]
+    [Option("--output", Description = "The name of the png file")]
     public string OutputFileName { get; init; } = "referenceShirley.png";
+
+    [Option("--algorithm", Description = "Render's algorithm. OnOffRenderer passed by default")]
+    public RenderFunc Algorithm { get; init; } = RenderFunc.OnOff;      
     
     [Option("--theta", Description = "Observer's azimuthal angle in degrees")]
     [Range(0.0f, 180.0f)]
@@ -75,6 +78,7 @@ public class DemoCommand
         Console.WriteLine($"width: {Width}");
         Console.WriteLine($"height: {Height}");
         Console.WriteLine($"outputFileName: {OutputFileName}");
+        Console.WriteLine($"Render's algorithm: {Algorithm}");
         Console.WriteLine($"theta: {Theta}");
         Console.WriteLine($"phi: {Phi}");
         Console.WriteLine($"projection: {Projection}");
@@ -91,6 +95,20 @@ public class DemoCommand
         if (OutputFileName[^4..] != ".png") pngFilePath += ".png";
 
         var image = new HDRImage(Width, Height);
+
+        var material1 = new Material(new UniformPigment(new Color(0.7f, 0.3f, 0.2f)), new DiffuseBRDF());
+
+        var material2 =
+            new Material(new CheckeredPigment(new Color(0.2f, 0.7f, 0.3f), new Color(0.3f, 0.2f, 0.7f), numsteps: 4),
+                new DiffuseBRDF());
+
+        var sphere_texture = new HDRImage(2, 2);
+        sphere_texture[0] = new Color(0.1f, 0.2f, 0.3f);
+        sphere_texture[1] = new Color(0.2f, 0.1f, 0.3f);
+        sphere_texture[2] = new Color(0.3f, 0.2f, 0.1f);
+        sphere_texture[3] = new Color(0.3f, 0.1f, 0.2f);
+
+        var material3 = new Material(new ImagePigment(sphere_texture), new DiffuseBRDF());
 
         // PER LA CAMERA APPLICARE LA TRASLAZIONE PER PRIMA (ULTIMA NELLA CONCATENAZIONE)
         ICamera camera;
@@ -111,16 +129,16 @@ public class DemoCommand
         var tracer = new ImageTracer(image, camera);
 
         //PER LE FORME APPLICARE LA TRASLAZIONE PER ULTIMA (PRIMA NELLA CONCATENAZIONE)
-        var s1 = new Sphere(new Transformation(new Vector(0.5f, 0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f));
-        var s2 = new Sphere(new Transformation(new Vector(-0.5f, 0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f));
-        var s3 = new Sphere(new Transformation(new Vector(0.5f, -0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f));
-        var s4 = new Sphere(new Transformation(new Vector(0.5f, 0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f));
-        var s5 = new Sphere(new Transformation(new Vector(-0.5f, -0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f));
-        var s6 = new Sphere(new Transformation(new Vector(0.5f, -0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f));
-        var s7 = new Sphere(new Transformation(new Vector(-0.5f, 0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f));
-        var s8 = new Sphere(new Transformation(new Vector(-0.5f, -0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f));
-        var s9 = new Sphere(new Transformation(new Vector(0f, 0f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f));
-        var s10 = new Sphere(new Transformation(new Vector(0f, 0.5f, 0f)) * new Transformation(0.1f, 0.1f, 0.1f));
+        var s1 = new Sphere(new Transformation(new Vector(0.5f, 0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f), material1);
+        var s2 = new Sphere(new Transformation(new Vector(-0.5f, 0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f), material1);
+        var s3 = new Sphere(new Transformation(new Vector(0.5f, -0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f), material1);
+        var s4 = new Sphere(new Transformation(new Vector(0.5f, 0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f), material1);
+        var s5 = new Sphere(new Transformation(new Vector(-0.5f, -0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f), material1);
+        var s6 = new Sphere(new Transformation(new Vector(0.5f, -0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f), material1);
+        var s7 = new Sphere(new Transformation(new Vector(-0.5f, 0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f), material1);
+        var s8 = new Sphere(new Transformation(new Vector(-0.5f, -0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f), material1);
+        var s9 = new Sphere(new Transformation(new Vector(0f, 0f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f), material2);
+        var s10 = new Sphere(new Transformation(new Vector(0f, 0.5f, 0f)) * new Transformation(0.1f, 0.1f, 0.1f), material3);
 
         var shapes = new List<Shape>
         {
@@ -137,9 +155,20 @@ public class DemoCommand
         };
 
         var world = new World(shapes);
+        
+        
 
-        tracer.FireAllRays(ray =>
-            world.RayIntersection(ray) != null ? new Color(1.0f, 1.0f, 1.0f) : new Color(0.0f, 0.0f, 0.0f));
+        if (Algorithm == RenderFunc.OnOff)
+        {
+            tracer.FireAllRays(ray =>
+                world.RayIntersection(ray) != null ? new Color(1.0f, 1.0f, 1.0f) : new Color(0.0f, 0.0f, 0.0f));
+        } else if (Algorithm == RenderFunc.Flat)
+        {
+            tracer.FireAllRays(ray => world.RayIntersection(ray) != null ? 
+                world.RayIntersection(ray).Value.Shape.Material.Pigment.GetColor(world.RayIntersection(ray).Value.SurfacePoint) 
+                : new Color(0.0f, 0.0f, 0.0f));
+        }
+        
         image.WritePNG(pngFilePath, LuminosityFunction, Factor, Gamma);
         Console.WriteLine("The PNG file has been saved in DemoImages/" + OutputFileName);
     }
@@ -184,6 +213,11 @@ public enum Projection
     Orthogonal
 }
 
+public enum RenderFunc
+{
+    OnOff, 
+    Flat
+}
 
 /*try
 {
