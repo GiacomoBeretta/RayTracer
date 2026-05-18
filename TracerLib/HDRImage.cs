@@ -672,3 +672,9 @@ public class HDRImage
         }
     }
 }
+
+public enum LumFunction
+{
+    Shirley,
+    Weighted
+}
