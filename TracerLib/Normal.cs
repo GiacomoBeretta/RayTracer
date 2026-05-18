@@ -124,12 +124,12 @@ public struct Normal
     /// <summary>
     /// Returns the cross product between 2 <c>Normal</c>
     /// </summary>
-    /// <param name="n"></param>
-    /// <param name="v"></param>
+    /// <param name="n1"></param>
+    /// <param name="n2"></param>
     /// <returns></returns>
-    public static Vector CrossProduct(Normal n, Normal v)
+    public static Vector CrossProduct(Normal n1, Normal n2)
     {
-        return new Vector(n.Y * v.Z - n.Z * v.Y, n.Z * v.X - n.X * v.Z, n.X * v.Y - n.Y * v.X);
+        return new Vector(n1.Y * n2.Z - n1.Z * n2.Y, n1.Z * n2.X - n1.X * n2.Z, n1.X * n2.Y - n1.Y * n2.X);
     }
 
     /// <summary>
