@@ -164,13 +164,10 @@ public class DemoCommand
 
         if (Algorithm == RenderFunc.OnOff)
         {
-            tracer.FireAllRays(ray =>
-                world.RayIntersection(ray) != null ? new Color(1.0f, 1.0f, 1.0f) : new Color(0.0f, 0.0f, 0.0f));
+            tracer.FireAllRays(ray => Render.OnOff(world, ray));
         } else if (Algorithm == RenderFunc.Flat)
         {
-            tracer.FireAllRays(ray => world.RayIntersection(ray) != null ? 
-                world.RayIntersection(ray).Value.Shape.Material.Pigment.GetColor(world.RayIntersection(ray).Value.SurfacePoint) 
-                : new Color(0.0f, 0.0f, 0.0f));
+            tracer.FireAllRays(ray => Render.Flat(world, ray));
         }
         else
         {

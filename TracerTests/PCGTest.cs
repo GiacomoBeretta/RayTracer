@@ -1,9 +1,18 @@
+using System.Globalization;
 using TracerLib;
+using Xunit.Abstractions;
 
 namespace TracerTests;
 
 public class PCGTest
 {
+    private readonly ITestOutputHelper _testOutputHelper;
+
+    public PCGTest(ITestOutputHelper testOutputHelper)
+    {
+        _testOutputHelper = testOutputHelper;
+    }
+
     [Fact]
     public void RandomTest()
     {
@@ -27,8 +36,8 @@ public class PCGTest
 
         for (var i = 0; i < 10; i++)
         {
-            //var rand = pcg.RandomFloat();
-            Assert.True(pcg.RandomFloat() is < 1 and >= 0);
+            var rand = pcg.RandomFloat();
+            Assert.True(rand is < 1 and >= 0);
         }
     }
 }
