@@ -33,8 +33,11 @@ public class ImagePigment : Pigment
 
     public override Color GetColor(Vector2D uv)
     {
-        var col = (int)(uv.U * this.Image.Width);
-        var row = (int)(uv.V * this.Image.Height);
+        var u = uv.U - MathF.Floor(uv.U);
+        var v = uv.V - MathF.Floor(uv.V);
+        
+        var col = (int)(u * this.Image.Width);
+        var row = (int)(v * this.Image.Height);
 
         if (col >= Image.Width) col = Image.Width - 1;
         if (row >= Image.Height) row = Image.Height - 1;
@@ -58,8 +61,12 @@ public class CheckeredPigment : Pigment
 
     public override Color GetColor(Vector2D uv)
     {
-        var iu = (int)(MathF.Floor(uv.U * this.NumSteps));
-        var iv = (int)(MathF.Floor(uv.V * this.NumSteps));
+        //Normalizzazione coordinate u,v [foooorza entrambi i valori nell'intervallo (0,1)](Per risolvere l'artefatto grafico nell'immagine)
+        var u = uv.U - MathF.Floor(uv.U);
+        var v = uv.V - MathF.Floor(uv.V);
+        
+        var iu = (int)(MathF.Floor(u * this.NumSteps));
+        var iv = (int)(MathF.Floor(v * this.NumSteps));
 
         return ((iu % 2) == (iv % 2)) ? this.Color1 : this.Color2;
     }
