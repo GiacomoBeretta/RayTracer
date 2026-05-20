@@ -16,7 +16,7 @@ public class ImageTracer
     private PCG _pcg;
     public int SamplePerSide { get; set; }
 
-    public ImageTracer(HDRImage image, ICamera camera, PCG? pcg, int samplePerSide=0)
+    public ImageTracer(HDRImage image, ICamera camera, PCG? pcg = null, int samplePerSide=0)
     {
         this._image = image;
         this._camera = camera;
