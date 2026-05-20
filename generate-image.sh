@@ -36,6 +36,7 @@ readonly exePath="./RayTracer/bin/Debug/net10.0/RayTracer"
 echo "DEBUG COMMAND"
 echo "$exePath demo --width "$width" --height "$height" --algorithm "$algorithm" --output "$pngfile" --theta "$theta" --phi "$phi" --projection "$projection" --factor "$factor" --gamma "$gamma""
 
+dotnet build 
 time "$exePath" demo \
   --width "$width" \
   --height "$height" \

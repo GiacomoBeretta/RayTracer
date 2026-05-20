@@ -121,8 +121,8 @@ public class DemoCommand
         }
         else if (Projection == Projection.Orthogonal)
         {
-            camera = new OrthogonalCamera(transformation: new Transformation('y', phiRad) *
-                                                          new Transformation('z', thetaRad) *
+            camera = new OrthogonalCamera(transformation: new Transformation('z', phiRad) *
+                                                          new Transformation('y', thetaRad) *
                                                           new Transformation(new Vector(-1.0f, 0f, 0f)));
         }
         else
@@ -159,20 +159,25 @@ public class DemoCommand
         };
 
         var world = new World(shapes);
-        
-        
+
+        Render render;
 
         if (Algorithm == RenderFunc.OnOff)
         {
-            tracer.FireAllRays(ray => Render.OnOff(world, ray));
+            render = new OnOff(world);
         } else if (Algorithm == RenderFunc.Flat)
         {
-            tracer.FireAllRays(ray => Render.Flat(world, ray));
+            render = new Flat(world);
+        }else if (Algorithm == RenderFunc.PathTracer)
+        {
+            render = new PathTracer(world);
         }
         else
         {
-            throw new ArgumentException("Invalid renderer mode, accepted onoff or flat");
+            throw new ArgumentException("Invalid renderer mode, accepted onoff, flat or pathtracer");
         }
+        
+        tracer.FireAllRays(ray => render.RenderFunction(ray));
         
         image.WritePNG(pngFilePath, LuminosityFunction, Factor, Gamma, averageLuminosity: 0.5f);
         Console.WriteLine("The PNG file has been saved in DemoImages/" + OutputFileName);
@@ -221,7 +226,8 @@ public enum Projection
 public enum RenderFunc
 {
     OnOff, 
-    Flat
+    Flat,
+    PathTracer
 }
 
 /*try
