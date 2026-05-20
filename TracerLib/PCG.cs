@@ -42,6 +42,6 @@ public class PCG
     /// <returns></returns>
     public float RandomFloat()
     {
-        return this.Random() / 0x100000000;
+        return this.Random() / (float)0x100000000;
     }
 }
