@@ -46,6 +46,18 @@ public struct Normal
                Functions.AreClose(a.Z, b.Z, epsilon);
     }
 
+    public bool IsNormalized(float epsilon = 1e-5f)
+    {
+        return Functions.AreClose(1, this.SquaredNorm(), epsilon);
+    }
+
+    public void CheckNormalized(float epsilon = 1e-5f)
+    {
+        if (!this.IsNormalized())
+        {
+            throw new ArgumentOutOfRangeException($"Normal is not normalized within epsilon={epsilon}");
+        }
+    }
     /// <summary>
     /// Returns the negated <c>Normal</c> vector
     /// </summary>
