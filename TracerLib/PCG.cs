@@ -10,7 +10,7 @@ public class PCG
     /// </summary>
     /// <param name="initState"></param>
     /// <param name="initSeq"></param>
-    public PCG(ulong initState = 42, ulong initSeq = 54)
+    public PCG(ulong initState = 42UL, ulong initSeq = 54UL)
     {
         State = 0;
         Inc = (initSeq << 1) | 1;

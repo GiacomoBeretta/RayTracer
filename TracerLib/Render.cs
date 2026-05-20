@@ -21,4 +21,11 @@ public static class Render
         return material.Pigment.GetColor(hit.Value.SurfacePoint) +
                material.EmittedRadiance.GetColor(hit.Value.SurfacePoint);
     }
+
+    public static Color Path(World world, Ray ray, ulong intState = 42UL, ulong intSeq = 54UL, int numRay = 10, int russianRouletteStop = 3)
+    {
+        var pcg = new PCG(intState, intSeq);
+
+        return new Color();
+    }
 }
