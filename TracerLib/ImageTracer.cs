@@ -22,7 +22,6 @@ public class ImageTracer
         this._camera = camera;
         _pcg = pcg ?? new PCG();
         SamplePerSide = samplePerSide;
-
     }
     
     //attenzione che Tomasi ha una formula diversa: da chiedere!!

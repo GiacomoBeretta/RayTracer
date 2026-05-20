@@ -105,7 +105,8 @@ public class VectorTest
     public void TestToNormal()
     {
         Vector v = new Vector(3, 5, 20);
-        Normal n = new Normal(3, 5, 20);
+        float norm = v.Norm();
+        Normal n = new Normal(3/norm, 5/norm, 20/norm);
         Assert.Equal(n, v.ToNormal());
     }
 }
