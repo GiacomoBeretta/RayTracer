@@ -117,20 +117,20 @@ public class DemoCommand
         {
             camera = new PerspectiveCamera(transformation: new Transformation('z', phiRad) *
                                                            new Transformation('y', thetaRad) *
-                                                           new Transformation(new Vector(-1.0f, 0f, 0f)));
+                                                           new Transformation(new Vector(-1.0f, 0f, 1.0f)));
         }
         else if (Projection == Projection.Orthogonal)
         {
             camera = new OrthogonalCamera(transformation: new Transformation('z', phiRad) *
                                                           new Transformation('y', thetaRad) *
-                                                          new Transformation(new Vector(-1.0f, 0f, 0f)));
+                                                          new Transformation(new Vector(-1.0f, 0f, 1.0f)));
         }
         else
         {
             throw new ArgumentException("Invalid camera mode, accepted orthogonal or perspective");
         }
 
-        var tracer = new ImageTracer(image, camera);
+        var tracer = new ImageTracer(image, camera, samplePerSide: 4);
 
         //PER LE FORME APPLICARE LA TRASLAZIONE PER ULTIMA (PRIMA NELLA CONCATENAZIONE)
         var s1 = new Sphere(new Transformation(new Vector(0.5f, 0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f), material1);
@@ -159,18 +159,38 @@ public class DemoCommand
         };
 
         var world = new World(shapes);
+        
+        //Starting generating pathtracer scenario
+
+        var world2 = new World();
+
+        var skyMaterial = new Material(new UniformPigment(new Color(0.0f, 0.0f, 0.0f)),
+            new UniformPigment(new Color(1.0f, 0.9f, 0.5f)), new DiffuseBRDF());
+        var groundMaterial =
+            new Material(new CheckeredPigment(new Color(0.3f, 0.5f, 0.1f), new Color(0.1f, 0.2f, 0.5f)), new DiffuseBRDF());
+        var sphereMaterial = new Material(new UniformPigment(new Color(0.3f, 0.4f, 0.8f)), new DiffuseBRDF());
+        var mirrorMaterial = new Material(new UniformPigment(new Color(0.6f, 0.2f, 0.3f)), new SpecularBRDF());
+        
+        world2.Add(new Sphere(new Transformation(new Vector(0f, 0f, 0.4f)) * new Transformation(200f,200f,200f), skyMaterial));
+        world2.Add(new Plane(new Transformation(), groundMaterial));
+        world2.Add(new Sphere(new Transformation(new Vector(0f, 0f, 1f)), sphereMaterial));
+        world2.Add(new Sphere(new Transformation(new Vector(1f, 2.5f, 0f)), mirrorMaterial));
+        
+        //Ending generating pathtracer scenario
 
         Render render;
 
         if (Algorithm == RenderFunc.OnOff)
         {
             render = new OnOff(world);
-        } else if (Algorithm == RenderFunc.Flat)
+        } 
+        else if (Algorithm == RenderFunc.Flat)
         {
             render = new Flat(world);
-        }else if (Algorithm == RenderFunc.PathTracer)
+        }
+        else if (Algorithm == RenderFunc.PathTracer)
         {
-            render = new PathTracer(world);
+            render = new PathTracer(world2);
         }
         else
         {
@@ -179,7 +199,7 @@ public class DemoCommand
         
         tracer.FireAllRays(ray => render.RenderFunction(ray));
         
-        image.WritePNG(pngFilePath, LuminosityFunction, Factor, Gamma, averageLuminosity: 0.5f);
+        image.WritePNG(pngFilePath, LuminosityFunction, Factor, Gamma, averageLuminosity: 0.3f);
         Console.WriteLine("The PNG file has been saved in DemoImages/" + OutputFileName);
     }
 }

@@ -67,7 +67,7 @@ public class ImageTracer
                             var uPix = (pixCol + _pcg.RandomFloat()) / SamplePerSide;
                             var vPix = (pixRow + _pcg.RandomFloat()) / SamplePerSide;
                             var ray = FireRay(col, row, uPix, vPix);
-                            cumcolor = renderer(ray);
+                            cumcolor += renderer(ray);
                         }
                     }
 

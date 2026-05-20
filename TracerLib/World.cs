@@ -4,9 +4,9 @@ public class World : Shape
 {
     public List<Shape> Shapes { get; private set; }
 
-    public World(List<Shape> shapes)
+    public World(List<Shape>? shapes = null)
     {
-        Shapes = shapes;
+        Shapes = shapes ?? new List<Shape>();
     }
 
     public void Add(Shape shape)
