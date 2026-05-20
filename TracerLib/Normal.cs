@@ -58,6 +58,7 @@ public struct Normal
             throw new ArgumentOutOfRangeException($"Normal is not normalized within epsilon={epsilon}");
         }
     }
+
     /// <summary>
     /// Returns the negated <c>Normal</c> vector
     /// </summary>
@@ -67,6 +68,7 @@ public struct Normal
         return new Normal(-n.X, -n.Y, -n.Z);
     }
 
+/*
     /// <summary>
     /// Returns the product per component between a <c>Normal</c> and a floating-point scalar
     /// </summary>
@@ -87,7 +89,8 @@ public struct Normal
     public static Normal operator *(float a, Normal n)
     {
         return n * a;
-    }
+    }*/
+
 
     /// <summary>
     /// Returns the scalar product between a <c>Normal</c> and a <c>Vector</c>
@@ -162,12 +165,13 @@ public struct Normal
         return MathF.Sqrt(this.SquaredNorm());
     }
 
+
     /// <summary>
     /// Returns a Normalized Normal 
     /// </summary>
     /// <returns></returns>
     public Normal Normalize()
     {
-        return new Normal(this.X, this.Y, this.Z) * (1 / this.Norm());
+        return new Normal(this.X * 1 / this.Norm(), this.Y * 1 / this.Norm(), this.Z * 1 / this.Norm());
     }
 }
