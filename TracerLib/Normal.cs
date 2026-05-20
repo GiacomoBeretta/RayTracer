@@ -174,4 +174,9 @@ public struct Normal
     {
         return new Normal(this.X * 1 / this.Norm(), this.Y * 1 / this.Norm(), this.Z * 1 / this.Norm());
     }
+
+    public Vector ToVector()
+    {
+        return new Vector(this.X, this.Y, this.Z);
+    }
 }
