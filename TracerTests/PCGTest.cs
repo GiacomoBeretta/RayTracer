@@ -34,10 +34,20 @@ public class PCGTest
     {
         var pcg = new PCG();
 
+        float[] value =
+        [
+            0.6303102204110473f, 0.4815666696522385f, 0.7270080558955669f,
+            0.5149375542532653f, 0.7486033614259213f, 0.7965908306650817f
+        ];
+        
+        foreach (var i in value)
+        {
+            Assert.Equal(pcg.RandomFloat(), i);
+        }
+        
         for (var i = 0; i < 10; i++)
         {
-            var rand = pcg.RandomFloat();
-            Assert.True(rand is < 1 and >= 0);
+            Assert.True(pcg.RandomFloat() is < 1 and >= 0);
         }
     }
 }
