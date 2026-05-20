@@ -11,13 +11,17 @@ namespace TracerLib;
 /// </summary>
 public class ImageTracer
 {
-    private HDRImage image;
-    private ICamera camera;
+    private HDRImage _image;
+    private ICamera _camera;
+    private PCG _pcg;
+    public int SamplePerSide { get; set; }
 
-    public ImageTracer(HDRImage image, ICamera camera)
+    public ImageTracer(HDRImage image, ICamera camera, PCG? pcg = null, int samplePerSide=0)
     {
-        this.image = image;
-        this.camera = camera;
+        this._image = image;
+        this._camera = camera;
+        _pcg = pcg ?? new PCG();
+        SamplePerSide = samplePerSide;
     }
     
     //attenzione che Tomasi ha una formula diversa: da chiedere!!
@@ -37,24 +41,44 @@ public class ImageTracer
     {
         //the formulas for u and v are different because columns start from left like the u coordinate
         //while the rows start from the top, contrary to v that starts from the bottom
-        float u = (column + uPixel) / image.Width; 
-        float v = 1 - (1 + row - vPixel) / image.Height; //equivale a (image.Height - 1 - row + vPixel) / image.Height;
-        return camera.FireRay(u, v);
+        float u = (column + uPixel) / _image.Width; 
+        float v = 1 - (1 + row - vPixel) / _image.Height; //equivale a (image.Height - 1 - row + vPixel) / image.Height;
+        return _camera.FireRay(u, v);
     }
 
     /// <summary>
     /// Fires a ray for each pixel and use the <c>Renderer</c> function to solve the rendering equation and compute the color.
     /// </summary>
-    /// <param name="Renderer"></param>
-    public void FireAllRays(Func<Ray, Color> Renderer)
+    /// <param name="renderer"></param>
+    public void FireAllRays(Func<Ray, Color> renderer)
     {
-        for (int col = 0; col < image.Width; col++)
+        for (int col = 0; col < _image.Width; col++)
         {
-            for (int row = 0; row < image.Height; row++)
+            for (int row = 0; row < _image.Height; row++)
             {
-                Ray ray = FireRay(col, row);
-                Color color = Renderer(ray);
-                image[col, row] = color;
+                var cumcolor = new Color(0.0f,0.0f,0.0f);
+
+                if (SamplePerSide > 0)
+                {
+                    for (var pixRow = 0; pixRow < SamplePerSide; pixRow++)
+                    {
+                        for (var pixCol = 0; pixCol < SamplePerSide; pixCol++)
+                        {
+                            var uPix = (pixCol + _pcg.RandomFloat()) / SamplePerSide;
+                            var vPix = (pixRow + _pcg.RandomFloat()) / SamplePerSide;
+                            var ray = FireRay(col, row, uPix, vPix);
+                            cumcolor = renderer(ray);
+                        }
+                    }
+
+                    _image[col, row] = cumcolor;
+                }
+                else
+                {
+                    var ray = FireRay(col, row);
+                    var color = renderer(ray);
+                    _image[col, row] = color;
+                }
             }
         }
     }
