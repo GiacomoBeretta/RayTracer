@@ -93,13 +93,13 @@ public struct Vector
         Y = Y / norm;
         Z = Z / norm;
     }
-
+    
     /// <summary>
-    /// Returns a normal vector that has the same x,y,z values
+    /// Returns a <c>Normal</c>, i.e. a normalized vector with same direction
     /// </summary>
     /// <returns></returns>
     public Normal ToNormal()
     {
-        return new Normal(X, Y, Z);    
+        return new Normal(X/this.Norm(), Y/this.Norm(), Z/this.Norm());    
     }
 }
