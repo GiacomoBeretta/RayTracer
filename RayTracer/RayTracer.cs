@@ -1,4 +1,4 @@
-// This file is release under EUPL_v1.2 license. See LICENSE.md
+// This file is release undnse. See LICENSE.md
 
 using System.ComponentModel;
 using SixLabors.ImageSharp.Processing;
@@ -102,13 +102,15 @@ public class DemoCommand
             new Material(new CheckeredPigment(new Color(0.2f, 0.7f, 0.3f), new Color(0.3f, 0.2f, 0.7f), numsteps: 4),
                 new DiffuseBRDF());
 
-        var sphere_texture = new HDRImage(2, 2);
-        sphere_texture[0] = new Color(0.1f, 0.2f, 0.3f);
-        sphere_texture[1] = new Color(0.2f, 0.1f, 0.3f);
-        sphere_texture[2] = new Color(0.3f, 0.2f, 0.1f);
-        sphere_texture[3] = new Color(0.3f, 0.1f, 0.2f);
+        var sphereTexture = new HDRImage(2, 2)
+        {
+            [0] = new Color(0.1f, 0.2f, 0.3f),
+            [1] = new Color(0.2f, 0.1f, 0.3f),
+            [2] = new Color(0.3f, 0.2f, 0.1f),
+            [3] = new Color(0.3f, 0.1f, 0.2f)
+        };
 
-        var material3 = new Material(new ImagePigment(sphere_texture), new DiffuseBRDF());
+        var material3 = new Material(new ImagePigment(sphereTexture), new DiffuseBRDF());
 
         // PER LA CAMERA APPLICARE LA TRASLAZIONE PER PRIMA (ULTIMA NELLA CONCATENAZIONE)
         ICamera camera;
@@ -199,7 +201,7 @@ public class DemoCommand
         
         tracer.FireAllRays(ray => render.RenderFunction(ray));
         
-        image.WritePNG(pngFilePath, LuminosityFunction, Factor, Gamma, averageLuminosity: 0.3f);
+        image.WritePNG(pngFilePath, LuminosityFunction, Factor, Gamma, averageLuminosity: 0.5f);
         Console.WriteLine("The PNG file has been saved in DemoImages/" + OutputFileName);
     }
 }
