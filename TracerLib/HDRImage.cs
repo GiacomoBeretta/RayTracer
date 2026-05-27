@@ -4,7 +4,8 @@
 // Forse si possono mettere i membri privati e rendere la classe dei test una friend?
 
 using System.Diagnostics.CodeAnalysis; // per sopprimere i messaggi di errore
-using System.Globalization; //per il metodo cultureInfo e quindi per risolvere il problema dell'1.0 che viene letto come 10
+using
+    System.Globalization; //per il metodo cultureInfo e quindi per risolvere il problema dell'1.0 che viene letto come 10
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats; //for the Rgb24 Pixel Format
 
