@@ -7,7 +7,7 @@ public class CameraTest
     [Fact]
     public void FireRayOrthogonalTest()
     {
-        var cam = new OrthogonalCamera(2.0f, new Transformation()); //Cercare metodo default
+        var cam = new OrthogonalCamera(new Transformation(), 2.0f); //Cercare metodo default
 
         var ray1 = cam.FireRay(0.0f, 0.0f);
         var ray2 = cam.FireRay(1.0f, 0.0f);
