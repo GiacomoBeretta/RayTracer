@@ -17,6 +17,11 @@ public struct SourceLocation
         this.line = line;
         this.column = column;
     }
+
+    public override string ToString()
+    {
+        return "Source Location: "+ fileName + ", line " + line + ", column " + column;
+    }
 }
 
 public class Token
