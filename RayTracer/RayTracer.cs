@@ -168,9 +168,12 @@ public class DemoCommand
 
         var skyMaterial = new Material(new UniformPigment(new Color(0.0f, 0.0f, 0.0f)),
             new UniformPigment(new Color(1.0f, 0.9f, 0.5f)), new DiffuseBRDF());
+        
         var groundMaterial =
             new Material(new CheckeredPigment(new Color(0.3f, 0.5f, 0.1f), new Color(0.1f, 0.2f, 0.5f)), new DiffuseBRDF());
+        
         var sphereMaterial = new Material(new UniformPigment(new Color(0.3f, 0.4f, 0.8f)), new DiffuseBRDF());
+        
         var mirrorMaterial = new Material(new UniformPigment(new Color(0.6f, 0.2f, 0.3f)), new SpecularBRDF());
         
         world2.Add(new Sphere(new Transformation(new Vector(0f, 0f, 0.4f)) * new Transformation(200f,200f,200f), skyMaterial));
@@ -182,21 +185,19 @@ public class DemoCommand
 
         Render render;
 
-        if (Algorithm == RenderFunc.OnOff)
+        switch (Algorithm)
         {
-            render = new OnOff(world);
-        } 
-        else if (Algorithm == RenderFunc.Flat)
-        {
-            render = new Flat(world);
-        }
-        else if (Algorithm == RenderFunc.PathTracer)
-        {
-            render = new PathTracer(world2);
-        }
-        else
-        {
-            throw new ArgumentException("Invalid renderer mode, accepted onoff, flat or pathtracer");
+            case RenderFunc.OnOff:
+                render = new OnOff(world);
+                break;
+            case RenderFunc.Flat:
+                render = new Flat(world);
+                break;
+            case RenderFunc.PathTracer:
+                render = new PathTracer(world2);
+                break;
+            default:
+                throw new ArgumentException("Invalid renderer mode, accepted onoff, flat or pathtracer");
         }
         
         tracer.FireAllRays(ray => render.RenderFunction(ray));
