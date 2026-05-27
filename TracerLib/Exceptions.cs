@@ -15,10 +15,12 @@ public class InvalidPfmFileFormat : FormatException
 //e come si stampa poi la location?
 public class GrammarError : Exception
 {
-    private SourceLocation location;
+    //private SourceLocation location;
     
     public GrammarError(string message) : base(message) { }
     public GrammarError(string message, Exception inner) : base(message, inner) { }
+    
+    /*
     public GrammarError(string message, SourceLocation location) : base(message)
     {
         this.location = location;
@@ -26,8 +28,7 @@ public class GrammarError : Exception
     public GrammarError(string message, SourceLocation location, Exception inner) : base(message, inner)
     {
         this.location = location;
-    }
-    
+    }*/
 }
 
 /* public class ZeroDivision : ArithmeticException
