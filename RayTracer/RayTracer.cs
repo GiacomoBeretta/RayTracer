@@ -9,7 +9,7 @@ using SixLabors.ImageSharp.Metadata.Profiles.Exif; // per rendere le opzioni o g
 
 
 [Command(Name = "RayTracer")]
-[Subcommand(typeof(DemoCommand), typeof(PfmToPngCommand))]
+[Subcommand(typeof(DemoCommand), typeof(PfmToPngCommand)/*, typeof(AverageImageCommand)*/)]
 public class RayTracer
 {
     public static int Main(string[] args)
@@ -239,6 +239,20 @@ public class PfmToPngCommand
         image.WritePNG(OutputFilePath, LuminosityFunction, Factor, Gamma);
     }
 }
+
+/*[Command(Name = "averageimage", Description = "Generate an image averaging the color of multiple images using different seed in pathtracing renderer")]
+public  class AverageImageCommand
+{
+    [Option("--input", Description = "Input file path")]
+    [Required]
+    public required string InputFilePath { get; init; }
+    
+    [Option("--output", Description = "Output file path")]
+    [Required]
+    public required string OutputFilePath { get; init; }
+    
+    
+}*/
 
 public enum Projection
 {
