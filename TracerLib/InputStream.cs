@@ -112,6 +112,68 @@ public class InputStream
         }
     }
 
+    public void SkipWhitespacesAndComments()
+    {
+        const string whitespace = " \t\n\r";
+        var ch = ReadChar();
+
+        var c = new List<char>
+        {
+            '\r',
+            '\n',
+            Convert.ToChar("")
+        };
+
+        while (ch.HasValue && whitespace.Contains(ch.Value) || ch == '#')
+        {
+            if (ch == '#')
+            {
+                char? comment;
+                while ((comment=ReadChar()).HasValue && !c.Contains(comment.Value))
+                {
+                    
+                }
+            }
+
+            ch = ReadChar();
+            //Chiedere a Tomasi se si può fare qualcosa coi nullable type
+            if (ch == Convert.ToChar(""))
+            {
+                return;
+            }
+        }
+
+        if (ch.HasValue)
+        {
+            UnreadChar(ch.Value);
+        }
+    }
+
+    public Token ReadToken()
+    {
+        const string symbol = "()<>[],*";
+        SkipWhitespacesAndComments();
+
+        var ch = ReadChar();
+        
+        //mettere controllo eof
+
+        var tokenLocation = _location;
+
+        if (ch.HasValue && symbol.Contains(ch.Value))
+        {
+            return new SymbolToken(tokenLocation, ch.Value.ToString());
+        }
+        else if (ch == '"')
+        {
+            return new StringToken(tokenLocation, ch.Value.ToString());
+        }
+
+        return new IdentifierToken(tokenLocation, ch.Value.ToString());
+    }
+    
+    //Aggiungere funzioni parse keyword
+
     //E se si raggiunge la fine del file che valore ha il char?
     public void UpdateLocation(char c)
     {

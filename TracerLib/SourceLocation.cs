@@ -24,7 +24,7 @@ public struct SourceLocation
     }
 }
 
-public class Token
+/*public class Token
 {
     SourceLocation location;
 
@@ -37,4 +37,4 @@ public class Token
     {
         this.location = new SourceLocation(fileName, line, column);
     }
-}
+}*/
