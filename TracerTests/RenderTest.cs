@@ -61,6 +61,8 @@ public class RenderTest
 
         tracer.FireAllRays(ray => render.RenderFunction(ray));
         
+        _testOutputHelper.WriteLine(image[1].ToString());
+        
         Assert.True(Color._AreColorsClose(new Color(0f,0f,0f), image[0]));
         Assert.True(Color._AreColorsClose(new Color(0f,0f,0f), image[1]));
         Assert.True(Color._AreColorsClose(new Color(0f,0f,0f), image[2]));
@@ -70,5 +72,36 @@ public class RenderTest
         Assert.True(Color._AreColorsClose(new Color(0f,0f,0f), image[6]));
         Assert.True(Color._AreColorsClose(new Color(0f,0f,0f), image[7]));
         Assert.True(Color._AreColorsClose(new Color(0f,0f,0f), image[8]));
+    }
+
+    //Test della fornace
+    [Fact]
+    public void PathTracingTest()
+    {
+        var pcg = new PCG();
+
+        for (var i = 0; i < 5; i++)
+        {
+            var emittedRadiance = pcg.RandomFloat();
+            var reflectance = pcg.RandomFloat() * 0.9f;
+
+            var world = new World();
+
+            var enclosureMaterial = new Material(new UniformPigment(new Color(1.0f, 1.0f, 1.0f) * reflectance),
+                new UniformPigment(new Color(1.0f, 1.0f, 1.0f) * emittedRadiance), new DiffuseBRDF());
+            
+            world.Add(new Sphere(new Transformation(), enclosureMaterial));
+
+            Render pathTracer = new PathTracer(pcg: pcg, numRay: 1, world: world, maxDepth: 100, russianRouletteStop: 101);
+
+            var ray = new Ray(new Point(0f, 0f, 0f), new Vector(1f, 0f, 0f));
+            var color = pathTracer.RenderFunction(ray);
+
+            var expected = emittedRadiance / (1.0f - reflectance);
+            
+            Assert.True(Functions.AreClose(expected, color.R, 1e-3f));
+            Assert.True(Functions.AreClose(expected, color.G, 1e-3f));
+            Assert.True(Functions.AreClose(expected, color.B, 1e-3f));
+        }
     }
 }

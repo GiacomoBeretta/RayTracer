@@ -56,16 +56,18 @@ public class Sphere : Shape
 {
     public Transformation Transform { get; }
 
+    //Vedere se rimuovere o meno il costruttore vuoto
     public Sphere()
     {
         Transform = new Transformation();
     }
 
-    public Sphere(Transformation transform)
+    public Sphere(Transformation? transform = null)
     {
-        this.Transform = transform;
+        this.Transform = transform ?? new Transformation();
     }
 
+    //Rivedere come costruire una sfera che abbia come argomento solo material
     public Sphere(Transformation transform, Material material) : base(material)
     {
         Transform = transform;
