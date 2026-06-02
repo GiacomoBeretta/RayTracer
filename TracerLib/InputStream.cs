@@ -75,13 +75,15 @@ public class InputStream
     private SourceLocation _location;
     private char? _savedChar;
     private readonly int _tabulations;
+    private Token? _savedToken;
 
-    public InputStream(string filename, int tabulations)
+    public InputStream(string filename, int tabulations = 8)
     {
         _stream = new FileStream(filename, FileMode.Open, FileAccess.Read);
         _location = new SourceLocation(filename, 0, 0);
         _savedChar = null;
         _tabulations = tabulations;
+        _savedToken = null;
     }
 
     public void UnreadChar(char c)
@@ -120,8 +122,7 @@ public class InputStream
         var c = new List<char>
         {
             '\r',
-            '\n',
-            Convert.ToChar("")
+            '\n'
         };
 
         while (ch.HasValue && whitespace.Contains(ch.Value) || ch == '#')
@@ -137,7 +138,7 @@ public class InputStream
 
             ch = ReadChar();
             //Chiedere a Tomasi se si può fare qualcosa coi nullable type
-            if (ch == Convert.ToChar(""))
+            if (ch == null)
             {
                 return;
             }
@@ -148,10 +149,101 @@ public class InputStream
             UnreadChar(ch.Value);
         }
     }
+    
+    //Start Parse_token methods
 
+    public StringToken _ParseStringToken(SourceLocation tokenLocation)
+    {
+        var token = "";
+
+        while (true)
+        {
+            var ch = ReadChar();
+
+            if (ch.HasValue && ch.Value == '"')
+            {
+                break;
+            }else if (ch == null)
+            {
+                throw new GrammarError("unterminated string");
+            }
+
+            token += ch;
+        }
+
+        return new StringToken(tokenLocation, token);
+    }
+
+    public LiteralNumberToken _ParseFloatToken(string firstChar, SourceLocation tokenLocation)
+    {
+        var token = firstChar;
+        const string exp = "eE";
+        float value;
+
+        while (true)
+        {
+            var ch = ReadChar();
+
+            if (ch.HasValue && !float.TryParse(Convert.ToString(ch), out _) || ch.Value != '.' || !exp.Contains(ch.Value))
+            {
+                UnreadChar(ch.Value);
+                break;
+            }
+
+            token += ch;
+        }
+
+        try
+        {
+            value = float.Parse(token);
+        }
+        catch(Exception)
+        {
+            throw new GrammarError($"{token} is an invalid floating point number");
+        }
+
+        return new LiteralNumberToken(tokenLocation, value: value);
+    }
+
+    public Token _ParseKeywordIdentifierToken(string firstChar, SourceLocation tokenLocation)
+    {
+        var token = firstChar;
+
+        while (true)
+        {
+            var ch = ReadChar();
+
+            if (ch.HasValue && !char.IsLetterOrDigit(ch.Value) || ch.Value != '_')
+            {
+                UnreadChar(ch.Value);
+                break;
+            }
+
+            token += ch;
+        }
+
+        if (Keywords.Map.TryGetValue(token, out var keyword))
+        {
+            return new KeywordToken(tokenLocation, keyword);
+        }
+
+        return new IdentifierToken(tokenLocation, token);
+    }
+    
+    //End Parse_Token methods 
+    
     public Token ReadToken()
     {
         const string symbol = "()<>[],*";
+        const string op = "+-.";
+
+        if (_savedToken != null)
+        {
+            var result = _savedToken;
+            _savedToken = null;
+            return result;
+        }
+            
         SkipWhitespacesAndComments();
 
         var ch = ReadChar();
@@ -166,13 +258,23 @@ public class InputStream
         }
         else if (ch == '"')
         {
-            return new StringToken(tokenLocation, ch.Value.ToString());
+            return _ParseStringToken(tokenLocation);
+        } 
+        else if (ch.HasValue && char.IsDigit(ch.Value) || op.Contains(ch.Value))
+        {
+            return _ParseFloatToken(ch.Value.ToString(), tokenLocation);
+        }
+        else if (ch.HasValue && char.IsLetter(ch.Value) || ch.Value == '_') //???
+        {
+            return _ParseKeywordIdentifierToken(ch.Value.ToString(), tokenLocation);
+        }
+        else
+        {
+            throw new GrammarError($"invalid character {ch}");
         }
 
         return new IdentifierToken(tokenLocation, ch.Value.ToString());
     }
-    
-    //Aggiungere funzioni parse keyword
 
     //E se si raggiunge la fine del file che valore ha il char?
     public void UpdateLocation(char c)

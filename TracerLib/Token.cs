@@ -37,25 +37,25 @@ public enum Keyword
 
 public static class Keywords
 {
-    public static readonly Dictionary<string, Keyword> Keyword = new Dictionary<string, Keyword>
+    public static readonly Dictionary<string, Keyword> Map = new Dictionary<string, Keyword>
     {
-        ["new"] = TracerLib.Keyword.New,
-        ["material"] = TracerLib.Keyword.Material,
-        ["plane"] = TracerLib.Keyword.Plane,
-        ["sphere"] = TracerLib.Keyword.Sphere,
-        ["diffuse"] = TracerLib.Keyword.Diffuse,
-        ["specular"] = TracerLib.Keyword.Specular,
-        ["uniform"] = TracerLib.Keyword.Uniform,
-        ["checkered"] = TracerLib.Keyword.Checkered,
-        ["image"] = TracerLib.Keyword.Image,
-        ["rotation_x"] = TracerLib.Keyword.RotationX,
-        ["rotation_y"] = TracerLib.Keyword.RotationY,
-        ["rotation_z"] = TracerLib.Keyword.RotationZ,
-        ["scaling"] = TracerLib.Keyword.Scaling,
-        ["camera"] = TracerLib.Keyword.Camera,
-        ["orthogonal"] = TracerLib.Keyword.Orthogonal,
-        ["perspective"] = TracerLib.Keyword.Perspective,
-        ["float"] = TracerLib.Keyword.Float
+        ["new"] = Keyword.New,
+        ["material"] = Keyword.Material,
+        ["plane"] = Keyword.Plane,
+        ["sphere"] = Keyword.Sphere,
+        ["diffuse"] = Keyword.Diffuse,
+        ["specular"] = Keyword.Specular,
+        ["uniform"] = Keyword.Uniform,
+        ["checkered"] = Keyword.Checkered,
+        ["image"] = Keyword.Image,
+        ["rotation_x"] = Keyword.RotationX,
+        ["rotation_y"] = Keyword.RotationY,
+        ["rotation_z"] = Keyword.RotationZ,
+        ["scaling"] = Keyword.Scaling,
+        ["camera"] = Keyword.Camera,
+        ["orthogonal"] = Keyword.Orthogonal,
+        ["perspective"] = Keyword.Perspective,
+        ["float"] = Keyword.Float
     };
 }
 
