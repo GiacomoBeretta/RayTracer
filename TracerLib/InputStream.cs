@@ -71,47 +71,53 @@ public class InputStream
 //prova senza savedLocation
 public class InputStream
 {
-    private Stream _stream;
-    private SourceLocation _location;
-    private char? _savedChar;
-    private readonly int _tabulations;
-    private Token? _savedToken;
+    public Stream Stream;
+    public SourceLocation Location;
+    public SourceLocation Savedlocation;
+    public char? SavedChar;
+    public readonly int Tabulations;
+    public Token? SavedToken;
 
     public InputStream(string filename, int tabulations = 8)
     {
-        _stream = new FileStream(filename, FileMode.Open, FileAccess.Read);
-        _location = new SourceLocation(filename, 0, 0);
-        _savedChar = null;
-        _tabulations = tabulations;
-        _savedToken = null;
+        Stream = new FileStream(filename, FileMode.Open, FileAccess.Read);
+        Location = new SourceLocation(filename, 0, 0);
+        Savedlocation = Location;
+        SavedChar = null;
+        Tabulations = tabulations;
+        SavedToken = null;
     }
 
     public void UnreadChar(char c)
     {
         {
-            _savedChar = c;
+            SavedChar = c;
+            var savedLocation = Savedlocation;
+            Location = savedLocation;
         }
     }
 
     public char? ReadChar()
     {
-        if (_savedChar == null)
+        char c;
+        if (SavedChar == null)
         {
-            int b = _stream.ReadByte();
+            int b = Stream.ReadByte();
             if (b == -1) return null; // if it has reached the end of file
             else
             {
-                char c = (char)b;
-                UpdateLocation(c);
-                return c;
+                c = (char)b;
             }
         }
         else
         {
-            char c = _savedChar.Value;
-            _savedChar = null;
-            return c;
+            c = SavedChar.Value;
+            SavedChar = null;
         }
+        var location = Location;
+        Savedlocation = location;
+        UpdateLocation(c);
+        return c;
     }
 
     public void SkipLine()
@@ -246,34 +252,34 @@ public class InputStream
         const string symbol = "()<>[],*";
         const string op = "+-.";
 
-        if (_savedToken != null)
+        if (SavedToken != null)
         {
-            var result = _savedToken;
-            _savedToken = null;
+            var result = SavedToken;
+            SavedToken = null;
             return result;
         }
-
+            
         SkipWhitespacesAndComments();
 
         var ch = ReadChar();
-
+        
         //mettere controllo eof
 
-        var tokenLocation = _location;
+        var tokenLocation = Location;
 
         if (ch.HasValue && symbol.Contains(ch.Value))
         {
             return new SymbolToken(tokenLocation, ch.Value.ToString());
         }
-        else if (ch == '"')
+        else if (ch == '\"')
         {
             return _ParseStringToken(tokenLocation);
-        }
+        } 
         else if (ch.HasValue && char.IsDigit(ch.Value) || op.Contains(ch.Value))
         {
             return _ParseFloatToken(ch.Value.ToString(), tokenLocation);
         }
-        else if (ch.HasValue && char.IsLetter(ch.Value) || ch.Value == '_') //???
+        else if (char.IsLetter(ch.Value) || ch.Value == '_') //???
         {
             return _ParseKeywordIdentifierToken(ch.Value.ToString(), tokenLocation);
         }
@@ -281,8 +287,6 @@ public class InputStream
         {
             throw new GrammarError($"invalid character {ch}");
         }
-
-        return new IdentifierToken(tokenLocation, ch.Value.ToString());
     }
 
     //E se si raggiunge la fine del file che valore ha il char?
@@ -292,14 +296,14 @@ public class InputStream
         {
             case '\n':
             case '\r':
-                _location.line += 1;
-                _location.column = 0;
+                Location.line += 1;
+                Location.column = 0;
                 break;
             case '\t':
-                _location.column += _tabulations;
+                Location.column += Tabulations;
                 break;
             default:
-                _location.column += 1;
+                Location.column += 1;
                 break;
         }
     }
