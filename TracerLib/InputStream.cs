@@ -114,42 +114,49 @@ public class InputStream
         }
     }
 
-    public void SkipWhitespacesAndComments()
+    public void SkipLine()
     {
-        const string whitespace = " \t\n\r";
-        var ch = ReadChar();
-
-        var c = new List<char>
+        var newLineChar = new List<char>
         {
             '\r',
             '\n'
         };
 
-        while (ch.HasValue && whitespace.Contains(ch.Value) || ch == '#')
+        char? ch;
+        while (true)
         {
-            if (ch == '#')
-            {
-                char? comment;
-                while ((comment=ReadChar()).HasValue && !c.Contains(comment.Value))
-                {
-                    
-                }
-            }
-
             ch = ReadChar();
-            //Chiedere a Tomasi se si può fare qualcosa coi nullable type
-            if (ch == null)
+            if (ch == null) return;
+            if (newLineChar.Contains(ch.Value))
             {
-                return;
+                break;
             }
-        }
-
-        if (ch.HasValue)
-        {
-            UnreadChar(ch.Value);
         }
     }
-    
+
+    public void SkipWhitespacesAndComments()
+    {
+        const string whitespace = " \t \n \r";
+        var newLineChar = new List<char>
+        {
+            '\r',
+            '\n'
+        };
+
+        var ch = ReadChar();
+
+        if (ch == null) return;
+
+        while (whitespace.Contains(ch.Value) || ch == '#')
+        {
+            if (ch == '#') SkipLine();
+            ch = ReadChar();
+            if (ch == null) return;
+        }
+
+        UnreadChar(ch.Value);
+    }
+
     //Start Parse_token methods
 
     public StringToken _ParseStringToken(SourceLocation tokenLocation)
@@ -163,7 +170,8 @@ public class InputStream
             if (ch.HasValue && ch.Value == '"')
             {
                 break;
-            }else if (ch == null)
+            }
+            else if (ch == null)
             {
                 throw new GrammarError("unterminated string");
             }
@@ -184,7 +192,8 @@ public class InputStream
         {
             var ch = ReadChar();
 
-            if (ch.HasValue && !float.TryParse(Convert.ToString(ch), out _) || ch.Value != '.' || !exp.Contains(ch.Value))
+            if (ch.HasValue && !float.TryParse(Convert.ToString(ch), out _) || ch.Value != '.' ||
+                !exp.Contains(ch.Value))
             {
                 UnreadChar(ch.Value);
                 break;
@@ -197,7 +206,7 @@ public class InputStream
         {
             value = float.Parse(token);
         }
-        catch(Exception)
+        catch (Exception)
         {
             throw new GrammarError($"{token} is an invalid floating point number");
         }
@@ -229,9 +238,9 @@ public class InputStream
 
         return new IdentifierToken(tokenLocation, token);
     }
-    
+
     //End Parse_Token methods 
-    
+
     public Token ReadToken()
     {
         const string symbol = "()<>[],*";
@@ -243,11 +252,11 @@ public class InputStream
             _savedToken = null;
             return result;
         }
-            
+
         SkipWhitespacesAndComments();
 
         var ch = ReadChar();
-        
+
         //mettere controllo eof
 
         var tokenLocation = _location;
@@ -259,7 +268,7 @@ public class InputStream
         else if (ch == '"')
         {
             return _ParseStringToken(tokenLocation);
-        } 
+        }
         else if (ch.HasValue && char.IsDigit(ch.Value) || op.Contains(ch.Value))
         {
             return _ParseFloatToken(ch.Value.ToString(), tokenLocation);
@@ -282,6 +291,7 @@ public class InputStream
         switch (c)
         {
             case '\n':
+            case '\r':
                 _location.line += 1;
                 _location.column = 0;
                 break;
