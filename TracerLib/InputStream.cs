@@ -116,16 +116,10 @@ public class InputStream
 
     public void SkipLine()
     {
-        var newLineChar = new List<char>
-        {
-            '\r',
-            '\n'
-        };
-
-        char? ch;
+        var newLineChar = new List<char> { '\r', '\n' };
         while (true)
         {
-            ch = ReadChar();
+            char? ch = ReadChar();
             if (ch == null) return;
             if (newLineChar.Contains(ch.Value))
             {
@@ -137,11 +131,7 @@ public class InputStream
     public void SkipWhitespacesAndComments()
     {
         const string whitespace = " \t \n \r";
-        var newLineChar = new List<char>
-        {
-            '\r',
-            '\n'
-        };
+        var newLineChar = new List<char> { '\r', '\n' };
 
         var ch = ReadChar();
 
