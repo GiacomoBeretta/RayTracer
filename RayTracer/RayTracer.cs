@@ -1,4 +1,4 @@
-// This file is release undnse. See LICENSE.md
+// This file is released under EUPL_v1.2 license. See LICENSE.md
 
 using System.ComponentModel;
 using SixLabors.ImageSharp.Processing;
