@@ -18,11 +18,6 @@ public struct Color
     public float G { get; set; }
     public float B { get; set; }
     
-    public Color() : this(0.0f, 0.0f, 0.0f)
-    {
-        
-    }
-
     /// <summary>
     /// Basic <c>Color</c> constructor which accepts 3 positive parameters between 0 and 1 : R,G,B 
     /// </summary>
