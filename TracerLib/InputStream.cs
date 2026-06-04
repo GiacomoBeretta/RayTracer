@@ -87,6 +87,25 @@ public class InputStream
         Tabulations = tabulations;
         SavedToken = null;
     }
+    
+    //E se si raggiunge la fine del file che valore ha il char?
+    public void UpdateLocation(char c)
+    {
+        switch (c)
+        {
+            case '\n':
+            case '\r':
+                Location.line += 1;
+                Location.column = 0;
+                break;
+            case '\t':
+                Location.column += Tabulations;
+                break;
+            default:
+                Location.column += 1;
+                break;
+        }
+    }
 
     public void UnreadChar(char c)
     {
@@ -104,18 +123,15 @@ public class InputStream
         {
             int b = Stream.ReadByte();
             if (b == -1) return null; // if it has reached the end of file
-            else
-            {
-                c = (char)b;
-            }
+            else c = (char)b;
         }
         else
         {
             c = SavedChar.Value;
             SavedChar = null;
         }
-        var location = Location;
-        Savedlocation = location;
+        var oldLocation = Location;
+        Savedlocation = oldLocation;
         UpdateLocation(c);
         return c;
     }
@@ -157,11 +173,11 @@ public class InputStream
 
     public StringToken _ParseStringToken(SourceLocation tokenLocation)
     {
-        var token = "";
+        string stringToken = "";
 
         while (true)
         {
-            var ch = ReadChar();
+            char? ch = ReadChar();
 
             if (ch.HasValue && ch.Value == '"')
             {
@@ -171,11 +187,9 @@ public class InputStream
             {
                 throw new GrammarError("unterminated string");
             }
-
-            token += ch;
+            stringToken += ch;
         }
-
-        return new StringToken(tokenLocation, token);
+        return new StringToken(tokenLocation, stringToken);
     }
 
     public LiteralNumberToken _ParseFloatToken(string firstChar, SourceLocation tokenLocation)
@@ -276,25 +290,6 @@ public class InputStream
         else
         {
             throw new GrammarError($"invalid character {ch}");
-        }
-    }
-
-    //E se si raggiunge la fine del file che valore ha il char?
-    public void UpdateLocation(char c)
-    {
-        switch (c)
-        {
-            case '\n':
-            case '\r':
-                Location.line += 1;
-                Location.column = 0;
-                break;
-            case '\t':
-                Location.column += Tabulations;
-                break;
-            default:
-                Location.column += 1;
-                break;
         }
     }
 }
