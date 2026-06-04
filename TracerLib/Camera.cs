@@ -18,9 +18,10 @@ public struct OrthogonalCamera : ICamera
     public float AspectRatio { get; set; }
     public Transformation Transform { get; set; }
 
-    public OrthogonalCamera() : this(new Transformation())
+    public OrthogonalCamera()
     {
-        
+        AspectRatio = 1.0f;
+        Transform = new Transformation();
     }
 
     public OrthogonalCamera( Transformation transformation, float aspectRatio = 1.0f)
