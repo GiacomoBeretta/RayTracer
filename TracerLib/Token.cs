@@ -10,6 +10,12 @@ public abstract class Token
     {
         Location = location;
     }
+    
+    /*
+    public Token(string fileName, int line, int column)
+    {
+        this.location = new SourceLocation(fileName, line, column);
+    }*/
 }
 
 public enum Keyword

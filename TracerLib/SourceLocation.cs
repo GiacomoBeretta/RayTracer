@@ -23,18 +23,3 @@ public struct SourceLocation
         return "Source Location: "+ fileName + ", line " + line + ", column " + column;
     }
 }
-
-/*public class Token
-{
-    SourceLocation location;
-
-    public Token(SourceLocation location)
-    {
-        this.location = location;
-    }
-    
-    public Token(string fileName, int line, int column)
-    {
-        this.location = new SourceLocation(fileName, line, column);
-    }
-}*/
