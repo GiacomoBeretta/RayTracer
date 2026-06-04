@@ -55,16 +55,15 @@ public abstract class Shape
 public class Sphere : Shape
 {
     public Transformation Transform { get; }
-
-    //Vedere se rimuovere o meno il costruttore vuoto
+    
     public Sphere()
     {
         Transform = new Transformation();
     }
 
-    public Sphere(Transformation? transform = null)
+    public Sphere(Transformation transform)
     {
-        this.Transform = transform ?? new Transformation();
+        this.Transform = transform;
     }
 
     //Rivedere come costruire una sfera che abbia come argomento solo material
