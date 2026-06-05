@@ -6,20 +6,27 @@ namespace TracerLib;
 /// </summary>
 public struct SourceLocation
 {
-    private string fileName;
+    private string filePath;
     //private int indexName;
     public int line;
     public int column;
 
-    public SourceLocation(string fileName, int line, int column)
+    public SourceLocation(string filePath)
     {
-        this.fileName = fileName;
+        this.filePath = Path.GetFileName(filePath);
+        this.line = 0;
+        this.column = 0;
+    }
+    
+    public SourceLocation(string filePath, int line, int column)
+    {
+        this.filePath = filePath;
         this.line = line;
         this.column = column;
     }
 
     public override string ToString()
     {
-        return "Source Location: "+ fileName + ", line " + line + ", column " + column;
+        return "Source Location: "+ filePath + ", line " + line + ", column " + column;
     }
 }
