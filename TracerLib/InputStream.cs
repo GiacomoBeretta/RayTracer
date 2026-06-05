@@ -68,7 +68,6 @@ public class InputStream
     }
 }*/
 
-//prova senza savedLocation
 public class InputStream
 {
     public Stream Stream;
@@ -78,10 +77,10 @@ public class InputStream
     public readonly int Tabulations;
     public Token? SavedToken;
 
-    public InputStream(string filename, int tabulations = 8)
+    public InputStream(string filePath, int tabulations = 8)
     {
-        Stream = new FileStream(filename, FileMode.Open, FileAccess.Read);
-        Location = new SourceLocation(filename, 0, 0);
+        Stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+        Location = new SourceLocation(filePath, 0, 0);
         Savedlocation = Location;
         SavedChar = null;
         Tabulations = tabulations;

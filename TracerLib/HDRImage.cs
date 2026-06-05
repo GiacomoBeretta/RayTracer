@@ -474,9 +474,9 @@ public class HDRImage
         return result;
     }
 
-    public static HDRImage ReadPFM_File(string filename)
+    public static HDRImage ReadPFM_File(string filePath)
     {
-        using (Stream filestream = File.OpenRead(filename))
+        using (Stream filestream = File.OpenRead(filePath))
         {
             return ReadPFM_File(filestream);
         }
@@ -500,9 +500,9 @@ public class HDRImage
         }
     }
 
-    public static void WritePFM_File(HDRImage img, double endian, string filename)
+    public static void WritePFM_File(HDRImage img, double endian, string filePath)
     {
-        using (Stream filestream = File.OpenWrite(filename))
+        using (Stream filestream = File.OpenWrite(filePath))
         {
             WritePFM_File(img, endian, filestream);
         }
@@ -656,18 +656,18 @@ public class HDRImage
     /// It accounts for the gamma correction of the display and of the empirical factor here named "factor"
     /// The luminosityFunction parameter allow to choose between some possible ways to compute the luminosity of a pixel
     /// </summary>
-    /// <param name="outputFilename"></param>
+    /// <param name="outputFilePath"></param>
     /// <param name="luminosityFunction"></param>
     /// <param name="factor"></param>
     /// <param name="gamma"></param>
     /// <param name="averageLuminosity"></param>
     /// <param name="delta"></param>
-    public void WritePNG(string outputFilename, LumFunction luminosityFunction, float factor, float gamma,
+    public void WritePNG(string outputFilePath, LumFunction luminosityFunction, float factor, float gamma,
         float? averageLuminosity = null,
         float delta = 1e-10f)
     {
         //using (Stream fileStream = File.OpenWrite(outputFilename))
-        using(Stream fileStream = new FileStream(outputFilename, FileMode.Create))
+        using(Stream fileStream = new FileStream(outputFilePath, FileMode.Create))
         {
             this.WritePNG(fileStream, luminosityFunction, factor, gamma, averageLuminosity, delta);
         }
