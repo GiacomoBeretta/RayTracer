@@ -65,13 +65,13 @@ public static class Keywords
     };
 }
 
-/*
+
 // A token signaling the end of a file
 public sealed class StopToken : Token
 {
-    
+    public StopToken(SourceLocation location) : base(location) { }
 }
-*/
+
 
 //Cambiare in sealed anche tutte le altre classi che non verranno ereditate (orthogonal, sphere, etc)
 public sealed class KeywordToken : Token
