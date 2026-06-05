@@ -7,18 +7,26 @@ namespace TracerLib;
 /// </summary>
 public class InvalidPfmFileFormat : FormatException
 {
-    public InvalidPfmFileFormat(string errorMessage) : base (errorMessage) { }
-    public InvalidPfmFileFormat(string message, Exception inner) : base(message, inner) { }
+    public InvalidPfmFileFormat(string errorMessage) : base(errorMessage)
+    {
+    }
+
+    public InvalidPfmFileFormat(string message, Exception inner) : base(message, inner)
+    {
+    }
 }
 
 //e come si stampa poi la location?
 public class GrammarError : Exception
 {
-    //private SourceLocation location;
-    
     public GrammarError(string message) : base(message) { }
+
     public GrammarError(string message, Exception inner) : base(message, inner) { }
-    
+
+    public GrammarError(SourceLocation location, string message) : base($"Grammar Error at ${location}: {message}") { }
+
+    public GrammarError(SourceLocation location, string message, Exception inner) : base($"Grammar Error at ${location}: {message}", inner) { }
+
     /*
     public GrammarError(string message, SourceLocation location) : base(message)
     {
