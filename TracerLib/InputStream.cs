@@ -169,7 +169,7 @@ public class InputStream
         UnreadChar(ch.Value);
     }
 
-    //Start Parse_token methods
+    // Parse_token methods - Begin
 
     public StringToken _ParseStringToken(SourceLocation tokenLocation)
     {
@@ -179,13 +179,13 @@ public class InputStream
         {
             char? ch = ReadChar();
 
-            if (ch.HasValue && ch.Value == '"')
-            {
-                break;
-            }
-            else if (ch == null)
+            if (ch == null)
             {
                 throw new GrammarError("unterminated string");
+            }
+            if (ch.Value == '\"')
+            {
+                break;
             }
             stringToken += ch;
         }
@@ -249,29 +249,35 @@ public class InputStream
         return new IdentifierToken(tokenLocation, token);
     }
 
-    //End Parse_Token methods 
+    // Parse_Token methods - End 
 
+    //modificare per end of file
     public Token ReadToken()
     {
-        const string symbol = "()<>[],*";
-        const string op = "+-.";
-
+        // '<>' are for the colors, '[]' for the vectors and points, ',' for separating numbers,
+        // '*' for composing transformations
+        const string symbol = "()<>[],*"; 
+        //const string op = "+-."; //non so a cosa serve il punto e per ora lo commento così quando salta fuori ce ne
+        // accorgiamo subito
+        const string op = "+-";
+        
         if (SavedToken != null)
         {
-            var result = SavedToken;
+            Token result = SavedToken;
             SavedToken = null;
             return result;
         }
             
         SkipWhitespacesAndComments();
+        char? ch = ReadChar();
+        if (ch == null)
+        {
+            throw new NotImplementedException("reached end of file, still not sure what to do");
+        }
 
-        var ch = ReadChar();
-        
-        //mettere controllo eof
+        SourceLocation tokenLocation = Location;
 
-        var tokenLocation = Location;
-
-        if (ch.HasValue && symbol.Contains(ch.Value))
+        if (symbol.Contains(ch.Value))
         {
             return new SymbolToken(tokenLocation, ch.Value.ToString());
         }
@@ -279,7 +285,7 @@ public class InputStream
         {
             return _ParseStringToken(tokenLocation);
         } 
-        else if (ch.HasValue && char.IsDigit(ch.Value) || op.Contains(ch.Value))
+        else if (char.IsDigit(ch.Value) || op.Contains(ch.Value))
         {
             return _ParseFloatToken(ch.Value.ToString(), tokenLocation);
         }
