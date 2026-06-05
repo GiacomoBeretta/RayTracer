@@ -72,7 +72,7 @@ public class InputStream
 {
     public Stream Stream;
     public SourceLocation Location;
-    public SourceLocation Savedlocation;
+    public SourceLocation SavedLocation;
     public char? SavedChar;
     public readonly int Tabulations;
     public Token? SavedToken;
@@ -80,8 +80,8 @@ public class InputStream
     public InputStream(string filePath, int tabulations = 8)
     {
         Stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
-        Location = new SourceLocation(filePath, 0, 0);
-        Savedlocation = Location;
+        Location = new SourceLocation(filePath);
+        SavedLocation = Location;
         SavedChar = null;
         Tabulations = tabulations;
         SavedToken = null;
@@ -89,6 +89,7 @@ public class InputStream
     
     public void UpdateLocation(char c)
     {
+        SavedLocation = Location;
         switch (c)
         {
             case '\n':
@@ -109,8 +110,7 @@ public class InputStream
     {
         {
             SavedChar = c;
-            var savedLocation = Savedlocation;
-            Location = savedLocation;
+            Location = SavedLocation;
         }
     }
 
@@ -132,8 +132,7 @@ public class InputStream
             c = SavedChar.Value;
             SavedChar = null;
         }
-        var oldLocation = Location;
-        Savedlocation = oldLocation;
+        
         UpdateLocation(c);
         return c;
     }
