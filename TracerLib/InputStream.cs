@@ -88,7 +88,6 @@ public class InputStream
         SavedToken = null;
     }
     
-    //E se si raggiunge la fine del file che valore ha il char?
     public void UpdateLocation(char c)
     {
         switch (c)
@@ -106,7 +105,7 @@ public class InputStream
                 break;
         }
     }
-
+    
     public void UnreadChar(char c)
     {
         {
@@ -116,6 +115,10 @@ public class InputStream
         }
     }
 
+    /// <summary>
+    /// Returns null if it has been reached the end of file
+    /// </summary>
+    /// <returns></returns>
     public char? ReadChar()
     {
         char c;
@@ -153,7 +156,6 @@ public class InputStream
     public void SkipWhitespacesAndComments()
     {
         const string whitespace = " \t \n \r";
-        var newLineChar = new List<char> { '\r', '\n' };
 
         var ch = ReadChar();
 
@@ -179,60 +181,59 @@ public class InputStream
         {
             char? ch = ReadChar();
 
-            if (ch == null)
-            {
-                throw new GrammarError("unterminated string");
-            }
-            if (ch.Value == '\"')
-            {
-                break;
-            }
+            if (ch == null) throw new GrammarError(tokenLocation, "unterminated string");
+            if (ch.Value == '\"') break;
+            
             stringToken += ch;
         }
         return new StringToken(tokenLocation, stringToken);
     }
 
-    public LiteralNumberToken _ParseFloatToken(string firstChar, SourceLocation tokenLocation)
+    public LiteralNumberToken _ParseFloatToken(char firstChar, SourceLocation tokenLocation)
     {
-        var token = firstChar;
-        const string exp = "eE";
+        string floatString = firstChar.ToString();
+        const string expChar = "eE";
         float value;
-
-        while (true)
+        
+        while (true) 
         {
-            var ch = ReadChar();
-
-            if (ch.HasValue && !float.TryParse(Convert.ToString(ch), out _) || ch.Value != '.' ||
-                !exp.Contains(ch.Value))
+            char? ch = ReadChar();
+            
+            // if it has been reached the end of file
+            if(ch == null) break;
+            
+            if (!Char.IsDigit(ch.Value) || ch.Value != '.' ||
+                !expChar.Contains(ch.Value))
             {
                 UnreadChar(ch.Value);
                 break;
             }
-
-            token += ch;
+            
+            floatString += ch;
         }
 
         try
         {
-            value = float.Parse(token);
+            value = float.Parse(floatString);
         }
         catch (Exception)
         {
-            throw new GrammarError($"{token} is an invalid floating point number");
+            throw new GrammarError(tokenLocation, $"{floatString} is an invalid floating point number");
         }
 
         return new LiteralNumberToken(tokenLocation, value: value);
     }
-
-    public Token _ParseKeywordIdentifierToken(string firstChar, SourceLocation tokenLocation)
+    
+    public Token _ParseKeywordIdentifierToken(char firstChar, SourceLocation tokenLocation)
     {
-        var token = firstChar;
+        string token = firstChar.ToString();
 
         while (true)
         {
-            var ch = ReadChar();
+            char? ch = ReadChar();
 
-            if (ch.HasValue && !char.IsLetterOrDigit(ch.Value) || ch.Value != '_')
+            if (ch == null) break;
+            if (!char.IsLetterOrDigit(ch.Value) || ch.Value != '_')
             {
                 UnreadChar(ch.Value);
                 break;
@@ -240,7 +241,7 @@ public class InputStream
 
             token += ch;
         }
-
+        
         if (Keywords.Map.TryGetValue(token, out var keyword))
         {
             return new KeywordToken(tokenLocation, keyword);
@@ -256,10 +257,10 @@ public class InputStream
     {
         // '<>' are for the colors, '[]' for the vectors and points, ',' for separating numbers,
         // '*' for composing transformations
-        const string symbol = "()<>[],*"; 
-        //const string op = "+-."; //non so a cosa serve il punto e per ora lo commento così quando salta fuori ce ne
-        // accorgiamo subito
-        const string op = "+-";
+        const string symbols = "()<>[],*"; 
+        //const string op = "+-."; //non so a cosa serve il punto e
+        // per ora lo commento così quando salta fuori ce ne accorgiamo subito
+        const string signs = "+-";
         
         if (SavedToken != null)
         {
@@ -272,30 +273,30 @@ public class InputStream
         char? ch = ReadChar();
         if (ch == null)
         {
-            throw new NotImplementedException("reached end of file, still not sure what to do");
+            return new StopToken(Location);
         }
 
-        SourceLocation tokenLocation = Location;
+        //SourceLocation tokenLocation = Location;
 
-        if (symbol.Contains(ch.Value))
+        if (symbols.Contains(ch.Value))
         {
-            return new SymbolToken(tokenLocation, ch.Value.ToString());
+            return new SymbolToken(Location, ch.Value.ToString());
         }
         else if (ch == '\"')
         {
-            return _ParseStringToken(tokenLocation);
+            return _ParseStringToken(Location);
         } 
-        else if (char.IsDigit(ch.Value) || op.Contains(ch.Value))
+        else if (char.IsDigit(ch.Value) || signs.Contains(ch.Value))
         {
-            return _ParseFloatToken(ch.Value.ToString(), tokenLocation);
+            return _ParseFloatToken(ch.Value, Location);
         }
-        else if (char.IsLetter(ch.Value) || ch.Value == '_') //???
+        else if (char.IsLetter(ch.Value) || ch.Value == '_')
         {
-            return _ParseKeywordIdentifierToken(ch.Value.ToString(), tokenLocation);
+            return _ParseKeywordIdentifierToken(ch.Value, Location);
         }
         else
         {
-            throw new GrammarError($"invalid character {ch}");
+            throw new GrammarError(Location, $"invalid character {ch}");
         }
     }
 }
