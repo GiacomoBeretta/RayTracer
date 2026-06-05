@@ -13,7 +13,7 @@ public struct SourceLocation
 
     public SourceLocation(string filePath)
     {
-        this.filePath = Path.GetFileName(filePath);
+        this.filePath = filePath;
         this.line = 0;
         this.column = 0;
     }
