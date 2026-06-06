@@ -139,14 +139,19 @@ public class InputStream
 
     public void SkipLine()
     {
-        var newLineChar = new List<char> { '\r', '\n' };
         while (true)
         {
             char? ch = ReadChar();
             if (ch == null) return;
-            if (newLineChar.Contains(ch.Value))
+            if (ch == '\n')
             {
                 break;
+            }
+
+            if (ch == '\r')
+            {
+                ch = ReadChar();
+                if (ch == '\n') break;
             }
         }
     }

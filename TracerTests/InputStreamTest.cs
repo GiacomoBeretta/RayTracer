@@ -132,9 +132,29 @@ public class InputStreamTest
 
         File.Delete(filePath);
     }
+    
+    [Fact]
+    public void TestSkipLine()
+    {
+        const string content = "example dshhe, siunw 3,4,5\n" +
+                               "pwsdjvr, g(ejsbd) \r wlsj \n" +
+                               "kgiu, gfoian + odsn \r\n" +
+                               "sodi, wkje.";
+        string filePath = Path.GetTempFileName();
+        File.WriteAllText(filePath, content);
 
-    //test skipLIne
+        InputStream str = new InputStream(filePath);
 
+        Assert.Equal('e', str.ReadChar());
+        str.SkipLine();
+        Assert.Equal('p', str.ReadChar());
+        str.SkipLine();
+        Assert.Equal('k', str.ReadChar());
+        str.SkipLine();
+        Assert.Equal('s', str.ReadChar());
+        
+        File.Delete(filePath);
+    }
     //test skipWhiteSPaces
 
     //test parseStringTOken
