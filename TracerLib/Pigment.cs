@@ -59,7 +59,7 @@ public class CheckeredPigment : Pigment
 
     public override Color GetColor(Vector2D uv)
     {
-        //Normalizzazione coordinate u,v [foooorza entrambi i valori nell'intervallo (0,1)](Per risolvere l'artefatto grafico nell'immagine)
+        //Normalizzazione coordinate u,v [forza entrambi i valori nell'intervallo (0,1)](Per risolvere l'artefatto grafico nell'immagine)
         var u = uv.U - MathF.Floor(uv.U);
         var v = uv.V - MathF.Floor(uv.V);
 

@@ -2,9 +2,15 @@ namespace TracerLib;
 
 public abstract class BRDF
 {
-    protected Pigment pigment;
+    public Pigment Pigment;
 
     //public abstract Color Eval(Normal normal, Vector Vin, Vector Vout, Vector2D uv);
+    protected BRDF() : this(new UniformPigment(new Color(0f,0f,0f))) {}
+
+    protected BRDF(Pigment pigment)
+    {
+        Pigment = pigment;
+    }
 
     public abstract Ray ScatterRay(PCG pcg, Vector vin, Point interactionPoint, Normal normal, int depth);
 }
@@ -18,9 +24,14 @@ public class DiffuseBRDF : BRDF
         _reflectance = 1;
     }
 
-    public DiffuseBRDF(float reflectance)
+    public DiffuseBRDF(Pigment pigment) : base(pigment)
     {
-        this._reflectance = reflectance;
+        _reflectance = 1;
+    }
+
+    public DiffuseBRDF(Pigment pigment, float reflectance) : base(pigment)
+    {
+        _reflectance = reflectance;
     }
 
    /* public override Color Eval(Normal normal, Vector Vin, Vector Vout, Vector2D uv)
@@ -55,6 +66,10 @@ public class SpecularBRDF : BRDF
     {
         throw new NotImplementedException();
     }*/
+   
+   public SpecularBRDF() {}
+   
+   public SpecularBRDF(Pigment pigment) : base(pigment){}
 
     //da modificare
     public override Ray ScatterRay(PCG pcg, Vector vin, Point interactionPoint, Normal normal, int depth)
