@@ -950,6 +950,8 @@ public class InputStreamTest
             Assert.Equal(")", symbolToken.Symbol);
 
             #endregion
+            
+            Assert.Equal(typeof(StopToken), ((StopToken)stream.ReadNextToken()).GetType());
         }
 
         finally
