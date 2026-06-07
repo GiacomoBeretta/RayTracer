@@ -86,7 +86,7 @@ public class InputStream
         Tabulations = tabulations;
         SavedToken = null;
     }
-    
+
     public void UpdateLocation(char c)
     {
         SavedLocation = Location;
@@ -105,7 +105,7 @@ public class InputStream
                 break;
         }
     }
-    
+
     public void UnreadChar(char c)
     {
         {
@@ -132,7 +132,7 @@ public class InputStream
             c = SavedChar.Value;
             SavedChar = null;
         }
-        
+
         UpdateLocation(c);
         return c;
     }
@@ -186,9 +186,10 @@ public class InputStream
 
             if (ch == null) throw new GrammarError(tokenLocation, "unterminated string");
             if (ch.Value == '\"') break;
-            
+
             stringToken += ch;
         }
+
         return new StringToken(tokenLocation, stringToken);
     }
 
@@ -196,22 +197,21 @@ public class InputStream
     {
         string floatString = firstChar.ToString();
         const string expChar = "eE";
+        const string signs = "+-";
         float value;
-        
-        while (true) 
+
+        while (true)
         {
             char? ch = ReadChar();
-            
             // if it has been reached the end of file
-            if(ch == null) break;
+            if (ch == null) break;
             
-            if (!Char.IsDigit(ch.Value) || ch.Value != '.' ||
-                !expChar.Contains(ch.Value))
+            if (!Char.IsDigit(ch.Value) && ch.Value != '.' &&
+                !expChar.Contains(ch.Value) && !signs.Contains(ch.Value))
             {
                 UnreadChar(ch.Value);
                 break;
             }
-            
             floatString += ch;
         }
 
@@ -223,10 +223,10 @@ public class InputStream
         {
             throw new GrammarError(tokenLocation, $"{floatString} is an invalid floating point number");
         }
-
+        
         return new LiteralNumberToken(tokenLocation, value: value);
     }
-    
+
     public Token _ParseKeywordIdentifierToken(char firstChar, SourceLocation tokenLocation)
     {
         string token = firstChar.ToString();
@@ -244,7 +244,7 @@ public class InputStream
 
             token += ch;
         }
-        
+
         if (Keywords.Map.TryGetValue(token, out var keyword))
         {
             return new KeywordToken(tokenLocation, keyword);
@@ -260,18 +260,18 @@ public class InputStream
     {
         // '<>' are for the colors, '[]' for the vectors and points, ',' for separating numbers,
         // '*' for composing transformations
-        const string symbols = "()<>[],*"; 
+        const string symbols = "()<>[],*";
         //const string op = "+-."; //non so a cosa serve il punto e
         // per ora lo commento così quando salta fuori ce ne accorgiamo subito
         const string signs = "+-";
-        
+
         if (SavedToken != null)
         {
             Token result = SavedToken;
             SavedToken = null;
             return result;
         }
-            
+
         SkipWhitespacesAndComments();
         char? ch = ReadChar();
         if (ch == null)
@@ -288,7 +288,7 @@ public class InputStream
         else if (ch == '\"')
         {
             return _ParseStringToken(Location);
-        } 
+        }
         else if (char.IsDigit(ch.Value) || signs.Contains(ch.Value))
         {
             return _ParseFloatToken(ch.Value, Location);
