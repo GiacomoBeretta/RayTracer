@@ -16,63 +16,73 @@ public class InputStreamTest
     public void TestInputStreamConstructor()
     {
         string filePath = Path.GetTempFileName();
-        SourceLocation location = new SourceLocation(filePath);
-        InputStream str = new InputStream(filePath);
+        try
+        {
+            SourceLocation location = new SourceLocation(filePath);
+            InputStream str = new InputStream(filePath);
 
-        Assert.Equal(location, str.Location);
-        Assert.Equal(location, str.SavedLocation);
-        Assert.Null(str.SavedChar);
-        Assert.Equal(8, str.Tabulations);
-        Assert.Null(str.SavedToken);
-
-        File.Delete(filePath);
+            Assert.Equal(location, str.Location);
+            Assert.Equal(location, str.SavedLocation);
+            Assert.Null(str.SavedChar);
+            Assert.Equal(8, str.Tabulations);
+            Assert.Null(str.SavedToken);
+        }
+        finally
+        {
+            File.Delete(filePath);
+        }
     }
 
     [Fact]
     public void TestUpdateLocation()
     {
         string filePath = Path.GetTempFileName();
-        InputStream str = new InputStream(filePath);
+        try
+        {
+            InputStream str = new InputStream(filePath);
 
-        Assert.Equal(0, str.Location.line);
-        Assert.Equal(0, str.Location.column);
+            Assert.Equal(0, str.Location.line);
+            Assert.Equal(0, str.Location.column);
 
-        char ch = 'a';
-        str.UpdateLocation(ch);
-        Assert.Equal(0, str.Location.line);
-        Assert.Equal(1, str.Location.column);
+            char ch = 'a';
+            str.UpdateLocation(ch);
+            Assert.Equal(0, str.Location.line);
+            Assert.Equal(1, str.Location.column);
 
-        ch = '\n';
-        str.UpdateLocation(ch);
-        Assert.Equal(1, str.Location.line);
-        Assert.Equal(0, str.Location.column);
+            ch = '\n';
+            str.UpdateLocation(ch);
+            Assert.Equal(1, str.Location.line);
+            Assert.Equal(0, str.Location.column);
 
-        ch = '\r';
-        str.UpdateLocation(ch);
-        Assert.Equal(2, str.Location.line);
-        Assert.Equal(0, str.Location.column);
+            ch = '\r';
+            str.UpdateLocation(ch);
+            Assert.Equal(2, str.Location.line);
+            Assert.Equal(0, str.Location.column);
 
-        ch = '\t';
-        str.UpdateLocation(ch);
-        Assert.Equal(2, str.Location.line);
-        Assert.Equal(8, str.Location.column);
+            ch = '\t';
+            str.UpdateLocation(ch);
+            Assert.Equal(2, str.Location.line);
+            Assert.Equal(8, str.Location.column);
 
-        ch = '\t';
-        str.UpdateLocation(ch);
-        Assert.Equal(2, str.Location.line);
-        Assert.Equal(16, str.Location.column);
+            ch = '\t';
+            str.UpdateLocation(ch);
+            Assert.Equal(2, str.Location.line);
+            Assert.Equal(16, str.Location.column);
 
-        ch = 'f';
-        str.UpdateLocation(ch);
-        Assert.Equal(2, str.Location.line);
-        Assert.Equal(17, str.Location.column);
+            ch = 'f';
+            str.UpdateLocation(ch);
+            Assert.Equal(2, str.Location.line);
+            Assert.Equal(17, str.Location.column);
 
-        ch = '\n';
-        str.UpdateLocation(ch);
-        Assert.Equal(3, str.Location.line);
-        Assert.Equal(0, str.Location.column);
-
-        File.Delete(filePath);
+            ch = '\n';
+            str.UpdateLocation(ch);
+            Assert.Equal(3, str.Location.line);
+            Assert.Equal(0, str.Location.column);
+        }
+        finally
+        {
+            File.Delete(filePath);
+        }
     }
 
     [Fact]
@@ -80,59 +90,64 @@ public class InputStreamTest
     {
         const string content = "abcde";
         string filePath = Path.GetTempFileName();
-        File.WriteAllText(filePath, content);
+        try
+        {
+            File.WriteAllText(filePath, content);
 
-        InputStream str = new InputStream(filePath);
+            InputStream str = new InputStream(filePath);
 
-        Assert.Equal('a', str.ReadChar());
-        Assert.Equal(0, str.SavedLocation.line);
-        Assert.Equal(0, str.SavedLocation.column);
-        Assert.Equal(0, str.Location.line);
-        Assert.Equal(1, str.Location.column);
+            Assert.Equal('a', str.ReadChar());
+            Assert.Equal(0, str.SavedLocation.line);
+            Assert.Equal(0, str.SavedLocation.column);
+            Assert.Equal(0, str.Location.line);
+            Assert.Equal(1, str.Location.column);
 
-        Assert.Equal('b', str.ReadChar());
-        Assert.Equal(0, str.SavedLocation.line);
-        Assert.Equal(1, str.SavedLocation.column);
-        Assert.Equal(0, str.Location.line);
-        Assert.Equal(2, str.Location.column);
+            Assert.Equal('b', str.ReadChar());
+            Assert.Equal(0, str.SavedLocation.line);
+            Assert.Equal(1, str.SavedLocation.column);
+            Assert.Equal(0, str.Location.line);
+            Assert.Equal(2, str.Location.column);
 
-        Assert.Equal('c', str.ReadChar());
-        Assert.Equal(0, str.SavedLocation.line);
-        Assert.Equal(2, str.SavedLocation.column);
-        Assert.Equal(0, str.Location.line);
-        Assert.Equal(3, str.Location.column);
+            Assert.Equal('c', str.ReadChar());
+            Assert.Equal(0, str.SavedLocation.line);
+            Assert.Equal(2, str.SavedLocation.column);
+            Assert.Equal(0, str.Location.line);
+            Assert.Equal(3, str.Location.column);
 
-        str.UnreadChar('c');
-        Assert.Equal('c', str.SavedChar);
-        Assert.Equal(0, str.SavedLocation.line);
-        Assert.Equal(2, str.SavedLocation.column);
-        Assert.Equal(0, str.Location.line);
-        Assert.Equal(2, str.Location.column);
+            str.UnreadChar('c');
+            Assert.Equal('c', str.SavedChar);
+            Assert.Equal(0, str.SavedLocation.line);
+            Assert.Equal(2, str.SavedLocation.column);
+            Assert.Equal(0, str.Location.line);
+            Assert.Equal(2, str.Location.column);
 
-        Assert.Equal('c', str.ReadChar());
-        Assert.Null(str.SavedChar);
-        Assert.Equal(0, str.SavedLocation.line);
-        Assert.Equal(2, str.SavedLocation.column);
-        Assert.Equal(0, str.Location.line);
-        Assert.Equal(3, str.Location.column);
+            Assert.Equal('c', str.ReadChar());
+            Assert.Null(str.SavedChar);
+            Assert.Equal(0, str.SavedLocation.line);
+            Assert.Equal(2, str.SavedLocation.column);
+            Assert.Equal(0, str.Location.line);
+            Assert.Equal(3, str.Location.column);
 
-        Assert.Equal('d', str.ReadChar());
-        Assert.Equal(0, str.SavedLocation.line);
-        Assert.Equal(3, str.SavedLocation.column);
-        Assert.Equal(0, str.Location.line);
-        Assert.Equal(4, str.Location.column);
+            Assert.Equal('d', str.ReadChar());
+            Assert.Equal(0, str.SavedLocation.line);
+            Assert.Equal(3, str.SavedLocation.column);
+            Assert.Equal(0, str.Location.line);
+            Assert.Equal(4, str.Location.column);
 
-        Assert.Equal('e', str.ReadChar());
-        Assert.Equal(0, str.SavedLocation.line);
-        Assert.Equal(4, str.SavedLocation.column);
-        Assert.Equal(0, str.Location.line);
-        Assert.Equal(5, str.Location.column);
-        
-        Assert.Null(str.ReadChar());
+            Assert.Equal('e', str.ReadChar());
+            Assert.Equal(0, str.SavedLocation.line);
+            Assert.Equal(4, str.SavedLocation.column);
+            Assert.Equal(0, str.Location.line);
+            Assert.Equal(5, str.Location.column);
 
-        File.Delete(filePath);
+            Assert.Null(str.ReadChar());
+        }
+        finally
+        {
+            File.Delete(filePath);
+        }
     }
-    
+
     [Fact]
     public void TestSkipLine()
     {
@@ -141,29 +156,186 @@ public class InputStreamTest
                                "kgiu, gfoian + odsn \r\n" +
                                "sodi, wkje.";
         string filePath = Path.GetTempFileName();
-        File.WriteAllText(filePath, content);
+        try
+        {
+            File.WriteAllText(filePath, content);
 
-        InputStream str = new InputStream(filePath);
+            InputStream str = new InputStream(filePath);
 
-        Assert.Equal('e', str.ReadChar());
-        str.SkipLine();
-        Assert.Equal('p', str.ReadChar());
-        str.SkipLine();
-        Assert.Equal('k', str.ReadChar());
-        str.SkipLine();
-        Assert.Equal('s', str.ReadChar());
-        
-        File.Delete(filePath);
+            Assert.Equal('e', str.ReadChar());
+            str.SkipLine();
+            Assert.Equal('p', str.ReadChar());
+            str.SkipLine();
+            Assert.Equal('k', str.ReadChar());
+            str.SkipLine();
+            Assert.Equal('s', str.ReadChar());
+        }
+        finally
+        {
+            File.Delete(filePath);
+        }
     }
-    //test skipWhiteSPaces
 
-    //test parseStringTOken
-    //test parsefloat
+    [Fact]
+    public void TestSkipWhiteSpacesAndComments()
+    {
+        const string content = "d     sd\n" +
+                               "\tr\n" +
+                               "\t\r\n" +
+                               "\n\n" +
+                               "utn\t\r\t\n" +
+                               "r";
+        string filePath = Path.GetTempFileName();
+        try
+        {
+            File.WriteAllText(filePath, content);
+
+            InputStream str = new InputStream(filePath);
+
+            Assert.Equal('d', str.ReadChar());
+            str.SkipWhitespacesAndComments();
+            Assert.Equal('s', str.ReadChar());
+            str.ReadChar();
+            str.SkipWhitespacesAndComments();
+            Assert.Equal('r', str.ReadChar());
+            str.SkipWhitespacesAndComments();
+            Assert.Equal('u', str.ReadChar());
+
+            str.SkipWhitespacesAndComments(); // Now it must not skip anything
+            Assert.Equal('t', str.ReadChar());
+            str.SkipWhitespacesAndComments(); // Now it must not skip anything
+            Assert.Equal('n', str.ReadChar());
+
+            str.SkipWhitespacesAndComments(); // Now it must not skip anything
+            Assert.Equal('r', str.ReadChar());
+        }
+        finally
+        {
+            File.Delete(filePath);
+        }
+    }
+
+    [Fact]
+    public void TestParseStringToken()
+    {
+        const string content = "Hello, World!\"";
+        const string fail = "Hello, World!";
+
+        string filePath1 = Path.GetTempFileName();
+        File.WriteAllText(filePath1, content);
+
+        string filePath2 = Path.GetTempFileName();
+        File.WriteAllText(filePath2, fail);
+
+        try
+        {
+            var stream1 = new InputStream(filePath1);
+            StringToken st1 = stream1._ParseStringToken(stream1.Location);
+            Assert.Equal("Hello, World!", st1.String);
+
+            var stream2 = new InputStream(filePath2);
+            Assert.Throws<GrammarError>(() => stream2._ParseStringToken(stream2.Location));
+        }
+        finally
+        {
+            File.Delete(filePath1);
+            File.Delete(filePath2);
+        }
+    }
+
+    [Fact]
+    public void TestParseFloatToken()
+    {
+        string content = "3496\n" +
+                         "2.4\n" +
+                         "6.92e3\n" +
+                         "830003.1E9\n" +
+                         "9.1e-4\n" +
+                         "4.7E-12\n" +
+                         "-34.3e5";
+        string filePath1 = Path.GetTempFileName();
+        File.WriteAllText(filePath1, content);
+        try
+        {
+            var stream1 = new InputStream(filePath1);
+
+            char? ch = stream1.ReadChar();
+            LiteralNumberToken floatToken = stream1._ParseFloatToken(ch.Value, stream1.Location);
+            Assert.Equal(3496, floatToken.Value);
+
+            stream1.SkipLine();
+            ch = stream1.ReadChar();
+            floatToken = stream1._ParseFloatToken(ch.Value, stream1.Location);
+            Assert.Equal(2.4f, floatToken.Value);
+
+            stream1.SkipLine();
+            ch = stream1.ReadChar();
+            floatToken = stream1._ParseFloatToken(ch.Value, stream1.Location);
+            Assert.Equal(6.92e3f, floatToken.Value);
+
+            stream1.SkipLine();
+            ch = stream1.ReadChar();
+            floatToken = stream1._ParseFloatToken(ch.Value, stream1.Location);
+            Assert.Equal(830003.1E9f, floatToken.Value);
+
+            stream1.SkipLine();
+            ch = stream1.ReadChar();
+            floatToken = stream1._ParseFloatToken(ch.Value, stream1.Location);
+            Assert.Equal(9.1e-4f, floatToken.Value);
+
+            stream1.SkipLine();
+            ch = stream1.ReadChar();
+            floatToken = stream1._ParseFloatToken(ch.Value, stream1.Location);
+            Assert.Equal(4.7E-12f, floatToken.Value);
+
+            stream1.SkipLine();
+            ch = stream1.ReadChar();
+            floatToken = stream1._ParseFloatToken(ch.Value, stream1.Location);
+            Assert.Equal(-34.3e5f, floatToken.Value);
+        }
+        finally
+        {
+            File.Delete(filePath1);
+        }
+
+        string fail = "a\n" +
+                      "7..2\n" +
+                      "4ee2\n" +
+                      "--3.4\n" +
+                      "3.5e--2";
+        string filePath2 = Path.GetTempFileName();
+        File.WriteAllText(filePath2, fail);
+        try
+        {
+            var stream2 = new InputStream(filePath2);
+            char? ch = stream2.ReadChar();
+            Assert.Throws<GrammarError>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
+
+            stream2.SkipLine();
+            ch = stream2.ReadChar();
+            Assert.Throws<GrammarError>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
+
+            stream2.SkipLine();
+            ch = stream2.ReadChar();
+            Assert.Throws<GrammarError>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
+
+            stream2.SkipLine();
+            ch = stream2.ReadChar();
+            Assert.Throws<GrammarError>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
+
+            stream2.SkipLine();
+            ch = stream2.ReadChar();
+            Assert.Throws<GrammarError>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
+        }
+        finally
+        {
+            File.Delete(filePath2);
+        }
+    }
 
     //test parseKEYWORDiDENTIFIER
 
     //TEST readToken
-
 
     [Fact]
     public void TestSceneFile()
@@ -226,35 +398,6 @@ public class InputStreamTest
         finally
         {
             File.Delete(filePath);
-        }
-    }
-
-    [Fact]
-    public void TestParseStringToken()
-    {
-        const string content = "Hello, World!\"";
-        const string fail = "Hello, World!";
-
-        var file1 = Path.GetTempFileName();
-        File.WriteAllText(file1, content);
-
-        var file2 = Path.GetTempFileName();
-        File.WriteAllText(file2, fail);
-
-        try
-        {
-            var stream1 = new InputStream(file1);
-            var st1 = stream1._ParseStringToken(stream1.Location);
-
-            var stream2 = new InputStream(file2);
-
-            Assert.Equal("Hello, World!", st1.String);
-            Assert.Throws<GrammarError>(() => stream2._ParseStringToken(stream2.Location));
-        }
-        finally
-        {
-            File.Delete(file1);
-            File.Delete(file2);
         }
     }
 }
