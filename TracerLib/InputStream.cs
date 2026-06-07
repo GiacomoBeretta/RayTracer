@@ -229,28 +229,27 @@ public class InputStream
 
     public Token _ParseKeywordIdentifierToken(char firstChar, SourceLocation tokenLocation)
     {
-        string token = firstChar.ToString();
+        string tokenString = firstChar.ToString();
 
         while (true)
         {
             char? ch = ReadChar();
 
             if (ch == null) break;
-            if (!char.IsLetterOrDigit(ch.Value) || ch.Value != '_')
+            if (!char.IsLetterOrDigit(ch.Value) && ch.Value != '_')
             {
                 UnreadChar(ch.Value);
                 break;
             }
 
-            token += ch;
+            tokenString += ch;
         }
-
-        if (Keywords.Map.TryGetValue(token, out var keyword))
+        if (Keywords.Map.TryGetValue(tokenString, out var keyword))
         {
             return new KeywordToken(tokenLocation, keyword);
         }
 
-        return new IdentifierToken(tokenLocation, token);
+        return new IdentifierToken(tokenLocation, tokenString);
     }
 
     // Parse_Token methods - End 
