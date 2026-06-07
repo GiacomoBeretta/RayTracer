@@ -84,10 +84,10 @@ public class SphereTest
         Sphere sphere = new Sphere();
 
         Point p1 = new Point(0, 0, -1);
-        Assert.Equal(1, sphere._SpherePointToUV(p1).V);
+        Assert.True(Functions.AreClose(1, sphere._SpherePointToUV(p1).V));
 
         Point p2 = new Point(0, 1, 0);
-        Assert.Equal(0.25f, sphere._SpherePointToUV(p2).U);
+        Assert.True(Functions.AreClose(0.25f, sphere._SpherePointToUV(p2).U));
     }
 
     [Fact]

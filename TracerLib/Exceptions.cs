@@ -19,13 +19,22 @@ public class InvalidPfmFileFormat : FormatException
 //e come si stampa poi la location?
 public class GrammarError : Exception
 {
-    public GrammarError(string message) : base(message) { }
+    public GrammarError(string message) : base(message)
+    {
+    }
 
-    public GrammarError(string message, Exception inner) : base(message, inner) { }
+    public GrammarError(string message, Exception inner) : base(message, inner)
+    {
+    }
 
-    public GrammarError(SourceLocation location, string message) : base($"Grammar Error at ${location}: {message}") { }
+    public GrammarError(SourceLocation location, string message) : base($"Grammar Error at ${location}: {message}")
+    {
+    }
 
-    public GrammarError(SourceLocation location, string message, Exception inner) : base($"Grammar Error at ${location}: {message}", inner) { }
+    public GrammarError(SourceLocation location, string message, Exception inner) : base(
+        $"Grammar Error at ${location}: {message}", inner)
+    {
+    }
 
     /*
     public GrammarError(string message, SourceLocation location) : base(message)
