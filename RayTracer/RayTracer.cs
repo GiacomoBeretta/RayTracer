@@ -87,8 +87,8 @@ public class DemoCommand
         if (OutputFileName[^4..] != ".png") pngFilePath += ".png";
         
         // Define materials
-        var skyMaterial = new Material(new UniformPigment(new Color(0.0f, 0.0f, 0.0f)),
-            new UniformPigment(new Color(1.0f, 0.9f, 0.5f)), new DiffuseBRDF());
+        var skyMaterial = new Material(new UniformPigment(new Color(1.0f, 0.9f, 0.5f)),
+            new DiffuseBRDF(new UniformPigment(new Color(0.0f, 0.0f, 0.0f))));
         var groundMaterial =
             new Material(new CheckeredPigment(new Color(0.3f, 0.5f, 0.1f), new Color(0.1f, 0.2f, 0.5f)), new DiffuseBRDF());
         var sphereMaterial = new Material(new UniformPigment(new Color(0.3f, 0.4f, 0.8f)), new DiffuseBRDF());

@@ -87,8 +87,8 @@ public class RenderTest
 
             var world = new World();
 
-            var enclosureMaterial = new Material(new UniformPigment(new Color(1.0f, 1.0f, 1.0f) * reflectance),
-                new UniformPigment(new Color(1.0f, 1.0f, 1.0f) * emittedRadiance), new DiffuseBRDF());
+            var enclosureMaterial = new Material(new UniformPigment(new Color(1.0f, 1.0f, 1.0f) * emittedRadiance),
+                new DiffuseBRDF(new UniformPigment(new Color(1.0f, 1.0f, 1.0f) * reflectance)));
             
             world.Add(new Sphere(new Transformation(), enclosureMaterial));
 

@@ -346,6 +346,8 @@ public class InputStreamTest
                           "uniform\n" +
                           "checkered\n" +
                           "image\n" +
+                          "identity\n" +
+                          "translation\n" +
                           "rotation_x\n" +
                           "rotation_y\n" +
                           "rotation_z\n" +
@@ -403,6 +405,16 @@ public class InputStreamTest
             ch = str.ReadChar();
             keywordToken = (KeywordToken)str._ParseKeywordIdentifierToken(ch.Value, str.Location);
             Assert.Equal(Keyword.Image, keywordToken.Keyword);
+            
+            str.SkipLine();
+            ch = str.ReadChar();
+            keywordToken = (KeywordToken)str._ParseKeywordIdentifierToken(ch.Value, str.Location);
+            Assert.Equal(Keyword.Identity, keywordToken.Keyword);
+            
+            str.SkipLine();
+            ch = str.ReadChar();
+            keywordToken = (KeywordToken)str._ParseKeywordIdentifierToken(ch.Value, str.Location);
+            Assert.Equal(Keyword.Translation, keywordToken.Keyword);
 
             str.SkipLine();
             ch = str.ReadChar();
