@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace TracerLib;
 /*
 //dal python di Tomasi
@@ -217,7 +219,7 @@ public class InputStream
 
         try
         {
-            value = float.Parse(floatString);
+            value = float.Parse(floatString, CultureInfo.InvariantCulture);
         }
         catch (Exception)
         {
