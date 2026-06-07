@@ -333,8 +333,149 @@ public class InputStreamTest
         }
     }
 
-    //test parseKEYWORDiDENTIFIER
+    [Fact]
+    public void TestParseKeywordToken()
+    {
+        string content = "new\n" +
+                         "material\n" +
+                         "plane\n" +
+                         "sphere\n" +
+                         "diffuse\n" +
+                         "specular\n" +
+                         "uniform\n" +
+                         "checkered\n" +
+                         "image\n" +
+                         "rotation_x\n" +
+                         "rotation_y\n" +
+                         "rotation_z\n" +
+                         "scaling\n" +
+                         "camera\n" +
+                         "orthogonal\n" +
+                         "perspective\n" +
+                         "float";
+        string filePath1 = Path.GetTempFileName();
+        File.WriteAllText(filePath1, content);
+        try
+        {
+            var stream1 = new InputStream(filePath1);
 
+            char? ch = stream1.ReadChar();
+            KeywordToken keywordToken = (KeywordToken)stream1._ParseKeywordIdentifierToken(ch.Value, stream1.Location);
+            Assert.Equal(Keyword.New, keywordToken.Keyword);
+
+            stream1.SkipLine();
+            ch = stream1.ReadChar();
+            keywordToken = (KeywordToken)stream1._ParseKeywordIdentifierToken(ch.Value, stream1.Location);
+            Assert.Equal(Keyword.Material, keywordToken.Keyword);
+
+            stream1.SkipLine();
+            ch = stream1.ReadChar();
+            keywordToken = (KeywordToken)stream1._ParseKeywordIdentifierToken(ch.Value, stream1.Location);
+            Assert.Equal(Keyword.Plane, keywordToken.Keyword);
+
+            stream1.SkipLine();
+            ch = stream1.ReadChar();
+            keywordToken = (KeywordToken)stream1._ParseKeywordIdentifierToken(ch.Value, stream1.Location);
+            Assert.Equal(Keyword.Sphere, keywordToken.Keyword);
+
+            stream1.SkipLine();
+            ch = stream1.ReadChar();
+            keywordToken = (KeywordToken)stream1._ParseKeywordIdentifierToken(ch.Value, stream1.Location);
+            Assert.Equal(Keyword.Diffuse, keywordToken.Keyword);
+
+            stream1.SkipLine();
+            ch = stream1.ReadChar();
+            keywordToken = (KeywordToken)stream1._ParseKeywordIdentifierToken(ch.Value, stream1.Location);
+            Assert.Equal(Keyword.Specular, keywordToken.Keyword);
+
+            stream1.SkipLine();
+            ch = stream1.ReadChar();
+            keywordToken = (KeywordToken)stream1._ParseKeywordIdentifierToken(ch.Value, stream1.Location);
+            Assert.Equal(Keyword.Uniform, keywordToken.Keyword);
+
+            stream1.SkipLine();
+            ch = stream1.ReadChar();
+            keywordToken = (KeywordToken)stream1._ParseKeywordIdentifierToken(ch.Value, stream1.Location);
+            Assert.Equal(Keyword.Checkered, keywordToken.Keyword);
+
+            stream1.SkipLine();
+            ch = stream1.ReadChar();
+            keywordToken = (KeywordToken)stream1._ParseKeywordIdentifierToken(ch.Value, stream1.Location);
+            Assert.Equal(Keyword.Image, keywordToken.Keyword);
+
+            stream1.SkipLine();
+            ch = stream1.ReadChar();
+            keywordToken = (KeywordToken)stream1._ParseKeywordIdentifierToken(ch.Value, stream1.Location);
+            Assert.Equal(Keyword.RotationX, keywordToken.Keyword);
+
+            stream1.SkipLine();
+            ch = stream1.ReadChar();
+            keywordToken = (KeywordToken)stream1._ParseKeywordIdentifierToken(ch.Value, stream1.Location);
+            Assert.Equal(Keyword.RotationY, keywordToken.Keyword);
+
+            stream1.SkipLine();
+            ch = stream1.ReadChar();
+            keywordToken = (KeywordToken)stream1._ParseKeywordIdentifierToken(ch.Value, stream1.Location);
+            Assert.Equal(Keyword.RotationZ, keywordToken.Keyword);
+
+            stream1.SkipLine();
+            ch = stream1.ReadChar();
+            keywordToken = (KeywordToken)stream1._ParseKeywordIdentifierToken(ch.Value, stream1.Location);
+            Assert.Equal(Keyword.Scaling, keywordToken.Keyword);
+
+            stream1.SkipLine();
+            ch = stream1.ReadChar();
+            keywordToken = (KeywordToken)stream1._ParseKeywordIdentifierToken(ch.Value, stream1.Location);
+            Assert.Equal(Keyword.Camera, keywordToken.Keyword);
+
+            stream1.SkipLine();
+            ch = stream1.ReadChar();
+            keywordToken = (KeywordToken)stream1._ParseKeywordIdentifierToken(ch.Value, stream1.Location);
+            Assert.Equal(Keyword.Orthogonal, keywordToken.Keyword);
+
+            stream1.SkipLine();
+            ch = stream1.ReadChar();
+            keywordToken = (KeywordToken)stream1._ParseKeywordIdentifierToken(ch.Value, stream1.Location);
+            Assert.Equal(Keyword.Perspective, keywordToken.Keyword);
+
+            stream1.SkipLine();
+            ch = stream1.ReadChar();
+            keywordToken = (KeywordToken)stream1._ParseKeywordIdentifierToken(ch.Value, stream1.Location);
+            Assert.Equal(Keyword.Float, keywordToken.Keyword);
+        }
+        finally
+        {
+            File.Delete(filePath1);
+        }
+    }
+
+    [Fact]
+    public void TestParseIdentifierToken()
+    {
+        string fail = "New\n" +
+                      "nEw\n" +
+                      "nnew\n" +
+                      "n ew\n" +
+                      "rotationX\n";
+        string filePath2 = Path.GetTempFileName();
+        File.WriteAllText(filePath2, fail);
+        try
+        {
+            var stream2 = new InputStream(filePath2);
+            char? ch = stream2.ReadChar();
+            Assert.Throws<GrammarError>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
+
+            stream2.SkipLine();
+            ch = stream2.ReadChar();
+            Assert.Throws<GrammarError>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
+
+            
+        }
+        finally
+        {
+            File.Delete(filePath2);
+        }
+    }
     //TEST readToken
 
     [Fact]
