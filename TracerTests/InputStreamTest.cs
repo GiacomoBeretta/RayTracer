@@ -515,7 +515,7 @@ public class InputStreamTest
             ch = str.ReadChar();
             identifierToken = (IdentifierToken)str._ParseKeywordIdentifierToken(ch.Value, str.Location);
             Assert.Equal("rotationX", identifierToken.Identifier);
-            
+
             str.SkipLine();
             ch = str.ReadChar();
             identifierToken = (IdentifierToken)str._ParseKeywordIdentifierToken(ch.Value, str.Location);
@@ -528,10 +528,435 @@ public class InputStreamTest
     }
 
     [Fact]
-    public void TestParseIdentifierToken()
+    public void TestReadNextToken()
     {
+        const string content = """
+                               # Declare a floating-point variable named "clock"
+                               float clock(150)
+
+                               # Declare a few new materials. Each of them includes a BRDF and a pigment
+
+                               # We can split a definition over multiple lines and indent them as we like
+                               material sky_material(
+                                   diffuse(image("sky-dome.pfm")),
+                                   uniform(<0.7, 0.5, 1>)
+                               )
+
+                               material ground_material(
+                                   diffuse(checkered(<0.3, 0.5, 0.1>,
+                                                     <0.1, 0.2, 0.5>, 4)),
+                                   uniform(<0, 0, 0>)
+                               )
+
+                               material sphere_material(
+                                   specular(uniform(<0.5, 0.5, 0.5>)),
+                                   uniform(<0, 0, 0>)
+                               )
+
+                               # Define a few shapes
+                               sphere(sphere_material, translation([0, 0, 1]))
+
+                               # The language is flexible enough to permit spaces before "("
+                               plane (ground_material, identity)
+
+                               # Here we use the "clock" variable! Note that vectors are notated using
+                               # square brackets ([]) instead of angular brackets (<>) like colors, and
+                               # that we can compose transformations through the "*" operator
+                               plane(sky_material, translation([0, 0, 100]) * rotation_y(clock))
+
+                               # Define a camera
+                               camera(perspective, rotation_z(30) * translation([-4, 0, 1]), 1.0, 1.0)
+                               """;
+        string filePath = Path.GetTempFileName();
+        File.WriteAllText(filePath, content);
+
+        try
+        {
+            var stream = new InputStream(filePath);
+            KeywordToken keywordToken;
+            IdentifierToken identifierToken;
+            StringToken stringToken;
+            LiteralNumberToken numberToken;
+            SymbolToken symbolToken;
+
+            // line 1: float clock(150) - begin
+
+            #region line 1
+
+            keywordToken = (KeywordToken)stream.ReadNextToken();
+            Assert.Equal(Keyword.Float, keywordToken.Keyword);
+            identifierToken = (IdentifierToken)stream.ReadNextToken();
+            Assert.Equal("clock", identifierToken.Identifier);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal("(", symbolToken.Symbol);
+            numberToken = (LiteralNumberToken)stream.ReadNextToken();
+            Assert.Equal(150f, numberToken.Value);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(")", symbolToken.Symbol);
+
+            #endregion
+
+            // line 2: material sky_material(diffuse(image("sky-dome.pfm")),uniform(<0.7, 0.5, 1>))
+
+            #region line 2
+
+            keywordToken = (KeywordToken)stream.ReadNextToken();
+            Assert.Equal(Keyword.Material, keywordToken.Keyword);
+            identifierToken = (IdentifierToken)stream.ReadNextToken();
+            Assert.Equal("sky_material", identifierToken.Identifier);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal("(", symbolToken.Symbol);
+            keywordToken = (KeywordToken)stream.ReadNextToken();
+            Assert.Equal(Keyword.Diffuse, keywordToken.Keyword);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal("(", symbolToken.Symbol);
+            keywordToken = (KeywordToken)stream.ReadNextToken();
+            Assert.Equal(Keyword.Image, keywordToken.Keyword);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal("(", symbolToken.Symbol);
+            stringToken = (StringToken)stream.ReadNextToken();
+            Assert.Equal("sky-dome.pfm", stringToken.String);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(")", symbolToken.Symbol);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(")", symbolToken.Symbol);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(",", symbolToken.Symbol);
+            keywordToken = (KeywordToken)stream.ReadNextToken();
+            Assert.Equal(Keyword.Uniform, keywordToken.Keyword);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal("(", symbolToken.Symbol);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal("<", symbolToken.Symbol);
+            numberToken = (LiteralNumberToken)stream.ReadNextToken();
+            Assert.Equal(0.7f, numberToken.Value);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(",", symbolToken.Symbol);
+            numberToken = (LiteralNumberToken)stream.ReadNextToken();
+            Assert.Equal(0.5f, numberToken.Value);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(",", symbolToken.Symbol);
+            numberToken = (LiteralNumberToken)stream.ReadNextToken();
+            Assert.Equal(1f, numberToken.Value);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(">", symbolToken.Symbol);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(")", symbolToken.Symbol);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(")", symbolToken.Symbol);
+
+            #endregion
+
+            // line 3: material ground_material(diffuse(checkered(<0.3, 0.5, 0.1>,<0.1, 0.2, 0.5>, 4)),uniform(<0, 0, 0>))
+
+            #region line 3
+
+            keywordToken = (KeywordToken)stream.ReadNextToken();
+            Assert.Equal(Keyword.Material, keywordToken.Keyword);
+            identifierToken = (IdentifierToken)stream.ReadNextToken();
+            Assert.Equal("ground_material", identifierToken.Identifier);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal("(", symbolToken.Symbol);
+            keywordToken = (KeywordToken)stream.ReadNextToken();
+            Assert.Equal(Keyword.Diffuse, keywordToken.Keyword);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal("(", symbolToken.Symbol);
+            keywordToken = (KeywordToken)stream.ReadNextToken();
+            Assert.Equal(Keyword.Checkered, keywordToken.Keyword);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal("(", symbolToken.Symbol);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal("<", symbolToken.Symbol);
+            numberToken = (LiteralNumberToken)stream.ReadNextToken();
+            Assert.Equal(0.3f, numberToken.Value);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(",", symbolToken.Symbol);
+            numberToken = (LiteralNumberToken)stream.ReadNextToken();
+            Assert.Equal(0.5f, numberToken.Value);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(",", symbolToken.Symbol);
+            numberToken = (LiteralNumberToken)stream.ReadNextToken();
+            Assert.Equal(0.1f, numberToken.Value);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(">", symbolToken.Symbol);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(",", symbolToken.Symbol);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal("<", symbolToken.Symbol);
+            numberToken = (LiteralNumberToken)stream.ReadNextToken();
+            Assert.Equal(0.1f, numberToken.Value);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(",", symbolToken.Symbol);
+            numberToken = (LiteralNumberToken)stream.ReadNextToken();
+            Assert.Equal(0.2f, numberToken.Value);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(",", symbolToken.Symbol);
+            numberToken = (LiteralNumberToken)stream.ReadNextToken();
+            Assert.Equal(0.5f, numberToken.Value);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(">", symbolToken.Symbol);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(",", symbolToken.Symbol);
+            numberToken = (LiteralNumberToken)stream.ReadNextToken();
+            Assert.Equal(4f, numberToken.Value);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(")", symbolToken.Symbol);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(")", symbolToken.Symbol);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(",", symbolToken.Symbol);
+            keywordToken = (KeywordToken)stream.ReadNextToken();
+            Assert.Equal(Keyword.Uniform, keywordToken.Keyword);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal("(", symbolToken.Symbol);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal("<", symbolToken.Symbol);
+            numberToken = (LiteralNumberToken)stream.ReadNextToken();
+            Assert.Equal(0f, numberToken.Value);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(",", symbolToken.Symbol);
+            numberToken = (LiteralNumberToken)stream.ReadNextToken();
+            Assert.Equal(0f, numberToken.Value);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(",", symbolToken.Symbol);
+            numberToken = (LiteralNumberToken)stream.ReadNextToken();
+            Assert.Equal(0f, numberToken.Value);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(">", symbolToken.Symbol);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(")", symbolToken.Symbol);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(")", symbolToken.Symbol);
+
+            #endregion
+
+            // line 4: material sphere_material(specular(uniform(<0.5, 0.5, 0.5>)),uniform(<0, 0, 0>))
+
+            #region line 4
+
+            keywordToken = (KeywordToken)stream.ReadNextToken();
+            Assert.Equal(Keyword.Material, keywordToken.Keyword);
+            identifierToken = (IdentifierToken)stream.ReadNextToken();
+            Assert.Equal("sphere_material", identifierToken.Identifier);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal("(", symbolToken.Symbol);
+            keywordToken = (KeywordToken)stream.ReadNextToken();
+            Assert.Equal(Keyword.Specular, keywordToken.Keyword);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal("(", symbolToken.Symbol);
+            keywordToken = (KeywordToken)stream.ReadNextToken();
+            Assert.Equal(Keyword.Uniform, keywordToken.Keyword);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal("(", symbolToken.Symbol);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal("<", symbolToken.Symbol);
+            numberToken = (LiteralNumberToken)stream.ReadNextToken();
+            Assert.Equal(0.5f, numberToken.Value);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(",", symbolToken.Symbol);
+            numberToken = (LiteralNumberToken)stream.ReadNextToken();
+            Assert.Equal(0.5f, numberToken.Value);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(",", symbolToken.Symbol);
+            numberToken = (LiteralNumberToken)stream.ReadNextToken();
+            Assert.Equal(0.5f, numberToken.Value);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(">", symbolToken.Symbol);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(")", symbolToken.Symbol);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(")", symbolToken.Symbol);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(",", symbolToken.Symbol);
+            keywordToken = (KeywordToken)stream.ReadNextToken();
+            Assert.Equal(Keyword.Uniform, keywordToken.Keyword);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal("(", symbolToken.Symbol);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal("<", symbolToken.Symbol);
+            numberToken = (LiteralNumberToken)stream.ReadNextToken();
+            Assert.Equal(0f, numberToken.Value);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(",", symbolToken.Symbol);
+            numberToken = (LiteralNumberToken)stream.ReadNextToken();
+            Assert.Equal(0f, numberToken.Value);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(",", symbolToken.Symbol);
+            numberToken = (LiteralNumberToken)stream.ReadNextToken();
+            Assert.Equal(0f, numberToken.Value);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(">", symbolToken.Symbol);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(")", symbolToken.Symbol);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(")", symbolToken.Symbol);
+
+            #endregion
+
+            // line 5: sphere(sphere_material, translation([0, 0, 1]))
+
+            #region line 5
+
+            keywordToken = (KeywordToken)stream.ReadNextToken();
+            Assert.Equal(Keyword.Sphere, keywordToken.Keyword);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal("(", symbolToken.Symbol);
+            identifierToken = (IdentifierToken)stream.ReadNextToken();
+            Assert.Equal("sphere_material", identifierToken.Identifier);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(",", symbolToken.Symbol);
+            keywordToken = (KeywordToken)stream.ReadNextToken();
+            Assert.Equal(Keyword.Translation, keywordToken.Keyword);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal("(", symbolToken.Symbol);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal("[", symbolToken.Symbol);
+            numberToken = (LiteralNumberToken)stream.ReadNextToken();
+            Assert.Equal(0f, numberToken.Value);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(",", symbolToken.Symbol);
+            numberToken = (LiteralNumberToken)stream.ReadNextToken();
+            Assert.Equal(0f, numberToken.Value);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(",", symbolToken.Symbol);
+            numberToken = (LiteralNumberToken)stream.ReadNextToken();
+            Assert.Equal(1f, numberToken.Value);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal("]", symbolToken.Symbol);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(")", symbolToken.Symbol);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(")", symbolToken.Symbol);
+
+            #endregion
+
+            // line 6: plane (ground_material, identity)
+
+            #region line 6
+
+            keywordToken = (KeywordToken)stream.ReadNextToken();
+            Assert.Equal(Keyword.Plane, keywordToken.Keyword);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal("(", symbolToken.Symbol);
+            identifierToken = (IdentifierToken)stream.ReadNextToken();
+            Assert.Equal("ground_material", identifierToken.Identifier);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(",", symbolToken.Symbol);
+            keywordToken = (KeywordToken)stream.ReadNextToken();
+            Assert.Equal(Keyword.Identity, keywordToken.Keyword);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(")", symbolToken.Symbol);
+
+            #endregion
+
+            // line 7: plane(sky_material, translation([0, 0, 100]) * rotation_y(clock))
+
+            #region line 7
+
+            keywordToken = (KeywordToken)stream.ReadNextToken();
+            Assert.Equal(Keyword.Plane, keywordToken.Keyword);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal("(", symbolToken.Symbol);
+            identifierToken = (IdentifierToken)stream.ReadNextToken();
+            Assert.Equal("sky_material", identifierToken.Identifier);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(",", symbolToken.Symbol);
+            keywordToken = (KeywordToken)stream.ReadNextToken();
+            Assert.Equal(Keyword.Translation, keywordToken.Keyword);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal("(", symbolToken.Symbol);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal("[", symbolToken.Symbol);
+            numberToken = (LiteralNumberToken)stream.ReadNextToken();
+            Assert.Equal(0f, numberToken.Value);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(",", symbolToken.Symbol);
+            numberToken = (LiteralNumberToken)stream.ReadNextToken();
+            Assert.Equal(0f, numberToken.Value);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(",", symbolToken.Symbol);
+            numberToken = (LiteralNumberToken)stream.ReadNextToken();
+            Assert.Equal(100f, numberToken.Value);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal("]", symbolToken.Symbol);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(")", symbolToken.Symbol);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal("*", symbolToken.Symbol);
+            keywordToken = (KeywordToken)stream.ReadNextToken();
+            Assert.Equal(Keyword.RotationY, keywordToken.Keyword);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal("(", symbolToken.Symbol);
+            identifierToken = (IdentifierToken)stream.ReadNextToken();
+            Assert.Equal("clock", identifierToken.Identifier);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(")", symbolToken.Symbol);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(")", symbolToken.Symbol);
+
+            #endregion
+
+            // line 8: camera(perspective, rotation_z(30) * translation([-4, 0, 1]), 1.0, 1.0)
+
+            #region line 8
+
+            keywordToken = (KeywordToken)stream.ReadNextToken();
+            Assert.Equal(Keyword.Camera, keywordToken.Keyword);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal("(", symbolToken.Symbol);
+            keywordToken = (KeywordToken)stream.ReadNextToken();
+            Assert.Equal(Keyword.Perspective, keywordToken.Keyword);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(",", symbolToken.Symbol);
+            keywordToken = (KeywordToken)stream.ReadNextToken();
+            Assert.Equal(Keyword.RotationZ, keywordToken.Keyword);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal("(", symbolToken.Symbol);
+            numberToken = (LiteralNumberToken)stream.ReadNextToken();
+            Assert.Equal(30f, numberToken.Value);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(")", symbolToken.Symbol);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal("*", symbolToken.Symbol);
+            keywordToken = (KeywordToken)stream.ReadNextToken();
+            Assert.Equal(Keyword.Translation, keywordToken.Keyword);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal("(", symbolToken.Symbol);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal("[", symbolToken.Symbol);
+            numberToken = (LiteralNumberToken)stream.ReadNextToken();
+            Assert.Equal(-4f, numberToken.Value);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(",", symbolToken.Symbol);
+            numberToken = (LiteralNumberToken)stream.ReadNextToken();
+            Assert.Equal(0f, numberToken.Value);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(",", symbolToken.Symbol);
+            numberToken = (LiteralNumberToken)stream.ReadNextToken();
+            Assert.Equal(1f, numberToken.Value);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal("]", symbolToken.Symbol);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(")", symbolToken.Symbol);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(",", symbolToken.Symbol);
+            numberToken = (LiteralNumberToken)stream.ReadNextToken();
+            Assert.Equal(1.0f, numberToken.Value);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(",", symbolToken.Symbol);
+            numberToken = (LiteralNumberToken)stream.ReadNextToken();
+            Assert.Equal(1.0f, numberToken.Value);
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(")", symbolToken.Symbol);
+
+            #endregion
+        }
+
+        finally
+        {
+            File.Delete(filePath);
+        }
     }
-    //TEST readToken
 
     [Fact]
     public void TestSceneFile()
