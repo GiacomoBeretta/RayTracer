@@ -255,13 +255,13 @@ public class InputStream
     // Parse_Token methods - End 
 
     //modificare per end of file
-    public Token ReadToken()
+    public Token ReadNextToken()
     {
         // '<>' are for the colors, '[]' for the vectors and points, ',' for separating numbers,
         // '*' for composing transformations
         const string symbols = "()<>[],*";
-        //const string op = "+-."; //non so a cosa serve il punto e
-        // per ora lo commento così quando salta fuori ce ne accorgiamo subito
+        // const string op = "+-."; // non so a cosa serve il punto e per ora
+        // lo commento così quando salta fuori ce ne accorgiamo subito
         const string signs = "+-";
 
         if (SavedToken != null)
