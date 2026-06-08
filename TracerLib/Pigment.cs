@@ -32,12 +32,12 @@ public class ImagePigment : Pigment
     //da commentare
     public override Color GetColor(Vector2D uv)
     {
-        var u = uv.U - MathF.Floor(uv.U); // magari può essere utile scrivere mathf.Floor(uv.U-epsilon) così se
+        float u = uv.U - MathF.Floor(uv.U); // magari può essere utile scrivere mathf.Floor(uv.U-epsilon) così se
         // uv.U vale 1 viene fuori 1-math.floor(0.99) = 1-0 =1 (e non 1-1=0)
-        var v = uv.V - MathF.Floor(uv.V); // idem per uv.V
+        float v = uv.V - MathF.Floor(uv.V); // idem per uv.V
 
-        var col = (int)(u * this.Image.Width);
-        var row = (int)(v * this.Image.Height);
+        int col = (int)(u * this.Image.Width);
+        int row = (int)(v * this.Image.Height);
 
         if (col >= Image.Width) col = Image.Width - 1;//come mai questo if?
         if (row >= Image.Height) row = Image.Height - 1;
