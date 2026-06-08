@@ -3,12 +3,12 @@ namespace TracerLib;
 public class World : Shape
 {
     public List<Shape> Shapes { get; private set; }
-
+    
     public World(List<Shape>? shapes = null)
     {
         Shapes = shapes ?? new List<Shape>();
     }
-
+    
     public void Add(Shape shape)
     {
         Shapes.Add(shape);
@@ -19,7 +19,7 @@ public class World : Shape
         HitRecord? closest = null;
         foreach (var shape in Shapes)
         {
-            var intersection = shape.RayIntersection(ray);
+            HitRecord? intersection = shape.RayIntersection(ray);
             if (intersection == null)
             {
                 continue;
