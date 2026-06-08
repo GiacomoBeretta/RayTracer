@@ -14,7 +14,7 @@ public class ImageTracerTest
     {
         _testOutputHelper = testOutputHelper;
         image = new HDRImage(4, 2);
-        camera = new PerspectiveCamera(1, 2, new Transformation());
+        camera = new PerspectiveCamera(new Transformation(), 1f, 2f);
         tracer = new ImageTracer(image, camera);
     }
 

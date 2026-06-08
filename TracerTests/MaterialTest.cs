@@ -55,10 +55,11 @@ public class PigmentTest
         ip.Image[2] = new Color(2.0f, 1.0f, 3.0f);
         ip.Image[3] = new Color(3.0f, 2.0f, 1.0f);
         
-        Assert.True(Color._AreColorsClose(ip.GetColor(new Vector2D(0.0f, 0.0f)), new Color(1.0f, 2.0f, 3.0f)));
-        Assert.True(Color._AreColorsClose(ip.GetColor(new Vector2D(1.0f, 0.0f)), new Color(2.0f, 3.0f, 1.0f)));
-        Assert.True(Color._AreColorsClose(ip.GetColor(new Vector2D(0.0f, 1.0f)), new Color(2.0f, 1.0f, 3.0f)));
-        Assert.True(Color._AreColorsClose(ip.GetColor(new Vector2D(1.0f, 1.0f)), new Color(3.0f, 2.0f, 1.0f)));
+        //Crea problemi al bordo dell'immagine
+        Assert.True(Color._AreColorsClose(ip.GetColor(new Vector2D(0.25f, 0.25f)), new Color(1.0f, 2.0f, 3.0f)));
+        Assert.True(Color._AreColorsClose(ip.GetColor(new Vector2D(0.75f, 0.25f)), new Color(2.0f, 3.0f, 1.0f)));
+        Assert.True(Color._AreColorsClose(ip.GetColor(new Vector2D(0.25f, 0.75f)), new Color(2.0f, 1.0f, 3.0f)));
+        Assert.True(Color._AreColorsClose(ip.GetColor(new Vector2D(0.75f, 0.75f)), new Color(3.0f, 2.0f, 1.0f)));
     }
 
     [Fact]
