@@ -24,7 +24,7 @@ public struct OrthogonalCamera : ICamera
         Transform = new Transformation();
     }
 
-    public OrthogonalCamera( Transformation transformation, float aspectRatio = 1.0f)
+    public OrthogonalCamera(Transformation transformation, float aspectRatio = 1.0f)
     {
         AspectRatio = aspectRatio;
         Transform = transformation;
@@ -50,11 +50,18 @@ public struct PerspectiveCamera : ICamera
     public float AspectRatio { get; set; }
     public Transformation Transformation { get; set; }
 
-    public PerspectiveCamera(float distance = 1.0f, float aspectRatio = 1.0f, Transformation? transformation = null)
+    public PerspectiveCamera()
+    {
+        Distance = 1.0f;
+        AspectRatio = 1.0f;
+        Transformation = new Transformation();
+    }
+
+    public PerspectiveCamera(Transformation transformation, float distance = 1.0f, float aspectRatio = 1.0f)
     {
         Distance = distance;
         AspectRatio = aspectRatio;
-        Transformation = transformation ?? new Transformation();
+        Transformation = transformation;
     }
 
     /// <summary>

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Globalization;
 
 namespace TracerLib;
@@ -307,6 +308,12 @@ public class InputStream
             throw new GrammarError(Location, $"invalid character {ch}");
         }
     }
+
+    public void UnreadToken(Token token)
+    {
+        Debug.Assert(SavedToken == null);
+        SavedToken = token;
+    }
 }
 
 
@@ -343,7 +350,7 @@ public class InputStream
            return (char)_stream.ReadByte();
        }
        else
-       {
+       { 
            char c = _savedChar.Value;
            _savedChar = null;
            return c;
