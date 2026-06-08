@@ -5,12 +5,12 @@ public abstract class Render
     public abstract Color RenderFunction(Ray ray);
 }
 
-public class OnOff : Render
+public class OnOffRender : Render
 {
     public World World { get; set; }
     public Color BackgroundColor { get; set; }
     
-    public OnOff(World world, Color? backgroundColor = null)
+    public OnOffRender(World world, Color? backgroundColor = null)
     {
         World = world;
         BackgroundColor = backgroundColor ?? new Color(0.0f, 0.0f, 0.0f);
@@ -20,15 +20,14 @@ public class OnOff : Render
     {
         return this.World.RayIntersection(ray) != null ? new Color(1.0f, 1.0f, 1.0f) : BackgroundColor;
     }
-    
 }
 
-public class Flat : Render
+public class FlatRender : Render
 {
     public World World { get; set; }
     public Color BackgroundColor { get; set; }
 
-    public Flat(World world, Color? backgroundColor = null)
+    public FlatRender(World world, Color? backgroundColor = null)
     {
         World = world;
         BackgroundColor = backgroundColor ?? new Color(0.0f, 0.0f, 0.0f);
