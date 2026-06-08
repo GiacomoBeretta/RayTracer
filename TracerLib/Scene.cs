@@ -221,7 +221,11 @@ public class Scene
             }
             
             var nextToken = inputFile.ReadNextToken();
-            if (nextToken is not SymbolToken symbolToken || symbolToken.Symbol != "*") break; //InputFile.UnreadToken();
+            if (nextToken is not SymbolToken symbolToken || symbolToken.Symbol != "*")
+            {
+                inputFile.UnreadToken(nextToken);
+                break;
+            }
         }
 
         return result;
@@ -285,5 +289,52 @@ public class Scene
         }
 
         return result;
+    }
+
+    public Scene ParseScene(InputStream inputFile, Dictionary<string, float> variables)
+    {
+        var scene = new Scene
+        {
+            Variables = variables
+        };
+
+        while (true)
+        {
+            var token = inputFile.ReadNextToken();
+            if (token is StopToken) break;
+            if (token is not KeywordToken)
+                throw new GrammarError(token.Location, $"expected keyword instad of {token}");
+            if (token is KeywordToken { Keyword: Keyword.Float })
+            {
+                var variableName = ExpectIdentifier(inputFile);
+
+                var variableLocation = inputFile.Location;
+                
+                ExpectSymbol(inputFile, "(");
+                var variableValue = ExpectNumber(inputFile, scene);
+                ExpectSymbol(inputFile, ")");
+
+                if (scene.Variables.ContainsKey(variableName))
+                    throw new GrammarError(variableLocation,
+                        $"{variableName} cannot be redefined"); //Aggiungere controllo overridden variables 
+                //Aggiungere controllo overridden variables anche qui
+                scene.Variables[variableName] = variableValue;
+            }
+            else if (token is KeywordToken {Keyword: Keyword.Sphere}) scene.World.Add(ParseSphere(inputFile, scene));
+            else if (token is KeywordToken {Keyword: Keyword.Plane}) scene.World.Add(ParsePlane(inputFile, scene));
+            else if (token is KeywordToken { Keyword: Keyword.Camera })
+            {
+                if (scene.Camera != null) throw new GrammarError(token.Location, "Cannot define more Cameras");
+
+                scene.Camera = ParseCamera(inputFile, scene);
+            }
+            else if (token is KeywordToken { Keyword: Keyword.Material })
+            {
+                ParseMaterial(inputFile, scene, out var name, out var material);
+                scene.Materials[name] = material;
+            }
+        }
+
+        return scene;
     }
 }
