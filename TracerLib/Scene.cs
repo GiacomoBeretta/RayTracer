@@ -4,19 +4,12 @@ namespace TracerLib;
 //Considerare di cambiare ExpecteSymbol(InputStream, string) in ExpecteSymbol(InputStream, char)
 public class Scene
 {
-    public Dictionary<string, Material> Materials { get; set; }
-    public World World { get; set; }
-    public ICamera? Camera { get; set; }
-    public Dictionary<string, float> Variables { get; set; }
-    //Overridden variables???
+    public Dictionary<string, Material> Materials { get; set; } = new();
+    public World World { get; set; } = new();
+    public ICamera? Camera { get; set; } = null;
 
-    public Scene()
-    {
-        Materials = new Dictionary<string, Material>();
-        World = new World();
-        Camera = null;
-        Variables = new Dictionary<string, float>();
-    }
+    public Dictionary<string, float> Variables { get; set; } = new();
+    //Overridden variables???
 
     public void ExpectSymbol(InputStream inputFile, string symbol)
     {
@@ -175,5 +168,122 @@ public class Scene
         ExpectSymbol(inputFile, ")");
 
         material = new Material(emittedRadiance, brdf);
+    }
+
+    public Transformation ParseTransformation(InputStream inputFile, Scene scene)
+    {
+        var result = new Transformation();
+
+        while (true)
+        {
+            var transformKeyword = ExpectKeywords(inputFile,
+            [
+                Keyword.Identity, Keyword.Translation, Keyword.RotationX, Keyword.RotationY, Keyword.RotationZ,
+                Keyword.Scaling
+            ]);
+            
+            switch(transformKeyword)
+            {
+                case Keyword.Identity:
+                    break;
+                case Keyword.Translation:
+                    ExpectSymbol(inputFile, "(");
+                    result *= new Transformation(ParseVector(inputFile, scene));
+                    ExpectSymbol(inputFile, ")");
+                    break;
+                case Keyword.RotationX:
+                    ExpectSymbol(inputFile, "(");
+                    result *= new Transformation('x', ExpectNumber(inputFile, scene));
+                    ExpectSymbol(inputFile, ")");
+                    break;
+                case Keyword.RotationY:
+                    ExpectSymbol(inputFile, "(");
+                    result *= new Transformation('y', ExpectNumber(inputFile, scene));
+                    ExpectSymbol(inputFile, ")");
+                    break;
+                case Keyword.RotationZ:
+                    ExpectSymbol(inputFile, "(");
+                    result *= new Transformation('z', ExpectNumber(inputFile, scene));
+                    ExpectSymbol(inputFile, ")");
+                    break;
+                case Keyword.Scaling:
+                    ExpectSymbol(inputFile, "(");
+                    var x = ExpectNumber(inputFile, scene);
+                    ExpectSymbol(inputFile, ",");
+                    var y = ExpectNumber(inputFile, scene);
+                    ExpectSymbol(inputFile, ",");
+                    var z = ExpectNumber(inputFile, scene);
+                    result *= new Transformation(x, y, z);
+                    ExpectSymbol(inputFile, ")");
+                    break;
+                default:
+                    throw new GrammarError("Keyword doesn't match any of the Transformation types");
+            }
+            
+            var nextToken = inputFile.ReadNextToken();
+            if (nextToken is not SymbolToken symbolToken || symbolToken.Symbol != "*") break; //InputFile.UnreadToken();
+        }
+
+        return result;
+        
+    }
+
+    public Sphere ParseSphere(InputStream inputFile, Scene scene)
+    {
+        ExpectSymbol(inputFile, "(");
+
+        var material = ExpectIdentifier(inputFile);
+        if (!scene.Materials.ContainsKey(material))
+            throw new GrammarError(inputFile.Location, $"unknown material {material}");
+        
+        ExpectSymbol(inputFile, ",");
+        var transformation = ParseTransformation(inputFile, scene);
+        ExpectSymbol(inputFile, ")");
+
+        return new Sphere(transformation, scene.Materials[material]);
+    }
+
+    public Plane ParsePlane(InputStream inputFile, Scene scene)
+    {
+        ExpectSymbol(inputFile, "(");
+
+        var material = ExpectIdentifier(inputFile);
+        if (!scene.Materials.ContainsKey(material))
+            throw new GrammarError(inputFile.Location, $"unknown material {material}");
+        
+        ExpectSymbol(inputFile, ",");
+        var transformation = ParseTransformation(inputFile, scene);
+        ExpectSymbol(inputFile, ")");
+
+        return new Plane(transformation, scene.Materials[material]);
+    }
+
+    public ICamera ParseCamera(InputStream inputFile, Scene scene)
+    {
+        ExpectSymbol(inputFile, "(");
+        var cameraKeyword = ExpectKeywords(inputFile, [Keyword.Perspective, Keyword.Orthogonal]);
+        ExpectSymbol(inputFile, ",");
+        var transformation = ParseTransformation(inputFile, scene);
+        ExpectSymbol(inputFile, ",");
+        var aspectRatio = ExpectNumber(inputFile, scene);
+        ExpectSymbol(inputFile, ",");
+        var distance = ExpectNumber(inputFile, scene);
+        ExpectSymbol(inputFile, ")");
+
+        ICamera result;
+
+        switch (cameraKeyword)
+        {
+            case Keyword.Perspective:
+                result = new PerspectiveCamera(transformation, distance, aspectRatio);
+                break;
+            case Keyword.Orthogonal:
+                result = new OrthogonalCamera(transformation, aspectRatio);
+                break;
+            default:
+                throw new GrammarError("Keyword doesn't match any of the Cameras types");
+        }
+
+        return result;
     }
 }
