@@ -28,7 +28,7 @@ public class CameraTest
     [Fact]
     public void FireRayPerspectiveTest()
     {
-        var cam = new PerspectiveCamera(1.0f, 2.0f, new Transformation());
+        var cam = new PerspectiveCamera(new Transformation(), 1f, 2f);
         
         var ray1 = cam.FireRay(0.0f, 0.0f);
         var ray2 = cam.FireRay(1.0f, 0.0f);

@@ -3,6 +3,8 @@
 //forse è meglio cambiare nome ai membri di HomMatrix e Transformation,
 //per ora hanno entrambi 
 
+using System.Globalization;
+
 namespace TracerLib;
 
 /// <summary>
@@ -134,7 +136,7 @@ public struct HomMatrix
             str += "(";
             for (int j = 0; j < 4; j++)
             {
-                str += this[i, j].ToString("F2");
+                str += this[i, j].ToString("F2", CultureInfo.InvariantCulture);
                 if (j < 3)
                 {
                     str += ",\t";
