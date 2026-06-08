@@ -2,6 +2,15 @@
 
 namespace TracerLib;
 
+/// <summary>
+/// A struct representing a ray.
+/// 
+/// Origin is the point where the ray is generated.
+/// Dir is the direction at which the ray points to.
+/// Tmin and Tmax are parameters used to compute intersections.
+/// If an intersection occurs at the point P = Origin + t * Dir then t must satisfy the inequality Tmin <= t <= Tmax
+/// Depth counts how many times the ray has been already reflected.
+/// </summary>
 public struct Ray
 {
     public Point Origin { get; set; }

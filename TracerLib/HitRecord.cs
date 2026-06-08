@@ -2,10 +2,17 @@
 
 namespace TracerLib;
 
+/// <summary>
+/// A struct representing the intersection between a shape and a ray.
+/// 
+/// WorldPoint is the point where the intersection occurs.
+/// SurfaceNormal is the surface normal at the intersection point, typically oriented
+/// against the incoming ray direction.
+/// T is the parameter such that WorldPoint = IncomingRay.Origin + T * IncomingRay.Dir
+/// </summary>
 public struct HitRecord
 {
     public Point WorldPoint { get; }
-
     public Shape Shape { get; }
     public Normal SurfaceNormal { get; }
     public Vector2D SurfacePoint { get; }
