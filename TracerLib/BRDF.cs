@@ -2,6 +2,9 @@
 
 namespace TracerLib;
 
+/// <summary>
+/// A class representing the Bidirectional Reflectance Distribution Function
+/// </summary>
 public abstract class BRDF
 {
     public Pigment Pigment;
