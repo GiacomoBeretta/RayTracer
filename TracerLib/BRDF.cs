@@ -71,14 +71,16 @@ public class DiffuseBRDF : BRDF
     }*/
    
     /// <summary>
-    /// Generate a scattered <c>Ray</c> accordingly to the <c>DiffuseBRDF</c>
+    /// Returns a <c>Ray</c> randomly generated over the hemisphere oriented by the surface <c>normal</c>
+    /// and originating at the <c>interactionPoint</c>.
+    /// The returned ray will have provided <c>depth</c>.
     /// </summary>
-    /// <param name="pcg"> Random number generator for Monte Carlo sampling </param>
-    /// <param name="vin"> Direction of the incoming <c>Ray</c> </param>
-    /// <param name="interactionPoint"> Surface <c>Point</c> where the scattering event occur </param>
-    /// <param name="normal"> Surface <c>Normal</c> </param>
-    /// <param name="depth"> Recursion depth of the ray tracing process </param>
-    /// <returns> A new <c>Ray</c> originating from the interaction point and traveling in the sampled direction</returns>
+    /// <param name="pcg"> Random number generator used for Monte Carlo sampling.</param>
+    /// <param name="incidentVector">Direction of the incoming <c>Ray</c>.</param>
+    /// <param name="interactionPoint"><c>Point</c> on the surface where the scattering event occurs.</param>
+    /// <param name="normal"> Surface <c>Normal</c> used to orient the new ray.</param>
+    /// <param name="depth"> Number of reflections of the generated ray.</param>
+    /// <returns> A new <c>Ray</c> originating from the interaction point and traveling in the sampled direction.</returns>
     public override Ray ScatterRay(PCG pcg, Vector incidentVector, Point interactionPoint, Normal normal, int depth)
     {
         Shape.CreateONB(normal, out Vector e1, out Vector e2, out Vector e3);

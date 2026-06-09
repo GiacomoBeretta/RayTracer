@@ -3,20 +3,41 @@
 namespace TracerLib;
 
 /// <summary>
-/// A struct representing a ray.
+/// A struct representing a light ray.
 /// 
-/// Origin is the point where the ray is generated.
-/// Dir is the direction at which the ray points to.
-/// Tmin and Tmax are parameters used to compute intersections.
-/// If an intersection occurs at the point P = Origin + t * Dir then t must satisfy the inequality Tmin <= t <= Tmax
-/// Depth counts how many times the ray has been already reflected.
+/// Intersections are parameterized by a scalar t such that
+/// P = <see cref="Origin"/> + t * <see cref="Dir"/>.
+/// A valid intersection must satisfy:
+/// <see cref="Tmin"/>  &lt;= t  &lt;= <see cref="Tmax"/>.
+/// 
+/// The Depth property stores the number of reflections
+/// undergone by the ray.
 /// </summary>
 public struct Ray
 {
+    /// <summary>
+    /// Origin is the origin of the <see cref="Dir"/> vector.
+    /// </summary>
     public Point Origin { get; set; }
+    
+    /// <summary>
+    /// Dir is the direction at which the ray points to.
+    /// </summary>
     public Vector Dir { get; set; }
+    
+    /// <summary>
+    /// Lower bound for valid intersection parameters.
+    /// </summary>
     public float Tmin { get; private set; }
+    
+    /// <summary>
+    /// Upper bound for valid intersection parameters.
+    /// </summary>
     public float Tmax { get; private set; }
+    
+    /// <summary>
+    /// Depth counts how many times the ray has been already reflected.
+    /// </summary>
     public int Depth { get; private set; }
 
     public Ray()
