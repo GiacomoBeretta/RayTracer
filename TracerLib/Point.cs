@@ -17,7 +17,7 @@ public struct Point
 
     public override string ToString()
     {
-        var point = $"Point(x={X}, y={Y}, z={Z})";
+        string point = $"Point(x={X}, y={Y}, z={Z})";
         return point;
     }
 

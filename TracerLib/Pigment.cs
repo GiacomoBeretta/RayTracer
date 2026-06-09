@@ -64,11 +64,11 @@ public class CheckeredPigment : Pigment
     public override Color GetColor(Vector2D uv)
     {
         //Normalizzazione coordinate u,v [forza entrambi i valori nell'intervallo (0,1)](Per risolvere l'artefatto grafico nell'immagine)
-        var u = uv.U - MathF.Floor(uv.U);
-        var v = uv.V - MathF.Floor(uv.V);
+        float u = uv.U - MathF.Floor(uv.U);
+        float v = uv.V - MathF.Floor(uv.V);
 
-        var iu = (int)(MathF.Floor(u * this.NumSteps));
-        var iv = (int)(MathF.Floor(v * this.NumSteps));
+        int iu = (int)(MathF.Floor(u * this.NumSteps));
+        int iv = (int)(MathF.Floor(v * this.NumSteps));
 
         return ((iu % 2) == (iv % 2)) ? this.Color1 : this.Color2;
     }

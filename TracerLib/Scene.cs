@@ -15,7 +15,7 @@ public class Scene
 
     public void ExpectSymbol(InputStream inputFile, string symbol)
     {
-        var token = inputFile.ReadNextToken();
+        Token token = inputFile.ReadNextToken();
         if (token is not SymbolToken symbolToken || symbolToken.Symbol != symbol)
         {
             throw new GrammarError(token.Location, $"got {token} instead of {symbol}");
@@ -24,7 +24,7 @@ public class Scene
 
     public Keyword ExpectKeywords(InputStream inputFile, List<Keyword> keywords)
     {
-        var token = inputFile.ReadNextToken();
+        Token token = inputFile.ReadNextToken();
 
         if (token is not KeywordToken keywordToken)
         {
@@ -41,7 +41,7 @@ public class Scene
 
     public float ExpectNumber(InputStream inputFile, Scene scene)
     {
-        var token = inputFile.ReadNextToken();
+        Token token = inputFile.ReadNextToken();
 
         if (token is LiteralNumberToken literalNumberToken) return literalNumberToken.Value;
         else if (token is IdentifierToken identifierToken)
@@ -57,7 +57,7 @@ public class Scene
 
     public string ExpectString(InputStream inputFile)
     {
-        var token = inputFile.ReadNextToken();
+        Token token = inputFile.ReadNextToken();
 
         if (token is not StringToken stringToken)
             throw new GrammarError(token.Location, $"got {token} instead of a string");
@@ -67,7 +67,7 @@ public class Scene
 
     public string ExpectIdentifier(InputStream inputFile)
     {
-        var token = inputFile.ReadNextToken();
+        Token token = inputFile.ReadNextToken();
 
         if (token is not IdentifierToken identifierToken)
             throw new GrammarError(token.Location, $"got {token} instead of an identifier");
@@ -78,11 +78,11 @@ public class Scene
     public Vector ParseVector(InputStream inputFile, Scene scene)
     {
         ExpectSymbol(inputFile, "[");
-        var x = ExpectNumber(inputFile, scene);
+        float x = ExpectNumber(inputFile, scene);
         ExpectSymbol(inputFile, ",");
-        var y = ExpectNumber(inputFile, scene);
+        float y = ExpectNumber(inputFile, scene);
         ExpectSymbol(inputFile, ",");
-        var z = ExpectNumber(inputFile, scene);
+        float z = ExpectNumber(inputFile, scene);
         ExpectSymbol(inputFile, "]");
 
         return new Vector(x, y, z);
@@ -91,11 +91,11 @@ public class Scene
     public Color ParseColor(InputStream inputFile, Scene scene)
     {
         ExpectSymbol(inputFile, "<");
-        var r = ExpectNumber(inputFile, scene);
+        float r = ExpectNumber(inputFile, scene);
         ExpectSymbol(inputFile, ",");
-        var g = ExpectNumber(inputFile, scene);
+        float g = ExpectNumber(inputFile, scene);
         ExpectSymbol(inputFile, ",");
-        var b = ExpectNumber(inputFile, scene);
+        float b = ExpectNumber(inputFile, scene);
         ExpectSymbol(inputFile, ">");
 
         return new Color(r, g, b);
@@ -103,7 +103,7 @@ public class Scene
 
     public Pigment ParsePigment(InputStream inputFile, Scene scene)
     {
-        var keyword = ExpectKeywords(inputFile, [Keyword.Uniform, Keyword.Checkered, Keyword.Image]);
+        Keyword keyword = ExpectKeywords(inputFile, [Keyword.Uniform, Keyword.Checkered, Keyword.Image]);
         Pigment result;
 
         ExpectSymbol(inputFile, "(");
@@ -111,22 +111,22 @@ public class Scene
         switch (keyword)
         {
             case Keyword.Uniform:
-                var color = ParseColor(inputFile, scene);
+                Color color = ParseColor(inputFile, scene);
                 result = new UniformPigment(color);
                 break;
             case Keyword.Checkered:
-                var color1 = ParseColor(inputFile, scene);
+                Color color1 = ParseColor(inputFile, scene);
                 ExpectSymbol(inputFile, ",");
-                var color2 = ParseColor(inputFile, scene);
+                Color color2 = ParseColor(inputFile, scene);
                 ExpectSymbol(inputFile, ",");
-                var steps = (int)ExpectNumber(inputFile, scene);
+                int steps = (int)ExpectNumber(inputFile, scene);
                 result = new CheckeredPigment(color1, color2, steps);
                 break;
             case Keyword.Image:
-                var fileName = ExpectString(inputFile);
+                string fileName = ExpectString(inputFile);
                 using (FileStream imageFile = File.OpenRead(fileName))
                 {
-                    var image = HDRImage.ReadPFM_File(imageFile);
+                    HDRImage image = HDRImage.ReadPFM_File(imageFile);
                     result = new ImagePigment(image);
                 }
 
@@ -141,9 +141,9 @@ public class Scene
 
     public BRDF ParseBRDF(InputStream inputFile, Scene scene)
     {
-        var BRDFkeyword = ExpectKeywords(inputFile, [Keyword.Diffuse, Keyword.Specular]);
+        Keyword BRDFkeyword = ExpectKeywords(inputFile, [Keyword.Diffuse, Keyword.Specular]);
         ExpectSymbol(inputFile, "(");
-        var pigment = ParsePigment(inputFile, scene);
+        Pigment pigment = ParsePigment(inputFile, scene);
         ExpectSymbol(inputFile, ")");
         BRDF result;
 
@@ -167,9 +167,9 @@ public class Scene
         name = ExpectIdentifier(inputFile);
 
         ExpectSymbol(inputFile, "(");
-        var brdf = ParseBRDF(inputFile, scene);
+        BRDF brdf = ParseBRDF(inputFile, scene);
         ExpectSymbol(inputFile, ",");
-        var emittedRadiance = ParsePigment(inputFile, scene);
+        Pigment emittedRadiance = ParsePigment(inputFile, scene);
         ExpectSymbol(inputFile, ")");
 
         material = new Material(emittedRadiance, brdf);
@@ -181,7 +181,7 @@ public class Scene
 
         while (true)
         {
-            var transformKeyword = ExpectKeywords(inputFile,
+            Keyword transformKeyword = ExpectKeywords(inputFile,
             [
                 Keyword.Identity, Keyword.Translation, Keyword.RotationX, Keyword.RotationY, Keyword.RotationZ,
                 Keyword.Scaling
@@ -213,11 +213,11 @@ public class Scene
                     break;
                 case Keyword.Scaling:
                     ExpectSymbol(inputFile, "(");
-                    var x = ExpectNumber(inputFile, scene);
+                    float x = ExpectNumber(inputFile, scene);
                     ExpectSymbol(inputFile, ",");
-                    var y = ExpectNumber(inputFile, scene);
+                    float y = ExpectNumber(inputFile, scene);
                     ExpectSymbol(inputFile, ",");
-                    var z = ExpectNumber(inputFile, scene);
+                    float z = ExpectNumber(inputFile, scene);
                     result *= new Transformation(x, y, z);
                     ExpectSymbol(inputFile, ")");
                     break;
@@ -225,7 +225,7 @@ public class Scene
                     throw new GrammarError("Keyword doesn't match any of the Transformation types");
             }
 
-            var nextToken = inputFile.ReadNextToken();
+            Token nextToken = inputFile.ReadNextToken();
             if (nextToken is not SymbolToken symbolToken || symbolToken.Symbol != "*")
             {
                 inputFile.UnreadToken(nextToken);
@@ -240,12 +240,12 @@ public class Scene
     {
         ExpectSymbol(inputFile, "(");
 
-        var material = ExpectIdentifier(inputFile);
+        string material = ExpectIdentifier(inputFile);
         if (!scene.Materials.ContainsKey(material))
             throw new GrammarError(inputFile.Location, $"unknown material {material}");
 
         ExpectSymbol(inputFile, ",");
-        var transformation = ParseTransformation(inputFile, scene);
+        Transformation transformation = ParseTransformation(inputFile, scene);
         ExpectSymbol(inputFile, ")");
 
         return new Sphere(transformation, scene.Materials[material]);
@@ -255,12 +255,12 @@ public class Scene
     {
         ExpectSymbol(inputFile, "(");
 
-        var material = ExpectIdentifier(inputFile);
+        string material = ExpectIdentifier(inputFile);
         if (!scene.Materials.ContainsKey(material))
             throw new GrammarError(inputFile.Location, $"unknown material {material}");
 
         ExpectSymbol(inputFile, ",");
-        var transformation = ParseTransformation(inputFile, scene);
+        Transformation transformation = ParseTransformation(inputFile, scene);
         ExpectSymbol(inputFile, ")");
 
         return new Plane(transformation, scene.Materials[material]);
@@ -269,13 +269,13 @@ public class Scene
     public ICamera ParseCamera(InputStream inputFile, Scene scene)
     {
         ExpectSymbol(inputFile, "(");
-        var cameraKeyword = ExpectKeywords(inputFile, [Keyword.Perspective, Keyword.Orthogonal]);
+        Keyword cameraKeyword = ExpectKeywords(inputFile, [Keyword.Perspective, Keyword.Orthogonal]);
         ExpectSymbol(inputFile, ",");
-        var transformation = ParseTransformation(inputFile, scene);
+        Transformation transformation = ParseTransformation(inputFile, scene);
         ExpectSymbol(inputFile, ",");
-        var aspectRatio = ExpectNumber(inputFile, scene);
+        float aspectRatio = ExpectNumber(inputFile, scene);
         ExpectSymbol(inputFile, ",");
-        var distance = ExpectNumber(inputFile, scene);
+        float distance = ExpectNumber(inputFile, scene);
         ExpectSymbol(inputFile, ")");
 
         ICamera result;
@@ -304,18 +304,18 @@ public class Scene
 
         while (true)
         {
-            var token = inputFile.ReadNextToken();
+            Token token = inputFile.ReadNextToken();
             if (token is StopToken) break;
             if (token is not KeywordToken)
                 throw new GrammarError(token.Location, $"expected keyword instad of {token}");
             if (token is KeywordToken { Keyword: Keyword.Float })
             {
-                var variableName = ExpectIdentifier(inputFile);
+                string variableName = ExpectIdentifier(inputFile);
 
-                var variableLocation = inputFile.Location;
+                SourceLocation variableLocation = inputFile.Location;
 
                 ExpectSymbol(inputFile, "(");
-                var variableValue = ExpectNumber(inputFile, scene);
+                float variableValue = ExpectNumber(inputFile, scene);
                 ExpectSymbol(inputFile, ")");
 
                 if (scene.Variables.ContainsKey(variableName))
@@ -334,7 +334,7 @@ public class Scene
             }
             else if (token is KeywordToken { Keyword: Keyword.Material })
             {
-                ParseMaterial(inputFile, scene, out var name, out var material);
+                ParseMaterial(inputFile, scene, out string name, out Material material);
                 scene.Materials[name] = material;
             }
         }

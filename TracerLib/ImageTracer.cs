@@ -60,13 +60,13 @@ public class ImageTracer
 
                 if (SamplePerSide > 0)
                 {
-                    for (var pixRow = 0; pixRow < SamplePerSide; pixRow++)
+                    for (int pixRow = 0; pixRow < SamplePerSide; pixRow++)
                     {
-                        for (var pixCol = 0; pixCol < SamplePerSide; pixCol++)
+                        for (int pixCol = 0; pixCol < SamplePerSide; pixCol++)
                         {
-                            var uPix = (pixCol + _pcg.RandomFloat()) / SamplePerSide;
-                            var vPix = (pixRow + _pcg.RandomFloat()) / SamplePerSide;
-                            var ray = FireRay(col, row, uPix, vPix);
+                            float uPix = (pixCol + _pcg.RandomFloat()) / SamplePerSide;
+                            float vPix = (pixRow + _pcg.RandomFloat()) / SamplePerSide;
+                            Ray ray = FireRay(col, row, uPix, vPix);
                             cumcolor += renderer(ray);
                         }
                     }
@@ -75,8 +75,8 @@ public class ImageTracer
                 }
                 else
                 {
-                    var ray = FireRay(col, row);
-                    var color = renderer(ray);
+                    Ray ray = FireRay(col, row);
+                    Color color = renderer(ray);
                     _image[col, row] = color;
                 }
             }

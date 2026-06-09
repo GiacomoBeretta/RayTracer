@@ -165,7 +165,7 @@ public class InputStream
     {
         const string whitespace = " \t \n \r";
 
-        var ch = ReadChar();
+        char? ch = ReadChar();
 
         if (ch == null) return;
 
@@ -249,7 +249,7 @@ public class InputStream
 
             tokenString += ch;
         }
-        if (Keywords.Map.TryGetValue(tokenString, out var keyword))
+        if (Keywords.Map.TryGetValue(tokenString, out Keyword keyword))
         {
             return new KeywordToken(tokenLocation, keyword);
         }

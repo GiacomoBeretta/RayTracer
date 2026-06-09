@@ -13,7 +13,11 @@ namespace TracerLib;
 public struct HitRecord
 {
     public Point WorldPoint { get; }
-    public Shape Shape { get; }
+    public Shape Shape { get; }/// <summary>
+    /// Converts degrees to radians using the formula: radians = degrees * π / 180.
+    /// </summary>
+    /// <param name="deg">Angle in degrees.</param>
+    /// <returns>Angle in radians.</returns>
     public Normal SurfaceNormal { get; }
     public Vector2D SurfacePoint { get; }
     public Ray IncomingRay { get; }

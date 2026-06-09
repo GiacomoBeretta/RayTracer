@@ -242,14 +242,14 @@ public class Plane : Shape
 
     public override HitRecord? FindIntersection(Ray ray)
     {
-        var invRay = Transform.Inverse() * ray;
-        var origin = invRay.Origin;
-        var dir = invRay.Dir;
-        var t = -origin.Z / dir.Z;
+        Ray invRay = Transform.Inverse() * ray;
+        Point origin = invRay.Origin;
+        Vector dir = invRay.Dir;
+        float t = -origin.Z / dir.Z;
 
         if (t > invRay.Tmin && t < invRay.Tmax)
         {
-            var intersectionPoint = invRay.At(t);
+            Point intersectionPoint = invRay.At(t);
             return new HitRecord(
                 Transform * intersectionPoint,
                 this,

@@ -27,13 +27,13 @@ public class PCG
     /// <returns></returns>
     public uint Random()
     {
-        var oldstate = State;
+        ulong oldstate = State;
 
         State = oldstate * 6364136223846793005 + Inc;
 
-        var xorshifted = (uint)(((oldstate >> 18) ^ oldstate) >> 27);
+        uint xorshifted = (uint)(((oldstate >> 18) ^ oldstate) >> 27);
 
-        var rot = (int)(oldstate >> 59); 
+        int rot = (int)(oldstate >> 59); 
 
         return (xorshifted >> rot) | (xorshifted << ((~rot + 1) & 31)); // Rivedere con 32 - rot al posto di ~rot +1
     }

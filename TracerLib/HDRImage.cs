@@ -194,7 +194,7 @@ public class HDRImage
 
     public HDRImage(Stream stream)
     {
-        var img = ReadPFM_File(stream);
+        HDRImage img = ReadPFM_File(stream);
 
         Width = img.Width;
         Height = img.Height;
@@ -209,7 +209,7 @@ public class HDRImage
     {
         using (Stream filestream = File.OpenRead(fileName))
         {
-            var img = ReadPFM_File(filestream);
+            HDRImage img = ReadPFM_File(filestream);
 
             Width = img.Width;
             Height = img.Height;
@@ -399,7 +399,7 @@ public class HDRImage
     /// <exception cref="InvalidPfmFileFormat"></exception>
     public static float _ReadFloat(BinaryReader br, bool bigEndian = true)
     {
-        var bytes = br.ReadBytes(4);
+        byte[] bytes = br.ReadBytes(4);
 
         if (bytes.Length < 4)
         {
@@ -416,34 +416,34 @@ public class HDRImage
     
     public static void _WriteFloat(Stream outputstream, float value)
     {
-        var seq = BitConverter.GetBytes(value);
+        byte[] seq = BitConverter.GetBytes(value);
         outputstream.Write(seq, 0, seq.Length);
     }
 
     public static HDRImage ReadPFM_File(Stream stream)
     {
         using var br = new BinaryReader(stream);
-        var magic = _ReadLine(br);
+        string magic = _ReadLine(br);
         if (magic != "PF")
         {
             throw new InvalidPfmFileFormat("Invalid magic in PFM file");
         }
-
-        var imgSize = _ReadLine(br);
+        
+        string imgSize = _ReadLine(br);
         if (imgSize == null)
         {
             throw new InvalidPfmFileFormat("Missing image size line");
         }
 
-        _ParseImgSize(imgSize, out var width, out var height);
+        _ParseImgSize(imgSize, out int width, out int height);
 
-        var endiannessLine = _ReadLine(br);
+        string endiannessLine = _ReadLine(br);
         if (endiannessLine == null)
         {
             throw new InvalidPfmFileFormat("Missing endianness line");
         }
 
-        var endianness = _ParseEndianness(endiannessLine);
+        bool endianness = _ParseEndianness(endiannessLine);
 
         /*Console.WriteLine($"POS BEFORE PIXELS: {br.BaseStream.Position}");
         long expectedBytes = width * height * 3 * 4;
@@ -485,14 +485,14 @@ public class HDRImage
     //io la cambierei il nome in WritePFM e basta
     public static void WritePFM_File(HDRImage img, double endian, Stream filestream)
     {
-        var header = Encoding.ASCII.GetBytes($"PF\n{img.Width} {img.Height}\n{endian}\n");
+        byte[] header = Encoding.ASCII.GetBytes($"PF\n{img.Width} {img.Height}\n{endian}\n");
         filestream.Write(header, 0, header.Length);
 
         for (int i = img.Height - 1; i >= 0; i--)
         {
             for (int j = 0; j <= img.Width; j++)
             {
-                var color = img[j, i];
+                Color color = img[j, i];
                 _WriteFloat(filestream, color.R);
                 _WriteFloat(filestream, color.G);
                 _WriteFloat(filestream, color.B);
