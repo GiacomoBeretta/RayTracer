@@ -21,14 +21,14 @@ public class World
     /// Finds the closest intersection between the specified ray and the shapes in the scene.
     /// Returns null if the ray does not intersect any shape.
     /// </summary>
-    /// <param name="ray">The ray to test for intersections.</param>
+    /// <param name="ray">The <see cref="Ray"/> to test for intersections.</param>
     /// <returns>A <see cref="HitRecord"/> describing the closest intersection, or null if no intersection exists.</returns>
     public HitRecord? FindIntersection(Ray ray)
     {
         HitRecord? closest = null;
         foreach (var shape in Shapes)
         {
-            HitRecord? intersection = shape.RayIntersection(ray);
+            HitRecord? intersection = shape.FindIntersection(ray);
             if (intersection == null)
             {
                 continue;

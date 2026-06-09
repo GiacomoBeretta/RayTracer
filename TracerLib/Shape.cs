@@ -3,7 +3,7 @@
 namespace TracerLib;
 
 /// <summary>
-/// An abstract class to represent all the possible 3D geometric shapes that will compose the scene
+/// Base class for all the 3D geometric shapes that will compose the scene.
 /// </summary>
 public abstract class Shape
 {
@@ -20,13 +20,11 @@ public abstract class Shape
     }
 
     /// <summary>
-    /// Returns a <c>HitRecord</c> object if there is an intersection between the <c>Ray</c> passed as argument
-    /// and *this* shape, otherwise returns a null value.
-    /// See <c>HitRecord</c> for more information.
+    /// Finds the closest intersection between the specified ray and *this* shape, otherwise returns a null value.
     /// </summary>
-    /// <param name="ray"></param>
-    /// <returns></returns>
-    public abstract HitRecord? RayIntersection(Ray ray);
+    /// <param name="ray">The <see cref="Ray"/> to test for intersections.</param>
+    /// <returns>A <see cref="HitRecord"/> describing the closest intersection, or null if no intersection exists.</returns>
+    public abstract HitRecord? FindIntersection(Ray ray);
 
     /// <summary>
     /// Returns if the shapes are of the same type
@@ -132,7 +130,7 @@ public class Sphere : Shape
     /// </summary>
     /// <param name="ray"></param>
     /// <returns></returns>
-    public override HitRecord? RayIntersection(Ray ray)
+    public override HitRecord? FindIntersection(Ray ray)
     {
         // instead of transforming the sphere to represent all sorts of ellipsoids
         // we transform the ray with the inverse transformation
@@ -235,7 +233,7 @@ public class Plane : Shape
         return new Vector2D(p.X - MathF.Floor(p.X), p.Y - MathF.Floor(p.Y));
     }
 
-    public override HitRecord? RayIntersection(Ray ray)
+    public override HitRecord? FindIntersection(Ray ray)
     {
         var invRay = Transform.Inverse() * ray;
         var origin = invRay.Origin;

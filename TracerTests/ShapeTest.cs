@@ -95,7 +95,7 @@ public class SphereTest
     {
         Ray ray = new Ray(new Point(0, 0, 2), new Vector(0, 0, -1));
         Sphere sphere = new Sphere();
-        HitRecord? hit = sphere.RayIntersection(ray);
+        HitRecord? hit = sphere.FindIntersection(ray);
         Assert.Equal(new Point(0, 0, 1), hit?.WorldPoint);
         Assert.Equal(new Normal(0, 0, 1), hit?.SurfaceNormal);
         Assert.Equal(new Vector2D(0, 0), hit?.SurfacePoint);
@@ -103,7 +103,7 @@ public class SphereTest
         Assert.Equal(1, hit?.T);
 
         ray = new Ray(new Point(3, 0, 0), new Vector(-1, 0, 0));
-        hit = sphere.RayIntersection(ray);
+        hit = sphere.FindIntersection(ray);
         Assert.Equal(new Point(1, 0, 0), hit?.WorldPoint);
         Assert.Equal(new Normal(1, 0, 0), hit?.SurfaceNormal);
         Assert.Equal(new Vector2D(0, 0.5f), hit?.SurfacePoint);
@@ -111,7 +111,7 @@ public class SphereTest
         Assert.Equal(2, hit?.T);
 
         ray = new Ray(new Point(0, 0, 0), new Vector(1, 0, 0));
-        hit = sphere.RayIntersection(ray);
+        hit = sphere.FindIntersection(ray);
         Assert.Equal(new Point(1, 0, 0), hit?.WorldPoint);
         Assert.Equal(new Normal(-1, 0, 0), hit?.SurfaceNormal);
         Assert.Equal(new Vector2D(0, 0.5f), hit?.SurfacePoint);
@@ -119,7 +119,7 @@ public class SphereTest
         Assert.Equal(1, hit?.T);
 
         ray = new Ray(new Point(1, 1, 1), new Vector(1, 1, 1));
-        hit = sphere.RayIntersection(ray);
+        hit = sphere.FindIntersection(ray);
         Assert.Null(hit);
     }
 
@@ -132,7 +132,7 @@ public class SphereTest
         Transformation translate = new Transformation(translateVector);
         Sphere sphere = new Sphere(translate);
 
-        HitRecord? hit = sphere.RayIntersection(ray);
+        HitRecord? hit = sphere.FindIntersection(ray);
         Assert.Equal(new Point(10, 0, 1), hit?.WorldPoint);
         Assert.Equal(new Normal(0, 0, 1), hit?.SurfaceNormal);
         Assert.Equal(new Vector2D(0, 0), hit?.SurfacePoint);
@@ -140,7 +140,7 @@ public class SphereTest
         Assert.Equal(1, hit?.T);
 
         Ray ray2 = new Ray(new Point(13, 0, 0), new Vector(-1, 0, 0));
-        hit = sphere.RayIntersection(ray2);
+        hit = sphere.FindIntersection(ray2);
         Assert.Equal(new Point(11, 0, 0), hit?.WorldPoint);
         Assert.Equal(new Normal(1, 0, 0), hit?.SurfaceNormal);
         Assert.Equal(new Vector2D(0, 0.5f), hit?.SurfacePoint);
@@ -148,11 +148,11 @@ public class SphereTest
         Assert.Equal(2, hit?.T);
 
         Ray ray3 = new Ray(new Point(0, 0, 2), new Vector(0, 0, -1));
-        hit = sphere.RayIntersection(ray3);
+        hit = sphere.FindIntersection(ray3);
         Assert.Null(hit);
 
         Ray ray4 = new Ray(new Point(-10, 0, 0), new Vector(0, 0, -1));
-        hit = sphere.RayIntersection(ray4);
+        hit = sphere.FindIntersection(ray4);
         Assert.Null(hit);
     }
 }
