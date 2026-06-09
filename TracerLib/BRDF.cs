@@ -13,14 +13,26 @@ public abstract class BRDF
 
     // forse questo si può togliere?
     //public abstract Color Eval(Normal normal, Vector Vin, Vector Vout, Vector2D uv);
-    protected BRDF() : this(new UniformPigment(new Color(0f,0f,0f))) {}
+    protected BRDF() : this(new UniformPigment(new Color(0f, 0f, 0f)))
+    {
+    }
 
     protected BRDF(Pigment pigment)
     {
         Pigment = pigment;
     }
-    
-    //public abstract Ray ScatterRay(PCG pcg, Ray incidentRay, Point interactionPoint, Normal normal);
+
+    // public abstract Ray ScatterRay(PCG pcg, Ray incidentRay, Point interactionPoint, Normal normal);
+    /// <summary>
+    /// Returns a <c>Ray</c> generated according to the type of <see cref="BRDF"/>.
+    /// The new ray will have the provided <c>depth</c>.
+    /// </summary>
+    /// <param name="pcg"> Random number generator used for Monte Carlo sampling.</param>
+    /// <param name="incidentVector">Direction of the incoming <c>Ray</c>.</param>
+    /// <param name="interactionPoint"><c>Point</c> on the surface where the scattering event occurs.</param>
+    /// <param name="normal"> Surface <c>Normal</c> used to orient the new ray.</param>
+    /// <param name="depth"> Number of reflections of the new ray.</param>
+    /// <returns> A new <c>Ray</c> originating from the interaction point.</returns>
     public abstract Ray ScatterRay(PCG pcg, Vector incidentVector, Point interactionPoint, Normal normal, int depth);
 }
 
@@ -49,7 +61,7 @@ public class DiffuseBRDF : BRDF
     {
         _reflectance = 1;
     }
-    
+
     /// <summary>
     /// Initialize a <c>DiffuseBRDF</c> with a specified <c>Pigment</c> and reflectance 
     /// </summary>
@@ -65,21 +77,21 @@ public class DiffuseBRDF : BRDF
     }
 
     // da togliere?
-   /* public override Color Eval(Normal normal, Vector Vin, Vector Vout, Vector2D uv)
-    {
-        return pigment.GetColor(uv) * reflectance * (1.0f / MathF.PI);
-    }*/
-   
+    /* public override Color Eval(Normal normal, Vector Vin, Vector Vout, Vector2D uv)
+     {
+         return pigment.GetColor(uv) * reflectance * (1.0f / MathF.PI);
+     }*/
+
     /// <summary>
     /// Returns a <c>Ray</c> randomly generated over the hemisphere oriented by the surface <c>normal</c>
     /// and originating at the <c>interactionPoint</c>.
-    /// The returned ray will have provided <c>depth</c>.
+    /// The new ray will have the provided <c>depth</c>.
     /// </summary>
     /// <param name="pcg"> Random number generator used for Monte Carlo sampling.</param>
     /// <param name="incidentVector">Direction of the incoming <c>Ray</c>.</param>
     /// <param name="interactionPoint"><c>Point</c> on the surface where the scattering event occurs.</param>
     /// <param name="normal"> Surface <c>Normal</c> used to orient the new ray.</param>
-    /// <param name="depth"> Number of reflections of the generated ray.</param>
+    /// <param name="depth"> Number of reflections of the new ray.</param>
     /// <returns> A new <c>Ray</c> originating from the interaction point and traveling in the sampled direction.</returns>
     public override Ray ScatterRay(PCG pcg, Vector incidentVector, Point interactionPoint, Normal normal, int depth)
     {
@@ -110,33 +122,38 @@ public class DiffuseBRDF : BRDF
 /// </summary>
 public class SpecularBRDF : BRDF
 {
-   /* public override Color Eval(Normal normal, Vector Vin, Vector Vout, Vector2D uv)
+    /* public override Color Eval(Normal normal, Vector Vin, Vector Vout, Vector2D uv)
+     {
+         throw new NotImplementedException();
+     }*/
+
+
+    /// <summary>
+    /// Initialize a <c>SpecularBRDF</c> with a uniform black <c>Pigment</c>
+    /// </summary>
+    public SpecularBRDF()
     {
-        throw new NotImplementedException();
-    }*/
-   
-   
-   /// <summary>
-   /// Initialize a <c>SpecularBRDF</c> with a uniform black <c>Pigment</c>
-   /// </summary>
-   public SpecularBRDF() {}
-   
-   /// <summary>
-   /// Initialize a <c>SpecularBRDF</c> with a specified <c>Pigment</c>
-   /// </summary>
-   /// <param name="pigment"> The pigment defining the surface color </param>
-   public SpecularBRDF(Pigment pigment) : base(pigment){}
+    }
+
+    /// <summary>
+    /// Initialize a <c>SpecularBRDF</c> with a specified <c>Pigment</c>
+    /// </summary>
+    /// <param name="pigment"> The pigment defining the surface color </param>
+    public SpecularBRDF(Pigment pigment) : base(pigment)
+    {
+    }
 
     //da modificare
     /// <summary>
-    /// Generate a scattered <c>Ray</c> accordingly to the reflection's law
+    /// Returns a <c>Ray</c> generated accordingly to the reflection's law and originating at the <c>interactionPoint</c>.
+    /// The new ray will have the provided <c>depth</c>.
     /// </summary>
-    /// <param name="pcg"> Random number generator. This parameter won't be used because specular reflection is deterministic</param>
-    /// <param name="vin">Direction of the incoming <c>Ray</c></param>
-    /// <param name="interactionPoint">Surface <c>Point</c> where the reflection occurs</param>
-    /// <param name="normal">Surface <c>Normal</c> at the interaction point</param>
-    /// <param name="depth">Current recursion depth of the ray tracing process</param>
-    /// <returns>A <c>Ray</c> originating from the interaction point and traveling in the mirror-reflected direction</returns>
+    /// <param name="pcg">Parameter not used.</param>
+    /// <param name="incidentVector">Direction of the incoming <c>Ray</c>.</param>
+    /// <param name="interactionPoint"><c>Point</c> on the surface where the scattering event occurs.</param>
+    /// <param name="normal"> Surface <c>Normal</c> used to orient the new ray.</param>
+    /// <param name="depth"> Number of reflections of the new ray.</param>
+    /// <returns> A new <c>Ray</c> originating from the interaction point and traveling in the sampled direction.</returns>
     public override Ray ScatterRay(PCG pcg, Vector incindentVector, Point interactionPoint, Normal normal, int depth)
     {
         Vector rayDir = new Vector(incindentVector.X, incindentVector.Y, incindentVector.Z);
