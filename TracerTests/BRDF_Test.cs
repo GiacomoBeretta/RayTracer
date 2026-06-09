@@ -46,23 +46,23 @@ public class DiffuseBRDF_Test
     public void SpecularScatterRay()
     {
         PCG pcg = new PCG();
-        Vector v = new Vector(0,0,-1);
+        Vector vin = new Vector(0,0,-1);
         Point intersect = new Point(0, 0, 0);
         Normal n = new Normal(0,0,1);
         SpecularBRDF specularBrdf = new SpecularBRDF();
         
-        Ray ray = specularBrdf.ScatterRay(pcg, v, intersect, n, 0);
+        Ray ray = specularBrdf.ScatterRay(pcg, vin, intersect, n, 0);
         Ray expected = new Ray(intersect, new Vector(0, 0, 1), tmin:1e-3f);
         Assert.Equal(expected, ray);
-        v = new Vector(-1, 1, 0);
+        vin = new Vector(-1, 1, 0);
         n = new Normal(1,0,0);
-        ray = specularBrdf.ScatterRay(pcg, v, intersect, n, 0);
+        ray = specularBrdf.ScatterRay(pcg, vin, intersect, n, 0);
         expected = new Ray(intersect, new Vector(1, 1, 0), tmin:1e-3f);
         Assert.Equal(expected, ray);
 
-        v = new Vector(1, 1, -1);
+        vin = new Vector(1, 1, -1);
         n = new Normal(0,-1,0);
-        ray = specularBrdf.ScatterRay(pcg, v, intersect, n, 0);
+        ray = specularBrdf.ScatterRay(pcg, vin, intersect, n, 0);
         expected = new Ray(intersect, new Vector(1, -1, -1), tmin:1e-3f);
         Assert.Equal(expected, ray);
 

@@ -10,6 +10,7 @@ public abstract class BRDF
     /// The Pigment property represents the texture of the surface
     public Pigment Pigment;
 
+    // forse questo si può togliere?
     //public abstract Color Eval(Normal normal, Vector Vin, Vector Vout, Vector2D uv);
     protected BRDF() : this(new UniformPigment(new Color(0f,0f,0f))) {}
 
@@ -17,8 +18,9 @@ public abstract class BRDF
     {
         Pigment = pigment;
     }
-
-    public abstract Ray ScatterRay(PCG pcg, Vector vin, Point interactionPoint, Normal normal, int depth);
+    
+    //public abstract Ray ScatterRay(PCG pcg, Ray incidentRay, Point interactionPoint, Normal normal);
+    public abstract Ray ScatterRay(PCG pcg, Vector incidentVector, Point interactionPoint, Normal normal, int depth);
 }
 
 public class DiffuseBRDF : BRDF
@@ -40,18 +42,22 @@ public class DiffuseBRDF : BRDF
         _reflectance = reflectance;
     }
 
+    // da togliere?
    /* public override Color Eval(Normal normal, Vector Vin, Vector Vout, Vector2D uv)
     {
         return pigment.GetColor(uv) * reflectance * (1.0f / MathF.PI);
     }*/
-
-    //da RIVEDERE PER LA GENERAZIONE DI THETA TRA 0 E PI/2
-    public override Ray ScatterRay(PCG pcg, Vector vin, Point interactionPoint, Normal normal, int depth)
+   
+    public override Ray ScatterRay(PCG pcg, Vector incidentVector, Point interactionPoint, Normal normal, int depth)
     {
         Shape.CreateONB(normal, out Vector e1, out Vector e2, out Vector e3);
 
+        // This algorithm uses the importance sampling, using the Phong distribution with n=1
+        // (instead of generating uniformly on the hemisphere)
+        // i.e. p(theta, phi) = cos(theta) sin(theta) / pi
+        // With this distribution we generate theta and phi as follows
         float phi = 2 * MathF.PI * pcg.RandomFloat();
-        float cosThetaSq = pcg.RandomFloat();
+        float cosThetaSq = pcg.RandomFloat(); // i.e. theta = arccos(sqrt(y)) with y uniformly in (0,1)
         float cosTheta = MathF.Sqrt(cosThetaSq);
         float sinTheta = MathF.Sqrt(1 - cosThetaSq);
 
@@ -78,9 +84,9 @@ public class SpecularBRDF : BRDF
    public SpecularBRDF(Pigment pigment) : base(pigment){}
 
     //da modificare
-    public override Ray ScatterRay(PCG pcg, Vector vin, Point interactionPoint, Normal normal, int depth)
+    public override Ray ScatterRay(PCG pcg, Vector incindentVector, Point interactionPoint, Normal normal, int depth)
     {
-        Vector rayDir = new Vector(vin.X, vin.Y, vin.Z);
+        Vector rayDir = new Vector(incindentVector.X, incindentVector.Y, incindentVector.Z);
         //rayDir.Normalize(); //Tomasi non ho capito perché normalizza il vettore
         Vector normalVec = normal.ToVector();
 
