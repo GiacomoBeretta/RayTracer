@@ -104,7 +104,7 @@ public class PathTracingRenderer : Renderer
     /// Maximum number of ray reflections before terminating the path and returning the background color.
     /// </summary>
     public int MaxDepth { get; set; }
-    
+
     /// <summary>
     /// Optional fixed probability for the Russian roulette algorithm.
     /// When null, the probability is computed dynamically at each recursive call of <see cref="RenderFunction"/>.
@@ -120,7 +120,7 @@ public class PathTracingRenderer : Renderer
         NumRay = numRay;
         RussianRouletteStartDepth = russianRouletteStop;
         MaxDepth = maxDepth;
-        RussianRouletteFixedProbability =  russianRouletteProb;
+        RussianRouletteFixedProbability = russianRouletteProb;
     }
 
     public override Color RenderFunction(Ray ray)
@@ -132,14 +132,19 @@ public class PathTracingRenderer : Renderer
         if (hit == null) return BackgroundColor;
 
         Material material = hit.Value.Shape.Material;
-        Color reflectedColor = material.Pigment.GetColor(hit.Value.SurfacePosition);
+        Color hitColor = material.Pigment.GetColor(hit.Value.SurfacePosition);
         Color emittedRadiance = material.EmittedRadiance.GetColor(hit.Value.SurfacePosition);
 
-        float maxLum = MathF.Max(MathF.Max(reflectedColor.R, reflectedColor.G), reflectedColor.B);
-        
+        //maybe it's more efficient to put it inside the if of the russian roulette algorithm
+        //and substitute in
+        //if (maxLum > 0.0f)
+        //the equivalent condition
+        //if (hitColor.R > 0 && hitColor.G > 0 && hitColor.B > 0)
+        float maxLum = MathF.Max(MathF.Max(hitColor.R, hitColor.G), hitColor.B);
+
         float q = RussianRouletteFixedProbability ?? MathF.Max(0.05f, 1 - maxLum);
 
-        //Russian roulette
+        //Russian roulette algorithm
         if (ray.Depth > RussianRouletteStartDepth)
         {
             if (Pcg.RandomFloat() < q)
@@ -151,23 +156,26 @@ public class PathTracingRenderer : Renderer
             {
                 // keep the recursion going and boost the value of reflected radiance
                 // to compensate for other potentially discarded rays.
-                reflectedColor *= 1.0f / (1.0f - q);
+                hitColor *= 1.0f / (1.0f - q);
             }
         }
 
+        Color newRadiance = new Color();
         Color cumRadiance = new Color();
-
         Ray newRay = new Ray();
+
+        // if the RGB values of hitColor are 0 then the contribution to cumRadiance is null.
         if (maxLum > 0.0f)
         {
             for (int i = 0; i < NumRay; i++)
             {
                 newRay = material.Brdf.ScatterRay(Pcg, hit.Value.IncomingRay.Dir, hit.Value.WorldPoint,
                     hit.Value.SurfaceNormal, ray.Depth + 1);
-            }
 
-            Color newRadiance = RenderFunction(newRay);
-            cumRadiance += reflectedColor * newRadiance;
+                newRadiance = RenderFunction(newRay);
+                // BRDF * incident radiance (hadamard product) they are 3 equations for the 3 colors.
+                cumRadiance += hitColor * newRadiance;
+            }
         }
 
         return emittedRadiance + cumRadiance * (1.0f / NumRay);
