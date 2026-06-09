@@ -3,10 +3,11 @@
 namespace TracerLib;
 
 /// <summary>
-/// A class representing the Bidirectional Reflectance Distribution Function
+/// A class representing the Bidirectional Reflectance Distribution Function.
 /// </summary>
 public abstract class BRDF
 {
+    /// The Pigment property represents the texture of the surface
     public Pigment Pigment;
 
     //public abstract Color Eval(Normal normal, Vector Vin, Vector Vout, Vector2D uv);

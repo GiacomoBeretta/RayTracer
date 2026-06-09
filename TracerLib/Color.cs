@@ -172,7 +172,7 @@ public struct Color
     }
 
     /// <summary>
-    /// Clamps the value of x under 1
+    /// Clamps the value of x under 1.
     /// </summary>
     /// <param name="x"></param>
     /// <returns></returns>
@@ -183,7 +183,7 @@ public struct Color
 
     /// <summary>
     /// Clamps the values of RGB under 1
-    /// and resize a potential too bright pixel
+    /// and resize a potential too bright pixel.
     /// </summary>
     public void _Clamp()
     {
@@ -191,12 +191,15 @@ public struct Color
         G = Color._Clamp(G);
         B = Color._Clamp(B);
     }
-
+    
     /// <summary>
-    /// Returns the corresponding sRGB triple corrected by the characteristic gamma factor of the display
+    /// Returns the corresponding sRGB triple corrected by the characteristic gamma factor of the display.
     /// </summary>
     /// <param name="gamma"></param>
     /// <returns></returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown when gamma is less than or equal to 0.
+    /// </exception>
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public Color To8BitRGB(float gamma)
     {
