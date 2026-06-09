@@ -1,3 +1,5 @@
+// This file is release under EUPL_v1.2 license. See LICENSE.md
+
 namespace TracerLib;
 
 //Verificare se modificare {token} in {type(token)} nei messaggi d'errore cambia qualcosa
