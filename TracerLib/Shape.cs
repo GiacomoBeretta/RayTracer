@@ -73,8 +73,12 @@ public class Sphere : Shape
     {
         this.Transform = transform;
     }
-
-    //Rivedere come costruire una sfera che abbia come argomento solo material
+    
+    public Sphere(Material material) : base(material)
+    {
+        Transform = new Transformation();
+    }
+    
     public Sphere(Transformation transform, Material material) : base(material)
     {
         Transform = transform;
@@ -104,7 +108,7 @@ public class Sphere : Shape
 
     /// <summary>
     /// Returns the normal to the Sphere surface
-    /// depending on the direction dir of the Ray incident on the <c>Point</c> p of the unit sphere.
+    /// depending on the direction dir of the Ray incident on the Point p of the unit sphere.
     /// </summary>
     /// <param name="p"></param>
     /// <param name="dir"></param>
