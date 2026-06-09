@@ -5,28 +5,39 @@
 namespace TracerLib;
 
 /// <summary>
-/// A base class that implements the render algorithm.
+/// A base class that implements the rendering algorithm.
 /// </summary>
 public abstract class Renderer
 {
+    //da completare
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="ray">The <see cref="Ray"/> that intersects the scene.</param>
+    /// <returns></returns>
     public abstract Color RenderFunction(Ray ray);
 }
 
 /// <summary>
-/// A renderer that renders all objects using a single white color (on/off rendering).
+/// A renderer that renders all objects using a single white and a background color (on/off rendering).
 /// </summary>
 public class OnOffRenderer : Renderer
 {
+    /// <summary>
+    /// The world containing all the shapes of the scene.
+    /// </summary>
     public World World { get; set; }
+
+    /// <summary>
+    /// The color returned when a ray does not intersect any <see cref="Shape"/> in the scene.
+    /// </summary>
     public Color BackgroundColor { get; set; }
 
     /// <summary>
-    /// Initializes a renderer that draws all objects in white.
+    /// Constructs a renderer that draws all objects in white.
     /// </summary>
     /// <param name="world">The world containing the objects to render.</param>
-    /// <param name="backgroundColor">
-    /// The background color. If null, defaults to black.
-    /// </param>
+    /// <param name="backgroundColor">The background color. If not provided, defaults to black.</param>
     public OnOffRenderer(World world, Color? backgroundColor = null)
     {
         World = world;
@@ -34,9 +45,10 @@ public class OnOffRenderer : Renderer
     }
 
     /// <summary>
-    /// Returns a white color if the ray intersects a <see cref="Shape"/> otherwhise returns the <see cref="BackgroundColor"/>.
+    /// Returns a white <see cref="Color"/> if the ray intersects a <see cref="Shape"/> of the scene
+    /// otherwhise returns the <see cref="BackgroundColor"/>.
     /// </summary>
-    /// <param name="ray"></param>
+    /// <param name="ray">The <see cref="Ray"/> that intersects the scene.</param>
     /// <returns></returns>
     public override Color RenderFunction(Ray ray)
     {
@@ -44,23 +56,37 @@ public class OnOffRenderer : Renderer
     }
 }
 
+/// <summary>
+/// A renderer that colors the objects based only on their <see cref="Pigment"/>, without reflecting any rays.
+/// </summary>
 public class FlatRenderer : Renderer
 {
+    /// <summary>
+    /// The world containing all the shapes of the scene.
+    /// </summary>
     public World World { get; set; }
+
+    /// <summary>
+    /// The color returned when a ray does not intersect any <see cref="Shape"/> in the scene.
+    /// </summary>
     public Color BackgroundColor { get; set; }
 
+    /// <summary>
+    /// Constructs a renderer that colors the objects based only on their <see cref="Pigment"/>.
+    /// </summary>
+    /// <param name="world">The world containing the objects to render.</param>
+    /// <param name="backgroundColor">The background color. If not provided, defaults to black.</param>
     public FlatRenderer(World world, Color? backgroundColor = null)
     {
         World = world;
         BackgroundColor = backgroundColor ?? new Color(0.0f, 0.0f, 0.0f);
     }
 
-    //da completare
     /// <summary>
-    /// Returns the color of the shape intersected by the ray, evaluating 
+    /// Evaluates the surface color at the ray intersection point using only the shape's <see cref="Pigment"/>.
     /// </summary>
-    /// <param name="ray"></param>
-    /// <returns></returns>
+    /// <param name="ray">The <see cref="Ray"/> that intersects the scene.</param>
+    /// <returns>The resulting <see cref="Color"/> of the intersected surface.</returns>
     public override Color RenderFunction(Ray ray)
     {
         HitRecord? hit = World.FindIntersection(ray);
@@ -78,22 +104,35 @@ public class FlatRenderer : Renderer
 }
 
 /// <summary>
-/// A renderer that uses a path tracing algorithm, i.e. follows each ray in his reflections to evaluate the radiance at the observer. 
+/// A renderer that uses a path tracing algorithm, tracing rays recursively through
+/// the scene to estimate radiance at the observer via Monte Carlo integration.
 /// </summary>
 public class PathTracingRenderer : Renderer
 {
     /// <summary>
-    /// Contains all the shapes of the scene.
+    /// The world containing all the shapes of the scene.
     /// </summary>
     public World World { get; set; }
 
     /// <summary>
-    /// A random generator.
+    /// A random generator used for the Monte Carlo integration.
     /// </summary>
     public PCG Pcg { get; set; }
 
+    /// <summary>
+    /// The color returned when a ray does not intersect any <see cref="Shape"/> in the scene.
+    /// </summary>
     public Color BackgroundColor { get; set; }
+
+    /// <summary>
+    /// The number of scattered rays for each intersection.
+    /// </summary>
     public int NumRay { get; set; }
+
+    /// <summary>
+    /// Maximum number of ray reflections before terminating the path and returning the <see cref="BackgroundColor"/>.
+    /// </summary>
+    public int MaxDepth { get; set; }
 
     /// <summary>
     /// Number of ray reflections after which the Russian roulette algorithm is applied.
@@ -101,28 +140,33 @@ public class PathTracingRenderer : Renderer
     public int RussianRouletteStartDepth { get; set; }
 
     /// <summary>
-    /// Maximum number of ray reflections before terminating the path and returning the background color.
-    /// </summary>
-    public int MaxDepth { get; set; }
-
-    /// <summary>
     /// Optional fixed probability for the Russian roulette algorithm.
     /// When null, the probability is computed dynamically at each recursive call of <see cref="RenderFunction"/>.
     /// </summary>
     public float? RussianRouletteFixedProbability { get; set; }
 
+    /// <summary>
+    /// Constructs a renderer that uses a path tracing algorithm.
+    /// See the class <see cref="PathTracingRenderer"/> for more information.
+    /// </summary>
     public PathTracingRenderer(World world, PCG? pcg = null, Color? backgroundColor = null, int numRay = 10,
-        int russianRouletteStop = 3, int maxDepth = 2, float? russianRouletteProb = null)
+        int maxDepth = 2, int russianRouletteStartDepth = 3, float? russianRouletteProbability = null)
     {
         World = world;
         Pcg = pcg ?? new PCG();
         BackgroundColor = backgroundColor ?? new Color(0.0f, 0.0f, 0.0f);
         NumRay = numRay;
-        RussianRouletteStartDepth = russianRouletteStop;
+        RussianRouletteStartDepth = russianRouletteStartDepth;
         MaxDepth = maxDepth;
-        RussianRouletteFixedProbability = russianRouletteProb;
+        RussianRouletteFixedProbability = russianRouletteProbability;
     }
-
+    
+    /// <summary>
+    /// Evaluates the surface color at the ray intersection point using Monte Carlo integration
+    /// and the Russian roulette algorithm.
+    /// </summary>
+    /// <param name="ray">The <see cref="Ray"/> that intersects the scene.</param>
+    /// <returns>The resulting <see cref="Color"/> of the intersected surface.</returns>
     public override Color RenderFunction(Ray ray)
     {
         if (ray.Depth > MaxDepth) return BackgroundColor;
