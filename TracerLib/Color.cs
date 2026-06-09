@@ -7,9 +7,10 @@ namespace TracerLib;
 //forse un controllo sul prodotto per scalare è troppo?
 //forse è meglio passare by value per efficienza certi argomenti, meglio chiedere a Tomasi
 //magari si può migliorare lo struct usando i primary constructor?
+//dove viene usato il prodotto tra colori (Hadamard product)?
 
 /// <summary>
-/// A Color type is identified by 3 float positive values R,G,B.
+/// The Color type is identified by 3 float positive values R,G,B.
 /// Some basic implemented operations: sum, product of a color by a scalar, product between 2 colors.
 /// </summary>
 public struct Color
@@ -96,7 +97,7 @@ public struct Color
     }
 
     /// <summary>
-    /// Returns if the 2 colors passed are exactly equal.
+    /// Returns whether the 2 Colors passed are exactly equal.
     /// </summary>
     /// <param name="c1">First Color</param>
     /// <param name="c2">Second Color</param>
@@ -110,7 +111,8 @@ public struct Color
     }
 
     /// <summary>
-    /// Returns if the 2 colors passed are equal within a difference given by the epsilon parameter to deal with floating numbers.
+    /// Returns whether the 2 Colors passed are equal
+    /// within a difference given by the epsilon parameter to deal with floating numbers.
     /// </summary>
     /// <param name="c1">First Color</param>
     /// <param name="c2">Second Color</param>
@@ -170,7 +172,7 @@ public struct Color
     }
 
     /// <summary>
-    /// Clamps the value of x under 1
+    /// Clamps the value of x under 1.
     /// </summary>
     /// <param name="x"></param>
     /// <returns></returns>
@@ -181,7 +183,7 @@ public struct Color
 
     /// <summary>
     /// Clamps the values of RGB under 1
-    /// and resize a potential too bright pixel
+    /// and resize a potential too bright pixel.
     /// </summary>
     public void _Clamp()
     {
@@ -189,12 +191,15 @@ public struct Color
         G = Color._Clamp(G);
         B = Color._Clamp(B);
     }
-
+    
     /// <summary>
-    /// Returns the corresponding sRGB triple corrected by the characteristic gamma factor of the display
+    /// Returns the corresponding sRGB triple corrected by the characteristic gamma factor of the display.
     /// </summary>
     /// <param name="gamma">Display's gamma factor</param>
     /// <returns></returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown when gamma is less than or equal to 0.
+    /// </exception>
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public Color To8BitRGB(float gamma)
     {

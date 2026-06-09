@@ -1,3 +1,5 @@
+// This file is release under EUPL_v1.2 license. See LICENSE.md
+
 namespace TracerLib;
 
 //magari è meglio definire Pigment come un delegate (cioè un function object)

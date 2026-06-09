@@ -26,7 +26,7 @@ public class RenderTest
         var world = new World();
         world.Add(sphere);
 
-        Render render = new OnOff(world);
+        Render render = new OnOffRender(world);
 
         tracer.FireAllRays(ray => render.RenderFunction(ray));
         
@@ -57,7 +57,7 @@ public class RenderTest
         var world = new World();
         world.Add(sphere);
 
-        Render render = new Flat(world);
+        Render render = new FlatRender(world);
 
         tracer.FireAllRays(ray => render.RenderFunction(ray));
         

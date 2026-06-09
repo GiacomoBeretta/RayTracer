@@ -1,3 +1,5 @@
+// This file is release under EUPL_v1.2 license. See LICENSE.md
+
 using System.Diagnostics;
 using System.Globalization;
 
@@ -163,7 +165,7 @@ public class InputStream
     {
         const string whitespace = " \t \n \r";
 
-        var ch = ReadChar();
+        char? ch = ReadChar();
 
         if (ch == null) return;
 
@@ -247,7 +249,7 @@ public class InputStream
 
             tokenString += ch;
         }
-        if (Keywords.Map.TryGetValue(tokenString, out var keyword))
+        if (Keywords.Map.TryGetValue(tokenString, out Keyword keyword))
         {
             return new KeywordToken(tokenLocation, keyword);
         }

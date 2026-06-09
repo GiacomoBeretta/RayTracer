@@ -3,7 +3,7 @@
 namespace TracerLib;
 
 /// <summary>
-/// An abstract class to represent all the possible 3D geometric shapes that will compose the scene
+/// Base class for all the 3D geometric shapes that will compose the scene.
 /// </summary>
 public abstract class Shape
 {
@@ -20,29 +20,30 @@ public abstract class Shape
     }
 
     /// <summary>
-    /// Returns a <c>HitRecord</c> object if there is an intersection between the <c>Ray</c> passed as argument
-    /// and *this* shape, otherwise returns a null value.
-    /// See <c>HitRecord</c> for more information.
+    /// Finds the closest intersection between the specified ray and *this* shape, otherwise returns a null value.
     /// </summary>
-    /// <param name="ray"></param>
-    /// <returns></returns>
-    public abstract HitRecord? RayIntersection(Ray ray);
-
-    /// <summary>
-    /// Returns if the shapes are of the same type
-    /// </summary>
-    /// <param name="s"></param>
-    /// <param name="epsilon"></param>
-    /// <returns></returns>
+    /// <param name="ray">The <see cref="Ray"/> to test for intersections.</param>
+    /// <returns>A <see cref="HitRecord"/> describing the closest intersection, or null if no intersection exists.</returns>
+    public abstract HitRecord? FindIntersection(Ray ray);
+    
     public abstract bool _IsCloseTo(Shape s, float epsilon = 1e-5f);
 
     /// <summary>
-    /// The out parameteres e1, e2, e3 are the new orthonormal basis, with e3 = normal
+    /// Constructs a local orthonormal basis from the specified normal vector.
+    /// The resulting basis satisfies e3 = normal.
     /// </summary>
-    /// <param name="normal"></param>
-    /// <param name="e1"></param>
-    /// <param name="e2"></param>
-    /// <param name="e3"></param>
+    /// <param name="normal">
+    /// The <see cref="Normal"/> vector used to construct the orthonormal basis.
+    /// </param>
+    /// <param name="e1">
+    /// The first unit vector of the basis.
+    /// </param>
+    /// <param name="e2">
+    /// The second unit vector of the basis.
+    /// </param>
+    /// <param name="e3">
+    /// The third unit vector of the basis, equal to <paramref name="normal"/>.
+    /// </param>
     public static void CreateONB(Normal normal, out Vector e1, out Vector e2, out Vector e3)
     {
         int sign = normal.Z > 0.0f ? 1 : -1;
@@ -72,8 +73,12 @@ public class Sphere : Shape
     {
         this.Transform = transform;
     }
-
-    //Rivedere come costruire una sfera che abbia come argomento solo material
+    
+    public Sphere(Material material) : base(material)
+    {
+        Transform = new Transformation();
+    }
+    
     public Sphere(Transformation transform, Material material) : base(material)
     {
         Transform = transform;
@@ -103,7 +108,7 @@ public class Sphere : Shape
 
     /// <summary>
     /// Returns the normal to the Sphere surface
-    /// depending on the direction dir of the Ray incident on the <c>Point</c> p of the unit sphere.
+    /// depending on the direction dir of the Ray incident on the Point p of the unit sphere.
     /// </summary>
     /// <param name="p"></param>
     /// <param name="dir"></param>
@@ -132,7 +137,7 @@ public class Sphere : Shape
     /// </summary>
     /// <param name="ray"></param>
     /// <returns></returns>
-    public override HitRecord? RayIntersection(Ray ray)
+    public override HitRecord? FindIntersection(Ray ray)
     {
         // instead of transforming the sphere to represent all sorts of ellipsoids
         // we transform the ray with the inverse transformation
@@ -235,16 +240,16 @@ public class Plane : Shape
         return new Vector2D(p.X - MathF.Floor(p.X), p.Y - MathF.Floor(p.Y));
     }
 
-    public override HitRecord? RayIntersection(Ray ray)
+    public override HitRecord? FindIntersection(Ray ray)
     {
-        var invRay = Transform.Inverse() * ray;
-        var origin = invRay.Origin;
-        var dir = invRay.Dir;
-        var t = -origin.Z / dir.Z;
+        Ray invRay = Transform.Inverse() * ray;
+        Point origin = invRay.Origin;
+        Vector dir = invRay.Dir;
+        float t = -origin.Z / dir.Z;
 
         if (t > invRay.Tmin && t < invRay.Tmax)
         {
-            var intersectionPoint = invRay.At(t);
+            Point intersectionPoint = invRay.At(t);
             return new HitRecord(
                 Transform * intersectionPoint,
                 this,
