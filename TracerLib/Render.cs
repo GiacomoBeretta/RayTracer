@@ -1,7 +1,5 @@
 // This file is release under EUPL_v1.2 license. See LICENSE.md
 
-//o forse è meglio chiamarli renderer al posto che render?
-
 namespace TracerLib;
 
 /// <summary>
@@ -9,12 +7,12 @@ namespace TracerLib;
 /// </summary>
 public abstract class Renderer
 {
-    //da completare
     /// <summary>
-    /// 
+    /// Evaluates the surface color at the ray intersection point
+    /// using an algorithm that depends on the concrete <see cref="Renderer"/> implementation.
     /// </summary>
     /// <param name="ray">The <see cref="Ray"/> that intersects the scene.</param>
-    /// <returns></returns>
+    /// <returns>The computed <see cref="Color"/> at the intersection point.</returns>
     public abstract Color RenderFunction(Ray ray);
 }
 
@@ -52,6 +50,7 @@ public class OnOffRenderer : Renderer
     /// <returns></returns>
     public override Color RenderFunction(Ray ray)
     {
+        //find the first intersection with the closest shape relative to the origin of the ray.
         return World.FindIntersection(ray) != null ? new Color(1.0f, 1.0f, 1.0f) : BackgroundColor;
     }
 }
@@ -86,9 +85,10 @@ public class FlatRenderer : Renderer
     /// Evaluates the surface color at the ray intersection point using only the shape's <see cref="Pigment"/>.
     /// </summary>
     /// <param name="ray">The <see cref="Ray"/> that intersects the scene.</param>
-    /// <returns>The resulting <see cref="Color"/> of the intersected surface.</returns>
+    /// <returns>The evaluated <see cref="Color"/> at the intersection point.</returns>
     public override Color RenderFunction(Ray ray)
     {
+        //find the first intersection with the closest shape relative to the origin of the ray.
         HitRecord? hit = World.FindIntersection(ray);
 
         if (hit == null)
@@ -166,11 +166,12 @@ public class PathTracingRenderer : Renderer
     /// and the Russian roulette algorithm.
     /// </summary>
     /// <param name="ray">The <see cref="Ray"/> that intersects the scene.</param>
-    /// <returns>The resulting <see cref="Color"/> of the intersected surface.</returns>
+    /// <returns>The computed <see cref="Color"/> at the intersection point.</returns>
     public override Color RenderFunction(Ray ray)
     {
         if (ray.Depth > MaxDepth) return BackgroundColor;
 
+        // find the first intersection with the closest shape relative to the origin of the ray.
         HitRecord? hit = World.FindIntersection(ray);
 
         if (hit == null) return BackgroundColor;
@@ -186,9 +187,12 @@ public class PathTracingRenderer : Renderer
         //if (hitColor.R > 0 && hitColor.G > 0 && hitColor.B > 0)
         float maxLum = MathF.Max(MathF.Max(hitColor.R, hitColor.G), hitColor.B);
 
+        // q is the probability used for Russian roulette
+        // if the user has set RussianRouletteFixedProbability then it's used that,
+        // otherwise is computed each time:
         float q = RussianRouletteFixedProbability ?? MathF.Max(0.05f, 1 - maxLum);
 
-        //Russian roulette algorithm
+        // Russian roulette algorithm
         if (ray.Depth > RussianRouletteStartDepth)
         {
             if (Pcg.RandomFloat() < q)
@@ -222,6 +226,7 @@ public class PathTracingRenderer : Renderer
             }
         }
 
+        // emittedRadiance + reflectedRadiance
         return emittedRadiance + cumRadiance * (1.0f / NumRay);
     }
 }
