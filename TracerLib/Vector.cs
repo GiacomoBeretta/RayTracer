@@ -12,6 +12,13 @@ public struct Vector
 
     public float Z { get; private set; }
 
+    public Vector()
+    {
+        X = 0;
+        Y = 0;
+        Z = 0;
+    }
+
     public Vector(float x, float y, float z)
     {
         X = x;

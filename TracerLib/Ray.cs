@@ -19,6 +19,15 @@ public struct Ray
     public float Tmax { get; private set; }
     public int Depth { get; private set; }
 
+    public Ray()
+    {
+        Origin = new Point(0, 0, 0);
+        Dir = new Vector();
+        Tmin = 1e-5f;
+        Tmax = float.PositiveInfinity;
+        Depth = 0;
+    }
+
     public Ray(Point origin, Vector dir, float tmin = 1e-5f, float tmax = float.PositiveInfinity, int depth = 0)
     {
         Origin = origin;

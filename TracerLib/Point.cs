@@ -8,6 +8,13 @@ public struct Point
     public float Y { get; }
     public float Z { get; }
 
+    public Point()
+    {
+        X = 0;
+        Y = 0;
+        Z = 0;
+    }
+    
     public Point(float x, float y, float z)
     {
         X = x;
