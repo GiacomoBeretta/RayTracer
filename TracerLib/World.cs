@@ -1,6 +1,9 @@
 namespace TracerLib;
 
-public class World : Shape
+/// <summary>
+/// A class that contains all the shapes of the scene to render.
+/// </summary>
+public class World
 {
     public List<Shape> Shapes { get; private set; }
     
@@ -13,8 +16,14 @@ public class World : Shape
     {
         Shapes.Add(shape);
     }
-
-    public override HitRecord? RayIntersection(Ray ray)
+    
+    /// <summary>
+    /// Finds the closest intersection between the specified ray and the shapes in the scene.
+    /// Returns null if the ray does not intersect any shape.
+    /// </summary>
+    /// <param name="ray">The ray to test for intersections.</param>
+    /// <returns>A <see cref="HitRecord"/> describing the closest intersection, or null if no intersection exists.</returns>
+    public HitRecord? FindIntersection(Ray ray)
     {
         HitRecord? closest = null;
         foreach (var shape in Shapes)
@@ -31,10 +40,5 @@ public class World : Shape
             }
         }
         return closest;
-    }
-
-    public override bool _IsCloseTo(Shape s, float epsilon = 1E-05f)
-    {
-        throw new NotImplementedException();
     }
 }

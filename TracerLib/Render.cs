@@ -18,7 +18,7 @@ public class OnOffRender : Render
 
     public override Color RenderFunction(Ray ray)
     {
-        return this.World.RayIntersection(ray) != null ? new Color(1.0f, 1.0f, 1.0f) : BackgroundColor;
+        return World.FindIntersection(ray) != null ? new Color(1.0f, 1.0f, 1.0f) : BackgroundColor;
     }
 }
 
@@ -35,7 +35,7 @@ public class FlatRender : Render
 
     public override Color RenderFunction(Ray ray)
     {
-        var hit = World.RayIntersection(ray);
+        var hit = World.FindIntersection(ray);
 
         if (hit == null)
         {
@@ -73,7 +73,7 @@ public class PathTracer : Render
     {
         if (ray.Depth > MaxDepth) return BackgroundColor;
 
-        var hit = World.RayIntersection(ray);
+        var hit = World.FindIntersection(ray);
 
         if (hit == null) return BackgroundColor;
 
