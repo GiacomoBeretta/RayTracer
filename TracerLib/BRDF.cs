@@ -1,7 +1,7 @@
 namespace TracerLib;
 
 /// <summary>
-/// The Bidirectional Reflectance Distribution Function (BRDF) represent the ratio between the radiance leavnig a surface and the irradiance recieved
+/// The Bidirectional Reflectance Distribution Function (<c>BRDF</c>) represent the ratio between the radiance leavnig a surface and the irradiance recieved
 /// </summary>
 public abstract class BRDF
 {
@@ -25,16 +25,34 @@ public class DiffuseBRDF : BRDF
 {
     private float _reflectance;
 
+    /// <summary>
+    /// Initialize a <c>DiffuseBRDF</c> with a uniform black <c>Pigment</c> and unity reflectance
+    /// </summary>
     public DiffuseBRDF()
     {
         _reflectance = 1;
     }
 
+    /// <summary>
+    /// Initialize a <c>DiffuseBRDF</c> with a specified <c>Pigment</c> and unity reflectance
+    /// </summary>
+    /// <param name="pigment">
+    /// The pigment define the surface color
+    /// </param>
     public DiffuseBRDF(Pigment pigment) : base(pigment)
     {
         _reflectance = 1;
     }
-
+    
+    /// <summary>
+    /// Initialize a <c>DiffuseBRDF</c> with a specified <c>Pigment</c> and reflectance 
+    /// </summary>
+    /// <param name="pigment">
+    /// The pigment define the surface color
+    /// </param>
+    /// <param name="reflectance">
+    /// The reflectance coefficient of the surface
+    /// </param>
     public DiffuseBRDF(Pigment pigment, float reflectance) : base(pigment)
     {
         _reflectance = reflectance;
@@ -46,6 +64,16 @@ public class DiffuseBRDF : BRDF
     }*/
 
     //da RIVEDERE PER LA GENERAZIONE DI THETA TRA 0 E PI/2
+    
+    /// <summary>
+    /// Generate a scattered <c>Ray</c> accordingly to the <c>DiffuseBRDF</c>
+    /// </summary>
+    /// <param name="pcg"> Random number generator for Monte Carlo sampling </param>
+    /// <param name="vin"> Direction of the incoming <c>Ray</c> </param>
+    /// <param name="interactionPoint"> Surface <c>Point</c> where the scattering event occur </param>
+    /// <param name="normal"> Surface <c>Normal</c> </param>
+    /// <param name="depth"> Recursion depth of the ray tracing process </param>
+    /// <returns> A new <c>Ray</c> originating from the interaction point and traveling in the sampled direction</returns>
     public override Ray ScatterRay(PCG pcg, Vector vin, Point interactionPoint, Normal normal, int depth)
     {
         Shape.CreateONB(normal, out Vector e1, out Vector e2, out Vector e3);
@@ -66,6 +94,9 @@ public class DiffuseBRDF : BRDF
     }
 }
 
+/// <summary>
+/// <c>BRDF</c> in which the incoming radiation is reflected along the direction given by the reflection law
+/// </summary>
 public class SpecularBRDF : BRDF
 {
    /* public override Color Eval(Normal normal, Vector Vin, Vector Vout, Vector2D uv)
@@ -73,11 +104,29 @@ public class SpecularBRDF : BRDF
         throw new NotImplementedException();
     }*/
    
+   
+   /// <summary>
+   /// Initialize a <c>SpecularBRDF</c> with a uniform black <c>Pigment</c>
+   /// </summary>
    public SpecularBRDF() {}
    
+   /// <summary>
+   /// Initialize a <c>SpecularBRDF</c> with a specified <c>Pigment</c>
+   /// </summary>
+   /// <param name="pigment"> The pigment defining the surface color </param>
    public SpecularBRDF(Pigment pigment) : base(pigment){}
 
     //da modificare
+    
+    /// <summary>
+    /// Generate a scattered <c>Ray</c> accordingly to the reflection's law
+    /// </summary>
+    /// <param name="pcg"> Random number generator. This parameter won't be used because specular reflection is deterministic</param>
+    /// <param name="vin">Direction of the incoming <c>Ray</c></param>
+    /// <param name="interactionPoint">Surface <c>Point</c> where the reflection occurs</param>
+    /// <param name="normal">Surface <c>Normal</c> at the interaction point</param>
+    /// <param name="depth">Current recursion depth of the ray tracing process</param>
+    /// <returns>A <c>Ray</c> originating from the interaction point and traveling in the mirror-reflected direction</returns>
     public override Ray ScatterRay(PCG pcg, Vector vin, Point interactionPoint, Normal normal, int depth)
     {
         Vector rayDir = new Vector(vin.X, vin.Y, vin.Z);
