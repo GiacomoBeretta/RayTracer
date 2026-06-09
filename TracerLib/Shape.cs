@@ -25,22 +25,25 @@ public abstract class Shape
     /// <param name="ray">The <see cref="Ray"/> to test for intersections.</param>
     /// <returns>A <see cref="HitRecord"/> describing the closest intersection, or null if no intersection exists.</returns>
     public abstract HitRecord? FindIntersection(Ray ray);
-
-    /// <summary>
-    /// Returns if the shapes are of the same type
-    /// </summary>
-    /// <param name="s"></param>
-    /// <param name="epsilon"></param>
-    /// <returns></returns>
+    
     public abstract bool _IsCloseTo(Shape s, float epsilon = 1e-5f);
 
     /// <summary>
-    /// The out parameteres e1, e2, e3 are the new orthonormal basis, with e3 = normal
+    /// Constructs a local orthonormal basis from the specified normal vector.
+    /// The resulting basis satisfies e3 = normal.
     /// </summary>
-    /// <param name="normal"></param>
-    /// <param name="e1"></param>
-    /// <param name="e2"></param>
-    /// <param name="e3"></param>
+    /// <param name="normal">
+    /// The <see cref="Normal"/> vector used to construct the orthonormal basis.
+    /// </param>
+    /// <param name="e1">
+    /// The first unit vector of the basis.
+    /// </param>
+    /// <param name="e2">
+    /// The second unit vector of the basis.
+    /// </param>
+    /// <param name="e3">
+    /// The third unit vector of the basis, equal to <paramref name="normal"/>.
+    /// </param>
     public static void CreateONB(Normal normal, out Vector e1, out Vector e2, out Vector e3)
     {
         int sign = normal.Z > 0.0f ? 1 : -1;

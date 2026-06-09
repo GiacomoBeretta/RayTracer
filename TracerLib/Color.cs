@@ -9,7 +9,7 @@ namespace TracerLib;
 //magari si può migliorare lo struct usando i primary constructor?
 
 /// <summary>
-/// A Color type is identified by 3 float positive values R,G,B.
+/// The Color type is identified by 3 float positive values R,G,B.
 /// Some basic implemented operations: sum, product of a color by a scalar, product between 2 colors.
 /// </summary>
 public struct Color
@@ -19,7 +19,7 @@ public struct Color
     public float B { get; set; }
     
     /// <summary>
-    /// Basic <c>Color</c> constructor which accepts 3 positive parameters between 0 and 1 : R,G,B 
+    /// Basic Color constructor which accepts 3 positive parameters between 0 and 1 : R,G,B 
     /// </summary>
     /// <param name="r"></param>
     /// <param name="g"></param>
@@ -48,7 +48,7 @@ public struct Color
     }
 
     /// <summary>
-    /// Sum per component between two <c>Color</c>
+    /// Sum per component between two Colors
     /// </summary>
     /// <param name="c1"></param>
     /// <param name="c2"></param>
@@ -59,7 +59,7 @@ public struct Color
     }
 
     /// <summary>
-    /// Product between a <c>Color</c> and a float scalar
+    /// Product between a Color and a float scalar
     /// </summary>
     /// <param name="a"></param>
     /// <param name="alpha"></param>
@@ -74,7 +74,7 @@ public struct Color
     }
     
     /// <summary>
-    /// Product between a <c>Color</c> and a float scalar
+    /// Product between a Color and a float scalar
     /// </summary>
     /// <param name="alpha"></param>
     /// <param name="a"></param>
@@ -85,7 +85,7 @@ public struct Color
     }
 
     /// <summary>
-    /// Hadamard's product: Product oper component between two <c>Color</c>
+    /// Hadamard's product: Product oper component between two Colors
     /// </summary>
     /// <param name="c1"></param>
     /// <param name="c2"></param>
@@ -96,7 +96,7 @@ public struct Color
     }
 
     /// <summary>
-    /// Returns if the 2 colors passed are exactly equal.
+    /// Returns whether the 2 Colors passed are exactly equal.
     /// </summary>
     /// <param name="c1"></param>
     /// <param name="c2"></param>
@@ -110,7 +110,8 @@ public struct Color
     }
 
     /// <summary>
-    /// Returns if the 2 colors passed are equal within a difference given by the epsilon parameter to deal with floating numbers.
+    /// Returns whether the 2 Colors passed are equal
+    /// within a difference given by the epsilon parameter to deal with floating numbers.
     /// </summary>
     /// <param name="c1"></param>
     /// <param name="c2"></param>
