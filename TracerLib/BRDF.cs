@@ -1,5 +1,8 @@
 namespace TracerLib;
 
+/// <summary>
+/// The Bidirectional Reflectance Distribution Function (BRDF) represent the ratio between the radiance leavnig a surface and the irradiance recieved
+/// </summary>
 public abstract class BRDF
 {
     public Pigment Pigment;
@@ -15,6 +18,9 @@ public abstract class BRDF
     public abstract Ray ScatterRay(PCG pcg, Vector vin, Point interactionPoint, Normal normal, int depth);
 }
 
+/// <summary>
+/// <c>BRDF</c> in which all incoming radiation is distributed over the 2π hemisphere
+/// </summary>
 public class DiffuseBRDF : BRDF
 {
     private float _reflectance;
