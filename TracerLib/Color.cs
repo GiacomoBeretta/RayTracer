@@ -7,6 +7,7 @@ namespace TracerLib;
 //forse un controllo sul prodotto per scalare è troppo?
 //forse è meglio passare by value per efficienza certi argomenti, meglio chiedere a Tomasi
 //magari si può migliorare lo struct usando i primary constructor?
+//dove viene usato il prodotto tra colori (Hadamard product)?
 
 /// <summary>
 /// The Color type is identified by 3 float positive values R,G,B.
