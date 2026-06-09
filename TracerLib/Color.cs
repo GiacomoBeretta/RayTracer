@@ -19,7 +19,7 @@ public struct Color
     public float B { get; set; }
     
     /// <summary>
-    /// Basic <c>Color</c> constructor which accepts 3 positive parameters between 0 and 1 : R,G,B 
+    /// Basic <see cref="Color"/> constructor which accepts 3 positive parameters between 0 and 1 : R,G,B 
     /// </summary>
     /// <param name="r"></param>
     /// <param name="g"></param>
@@ -48,7 +48,7 @@ public struct Color
     }
 
     /// <summary>
-    /// Sum per component between two <c>Color</c>
+    /// Sum per component between two <see cref="Color"/>
     /// </summary>
     /// <param name="c1"></param>
     /// <param name="c2"></param>
@@ -59,10 +59,10 @@ public struct Color
     }
 
     /// <summary>
-    /// Product between a <c>Color</c> and a float scalar
+    /// Product between a <see cref="Color"/> and a float scalar
     /// </summary>
-    /// <param name="a"></param>
-    /// <param name="alpha"></param>
+    /// <param name="a">Color</param>
+    /// <param name="alpha">Scalar</param>
     /// <returns></returns>
     public static Color operator *(Color a, float alpha)
     {
@@ -74,10 +74,10 @@ public struct Color
     }
     
     /// <summary>
-    /// Product between a <c>Color</c> and a float scalar
+    /// Product between a <see cref="Color"/> and a float scalar
     /// </summary>
-    /// <param name="alpha"></param>
-    /// <param name="a"></param>
+    /// <param name="alpha">Scalar</param>
+    /// <param name="a">Color</param>
     /// <returns></returns>
     public static Color operator *(float alpha, Color a)
     {
@@ -85,10 +85,10 @@ public struct Color
     }
 
     /// <summary>
-    /// Hadamard's product: Product oper component between two <c>Color</c>
+    /// Hadamard's product: Product oper component between two <see cref="Color"/>
     /// </summary>
-    /// <param name="c1"></param>
-    /// <param name="c2"></param>
+    /// <param name="c1">First Color</param>
+    /// <param name="c2">Second Color</param>
     /// <returns></returns>
     public static Color operator *(Color c1, Color c2)
     {
@@ -98,8 +98,8 @@ public struct Color
     /// <summary>
     /// Returns if the 2 colors passed are exactly equal.
     /// </summary>
-    /// <param name="c1"></param>
-    /// <param name="c2"></param>
+    /// <param name="c1">First Color</param>
+    /// <param name="c2">Second Color</param>
     /// <returns></returns>
     [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
     public static bool _AreSameColor(Color c1, Color c2)
@@ -112,9 +112,9 @@ public struct Color
     /// <summary>
     /// Returns if the 2 colors passed are equal within a difference given by the epsilon parameter to deal with floating numbers.
     /// </summary>
-    /// <param name="c1"></param>
-    /// <param name="c2"></param>
-    /// <param name="epsilon"></param>
+    /// <param name="c1">First Color</param>
+    /// <param name="c2">Second Color</param>
+    /// <param name="epsilon">Epsilon parameter</param>
     /// <returns></returns>
     public static bool _AreColorsClose(Color c1, Color c2, float epsilon = 1e-5f)
     {
@@ -147,7 +147,7 @@ public struct Color
     // }
 
     /// <summary>
-    /// Returns the luminosity of a pixel using the formula given by Shirley and Morley in their book
+    /// Returns the luminosity of a pixel using the formula given by Shirley and Morley 
     /// </summary>
     /// <returns></returns>
     public float LuminosityShirleyMorley()
@@ -193,7 +193,7 @@ public struct Color
     /// <summary>
     /// Returns the corresponding sRGB triple corrected by the characteristic gamma factor of the display
     /// </summary>
-    /// <param name="gamma"></param>
+    /// <param name="gamma">Display's gamma factor</param>
     /// <returns></returns>
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public Color To8BitRGB(float gamma)

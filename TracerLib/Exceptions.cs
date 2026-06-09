@@ -3,7 +3,7 @@
 namespace TracerLib;
 
 /// <summary>
-/// The class <c>InvalidPfmFileFormat</c> inherit from the FormatException's class and is used in the error management during the reading/writing of a file.pfm
+/// The class <see cref="InvalidPfmFileFormat"/> inherit from the FormatException's class and is used in the error management during the reading/writing of a file.pfm
 /// </summary>
 public class InvalidPfmFileFormat : FormatException
 {
@@ -16,7 +16,9 @@ public class InvalidPfmFileFormat : FormatException
     }
 }
 
-//e come si stampa poi la location?
+/// <summary>
+/// The class <see cref="GrammarError"/> inherit from the Exception's class and is used in the error management during the reading of a scene file
+/// </summary>
 public class GrammarError : Exception
 {
     public GrammarError(string message) : base(message)

@@ -59,8 +59,8 @@ public class HDRImage
     /// <summary>
     /// Checks for the validity of the coordinates
     /// </summary>
-    /// <param name="column"></param>
-    /// <param name="row"></param>
+    /// <param name="column">Image's width</param>
+    /// <param name="row">Image's height</param>
     /// <returns></returns>
     public bool _AreCoordinatesValid(int column, int row)
     {

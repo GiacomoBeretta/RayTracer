@@ -19,7 +19,7 @@ public struct OrthogonalCamera : ICamera
     public Transformation Transform { get; set; }
 
     /// <summary>
-    /// Initialize an orthogonal <c>Camera</c> with unity aspect ratio and identity <c>Transformation</c>
+    /// Initialize an <see cref="OrthogonalCamera"/> with unity aspect ratio and identity <c>Transformation</c>
     /// </summary>
     public OrthogonalCamera()
     {
