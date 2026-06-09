@@ -35,14 +35,14 @@ public class FlatRender : Render
 
     public override Color RenderFunction(Ray ray)
     {
-        var hit = World.FindIntersection(ray);
+        HitRecord? hit = World.FindIntersection(ray);
 
         if (hit == null)
         {
             return BackgroundColor;
         }
 
-        var material = hit.Value.Shape.Material;
+        Material material = hit.Value.Shape.Material;
 
         return material.Pigment.GetColor(hit.Value.SurfacePoint) +
                material.EmittedRadiance.GetColor(hit.Value.SurfacePoint);
@@ -73,15 +73,15 @@ public class PathTracer : Render
     {
         if (ray.Depth > MaxDepth) return BackgroundColor;
 
-        var hit = World.FindIntersection(ray);
+        HitRecord? hit = World.FindIntersection(ray);
 
         if (hit == null) return BackgroundColor;
 
-        var material = hit.Value.Shape.Material;
-        var color = material.Pigment.GetColor(hit.Value.SurfacePoint);
-        var radiance = material.EmittedRadiance.GetColor(hit.Value.SurfacePoint);
+        Material material = hit.Value.Shape.Material;
+        Color color = material.Pigment.GetColor(hit.Value.SurfacePoint);
+        Color radiance = material.EmittedRadiance.GetColor(hit.Value.SurfacePoint);
 
-        var lum = MathF.Max(MathF.Max(color.R, color.G), color.B);
+        float lum = MathF.Max(MathF.Max(color.R, color.G), color.B);
         
         //Russian roulette
         if (ray.Depth > RussianRouletteStop)
@@ -96,17 +96,17 @@ public class PathTracer : Render
             }
         }
 
-        var cumRadiance = new Color();
+        Color cumRadiance = new Color();
 
-        var newRay = new Ray();
+        Ray newRay = new Ray();
         if (lum > 0.0f)
         {
-            for(var i = 0; i < NumRay; i++)
+            for(int i = 0; i < NumRay; i++)
             {
                 newRay = material.Brdf.ScatterRay(Pcg, hit.Value.IncomingRay.Dir, hit.Value.WorldPoint, hit.Value.SurfaceNormal, ray.Depth +1);
             }
 
-            var newRadiance = RenderFunction(newRay);
+            Color newRadiance = RenderFunction(newRay);
             cumRadiance += color * newRadiance;
         }
 
