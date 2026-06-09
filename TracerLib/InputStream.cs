@@ -257,7 +257,11 @@ public class InputStream
 
     // Parse_Token methods - End 
 
-    //modificare per end of file
+    /// <summary>
+    /// Reads and returns the next Token that appears in the stream (skipping whitespaces, new lines and comments)
+    /// </summary>
+    /// <returns></returns>
+    /// <exception cref="GrammarError"></exception>
     public Token ReadNextToken()
     {
         // '<>' are for the colors, '[]' for the vectors and points, ',' for separating numbers,

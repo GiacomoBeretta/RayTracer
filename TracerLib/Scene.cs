@@ -1,6 +1,6 @@
 namespace TracerLib;
 
-//Verificare se modificare {token} in {typetoken} nei messaggi d'errore cambia qualcosa
+//Verificare se modificare {token} in {type(token)} nei messaggi d'errore cambia qualcosa
 //Considerare di cambiare ExpecteSymbol(InputStream, string) in ExpecteSymbol(InputStream, char)
 public class Scene
 {
@@ -27,7 +27,8 @@ public class Scene
         if (token is not KeywordToken keywordToken)
         {
             throw new GrammarError(token.Location, $"expected keyword instead of {token}");
-        } else if (!keywords.Contains(keywordToken.Keyword))
+        }
+        else if (!keywords.Contains(keywordToken.Keyword))
         {
             throw new GrammarError(token.Location,
                 $"expect one of the following keywords: {string.Join(',', keywords)} instead of {token}");
@@ -43,7 +44,7 @@ public class Scene
         if (token is LiteralNumberToken literalNumberToken) return literalNumberToken.Value;
         else if (token is IdentifierToken identifierToken)
         {
-            var variableName = identifierToken.Identifier;
+            string variableName = identifierToken.Identifier;
             if (!scene.Variables.ContainsKey(variableName))
                 throw new GrammarError(token.Location, $"unknow variable {token}");
             return scene.Variables[variableName];
@@ -66,7 +67,8 @@ public class Scene
     {
         var token = inputFile.ReadNextToken();
 
-        if (token is not IdentifierToken identifierToken) throw new GrammarError(token.Location, $"got {token} instead of an identifier");
+        if (token is not IdentifierToken identifierToken)
+            throw new GrammarError(token.Location, $"got {token} instead of an identifier");
 
         return identifierToken.Identifier;
     }
@@ -83,7 +85,7 @@ public class Scene
 
         return new Vector(x, y, z);
     }
-    
+
     public Color ParseColor(InputStream inputFile, Scene scene)
     {
         ExpectSymbol(inputFile, "<");
@@ -101,7 +103,7 @@ public class Scene
     {
         var keyword = ExpectKeywords(inputFile, [Keyword.Uniform, Keyword.Checkered, Keyword.Image]);
         Pigment result;
-        
+
         ExpectSymbol(inputFile, "(");
 
         switch (keyword)
@@ -125,11 +127,12 @@ public class Scene
                     var image = HDRImage.ReadPFM_File(imageFile);
                     result = new ImagePigment(image);
                 }
+
                 break;
-                default:
+            default:
                 throw new GrammarError("Keyword doesn't match any of the Pigments types");
         }
-        
+
         ExpectSymbol(inputFile, ")");
         return result;
     }
@@ -160,7 +163,7 @@ public class Scene
     public void ParseMaterial(InputStream inputFile, Scene scene, out string name, out Material material)
     {
         name = ExpectIdentifier(inputFile);
-        
+
         ExpectSymbol(inputFile, "(");
         var brdf = ParseBRDF(inputFile, scene);
         ExpectSymbol(inputFile, ",");
@@ -181,8 +184,8 @@ public class Scene
                 Keyword.Identity, Keyword.Translation, Keyword.RotationX, Keyword.RotationY, Keyword.RotationZ,
                 Keyword.Scaling
             ]);
-            
-            switch(transformKeyword)
+
+            switch (transformKeyword)
             {
                 case Keyword.Identity:
                     break;
@@ -219,7 +222,7 @@ public class Scene
                 default:
                     throw new GrammarError("Keyword doesn't match any of the Transformation types");
             }
-            
+
             var nextToken = inputFile.ReadNextToken();
             if (nextToken is not SymbolToken symbolToken || symbolToken.Symbol != "*")
             {
@@ -229,7 +232,6 @@ public class Scene
         }
 
         return result;
-        
     }
 
     public Sphere ParseSphere(InputStream inputFile, Scene scene)
@@ -239,7 +241,7 @@ public class Scene
         var material = ExpectIdentifier(inputFile);
         if (!scene.Materials.ContainsKey(material))
             throw new GrammarError(inputFile.Location, $"unknown material {material}");
-        
+
         ExpectSymbol(inputFile, ",");
         var transformation = ParseTransformation(inputFile, scene);
         ExpectSymbol(inputFile, ")");
@@ -254,7 +256,7 @@ public class Scene
         var material = ExpectIdentifier(inputFile);
         if (!scene.Materials.ContainsKey(material))
             throw new GrammarError(inputFile.Location, $"unknown material {material}");
-        
+
         ExpectSymbol(inputFile, ",");
         var transformation = ParseTransformation(inputFile, scene);
         ExpectSymbol(inputFile, ")");
@@ -309,7 +311,7 @@ public class Scene
                 var variableName = ExpectIdentifier(inputFile);
 
                 var variableLocation = inputFile.Location;
-                
+
                 ExpectSymbol(inputFile, "(");
                 var variableValue = ExpectNumber(inputFile, scene);
                 ExpectSymbol(inputFile, ")");
@@ -320,8 +322,8 @@ public class Scene
                 //Aggiungere controllo overridden variables anche qui
                 scene.Variables[variableName] = variableValue;
             }
-            else if (token is KeywordToken {Keyword: Keyword.Sphere}) scene.World.Add(ParseSphere(inputFile, scene));
-            else if (token is KeywordToken {Keyword: Keyword.Plane}) scene.World.Add(ParsePlane(inputFile, scene));
+            else if (token is KeywordToken { Keyword: Keyword.Sphere }) scene.World.Add(ParseSphere(inputFile, scene));
+            else if (token is KeywordToken { Keyword: Keyword.Plane }) scene.World.Add(ParsePlane(inputFile, scene));
             else if (token is KeywordToken { Keyword: Keyword.Camera })
             {
                 if (scene.Camera != null) throw new GrammarError(token.Location, "Cannot define more Cameras");

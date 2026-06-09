@@ -36,6 +36,13 @@ public abstract class Shape
     /// <returns></returns>
     public abstract bool _IsCloseTo(Shape s, float epsilon = 1e-5f);
 
+    /// <summary>
+    /// The out parameteres e1, e2, e3 are the new orthonormal basis, with e3 = normal
+    /// </summary>
+    /// <param name="normal"></param>
+    /// <param name="e1"></param>
+    /// <param name="e2"></param>
+    /// <param name="e3"></param>
     public static void CreateONB(Normal normal, out Vector e1, out Vector e2, out Vector e3)
     {
         int sign = normal.Z > 0.0f ? 1 : -1;
