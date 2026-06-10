@@ -202,7 +202,7 @@ public class InputStream
     {
         string floatString = firstChar.ToString();
         const string expChar = "eE";
-        const string signs = "+-";
+        const string signs = "+-"; //for exponents
         float value;
 
         while (true)

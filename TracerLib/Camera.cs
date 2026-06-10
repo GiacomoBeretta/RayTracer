@@ -89,7 +89,6 @@ public struct PerspectiveCamera : ICamera
     public float AspectRatio { get; set; }
     public Transformation Transformation { get; set; }
 
-
     /// <summary>
     /// Initialize a perspective <c>Camera</c> with unity distance, an aspect ratio of 1:1 and an identity <c>Transformation</c>
     /// </summary>
