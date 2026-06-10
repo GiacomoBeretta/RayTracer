@@ -92,7 +92,7 @@ public class RenderTest
             
             world.Add(new Sphere(new Transformation(), enclosureMaterial));
 
-            Renderer pathTracer = new PathTracingRenderer(world: world, pcg: pcg, numRay: 1, russianRouletteStop: 101, maxDepth: 100);
+            Renderer pathTracer = new PathTracingRenderer(world: world, pcg: pcg, numRay: 1, russianRouletteStartDepth: 101, maxDepth: 100);
 
             var ray = new Ray(new Point(0f, 0f, 0f), new Vector(1f, 0f, 0f));
             var color = pathTracer.RenderFunction(ray);
