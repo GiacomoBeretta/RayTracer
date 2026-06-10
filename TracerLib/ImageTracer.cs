@@ -37,7 +37,7 @@ public class ImageTracer
     /// <param name="uPixel"></param>
     /// <param name="vPixel"></param>
     /// <returns></returns>
-    public Ray FireRay(int column, int row, float uPixel = 0.5f, float vPixel = 0.5f)
+    public Ray FireRayAtPixel(int column, int row, float uPixel = 0.5f, float vPixel = 0.5f)
     {
         //the formulas for u and v are different because columns start from left like the u coordinate
         //while the rows start from the top, contrary to v that starts from the bottom
@@ -66,7 +66,7 @@ public class ImageTracer
                         {
                             float uPix = (pixCol + _pcg.RandomFloat()) / SamplePerSide;
                             float vPix = (pixRow + _pcg.RandomFloat()) / SamplePerSide;
-                            Ray ray = FireRay(col, row, uPix, vPix);
+                            Ray ray = FireRayAtPixel(col, row, uPix, vPix);
                             cumcolor += renderer(ray);
                         }
                     }
@@ -75,7 +75,7 @@ public class ImageTracer
                 }
                 else
                 {
-                    Ray ray = FireRay(col, row);
+                    Ray ray = FireRayAtPixel(col, row);
                     Color color = renderer(ray);
                     _image[col, row] = color;
                 }

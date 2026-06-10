@@ -2,9 +2,31 @@
 
 namespace TracerLib;
 
+/// <summary>
+/// Defines the common contract for a camera used to project a scene onto an image.
+/// The camera screen is parametrized as the unit square [0,1] × [0,1], with the origin in the top-left corner.
+/// The <see cref="AspectRatio"/> property can then be used to scale it to the desired proportions.
+/// </summary>
 public interface ICamera
 {
-    public float AspectRatio { get; set; }
+    /// <summary>
+    /// The ratio between the width and the height of the image.
+    /// </summary>
+    public float AspectRatio { get; }
+
+    /// <summary>
+    /// The transformation applied to the camera.
+    /// </summary>
+    public Transformation Transformation { get; set; }
+
+    /// <summary>
+    /// Generates a <see cref="Ray"/> for the specified screen's coordinates.
+    /// The coordinate origin is the top-left corner of the screen.
+    /// u,v are in [0,1].
+    /// </summary>
+    /// <param name="u">Horizontal screen coordinate (within [0,1]).</param>
+    /// <param name="v">Vertical screen coordinate (within [0,1]).</param>
+    /// <returns></returns>
     public Ray FireRay(float u, float v);
 }
 
@@ -16,39 +38,42 @@ public interface ICamera
 public struct OrthogonalCamera : ICamera
 {
     public float AspectRatio { get; set; }
-    public Transformation Transform { get; set; }
+
+    public Transformation Transformation { get; set; }
 
     /// <summary>
-    /// Initialize an <see cref="OrthogonalCamera"/> with unity aspect ratio and identity <c>Transformation</c>
+    /// Constructs an <see cref="OrthogonalCamera"/> with an aspect ratio of 1:1 and an identity <c>Transformation</c>
     /// </summary>
     public OrthogonalCamera()
     {
         AspectRatio = 1.0f;
-        Transform = new Transformation();
+        Transformation = new Transformation();
     }
 
     /// <summary>
-    /// Initialize an orthogonal <c>Camera</c> with specified aspect ratio and <c>Transformation</c>
+    /// Constructs an orthogonal <c>Camera</c> with specified aspect ratio and <c>Transformation</c>.
     /// </summary>
     /// <param name="transformation">Possible <c>Transformation</c>: Identity, Translation, Scaling and Rotation around a specified axis</param>
     /// <param name="aspectRatio">Ratio between image's width and height</param>
     public OrthogonalCamera(Transformation transformation, float aspectRatio = 1.0f)
     {
         AspectRatio = aspectRatio;
-        Transform = transformation;
+        Transformation = transformation;
     }
-
+   
     /// <summary>
-    /// Generate a <c>Ray</c> for the specified screen's coordinates
+    /// Generates a <see cref="Ray"/> for the specified screen's coordinates.
+    /// The coordinate origin is the top-left corner of the screen.
+    /// u,v are in [0,1].
     /// </summary>
-    /// <param name="u">Horizontal screen coordinate</param>
-    /// <param name="v">Vertical screen coordinate</param>
+    /// <param name="u">Horizontal screen coordinate (within [0,1]).</param>
+    /// <param name="v">Vertical screen coordinate (within [0,1]).</param>
     /// <returns></returns>
     public Ray FireRay(float u, float v)
     {
         var origin = new Point(-1f, (1f - 2f * u) * this.AspectRatio, 2f * v - 1f);
         var direction = new Vector(1, 0, 0);
-        return this.Transform * new Ray(origin, direction);
+        return this.Transformation * new Ray(origin, direction);
     }
 }
 
@@ -64,8 +89,9 @@ public struct PerspectiveCamera : ICamera
     public float AspectRatio { get; set; }
     public Transformation Transformation { get; set; }
 
+
     /// <summary>
-    /// Initialize a perspective <c>Camera</c> with unity distance, aspect ratio and identity <c>Transformation</c>
+    /// Initialize a perspective <c>Camera</c> with unity distance, an aspect ratio of 1:1 and an identity <c>Transformation</c>
     /// </summary>
     public PerspectiveCamera()
     {
