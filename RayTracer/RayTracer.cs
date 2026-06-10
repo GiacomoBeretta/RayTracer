@@ -1,10 +1,5 @@
 // This file is released under EUPL_v1.2 license. See LICENSE.md
 
-//aggiungere parametro per la probabilità della russian roulette
-//aggiungere parametro per il numero di raggi generati ad ogni ricorsione
-//aggiugnere parametro per il numero di riflessioni massimo
-//aggiungere parametro per il numero di riflessioni minimo da cui iniziare la roulette russa
-
 using System.ComponentModel;
 using SixLabors.ImageSharp.Processing;
 using TracerLib;
@@ -13,7 +8,7 @@ using System.ComponentModel.DataAnnotations;
 using SixLabors.ImageSharp.Metadata.Profiles.Exif; // per rendere le opzioni o gli argomenti required
 
 [Command(Name = "RayTracer")]
-[Subcommand(typeof(DemoCommand), typeof(PfmToPngCommand)/*, typeof(AverageImageCommand)*/)]
+[Subcommand(typeof(DemoCommand), typeof(PfmToPngCommand)/*, typeof(AverageImageCommand)*/, typeof(RenderCommand))]
 public class RayTracer
 {
     public static int Main(string[] args)
@@ -267,6 +262,7 @@ public class DemoCommand
 [Command(Name = "pfmtopng", Description = "Converts a PFM image to PNG")]
 public class PfmToPngCommand
 {
+    
     [Option("--input", Description = "The input file path")]
     [Required]
     public required string InputFilePath { get; init; }
@@ -294,6 +290,125 @@ public class PfmToPngCommand
         
         HDRImage image = HDRImage.ReadPFM_File(InputFilePath);
         image.WritePNG(OutputFilePath, LuminosityFunction, Factor, Gamma);
+    }
+}
+
+[Command(Name = "render", Description = "Read a scene file and creates the corresponding image")]
+public class RenderCommand
+{
+    [Option("--input", Description = "The input scene file path")]
+    [Required]
+    public required string InputScene { get; set; }
+    
+    [Option("--width", Description = "The width of the image")]
+    [Range(1, Int32.MaxValue)]
+    public int Width { get; init; } = 500;
+
+    [Option("--height", Description = "The height of the image")]
+    [Range(1, Int32.MaxValue)]
+    public int Height { get; init; } = 500;
+
+    [Option("--algorithm", Description = "Render's algorithm; pathTracer passed by default")]
+    public RenderFunc Algorithm { get; init; } = RenderFunc.PathTracer;
+
+    [Option("--output-pfm", Description = "Name of the pfm file output")]
+    public string OutputPfm { get; init; } = "output.pfm";
+
+    [Option("--output-png", Description = "Name of the png file output")]
+    public string OutputPng { get; init; } = "output.png";
+
+    [Option("--num-rays",
+        Description =
+            "Number of rays departing from each surface (this command only works for the Pathtracing algorithm)")]
+    public int NumRays { get; init; } = 10;
+
+    [Option("--max-depth",
+        Description = "Maximum allowed ray depth (this command only works for the Pathtracing algorithm)")]
+    public int MaxDepth { get; init; } = 3;
+
+    [Option("--init-state", Description = "Initial seed for the random number generator")]
+    [Range(0, ulong.MaxValue)]
+    public ulong InitState { get; init; } = 45;
+
+    [Option("--init-seq", Description = "Identifier of the sequence produced by the random number generator")]
+    [Range(0, ulong.MaxValue)]
+    public ulong InitSeq { get; init; } = 54;
+
+    [Option("--sample-side", Description = "Number of samples per pixel's side")]
+    [Range(1, Int32.MaxValue)]
+    public int SampleSide { get; init; } = 1;
+    
+    [Option("--luminosityFunction", Description = "Luminosity function, options are: shirley (default), weighted")]
+    public LumFunction LuminosityFunction { get; init; } = LumFunction.Shirley;
+    
+    [Option("--factor", Description = "The empirical factor to render images")]
+    public int Factor { get; init; } = 1;
+
+    [Option("--gamma", Description = "The gamma factor characteristic of the screen")]
+    public float Gamma { get; init; } = 1;
+
+    [Option("--declare-float|-d", Description = "Declare a variable. The syntax is --declare-float=NAME:VALUE")]
+    public string[] Definitions { get; init; } = [];
+
+    [Option("--roulette-start",
+        Description = "Number of ray reflections after which the Russian roulette algorithm is applied")]
+    [Range(0, Int32.MaxValue)]
+    public int RussianRouletteStartDepth { get; init; } = 3;
+
+    [Option("--roulette-prob", Description = "Optional fixed probability for the Russian roulette algorithm " +
+                                             "(when null, the probability is computed dynamically at each recursive call of RenderFunction)")]
+    [Range(0, 1)]
+    public float? RussianRouletteFixedProb { get; init; } = null;
+    
+    
+    
+    //Aggiungere opzioni per la roulette russa
+
+    public void OnExecute()
+    {
+        var scene = new Scene();
+        var input = new InputStream(InputScene);
+        var variables = Functions.VariableTable(Definitions);
+
+        try
+        {
+            scene.ParseScene(input, variables);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message); //Verificare che stampi anche la posizione dell'errore
+        }
+
+        var image = new HDRImage(Width, Height);
+        
+        Renderer render;
+        switch (Algorithm)
+        {
+            case RenderFunc.OnOff:
+                render = new OnOffRenderer(scene.World);
+                break;
+            case RenderFunc.Flat:
+                render = new FlatRenderer(scene.World);
+                break;
+            case RenderFunc.PathTracer:
+                render = new PathTracingRenderer(scene.World, new PCG(InitState, InitSeq), backgroundColor: null, NumRays, MaxDepth, RussianRouletteStartDepth, RussianRouletteFixedProb);
+                break;
+            default:
+                throw new ArgumentException("Invalid renderer mode, accepted onoff, flat or pathtracer");
+        }
+        
+        if(scene.Camera == null)
+        {
+            Console.WriteLine("Not initialized camera. Follows default initialization [perspective]");
+            scene.Camera = new PerspectiveCamera();
+        }
+        
+        var tracer = new ImageTracer(image, scene.Camera, samplePerSide: SampleSide);
+        tracer.FireAllRays(ray => render.RenderFunction(ray));
+        
+        HDRImage.WritePFM_File(image, OutputPfm);
+        image.WritePNG(OutputPng, LuminosityFunction, Factor, Gamma, averageLuminosity: 0.5f); 
+        
     }
 }
 

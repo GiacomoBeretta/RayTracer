@@ -483,7 +483,7 @@ public class HDRImage
     }
 
     //io la cambierei il nome in WritePFM e basta
-    public static void WritePFM_File(HDRImage img, double endian, Stream filestream)
+    public static void WritePFM_File(HDRImage img, Stream filestream, double endian = 1)
     {
         byte[] header = Encoding.ASCII.GetBytes($"PF\n{img.Width} {img.Height}\n{endian}\n");
         filestream.Write(header, 0, header.Length);
@@ -500,11 +500,11 @@ public class HDRImage
         }
     }
 
-    public static void WritePFM_File(HDRImage img, double endian, string filePath)
+    public static void WritePFM_File(HDRImage img, string filePath, double endian = 1)
     {
         using (Stream filestream = File.OpenWrite(filePath))
         {
-            WritePFM_File(img, endian, filestream);
+            WritePFM_File(img, filestream, endian);
         }
     }
 

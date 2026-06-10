@@ -59,4 +59,30 @@ public static class Functions
     {
         return deg * MathF.PI / 180f;
     }
+
+    public static Dictionary<string, float> VariableTable(string[] definitions)
+    {
+        var variables = new Dictionary<string, float>();
+
+        foreach (string declaration in definitions)
+        {
+            var parts = declaration.Split(':');
+
+            if (parts.Length != 2)
+            {
+                throw new ArgumentException($"The definition {declaration} doesn't follow the pattern NAME:VALUE");
+            }
+
+            var name = parts[0];
+
+            if (!float.TryParse(parts[1], out var result))
+            {
+                throw new ArgumentException($"Invalid floating point value {parts[1]}");
+            }
+
+            variables[name] = result;
+        }
+
+        return variables;
+    } 
 }
