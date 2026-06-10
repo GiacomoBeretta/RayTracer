@@ -1,5 +1,10 @@
 // This file is released under EUPL_v1.2 license. See LICENSE.md
 
+//aggiungere parametro per la probabilità della russian roulette
+//aggiungere parametro per il numero di raggi generati ad ogni ricorsione
+//aggiugnere parametro per il numero di riflessioni massimo
+//aggiungere parametro per il numero di riflessioni minimo da cui iniziare la roulette russa
+
 using System.ComponentModel;
 using SixLabors.ImageSharp.Processing;
 using TracerLib;
@@ -150,15 +155,15 @@ public class DemoCommand
 
        var world = new World(shapes);
        
-       Render render;
+       Renderer render;
 
        switch (Algorithm)
        {
            case RenderFunc.OnOff:
-               render = new OnOffRender(world);
+               render = new OnOffRenderer(world);
                break;
            case RenderFunc.Flat:
-               render = new FlatRender(world);
+               render = new FlatRenderer(world);
                break;
            //case RenderFunc.PathTracer:
                //render = new PathTracer(world);

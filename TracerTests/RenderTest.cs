@@ -26,7 +26,7 @@ public class RenderTest
         var world = new World();
         world.Add(sphere);
 
-        Render render = new OnOffRender(world);
+        Renderer render = new OnOffRenderer(world);
 
         tracer.FireAllRays(ray => render.RenderFunction(ray));
         
@@ -57,7 +57,7 @@ public class RenderTest
         var world = new World();
         world.Add(sphere);
 
-        Render render = new FlatRender(world);
+        Renderer render = new FlatRenderer(world);
 
         tracer.FireAllRays(ray => render.RenderFunction(ray));
         
@@ -92,7 +92,7 @@ public class RenderTest
             
             world.Add(new Sphere(new Transformation(), enclosureMaterial));
 
-            Render pathTracer = new PathTracer(pcg: pcg, numRay: 1, world: world, maxDepth: 100, russianRouletteStop: 101);
+            Renderer pathTracer = new PathTracingRenderer(world: world, pcg: pcg, numRay: 1, russianRouletteStop: 101, maxDepth: 100);
 
             var ray = new Ray(new Point(0f, 0f, 0f), new Vector(1f, 0f, 0f));
             var color = pathTracer.RenderFunction(ray);

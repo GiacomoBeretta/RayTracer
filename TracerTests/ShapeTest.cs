@@ -98,7 +98,7 @@ public class SphereTest
         HitRecord? hit = sphere.FindIntersection(ray);
         Assert.Equal(new Point(0, 0, 1), hit?.WorldPoint);
         Assert.Equal(new Normal(0, 0, 1), hit?.SurfaceNormal);
-        Assert.Equal(new Vector2D(0, 0), hit?.SurfacePoint);
+        Assert.Equal(new Vector2D(0, 0), hit?.SurfacePosition);
         Assert.Equal(ray, hit?.IncomingRay);
         Assert.Equal(1, hit?.T);
 
@@ -106,7 +106,7 @@ public class SphereTest
         hit = sphere.FindIntersection(ray);
         Assert.Equal(new Point(1, 0, 0), hit?.WorldPoint);
         Assert.Equal(new Normal(1, 0, 0), hit?.SurfaceNormal);
-        Assert.Equal(new Vector2D(0, 0.5f), hit?.SurfacePoint);
+        Assert.Equal(new Vector2D(0, 0.5f), hit?.SurfacePosition);
         Assert.Equal(ray, hit?.IncomingRay);
         Assert.Equal(2, hit?.T);
 
@@ -114,7 +114,7 @@ public class SphereTest
         hit = sphere.FindIntersection(ray);
         Assert.Equal(new Point(1, 0, 0), hit?.WorldPoint);
         Assert.Equal(new Normal(-1, 0, 0), hit?.SurfaceNormal);
-        Assert.Equal(new Vector2D(0, 0.5f), hit?.SurfacePoint);
+        Assert.Equal(new Vector2D(0, 0.5f), hit?.SurfacePosition);
         Assert.Equal(ray, hit?.IncomingRay);
         Assert.Equal(1, hit?.T);
 
@@ -135,7 +135,7 @@ public class SphereTest
         HitRecord? hit = sphere.FindIntersection(ray);
         Assert.Equal(new Point(10, 0, 1), hit?.WorldPoint);
         Assert.Equal(new Normal(0, 0, 1), hit?.SurfaceNormal);
-        Assert.Equal(new Vector2D(0, 0), hit?.SurfacePoint);
+        Assert.Equal(new Vector2D(0, 0), hit?.SurfacePosition);
         Assert.Equal(ray, hit?.IncomingRay);
         Assert.Equal(1, hit?.T);
 
@@ -143,7 +143,7 @@ public class SphereTest
         hit = sphere.FindIntersection(ray2);
         Assert.Equal(new Point(11, 0, 0), hit?.WorldPoint);
         Assert.Equal(new Normal(1, 0, 0), hit?.SurfaceNormal);
-        Assert.Equal(new Vector2D(0, 0.5f), hit?.SurfacePoint);
+        Assert.Equal(new Vector2D(0, 0.5f), hit?.SurfacePosition);
         Assert.Equal(ray2, hit?.IncomingRay);
         Assert.Equal(2, hit?.T);
 
