@@ -23,35 +23,35 @@ public class ImageTracerTest
     {
         //ImageTracerTest test = new ImageTracerTest();
 
-        Ray ray1 = tracer.FireRay(0, 1, 2.5f, 1.5f);
-        Ray ray2 = tracer.FireRay(2, 0, 0.5f, 0.5f);
+        Ray ray1 = tracer.FireRayAtPixel(0, 1, 2.5f, 1.5f);
+        Ray ray2 = tracer.FireRayAtPixel(2, 0, 0.5f, 0.5f);
         Assert.True(Ray._AreRaysClose(ray1, ray2));
 
-        ray1 = tracer.FireRay(0, 0, 0, 1);
-        ray2 = tracer.FireRay(0, 1, 0, 2);
+        ray1 = tracer.FireRayAtPixel(0, 0, 0, 1);
+        ray2 = tracer.FireRayAtPixel(0, 1, 0, 2);
         Assert.True(Ray._AreRaysClose(ray1, ray2));
 
-        ray1 = tracer.FireRay(3, 0, 1, 1);
-        ray2 = tracer.FireRay(0, 1, 4, 2);
+        ray1 = tracer.FireRayAtPixel(3, 0, 1, 1);
+        ray2 = tracer.FireRayAtPixel(0, 1, 4, 2);
         Assert.True(Ray._AreRaysClose(ray1, ray2));
     }
 
     [Fact]
     public void Test_uv_mapping()
     {
-        Ray ray = tracer.FireRay(0, 0, 0, 1);
+        Ray ray = tracer.FireRayAtPixel(0, 0, 0, 1);
         Point expectedPoint = new Point(0, camera.AspectRatio, 1); // top left of the screen
         Assert.True(Point._ArePointsClose(expectedPoint, ray.At(1)));
 
-        ray = tracer.FireRay(3, 0, 1, 1);
+        ray = tracer.FireRayAtPixel(3, 0, 1, 1);
         expectedPoint = new Point(0, -camera.AspectRatio, 1); // top right of the screen
         Assert.True(Point._ArePointsClose(expectedPoint, ray.At(1)));
 
-        ray = tracer.FireRay(0, 1, 0, 0);
+        ray = tracer.FireRayAtPixel(0, 1, 0, 0);
         expectedPoint = new Point(0, camera.AspectRatio, -1); // bottom left of the screen
         Assert.True(Point._ArePointsClose(expectedPoint, ray.At(1)));
 
-        ray = tracer.FireRay(3, 1, 1, 0);
+        ray = tracer.FireRayAtPixel(3, 1, 1, 0);
         expectedPoint = new Point(0, -camera.AspectRatio, -1); // bottom right of the screen
         Assert.True(Point._ArePointsClose(expectedPoint, ray.At(1)));
     }
