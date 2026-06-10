@@ -9,7 +9,6 @@ public class Scene
     public Dictionary<string, Material> Materials { get; set; } = new();
     public World World { get; set; } = new();
     public ICamera? Camera { get; set; } = null;
-
     public Dictionary<string, float> Variables { get; set; } = new();
     //Overridden variables???
 

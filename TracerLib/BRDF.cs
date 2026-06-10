@@ -4,7 +4,7 @@ namespace TracerLib;
 
 /// <summary>
 /// A class representing the Bidirectional Reflectance Distribution Function.
-/// That is the ratio between the radiance leavnig a surface and the irradiance recieved
+/// That is the ratio between the radiance leaving a surface and the irradiance received. So it's a dimensionless number.
 /// </summary>
 public abstract class BRDF
 {
@@ -13,8 +13,13 @@ public abstract class BRDF
 
     // forse questo si può togliere?
     //public abstract Color Eval(Normal normal, Vector Vin, Vector Vout, Vector2D uv);
-    protected BRDF() : this(new UniformPigment(new Color(0f, 0f, 0f)))
+    
+    /// <summary>
+    /// Constructs a BRDF with a uniform white color.
+    /// </summary>
+    protected BRDF()
     {
+        Pigment = new UniformPigment(new Color(1f, 1f, 1f));
     }
 
     protected BRDF(Pigment pigment)
@@ -37,25 +42,25 @@ public abstract class BRDF
 }
 
 /// <summary>
-/// <c>BRDF</c> in which all incoming radiation is distributed over the 2π hemisphere
+/// <c>BRDF</c> in which all incoming radiation is distributed uniformly over the 2π hemisphere.
 /// </summary>
 public class DiffuseBRDF : BRDF
 {
     private float _reflectance;
 
     /// <summary>
-    /// Initialize a <c>DiffuseBRDF</c> with a uniform black <c>Pigment</c> and unity reflectance
+    /// Constructs a <c>DiffuseBRDF</c> with a uniform white <c>Pigment</c> and unity reflectance.
     /// </summary>
-    public DiffuseBRDF()
+    public DiffuseBRDF() : base()
     {
         _reflectance = 1;
     }
 
     /// <summary>
-    /// Initialize a <c>DiffuseBRDF</c> with a specified <c>Pigment</c> and unity reflectance
+    /// Constructs a <c>DiffuseBRDF</c> with a specified <c>Pigment</c> and unity reflectance.
     /// </summary>
     /// <param name="pigment">
-    /// The pigment define the surface color
+    /// The pigment that defines the surface color.
     /// </param>
     public DiffuseBRDF(Pigment pigment) : base(pigment)
     {
@@ -63,13 +68,13 @@ public class DiffuseBRDF : BRDF
     }
 
     /// <summary>
-    /// Initialize a <c>DiffuseBRDF</c> with a specified <c>Pigment</c> and reflectance 
+    /// Constructs a <c>DiffuseBRDF</c> with a specified <c>Pigment</c> and reflectance.
     /// </summary>
     /// <param name="pigment">
-    /// The pigment define the surface color
+    /// The pigment that defines the surface color.
     /// </param>
     /// <param name="reflectance">
-    /// The reflectance coefficient of the surface
+    /// The reflectance coefficient of the surface.
     /// </param>
     public DiffuseBRDF(Pigment pigment, float reflectance) : base(pigment)
     {
@@ -118,7 +123,7 @@ public class DiffuseBRDF : BRDF
 }
 
 /// <summary>
-/// <c>BRDF</c> in which the incoming radiation is reflected along the direction given by the reflection law
+/// <c>BRDF</c> in which the incoming radiation is reflected along the direction given by the reflection law.
 /// </summary>
 public class SpecularBRDF : BRDF
 {
@@ -126,17 +131,16 @@ public class SpecularBRDF : BRDF
      {
          throw new NotImplementedException();
      }*/
-
-
+    
     /// <summary>
-    /// Initialize a <c>SpecularBRDF</c> with a uniform black <c>Pigment</c>
+    /// Constructs a <c>SpecularBRDF</c> with a uniform white <c>Pigment</c>
     /// </summary>
-    public SpecularBRDF()
+    public SpecularBRDF() : base()
     {
     }
 
     /// <summary>
-    /// Initialize a <c>SpecularBRDF</c> with a specified <c>Pigment</c>
+    /// Constructs a <c>SpecularBRDF</c> with a specified <c>Pigment</c>
     /// </summary>
     /// <param name="pigment"> The pigment defining the surface color </param>
     public SpecularBRDF(Pigment pigment) : base(pigment)
@@ -154,15 +158,16 @@ public class SpecularBRDF : BRDF
     /// <param name="normal"> Surface <c>Normal</c> used to orient the new ray.</param>
     /// <param name="depth"> Number of reflections of the new ray.</param>
     /// <returns> A new <c>Ray</c> originating from the interaction point and traveling in the sampled direction.</returns>
-    public override Ray ScatterRay(PCG pcg, Vector incindentVector, Point interactionPoint, Normal normal, int depth)
+    public override Ray ScatterRay(PCG pcg, Vector incidentVector, Point interactionPoint, Normal normal, int depth)
     {
-        Vector rayDir = new Vector(incindentVector.X, incindentVector.Y, incindentVector.Z);
-        //rayDir.Normalize(); //Tomasi non ho capito perché normalizza il vettore
+        //Tomasi non ho capito perché normalizza il vettore incidente
+        //Vector rayDir = new Vector(incindentVector.X, incindentVector.Y, incindentVector.Z);
+        //rayDir.Normalize();
         Vector normalVec = normal.ToVector();
 
         return new Ray(
             interactionPoint,
-            rayDir - normalVec * 2 * (normalVec * rayDir),
+            incidentVector - normalVec * 2 * (normalVec * incidentVector),
             1e-3f,
             float.PositiveInfinity,
             depth
