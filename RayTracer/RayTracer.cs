@@ -381,17 +381,17 @@ public class RenderCommand
 
         var image = new HDRImage(Width, Height);
         
-        Renderer render;
+        Renderer renderer;
         switch (Algorithm)
         {
             case RenderFunc.OnOff:
-                render = new OnOffRenderer(scene.World);
+                renderer = new OnOffRenderer(scene.World);
                 break;
             case RenderFunc.Flat:
-                render = new FlatRenderer(scene.World);
+                renderer = new FlatRenderer(scene.World);
                 break;
             case RenderFunc.PathTracer:
-                render = new PathTracingRenderer(scene.World, new PCG(InitState, InitSeq), backgroundColor: null, NumRays, MaxDepth, RussianRouletteStartDepth, RussianRouletteFixedProb);
+                renderer = new PathTracingRenderer(scene.World, new PCG(InitState, InitSeq), backgroundColor: null, NumRays, MaxDepth, RussianRouletteStartDepth, RussianRouletteFixedProb);
                 break;
             default:
                 throw new ArgumentException("Invalid renderer mode, accepted onoff, flat or pathtracer");
@@ -404,7 +404,7 @@ public class RenderCommand
         }
         
         var tracer = new ImageTracer(image, scene.Camera, samplePerSide: SampleSide);
-        tracer.FireAllRays(ray => render.RenderFunction(ray));
+        tracer.FireAllRays(ray => renderer.RenderFunction(ray));
         
         HDRImage.WritePFM_File(image, OutputPfm);
         image.WritePNG(OutputPng, LuminosityFunction, Factor, Gamma, averageLuminosity: 0.5f); 
