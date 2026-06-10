@@ -202,7 +202,8 @@ public class InputStream
     {
         string floatString = firstChar.ToString();
         const string expChar = "eE";
-        const string signs = "+-"; //for exponents
+        //const string signs = "+-"; //for exponents
+
         float value;
 
         while (true)
@@ -212,7 +213,7 @@ public class InputStream
             if (ch == null) break;
             
             if (!Char.IsDigit(ch.Value) && ch.Value != '.' &&
-                !expChar.Contains(ch.Value) && !signs.Contains(ch.Value))
+                !expChar.Contains(ch.Value) /*&& !signs.Contains(ch.Value)*/)
             {
                 UnreadChar(ch.Value);
                 break;
