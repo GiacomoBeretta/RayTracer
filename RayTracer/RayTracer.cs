@@ -82,8 +82,8 @@ public class DemoCommand
        float thetaRad = Functions.DegToRad(Theta);
        float phiRad = Functions.DegToRad(Phi);
        string currentPath = AppDomain.CurrentDomain.BaseDirectory;
-       string pngFilePath = Path.Combine(currentPath, "../../../../DemoImages/" + OutputFileName);
-       if (OutputFileName[^4..] != ".png") pngFilePath += ".png";
+       string pngFilePath = Path.Combine(currentPath, "../../../../DemoImages/" + OutputFileName); //"../../../../DemoImages/" dal path dell'eseguibile torna indietro (Controllare)
+       if (OutputFileName[^4..] != ".png") pngFilePath += ".png"; //OutputFilename[^4..] Legge gli ultimi 4 caratteri
        
        // Define materials
        var sphereTexture = new HDRImage(2, 2)
