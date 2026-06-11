@@ -21,7 +21,7 @@ public class SceneTest
             
             scene.ExpectSymbol(str, "(");
             scene.ExpectSymbol(str, ")");
-            Assert.Throws<GrammarError>(() => scene.ExpectSymbol(str, "Pizza"));
+            Assert.Throws<SceneSyntaxException>(() => scene.ExpectSymbol(str, "Pizza"));
             scene.ExpectSymbol(str, "[");
             scene.ExpectSymbol(str, "]");
             scene.ExpectSymbol(str, "<");
@@ -47,9 +47,9 @@ public class SceneTest
         {
             var str = new InputStream(filepath);
 
-            Assert.Throws<GrammarError>(() => scene.ExpectKeywords(str, keywords));
+            Assert.Throws<SceneSyntaxException>(() => scene.ExpectKeywords(str, keywords));
             Assert.Equal(Keyword.Scaling, scene.ExpectKeywords(str, keywords));
-            Assert.Throws<GrammarError>(() => scene.ExpectKeywords(str, keywords));
+            Assert.Throws<SceneSyntaxException>(() => scene.ExpectKeywords(str, keywords));
         }
         finally
         {
@@ -67,7 +67,7 @@ public class SceneTest
         try
         {
             var str = new InputStream(filepath);
-            Assert.Throws<GrammarError>(() => scene.ExpectNumber(str));
+            Assert.Throws<SceneSyntaxException>(() => scene.ExpectNumber(str));
             Assert.Equal(18f, scene.ExpectNumber(str));
             //Controllare perchè il segno + viene saltato
             Assert.Equal(15f, scene.ExpectNumber(str));
@@ -90,8 +90,8 @@ public class SceneTest
         {
             var str = new InputStream(filepath);
 
-            Assert.Throws<GrammarError>(() => scene.ExpectString(str));
-            Assert.Throws<GrammarError>(() => scene.ExpectString(str));
+            Assert.Throws<SceneSyntaxException>(() => scene.ExpectString(str));
+            Assert.Throws<SceneSyntaxException>(() => scene.ExpectString(str));
             Assert.Equal("pizza", scene.ExpectString(str));
         }
         finally
@@ -112,8 +112,8 @@ public class SceneTest
             var str = new InputStream(filepath);
             
             Assert.Equal("clock", scene.ExpectIdentifier(str));
-            Assert.Throws<GrammarError>(() => scene.ExpectIdentifier(str));
-            Assert.Throws<GrammarError>(() => scene.ExpectIdentifier(str));
+            Assert.Throws<SceneSyntaxException>(() => scene.ExpectIdentifier(str));
+            Assert.Throws<SceneSyntaxException>(() => scene.ExpectIdentifier(str));
         }
         finally
         {
@@ -282,7 +282,7 @@ public class SceneTest
             scene.ParseMaterial(str, out string name, out Material material);
             scene.Materials[name] = material;
 
-            var sphere = scene.ParseSphere(str);
+            var sphere = scene.ParseSphere(str, scene);
             var colorSphere = sphere.Material.Pigment.GetColor(new Vector2D(0.5f, 0.5f));
             var radianceSphere = sphere.Material.EmittedRadiance.GetColor(new Vector2D(0.5f, 0.5f));
             var transformSphere = sphere.Transform;
@@ -313,7 +313,7 @@ public class SceneTest
             scene.ParseMaterial(str, out string name, out var material);
             scene.Materials[name] = material;
 
-            var plane = scene.ParsePlane(str);
+            var plane = scene.ParsePlane(str, scene);
             var colorPlane1 = plane.Material.Pigment.GetColor(new Vector2D(0.1f, 0.1f));
             var colorPlane2 = plane.Material.Pigment.GetColor(new Vector2D(0.1f, 0.9f));
             var radiancePlane = plane.Material.EmittedRadiance.GetColor(new Vector2D(0.5f, 0.5f));
@@ -323,6 +323,7 @@ public class SceneTest
             Assert.True(Color._AreColorsClose(new Color(0.1f, 0.2f, 0.5f), colorPlane2));
             Assert.True(Color._AreColorsClose(new Color(0f, 0f, 0f), radiancePlane));
             Assert.True(Transformation.AreTransformationsClose(new Transformation(), transformPlane));
+            Assert.Single(scene.Materials);
         }
         finally
         {
@@ -341,7 +342,7 @@ public class SceneTest
         {
             var str = new InputStream(filepath);
 
-            var camera = (PerspectiveCamera)scene.ParseCamera(str);
+            var camera = (PerspectiveCamera)scene.ParseCamera(str,  scene);
             
             Assert.True(Transformation.AreTransformationsClose(new Transformation('z', Functions.DegToRad(30)) * new Transformation(new Vector(-4f, 0f, 1f)), camera.Transformation));
             Assert.True(Functions.AreClose(1.0f, camera.AspectRatio));

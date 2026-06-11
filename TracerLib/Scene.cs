@@ -6,7 +6,7 @@ namespace TracerLib;
 //Considerare di cambiare ExpecteSymbol(InputStream, string) in ExpecteSymbol(InputStream, char)
 public class Scene
 {
-    public Dictionary<string, Material> Materials { get; set; } = new();
+    public Dictionary<string, Material> Materials { get; set; } = new Dictionary<string, Material>();
     public World World { get; set; } = new();
     public ICamera? Camera { get; set; } = null;
     public Dictionary<string, float> Variables { get; set; } = new();
@@ -238,42 +238,44 @@ public class Scene
         return result;
     }
 
-    public Sphere ParseSphere(InputStream inputFile)
+    public Sphere ParseSphere(InputStream inputFile, Scene scene)
     {
         ExpectSymbol(inputFile, "(");
 
         string material = ExpectIdentifier(inputFile);
+        
         if (!Materials.ContainsKey(material))
             throw new SceneSyntaxException(inputFile.Location, $"unknown material {material}");
 
         ExpectSymbol(inputFile, ",");
-        Transformation transformation = ParseTransformation(inputFile);
+        Transformation transformation = scene.ParseTransformation(inputFile);
         ExpectSymbol(inputFile, ")");
 
         return new Sphere(transformation, Materials[material]);
     }
 
-    public Plane ParsePlane(InputStream inputFile)
+    public Plane ParsePlane(InputStream inputFile, Scene scene)
     {
         ExpectSymbol(inputFile, "(");
-
+        
         string material = ExpectIdentifier(inputFile);
+        
         if (!Materials.ContainsKey(material))
             throw new SceneSyntaxException(inputFile.Location, $"unknown material {material}");
 
         ExpectSymbol(inputFile, ",");
-        Transformation transformation = ParseTransformation(inputFile);
+        Transformation transformation = scene.ParseTransformation(inputFile);
         ExpectSymbol(inputFile, ")");
 
         return new Plane(transformation, Materials[material]);
     }
 
-    public ICamera ParseCamera(InputStream inputFile)
+    public ICamera ParseCamera(InputStream inputFile, Scene scene)
     {
         ExpectSymbol(inputFile, "(");
         Keyword cameraKeyword = ExpectKeywords(inputFile, [Keyword.Perspective, Keyword.Orthogonal]);
         ExpectSymbol(inputFile, ",");
-        Transformation transformation = ParseTransformation(inputFile);
+        Transformation transformation = scene.ParseTransformation(inputFile);
         ExpectSymbol(inputFile, ",");
         float aspectRatio = ExpectNumber(inputFile);
         ExpectSymbol(inputFile, ",");
@@ -326,17 +328,24 @@ public class Scene
                 //Aggiungere controllo overridden variables anche qui
                 scene.Variables[variableName] = variableValue;
             }
-            else if (token is KeywordToken { Keyword: Keyword.Sphere }) scene.World.Add(ParseSphere(inputFile));
-            else if (token is KeywordToken { Keyword: Keyword.Plane }) scene.World.Add(ParsePlane(inputFile));
+            else if (token is KeywordToken { Keyword: Keyword.Sphere })
+            {
+                var sphere = scene.ParseSphere(inputFile, scene);
+                scene.World.Add(sphere);
+            }
+            else if (token is KeywordToken { Keyword: Keyword.Plane })
+            {
+                scene.World.Add(scene.ParsePlane(inputFile, scene));
+            }
             else if (token is KeywordToken { Keyword: Keyword.Camera })
             {
                 if (scene.Camera != null) throw new SceneSyntaxException(token.Location, "Cannot define more Cameras");
-
-                scene.Camera = ParseCamera(inputFile);
+                
+                scene.Camera = scene.ParseCamera(inputFile, scene);
             }
             else if (token is KeywordToken { Keyword: Keyword.Material })
             {
-                ParseMaterial(inputFile, out string name, out Material material);
+                scene.ParseMaterial(inputFile, out string name, out Material material);
                 scene.Materials[name] = material;
             }
         }

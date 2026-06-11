@@ -490,7 +490,7 @@ public class HDRImage
 
         for (int i = img.Height - 1; i >= 0; i--)
         {
-            for (int j = 0; j <= img.Width; j++)
+            for (int j = 0; j < img.Width; j++)
             {
                 Color color = img[j, i];
                 _WriteFloat(filestream, color.R);

@@ -184,19 +184,19 @@ public class HDRImageTest
         string imgSize;
 
         imgSize = "1 3 8";
-        Assert.Throws<InvalidPfmFileFormat>(() => HDRImage._ParseImgSize(imgSize, out width, out height));
+        Assert.Throws<InvalidPfmFileFormatException>(() => HDRImage._ParseImgSize(imgSize, out width, out height));
 
         imgSize = "a  b";
-        Assert.Throws<InvalidPfmFileFormat>(() => HDRImage._ParseImgSize(imgSize, out width, out height));
+        Assert.Throws<InvalidPfmFileFormatException>(() => HDRImage._ParseImgSize(imgSize, out width, out height));
 
         imgSize = "-1 23";
-        Assert.Throws<InvalidPfmFileFormat>(() => HDRImage._ParseImgSize(imgSize, out width, out height));
+        Assert.Throws<InvalidPfmFileFormatException>(() => HDRImage._ParseImgSize(imgSize, out width, out height));
 
         imgSize = "5 -8";
-        Assert.Throws<InvalidPfmFileFormat>(() => HDRImage._ParseImgSize(imgSize, out width, out height));
+        Assert.Throws<InvalidPfmFileFormatException>(() => HDRImage._ParseImgSize(imgSize, out width, out height));
 
         imgSize = "-5 -8";
-        Assert.Throws<InvalidPfmFileFormat>(() => HDRImage._ParseImgSize(imgSize, out width, out height));
+        Assert.Throws<InvalidPfmFileFormatException>(() => HDRImage._ParseImgSize(imgSize, out width, out height));
 
         imgSize = "41 78";
         HDRImage._ParseImgSize(imgSize, out width, out height);
@@ -210,15 +210,15 @@ public class HDRImageTest
         string endianness;
 
         endianness = "1 .0";
-        Assert.Throws<InvalidPfmFileFormat>(() => HDRImage._ParseEndianness(endianness));
+        Assert.Throws<InvalidPfmFileFormatException>(() => HDRImage._ParseEndianness(endianness));
         endianness = "zws";
-        Assert.Throws<InvalidPfmFileFormat>(() => HDRImage._ParseEndianness(endianness));
+        Assert.Throws<InvalidPfmFileFormatException>(() => HDRImage._ParseEndianness(endianness));
         endianness = "2.0";
-        Assert.Throws<InvalidPfmFileFormat>(() => HDRImage._ParseEndianness(endianness));
+        Assert.Throws<InvalidPfmFileFormatException>(() => HDRImage._ParseEndianness(endianness));
         endianness = "0";
-        Assert.Throws<InvalidPfmFileFormat>(() => HDRImage._ParseEndianness(endianness));
+        Assert.Throws<InvalidPfmFileFormatException>(() => HDRImage._ParseEndianness(endianness));
         endianness = "-2.0";
-        Assert.Throws<InvalidPfmFileFormat>(() => HDRImage._ParseEndianness(endianness));
+        Assert.Throws<InvalidPfmFileFormatException>(() => HDRImage._ParseEndianness(endianness));
 
         endianness = "1.0";
         Assert.True(HDRImage._ParseEndianness(endianness));

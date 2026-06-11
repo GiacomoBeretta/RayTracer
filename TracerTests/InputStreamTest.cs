@@ -234,7 +234,7 @@ public class InputStreamTest
             Assert.Equal("Hello, World!", st1.String);
 
             var stream2 = new InputStream(filePath2);
-            Assert.Throws<GrammarError>(() => stream2._ParseStringToken(stream2.Location));
+            Assert.Throws<SceneSyntaxException>(() => stream2._ParseStringToken(stream2.Location));
         }
         finally
         {
@@ -309,23 +309,23 @@ public class InputStreamTest
         {
             var stream2 = new InputStream(filePath2);
             char? ch = stream2.ReadChar();
-            Assert.Throws<GrammarError>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
+            Assert.Throws<SceneSyntaxException>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
 
             stream2.SkipLine();
             ch = stream2.ReadChar();
-            Assert.Throws<GrammarError>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
+            Assert.Throws<SceneSyntaxException>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
 
             stream2.SkipLine();
             ch = stream2.ReadChar();
-            Assert.Throws<GrammarError>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
+            Assert.Throws<SceneSyntaxException>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
 
             stream2.SkipLine();
             ch = stream2.ReadChar();
-            Assert.Throws<GrammarError>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
+            Assert.Throws<SceneSyntaxException>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
 
             stream2.SkipLine();
             ch = stream2.ReadChar();
-            Assert.Throws<GrammarError>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
+            Assert.Throws<SceneSyntaxException>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
         }
         finally
         {
