@@ -32,12 +32,12 @@ public class ImageTracer
     /// </summary>
     public int PixelSideSubdivisions { get; set; }
     
-    public ImageTracer(HDRImage image, ICamera camera, PCG? pcg = null, int samplePerSide=0)
+    public ImageTracer(HDRImage image, ICamera camera, PCG? pcg = null, int pixelSideSubdivisions=0)
     {
         this._image = image;
         this._camera = camera;
         _pcg = pcg ?? new PCG();
-        PixelSideSubdivisions = samplePerSide;
+        PixelSideSubdivisions = pixelSideSubdivisions;
     }
     
     // (formule diverse da Tomasi)

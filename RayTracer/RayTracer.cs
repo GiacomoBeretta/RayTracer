@@ -120,7 +120,7 @@ public class DemoCommand
        }
 
        var image = new HDRImage(Width, Height);
-       var tracer = new ImageTracer(image, camera, samplePerSide: 4);
+       var tracer = new ImageTracer(image, camera, pixelSideSubdivisions: 4);
 
        //PER LE FORME APPLICARE LA TRASLAZIONE PER ULTIMA (PRIMA NELLA CONCATENAZIONE)
        var s1 = new Sphere(new Transformation(new Vector(0.5f, 0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f), material1);
@@ -406,7 +406,7 @@ public class RenderCommand
             scene.Camera = new PerspectiveCamera();
         }
         
-        var tracer = new ImageTracer(image, scene.Camera, samplePerSide: SampleSide);
+        var tracer = new ImageTracer(image, scene.Camera, pixelSideSubdivisions: SampleSide);
         tracer.FireAllRays(ray => renderer.RenderFunction(ray));
         
         HDRImage.WritePFM_File(image, pfmFilePath);
