@@ -27,12 +27,12 @@ public class HDRImageTest
     public void TestCheckCoordinates()
     {
         HDRImage image1 = new HDRImage(6, 11);
-        image1._CheckCoordinates(0, 0);
-        image1._CheckCoordinates(5, 10);
-        Assert.Throws<ArgumentOutOfRangeException>(() => image1._CheckCoordinates(-1, 0));
-        Assert.Throws<ArgumentOutOfRangeException>(() => image1._CheckCoordinates(0, -1));
-        Assert.Throws<ArgumentOutOfRangeException>(() => image1._CheckCoordinates(6, 2));
-        Assert.Throws<ArgumentOutOfRangeException>(() => image1._CheckCoordinates(4, 11));
+        image1._ValidateCoordinates(0, 0);
+        image1._ValidateCoordinates(5, 10);
+        Assert.Throws<ArgumentOutOfRangeException>(() => image1._ValidateCoordinates(-1, 0));
+        Assert.Throws<ArgumentOutOfRangeException>(() => image1._ValidateCoordinates(0, -1));
+        Assert.Throws<ArgumentOutOfRangeException>(() => image1._ValidateCoordinates(6, 2));
+        Assert.Throws<ArgumentOutOfRangeException>(() => image1._ValidateCoordinates(4, 11));
     }
 
     [Fact]
@@ -184,19 +184,19 @@ public class HDRImageTest
         string imgSize;
 
         imgSize = "1 3 8";
-        Assert.Throws<InvalidPfmFileFormat>(() => HDRImage._ParseImgSize(imgSize, out width, out height));
+        Assert.Throws<InvalidPfmFileFormatException>(() => HDRImage._ParseImgSize(imgSize, out width, out height));
 
         imgSize = "a  b";
-        Assert.Throws<InvalidPfmFileFormat>(() => HDRImage._ParseImgSize(imgSize, out width, out height));
+        Assert.Throws<InvalidPfmFileFormatException>(() => HDRImage._ParseImgSize(imgSize, out width, out height));
 
         imgSize = "-1 23";
-        Assert.Throws<InvalidPfmFileFormat>(() => HDRImage._ParseImgSize(imgSize, out width, out height));
+        Assert.Throws<InvalidPfmFileFormatException>(() => HDRImage._ParseImgSize(imgSize, out width, out height));
 
         imgSize = "5 -8";
-        Assert.Throws<InvalidPfmFileFormat>(() => HDRImage._ParseImgSize(imgSize, out width, out height));
+        Assert.Throws<InvalidPfmFileFormatException>(() => HDRImage._ParseImgSize(imgSize, out width, out height));
 
         imgSize = "-5 -8";
-        Assert.Throws<InvalidPfmFileFormat>(() => HDRImage._ParseImgSize(imgSize, out width, out height));
+        Assert.Throws<InvalidPfmFileFormatException>(() => HDRImage._ParseImgSize(imgSize, out width, out height));
 
         imgSize = "41 78";
         HDRImage._ParseImgSize(imgSize, out width, out height);
@@ -210,20 +210,20 @@ public class HDRImageTest
         string endianness;
 
         endianness = "1 .0";
-        Assert.Throws<InvalidPfmFileFormat>(() => HDRImage._ParseEndianness(endianness));
+        Assert.Throws<InvalidPfmFileFormatException>(() => HDRImage._ParseEndianness(endianness));
         endianness = "zws";
-        Assert.Throws<InvalidPfmFileFormat>(() => HDRImage._ParseEndianness(endianness));
+        Assert.Throws<InvalidPfmFileFormatException>(() => HDRImage._ParseEndianness(endianness));
         endianness = "2.0";
-        Assert.Throws<InvalidPfmFileFormat>(() => HDRImage._ParseEndianness(endianness));
+        Assert.Throws<InvalidPfmFileFormatException>(() => HDRImage._ParseEndianness(endianness));
         endianness = "0";
-        Assert.Throws<InvalidPfmFileFormat>(() => HDRImage._ParseEndianness(endianness));
+        Assert.Throws<InvalidPfmFileFormatException>(() => HDRImage._ParseEndianness(endianness));
         endianness = "-2.0";
-        Assert.Throws<InvalidPfmFileFormat>(() => HDRImage._ParseEndianness(endianness));
+        Assert.Throws<InvalidPfmFileFormatException>(() => HDRImage._ParseEndianness(endianness));
 
         endianness = "1.0";
-        Assert.True(HDRImage._ParseEndianness(endianness));
+        Assert.Equal(Endianness.Big, HDRImage._ParseEndianness(endianness));
         endianness = "-1.0";
-        Assert.False(HDRImage._ParseEndianness(endianness));
+        Assert.Equal(Endianness.Little, HDRImage._ParseEndianness(endianness));
     }
 
     //test read float

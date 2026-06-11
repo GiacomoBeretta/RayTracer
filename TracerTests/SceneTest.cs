@@ -21,7 +21,7 @@ public class SceneTest
             
             scene.ExpectSymbol(str, "(");
             scene.ExpectSymbol(str, ")");
-            Assert.Throws<GrammarError>(() => scene.ExpectSymbol(str, "Pizza"));
+            Assert.Throws<SceneSyntaxException>(() => scene.ExpectSymbol(str, "Pizza"));
             scene.ExpectSymbol(str, "[");
             scene.ExpectSymbol(str, "]");
             scene.ExpectSymbol(str, "<");
@@ -47,9 +47,9 @@ public class SceneTest
         {
             var str = new InputStream(filepath);
 
-            Assert.Throws<GrammarError>(() => scene.ExpectKeywords(str, keywords));
+            Assert.Throws<SceneSyntaxException>(() => scene.ExpectKeywords(str, keywords));
             Assert.Equal(Keyword.Scaling, scene.ExpectKeywords(str, keywords));
-            Assert.Throws<GrammarError>(() => scene.ExpectKeywords(str, keywords));
+            Assert.Throws<SceneSyntaxException>(() => scene.ExpectKeywords(str, keywords));
         }
         finally
         {
@@ -67,7 +67,7 @@ public class SceneTest
         try
         {
             var str = new InputStream(filepath);
-            Assert.Throws<GrammarError>(() => scene.ExpectNumber(str));
+            Assert.Throws<SceneSyntaxException>(() => scene.ExpectNumber(str));
             Assert.Equal(18f, scene.ExpectNumber(str));
             //Controllare perchè il segno + viene saltato
             Assert.Equal(15f, scene.ExpectNumber(str));
@@ -90,8 +90,8 @@ public class SceneTest
         {
             var str = new InputStream(filepath);
 
-            Assert.Throws<GrammarError>(() => scene.ExpectString(str));
-            Assert.Throws<GrammarError>(() => scene.ExpectString(str));
+            Assert.Throws<SceneSyntaxException>(() => scene.ExpectString(str));
+            Assert.Throws<SceneSyntaxException>(() => scene.ExpectString(str));
             Assert.Equal("pizza", scene.ExpectString(str));
         }
         finally
@@ -112,8 +112,8 @@ public class SceneTest
             var str = new InputStream(filepath);
             
             Assert.Equal("clock", scene.ExpectIdentifier(str));
-            Assert.Throws<GrammarError>(() => scene.ExpectIdentifier(str));
-            Assert.Throws<GrammarError>(() => scene.ExpectIdentifier(str));
+            Assert.Throws<SceneSyntaxException>(() => scene.ExpectIdentifier(str));
+            Assert.Throws<SceneSyntaxException>(() => scene.ExpectIdentifier(str));
         }
         finally
         {
