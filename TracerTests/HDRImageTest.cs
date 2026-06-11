@@ -18,7 +18,7 @@ public class HDRImageTest
         Assert.False(image1._AreCoordinatesValid(-1, 2));
         Assert.False(image1._AreCoordinatesValid(2, -1));
 
-        var image2 = new HDRImage(100, 100);
+        HDRImage image2 = new HDRImage(100, 100);
         Assert.True(image2._AreCoordinatesValid(53, 68));
         Assert.False(image2._AreCoordinatesValid(200, 39));
     }
@@ -103,7 +103,7 @@ public class HDRImageTest
         Assert.Equal(10, image1._PixelOffset(0, 2));
         Assert.Equal(29, image1._PixelOffset(4, 5));
 
-        var image2 = new HDRImage(100, 100);
+        HDRImage image2 = new HDRImage(100, 100);
         Assert.Equal(203, image2._PixelOffset(3, 2));
     }
 
@@ -290,7 +290,7 @@ public class HDRImageTest
     public void TestReadPFM_File()  //Rivedi
     {
         /*
-        var LE_REFERENCE_BYTES = new byte[]
+        byte[] LE_REFERENCE_BYTES = new byte[]
         { 
             0x50, 0x46, 0x0a, 0x33, 0x20, 0x32, 0x0a, 0x2d, 0x31, 0x2e, 0x30, 0x0a,
             0x00, 0x00, 0xc8, 0x42, 0x00, 0x00, 0x48, 0x43, 0x00, 0x00, 0x96, 0x43,
@@ -301,7 +301,7 @@ public class HDRImageTest
             0x00, 0x00, 0x8c, 0x42, 0x00, 0x00, 0xa0, 0x42, 0x00, 0x00, 0xb4, 0x42
         };
 
-        var BE_REFERENCE_BYTES = new byte[]
+        byte[] BE_REFERENCE_BYTES = new byte[]
         {
             0x50, 0x46, 0x0a, 0x33, 0x20, 0x32, 0x0a, 0x31, 0x2e, 0x30, 0x0a, 0x42,
             0xc8, 0x00, 0x00, 0x43, 0x48, 0x00, 0x00, 0x43, 0x96, 0x00, 0x00, 0x43,
@@ -336,7 +336,7 @@ public class HDRImageTest
 
         using (Stream reference_bytes = new MemoryStream(LE_REFERENCE_BYTES))
         {
-            var img = new HDRImage(reference_bytes);
+            HDRImage img = new HDRImage(reference_bytes);
             
             Assert.Equal(2, img.Height);
             Assert.Equal(3, img.Width); 
@@ -351,7 +351,7 @@ public class HDRImageTest
         
         using (Stream reference_bytes = new MemoryStream(BE_REFERENCE_BYTES))
         {
-            var img = new HDRImage(reference_bytes);
+            HDRImage img = new HDRImage(reference_bytes);
                     
             Assert.Equal(2, img.Height);
             Assert.Equal(3, img.Width); 
@@ -369,7 +369,7 @@ public class HDRImageTest
     [Fact]
     public void TestClampImage()
     {
-        var img = new HDRImage(2, 1)
+        HDRImage img = new HDRImage(2, 1)
         {
             [0, 0] = new Color(0.5f, 1.0f, 1.5f),
             [1, 0] = new Color(50.0f, 100.0f, 150.0f)
@@ -377,7 +377,7 @@ public class HDRImageTest
 
         img._ClampImage();
 
-        foreach (var pixel in img.Pixels)
+        foreach (Color pixel in img.Pixels)
         {
             Assert.True(pixel.R is >= 0 and <= 1);
             Assert.True(pixel.G is >= 0 and <= 1);

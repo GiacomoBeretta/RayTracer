@@ -229,11 +229,11 @@ public class InputStreamTest
 
         try
         {
-            var stream1 = new InputStream(filePath1);
+            InputStream stream1 = new InputStream(filePath1);
             StringToken st1 = stream1._ParseStringToken(stream1.Location);
             Assert.Equal("Hello, World!", st1.String);
 
-            var stream2 = new InputStream(filePath2);
+            InputStream stream2 = new InputStream(filePath2);
             Assert.Throws<SceneSyntaxException>(() => stream2._ParseStringToken(stream2.Location));
         }
         finally
@@ -257,7 +257,7 @@ public class InputStreamTest
         File.WriteAllText(filePath1, content);
         try
         {
-            var stream1 = new InputStream(filePath1);
+            InputStream stream1 = new InputStream(filePath1);
 
             char? ch = stream1.ReadChar();
             LiteralNumberToken floatToken = stream1._ParseFloatToken(ch.Value, stream1.Location);
@@ -307,7 +307,7 @@ public class InputStreamTest
         File.WriteAllText(filePath2, fail);
         try
         {
-            var stream2 = new InputStream(filePath2);
+            InputStream stream2 = new InputStream(filePath2);
             char? ch = stream2.ReadChar();
             Assert.Throws<SceneSyntaxException>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
 
@@ -360,7 +360,7 @@ public class InputStreamTest
         File.WriteAllText(filePath1, content1);
         try
         {
-            var str = new InputStream(filePath1);
+            InputStream str = new InputStream(filePath1);
 
             char? ch = str.ReadChar();
             KeywordToken keywordToken = (KeywordToken)str._ParseKeywordIdentifierToken(ch.Value, str.Location);
@@ -477,7 +477,7 @@ public class InputStreamTest
         File.WriteAllText(filePath2, content2);
         try
         {
-            var str = new InputStream(filePath2);
+            InputStream str = new InputStream(filePath2);
             char? ch = str.ReadChar();
             IdentifierToken identifierToken =
                 (IdentifierToken)str._ParseKeywordIdentifierToken(ch.Value, str.Location);
@@ -584,7 +584,7 @@ public class InputStreamTest
 
         try
         {
-            var stream = new InputStream(filePath);
+            InputStream stream = new InputStream(filePath);
             KeywordToken keywordToken;
             IdentifierToken identifierToken;
             StringToken stringToken;
@@ -982,7 +982,7 @@ public class InputStreamTest
 
         try
         {
-            var stream = new InputStream(filePath);
+            InputStream stream = new InputStream(filePath);
 
             Assert.Equal(0, stream.Location.column);
             Assert.Equal(0, stream.Location.line);

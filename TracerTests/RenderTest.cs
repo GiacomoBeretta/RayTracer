@@ -15,15 +15,15 @@ public class RenderTest
     [Fact]
     public void OnOffTest()
     {
-        var sphere = new Sphere(new Transformation(new Vector(2.0f, 0f, 0f)) * new Transformation(0.2f, 0.2f, 0.2f), new Material(new UniformPigment(new Color(1.0f, 1.0f, 1.0f)), new DiffuseBRDF()));
+        Sphere sphere = new Sphere(new Transformation(new Vector(2.0f, 0f, 0f)) * new Transformation(0.2f, 0.2f, 0.2f), new Material(new UniformPigment(new Color(1.0f, 1.0f, 1.0f)), new DiffuseBRDF()));
 
-        var image = new HDRImage(3, 3);
+        HDRImage image = new HDRImage(3, 3);
 
         ICamera camera = new OrthogonalCamera(); 
 
-        var tracer = new ImageTracer(image, camera);
+        ImageTracer tracer = new ImageTracer(image, camera);
 
-        var world = new World();
+        World world = new World();
         world.Add(sphere);
 
         Renderer render = new OnOffRenderer(world);
@@ -44,17 +44,17 @@ public class RenderTest
     [Fact] 
     public void FlatTest()
     {
-        var sphereColor = new Color(1.0f, 2.0f, 3.0f);
+        Color sphereColor = new Color(1.0f, 2.0f, 3.0f);
         
-        var sphere = new Sphere(new Transformation(new Vector(2.0f, 0f, 0f)) * new Transformation(0.2f, 0.2f, 0.2f), new Material(new UniformPigment(sphereColor), new DiffuseBRDF()));
+        Sphere sphere = new Sphere(new Transformation(new Vector(2.0f, 0f, 0f)) * new Transformation(0.2f, 0.2f, 0.2f), new Material(new UniformPigment(sphereColor), new DiffuseBRDF()));
 
-        var image = new HDRImage(3, 3);
+        HDRImage image = new HDRImage(3, 3);
 
         ICamera camera = new OrthogonalCamera(); 
 
-        var tracer = new ImageTracer(image, camera);
+        ImageTracer tracer = new ImageTracer(image, camera);
 
-        var world = new World();
+        World world = new World();
         world.Add(sphere);
 
         Renderer render = new FlatRenderer(world);
@@ -78,26 +78,26 @@ public class RenderTest
     [Fact]
     public void PathTracingTest()
     {
-        var pcg = new PCG();
+        PCG pcg = new PCG();
 
-        for (var i = 0; i < 5; i++)
+        for (int i = 0; i < 5; i++)
         {
-            var emittedRadiance = pcg.RandomFloat();
-            var reflectance = pcg.RandomFloat() * 0.9f;
+            float emittedRadiance = pcg.RandomFloat();
+            float reflectance = pcg.RandomFloat() * 0.9f;
 
-            var world = new World();
+            World world = new World();
 
-            var enclosureMaterial = new Material(new UniformPigment(new Color(1.0f, 1.0f, 1.0f) * emittedRadiance),
+            Material enclosureMaterial = new Material(new UniformPigment(new Color(1.0f, 1.0f, 1.0f) * emittedRadiance),
                 new DiffuseBRDF(new UniformPigment(new Color(1.0f, 1.0f, 1.0f) * reflectance)));
             
             world.Add(new Sphere(new Transformation(), enclosureMaterial));
 
             Renderer pathTracer = new PathTracingRenderer(world: world, pcg: pcg, numRay: 1, russianRouletteStartDepth: 101, maxDepth: 100);
 
-            var ray = new Ray(new Point(0f, 0f, 0f), new Vector(1f, 0f, 0f));
-            var color = pathTracer.RenderFunction(ray);
+            Ray ray = new Ray(new Point(0f, 0f, 0f), new Vector(1f, 0f, 0f));
+            Color color = pathTracer.RenderFunction(ray);
 
-            var expected = emittedRadiance / (1.0f - reflectance);
+            float expected = emittedRadiance / (1.0f - reflectance);
             
             Assert.True(Functions.AreClose(expected, color.R, 1e-3f));
             Assert.True(Functions.AreClose(expected, color.G, 1e-3f));
