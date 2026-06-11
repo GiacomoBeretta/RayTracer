@@ -172,7 +172,7 @@ public class SceneTest
             InputStream str = new InputStream(filepath);
 
             Pigment uniform = scene.ParsePigment(str);
-            Pigment checkered = (CheckeredPigment)scene.ParsePigment(str);
+            CheckeredPigment checkered = (CheckeredPigment)scene.ParsePigment(str);
 
             Color uColor = uniform.GetColor(new Vector2D(0.5f, 0.5f));
             Color cColor1 = checkered.GetColor(new Vector2D(0.1f, 0.1f));
