@@ -15,11 +15,11 @@ public abstract class BRDF
     //public abstract Color Eval(Normal normal, Vector Vin, Vector Vout, Vector2D uv);
     
     /// <summary>
-    /// Constructs a BRDF with a uniform white color.
+    /// Constructs a BRDF with a uniform black color.
     /// </summary>
     protected BRDF()
     {
-        Pigment = new UniformPigment(new Color(1f, 1f, 1f));
+        Pigment = new UniformPigment(new Color(0f, 0f, 0f));
     }
 
     protected BRDF(Pigment pigment)
@@ -49,7 +49,7 @@ public class DiffuseBRDF : BRDF
     private float _reflectance;
 
     /// <summary>
-    /// Constructs a <c>DiffuseBRDF</c> with a uniform white <c>Pigment</c> and unity reflectance.
+    /// Constructs a <c>DiffuseBRDF</c> with a uniform black <c>Pigment</c> and unity reflectance.
     /// </summary>
     public DiffuseBRDF() : base()
     {
@@ -133,7 +133,7 @@ public class SpecularBRDF : BRDF
      }*/
     
     /// <summary>
-    /// Constructs a <c>SpecularBRDF</c> with a uniform white <c>Pigment</c>
+    /// Constructs a <c>SpecularBRDF</c> with a uniform black <c>Pigment</c>
     /// </summary>
     public SpecularBRDF() : base()
     {
