@@ -232,7 +232,7 @@ public class InputStreamTest
             InputStream stream1 = new InputStream(filePath1);
             StringToken st1 = stream1._ParseStringToken(stream1.Location);
             Assert.Equal("Hello, World!", st1.String);
-
+            
             InputStream stream2 = new InputStream(filePath2);
             Assert.Throws<SceneSyntaxException>(() => stream2._ParseStringToken(stream2.Location));
         }

@@ -297,76 +297,93 @@ public class PfmToPngCommand
 public class RenderCommand
 {
     [Option("--input", Description = "The input scene file path")]
-    public string InputScene { get; init; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../../Scenes/scene.txt");
+    public string InputScene { get; set; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../../Scenes/scene.txt");
     
     [Option("--width", Description = "The width of the image")]
     [Range(1, Int32.MaxValue)]
-    public int Width { get; init; } = 500;
+    public int Width { get; set; } = 500;
 
     [Option("--height", Description = "The height of the image")]
     [Range(1, Int32.MaxValue)]
-    public int Height { get; init; } = 500;
+    public int Height { get; set; } = 500;
 
     [Option("--algorithm", Description = "Render's algorithm; pathTracer passed by default")]
-    public RenderFunc Algorithm { get; init; } = RenderFunc.PathTracer;
+    public RenderFunc Algorithm { get; set; } = RenderFunc.PathTracer;
 
-    [Option("--output-pfm", Description = "Name of the pfm file output")]
-    public string OutputPfm { get; init; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../../PfmImages/output.pfm");
+    [Option("--outputpfm", Description = "Name of the pfm file output")]
+    public string OutputPfm { get; set; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../../PfmImages/output.pfm");
 
-    [Option("--output-png", Description = "Name of the png file output")]
-    public string OutputPng { get; init; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../../PngImages/output.png");
+    [Option("--outputpng", Description = "Name of the png file output")]
+    public string OutputPng { get; set; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../../PngImages/output.png");
 
-    [Option("--num-rays",
+    [Option("--numrays",
         Description =
             "Number of rays departing from each surface (this command only works for the Pathtracing algorithm)")]
-    public int NumRays { get; init; } = 10;
+    public int NumRays { get; set; } = 10;
 
-    [Option("--max-depth",
+    [Option("--maxdepth",
         Description = "Maximum allowed ray depth (this command only works for the Pathtracing algorithm)")]
-    public int MaxDepth { get; init; } = 3;
+    public int MaxDepth { get; set; } = 3;
 
-    [Option("--init-state", Description = "Initial seed for the random number generator")]
+    [Option("--initstate", Description = "Initial seed for the random number generator")]
     [Range(0, ulong.MaxValue)]
-    public ulong InitState { get; init; } = 45;
+    public ulong InitState { get; set; } = 45;
 
-    [Option("--init-seq", Description = "Identifier of the sequence produced by the random number generator")]
+    [Option("--initseq", Description = "Identifier of the sequence produced by the random number generator")]
     [Range(0, ulong.MaxValue)]
-    public ulong InitSeq { get; init; } = 54;
+    public ulong InitSeq { get; set; } = 54;
 
-    [Option("--sample-side", Description = "Number of samples per pixel's side")]
+    [Option("--sampleside", Description = "Number of samples per pixel's side")]
     [Range(1, Int32.MaxValue)]
-    public int SampleSide { get; init; } = 1;
+    public int SampleSide { get; set; } = 1;
     
     [Option("--luminosityFunction", Description = "Luminosity function, options are: shirley (default), weighted")]
-    public LumFunction LuminosityFunction { get; init; } = LumFunction.Shirley;
+    public LumFunction LuminosityFunction { get; set; } = LumFunction.Shirley;
     
     [Option("--factor", Description = "The empirical factor to render images")]
-    public int Factor { get; init; } = 1;
+    public int Factor { get; set; } = 1;
 
     [Option("--gamma", Description = "The gamma factor characteristic of the screen")]
-    public float Gamma { get; init; } = 1;
+    public float Gamma { get; set; } = 1;
 
-    [Option("--declare-float|-d", Description = "Declare a variable. The syntax is --declare-float=NAME:VALUE")]
-    public string[] Definitions { get; init; } = [];
+    [Option("--declarefloat|-d", Description = "Declare a variable. The syntax is --declare-float=NAME:VALUE")]
+    public string[] Definitions { get; set; } = [];
 
-    [Option("--roulette-start",
+    [Option("--roulettestart",
         Description = "Number of ray reflections after which the Russian roulette algorithm is applied")]
     [Range(0, Int32.MaxValue)]
-    public int RussianRouletteStartDepth { get; init; } = 3;
+    public int RussianRouletteStartDepth { get; set; } = 3;
 
-    [Option("--roulette-prob", Description = "Optional fixed probability for the Russian roulette algorithm " +
+    [Option("--rouletteprob", Description = "Optional fixed probability for the Russian roulette algorithm " +
                                              "(when null, the probability is computed dynamically at each recursive call of RenderFunction)")]
     [Range(0, 1)]
-    public float? RussianRouletteFixedProb { get; init; } = null;
+    public float? RussianRouletteFixedProb { get; set; } = null;
 
     public void OnExecute()
     {
+        Console.WriteLine($"Input: {InputScene}");
+        Console.WriteLine($"Width: {Width}");
+        Console.WriteLine($"Height: {Height}");
+        Console.WriteLine($"Algorithm: {Algorithm}");
+        Console.WriteLine($"OutputPfm: {OutputPfm}");
+        Console.WriteLine($"OutputPng: {OutputPng}");
+        Console.WriteLine($"NumRay: {NumRays}");
+        Console.WriteLine($"MaxDepth: {MaxDepth}");
+        Console.WriteLine($"InitState: {InitState}");
+        Console.WriteLine($"InitSeq: {InitSeq}");
+        Console.WriteLine($"SampleSide: {SampleSide}");
+        Console.WriteLine($"LuminosityFunction: {LuminosityFunction}");
+        Console.WriteLine($"Factor: {Factor}");
+        Console.WriteLine($"Gamma: {Gamma}");
+        Console.WriteLine($"RouletteStart: {RussianRouletteStartDepth}");
+        Console.WriteLine($"RouletteFixedProb: {RussianRouletteFixedProb}");
+        
         string currentPath = AppDomain.CurrentDomain.BaseDirectory;
         
-        string pngFilePath = Path.Combine(currentPath, "../../../../PngImages/" + OutputPng); //"../../../../DemoImages/" dal path dell'eseguibile torna indietro (Controllare)
+        string pngFilePath = Path.Combine(currentPath, "../../../../PngImages/", OutputPng); //"../../../../DemoImages/" dal path dell'eseguibile torna indietro (Controllare)
         if (OutputPng[^4..] != ".png") pngFilePath += ".png"; //OutputFilename[^4..] Legge gli ultimi 4 caratteri
 
-        string pfmFilePath = Path.Combine(currentPath, "../../../../PfmImages" + OutputPfm);
+        string pfmFilePath = Path.Combine(currentPath, "../../../../PfmImages", OutputPfm);
         if (OutputPfm[^4..] != ".pfm") pfmFilePath += ".pfm";
         
         var scene = new Scene();
@@ -375,7 +392,7 @@ public class RenderCommand
 
         try
         {
-            scene.ParseScene(input, variables);
+            scene = scene.ParseScene(input, variables);
         }
         catch (Exception e)
         {
@@ -410,7 +427,10 @@ public class RenderCommand
         tracer.FireAllRays(ray => renderer.RenderFunction(ray));
         
         HDRImage.WritePFM_File(image, pfmFilePath);
+        Console.WriteLine($"Pfm file created in: {OutputPfm}");
+        
         image.WritePNG(pngFilePath, LuminosityFunction, Factor, Gamma, averageLuminosity: 0.5f); 
+        Console.WriteLine($"Png file created in: {OutputPng}");
         
     }
 }

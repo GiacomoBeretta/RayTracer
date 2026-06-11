@@ -172,8 +172,9 @@ public class SceneTest
             InputStream str = new InputStream(filepath);
 
             Pigment uniform = scene.ParsePigment(str);
-            CheckeredPigment checkered = (CheckeredPigment)scene.ParsePigment(str);
 
+            CheckeredPigment checkered = (CheckeredPigment)scene.ParsePigment(str);
+            
             Color uColor = uniform.GetColor(new Vector2D(0.5f, 0.5f));
             Color cColor1 = checkered.GetColor(new Vector2D(0.1f, 0.1f));
             Color cColor2 = checkered.GetColor(new Vector2D(0.1f, 0.9f));
@@ -281,8 +282,8 @@ public class SceneTest
             
             scene.ParseMaterial(str, out string name, out Material material);
             scene.Materials[name] = material;
-
-            Sphere sphere = scene.ParseSphere(str);
+            
+            Sphere sphere = scene.ParseSphere(str, scene);
             Color colorSphere = sphere.Material.Pigment.GetColor(new Vector2D(0.5f, 0.5f));
             Color radianceSphere = sphere.Material.EmittedRadiance.GetColor(new Vector2D(0.5f, 0.5f));
             Transformation transformSphere = sphere.Transform;
@@ -312,8 +313,8 @@ public class SceneTest
             
             scene.ParseMaterial(str, out string name, out Material material);
             scene.Materials[name] = material;
-
-            Plane plane = scene.ParsePlane(str);
+            
+            Plane plane = scene.ParsePlane(str, scene);
             Color colorPlane1 = plane.Material.Pigment.GetColor(new Vector2D(0.1f, 0.1f));
             Color colorPlane2 = plane.Material.Pigment.GetColor(new Vector2D(0.1f, 0.9f));
             Color radiancePlane = plane.Material.EmittedRadiance.GetColor(new Vector2D(0.5f, 0.5f));
@@ -323,6 +324,7 @@ public class SceneTest
             Assert.True(Color._AreColorsClose(new Color(0.1f, 0.2f, 0.5f), colorPlane2));
             Assert.True(Color._AreColorsClose(new Color(0f, 0f, 0f), radiancePlane));
             Assert.True(Transformation.AreTransformationsClose(new Transformation(), transformPlane));
+            Assert.Single(scene.Materials);
         }
         finally
         {
@@ -340,8 +342,8 @@ public class SceneTest
         try
         {
             InputStream str = new InputStream(filepath);
-
-            PerspectiveCamera camera = (PerspectiveCamera)scene.ParseCamera(str);
+            
+            var camera = (PerspectiveCamera)scene.ParseCamera(str,  scene);
             
             Assert.True(Transformation.AreTransformationsClose(new Transformation('z', Functions.DegToRad(30)) * new Transformation(new Vector(-4f, 0f, 1f)), camera.Transformation));
             Assert.True(Functions.AreClose(1.0f, camera.AspectRatio));

@@ -1,45 +1,50 @@
 #!/bin/bash
 
-readonly input="$1"
-readonly width="$2"
-readonly height="$3"
-readonly algorithm="$4"
-readonly outputpfm="$5"
-readonly outputpng="$6"
-readonly numrays="$7"
-readonly maxdepth="$8"
-readonly initstate="$9"
-readonly initseq="${10}"
-readonly sampleside="${11}"
-readonly lumfunction="${12}"
-readonly factor="${13}"
-readonly gamma="${14}"
-readonly roulette_start="${15}"
-readonly roulette_prob="${16}"
-readonly declare_float="${17}"
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --input) input="$2"; shift 2 ;;
+    --width) width="$2"; shift 2 ;;
+    --height) height="$2"; shift 2 ;;
+    --algorithm) algorithm="$2"; shift 2 ;;
+    --output-pfm) outputpfm="$2"; shift 2 ;;
+    --output-png) outputpng="$2"; shift 2 ;;
+    --num-rays) numrays="$2"; shift 2 ;;
+    --max-depth) maxdepth="$2"; shift 2 ;;
+    --init-state) initstate="$2"; shift 2 ;;
+    --init-seq) initseq="$2"; shift 2 ;;
+    --sample-side) sampleside="$2"; shift 2 ;;
+    --luminosityFunction) lumfunction="$2"; shift 2 ;;
+    --factor) factor="$2"; shift 2 ;;
+    --gamma) gamma="$2"; shift 2 ;;
+    --roulette-start) roulette_start="$2"; shift 2 ;;
+    --roulette-prob) roulette_prob="$2"; shift 2 ;;
+    --declare-float) declare_float="$2"; shift 2 ;;
+    *) echo "Unknown parameter: $1"; exit 1 ;;
+  esac
+done
 
-echo "your parameters are:"
-echo "input=$input"
-echo "width=$width"
-echo "height=$height"
-echo "algorithm=$algorithm"
-echo "outputpfm=$outputpfm"
-echo "outputpng=$outputpng"
-echo "numrays=$numrays"
-echo "maxdepth=$maxdepth"
-echo "initstate=$initstate"
-echo "initseq=$initseq"
-echo "sampleside=$sampleside"
-echo "lumfunction=$lumfunction"
-echo "factor=$factor"
-echo "gamma=$gamma"
-echo "roulette_start=$roulette_start"
-echo "roulette_prob=$roulette_prob"
-echo "declare_float=$declare_float"
+#echo "your parameters are:"
+#echo "input=$input"
+#echo "width=$width"
+#echo "height=$height"
+#echo "algorithm=$algorithm"
+#echo "outputpfm=$outputpfm"
+#echo "outputpng=$outputpng"
+#echo "numrays=$numrays"
+#echo "maxdepth=$maxdepth"
+#echo "initstate=$initstate"
+#echo "initseq=$initseq"
+#echo "sampleside=$sampleside"
+#echo "lumfunction=$lumfunction"
+#echo "factor=$factor"
+#echo "gamma=$gamma"
+#echo "roulette_start=$roulette_start"
+#echo "roulette_prob=$roulette_prob"
+#echo "declare_float=$declare_float"
 
 readonly exePath="./RayTracer/bin/Debug/net10.0/RayTracer"
 
-echo "DEBUG COMMAND"
+#echo "DEBUG COMMAND"
 
 cmd=( "$exePath" render )
 
