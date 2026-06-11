@@ -1,7 +1,7 @@
 // This file is release under EUPL_v1.2 license. See LICENSE.md
 
 using System.Diagnostics;
-using System.Globalization;
+using System.Globalization; //per il metodo cultureInfo
 
 namespace TracerLib;
 /*
@@ -147,12 +147,8 @@ public class InputStream
         while (true)
         {
             char? ch = ReadChar();
-            if (ch == null) return;
-            if (ch == '\n')
-            {
-                break;
-            }
-
+            if (ch == null) throw new SceneSyntaxException(Location, "Attempt to Skip Line failed, reached the end of file before encountering the escape sequence \\n");
+            if (ch == '\n') break;
             if (ch == '\r')
             {
                 ch = ReadChar();
@@ -202,10 +198,13 @@ public class InputStream
     {
         string floatString = firstChar.ToString();
         const string expChar = "eE";
-        //const string signs = "+-"; //for exponents
+        const string signs = "+-"; //for exponents
 
         float value;
 
+        bool hasReadSign = false;
+        bool hasReadExpSing = false;
+        bool hasReadExpChar = false;
         while (true)
         {
             char? ch = ReadChar();
@@ -213,7 +212,7 @@ public class InputStream
             if (ch == null) break;
             
             if (!Char.IsDigit(ch.Value) && ch.Value != '.' &&
-                !expChar.Contains(ch.Value) /*&& !signs.Contains(ch.Value)*/)
+                !expChar.Contains(ch.Value) && !signs.Contains(ch.Value))
             {
                 UnreadChar(ch.Value);
                 break;
