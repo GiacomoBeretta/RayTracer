@@ -3,66 +3,34 @@
 namespace TracerLib;
 
 /// <summary>
-/// The class <see cref="InvalidPfmFileFormat"/> inherit from the FormatException's class and is used in the error management during the reading/writing of a file.pfm
+/// The class <see cref="InvalidPfmFileFormatException"/> inherit from the FormatException's class and is used in the error management during the reading/writing of a file.pfm
 /// </summary>
-public class InvalidPfmFileFormat : FormatException
+public class InvalidPfmFileFormatException : FormatException
 {
-    public InvalidPfmFileFormat(string errorMessage) : base(errorMessage)
+    public InvalidPfmFileFormatException(string errorMessage) : base(errorMessage)
     {
     }
 
-    public InvalidPfmFileFormat(string message, Exception inner) : base(message, inner)
+    public InvalidPfmFileFormatException(string message, Exception inner) : base(message, inner)
     {
     }
 }
 
 /// <summary>
-/// The class <see cref="GrammarError"/> inherit from the Exception's class and is used in the error management during the reading of a scene file
+/// The class <see cref="GrammarException"/> is used in the error management during the reading of a scene file
 /// </summary>
-public class GrammarError : Exception
+public class GrammarException : Exception
 {
-    public GrammarError(string message) : base(message)
+    SourceLocation Location;
+
+    public GrammarException(SourceLocation location, string message) : base($"Grammar Error at ${location}: {message}")
     {
+        Location = location;
     }
 
-    public GrammarError(string message, Exception inner) : base(message, inner)
-    {
-    }
-
-    public GrammarError(SourceLocation location, string message) : base($"Grammar Error at ${location}: {message}")
-    {
-    }
-
-    public GrammarError(SourceLocation location, string message, Exception inner) : base(
+    public GrammarException(SourceLocation location, string message, Exception inner) : base(
         $"Grammar Error at ${location}: {message}", inner)
     {
+        Location = location;
     }
-
-    /*
-    public GrammarError(string message, SourceLocation location) : base(message)
-    {
-        this.location = location;
-    }
-    public GrammarError(string message, SourceLocation location, Exception inner) : base(message, inner)
-    {
-        this.location = location;
-    }*/
 }
-
-/* public class ZeroDivision : ArithmeticException
-{
-    public ZeroDivision(string error) : base(error){}
-}
-
-public class Calculator{
-    public static float Divide(float num, float den)
-    {
-        if (den == 0f)
-        {
-            throw new ZeroDivision("Impossibile dividere per zero!");
-        }
-
-        return num / den;
-    }
-    }
-    */

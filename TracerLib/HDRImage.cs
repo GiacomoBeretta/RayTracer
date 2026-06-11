@@ -297,7 +297,7 @@ public class HDRImage
         string[] stringSizeArray = stringImgSize.Split(' ', StringSplitOptions.RemoveEmptyEntries);
         if (stringSizeArray.Length != 2)
         {
-            throw new InvalidPfmFileFormat(
+            throw new InvalidPfmFileFormatException(
                 "there isn't the right number of sizes: there must be two sizes width and height.");
         }
 
@@ -308,17 +308,17 @@ public class HDRImage
         }
         catch (FormatException ex)
         {
-            throw new InvalidPfmFileFormat("The size is not made of two ints.", ex);
+            throw new InvalidPfmFileFormatException("The size is not made of two ints.", ex);
         }
 
         if (width < 0)
         {
-            throw new InvalidPfmFileFormat("width must be greater than zero.");
+            throw new InvalidPfmFileFormatException("width must be greater than zero.");
         }
 
         if (height < 0)
         {
-            throw new InvalidPfmFileFormat("height must be greater than zero.");
+            throw new InvalidPfmFileFormatException("height must be greater than zero.");
         }
     }
 
@@ -341,12 +341,12 @@ public class HDRImage
         }
         catch (FormatException ex)
         {
-            throw new InvalidPfmFileFormat(ex.Message);
+            throw new InvalidPfmFileFormatException(ex.Message);
         }
 
         if (endian != 1 && endian != -1)
         {
-            throw new InvalidPfmFileFormat("The endianness must be written as 1.0 or -1.0");
+            throw new InvalidPfmFileFormatException("The endianness must be written as 1.0 or -1.0");
         }
 
         if (endian == 1)
@@ -396,14 +396,14 @@ public class HDRImage
     /// <param name="br"></param>
     /// <param name="bigEndian"></param>
     /// <returns></returns>
-    /// <exception cref="InvalidPfmFileFormat"></exception>
+    /// <exception cref="InvalidPfmFileFormatException"></exception>
     public static float _ReadFloat(BinaryReader br, bool bigEndian = true)
     {
         byte[] bytes = br.ReadBytes(4);
 
         if (bytes.Length < 4)
         {
-            throw new InvalidPfmFileFormat("Unexpected end of file");
+            throw new InvalidPfmFileFormatException("Unexpected end of file");
         }
 
         if (BitConverter.IsLittleEndian == bigEndian)
@@ -426,13 +426,13 @@ public class HDRImage
         string magic = _ReadLine(br);
         if (magic != "PF")
         {
-            throw new InvalidPfmFileFormat("Invalid magic in PFM file");
+            throw new InvalidPfmFileFormatException("Invalid magic in PFM file");
         }
         
         string imgSize = _ReadLine(br);
         if (imgSize == null)
         {
-            throw new InvalidPfmFileFormat("Missing image size line");
+            throw new InvalidPfmFileFormatException("Missing image size line");
         }
 
         _ParseImgSize(imgSize, out int width, out int height);
@@ -440,7 +440,7 @@ public class HDRImage
         string endiannessLine = _ReadLine(br);
         if (endiannessLine == null)
         {
-            throw new InvalidPfmFileFormat("Missing endianness line");
+            throw new InvalidPfmFileFormatException("Missing endianness line");
         }
 
         bool endianness = _ParseEndianness(endiannessLine);
