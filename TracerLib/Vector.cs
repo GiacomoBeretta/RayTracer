@@ -107,6 +107,6 @@ public struct Vector
     /// <returns></returns>
     public Normal ToNormal()
     {
-        return new Normal(X/this.Norm(), Y/this.Norm(), Z/this.Norm());    
+        return new Normal(X/Norm(), Y/Norm(), Z/Norm());    
     }
 }

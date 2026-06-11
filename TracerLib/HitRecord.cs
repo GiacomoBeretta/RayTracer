@@ -40,12 +40,12 @@ public struct HitRecord
 
     public HitRecord(Point worldPoint, Shape shape, Normal normal, Vector2D surfacePoint, Ray ray, float t)
     {
-        this.WorldPoint = worldPoint;
-        this.Shape = shape;
-        this.SurfaceNormal = normal;
-        this.SurfacePosition = surfacePoint;
-        this.IncomingRay = ray;
-        this.T = t;
+        WorldPoint = worldPoint;
+        Shape = shape;
+        SurfaceNormal = normal;
+        SurfacePosition = surfacePoint;
+        IncomingRay = ray;
+        T = t;
     }
 
     public static bool _AreHitRecordsClose(HitRecord hit1, HitRecord hit2, float epsilon = 1e-5f)

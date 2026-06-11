@@ -75,6 +75,6 @@ public struct Point
 
     public Vector ToVector()
     {
-        return new Vector(this.X, this.Y, this.Z);
+        return new Vector(X, Y, Z);
     }
 }

@@ -71,7 +71,7 @@ public class Sphere : Shape
 
     public Sphere(Transformation transform)
     {
-        this.Transform = transform;
+        Transform = transform;
     }
     
     public Sphere(Material material) : base(material)
@@ -98,7 +98,7 @@ public class Sphere : Shape
         }
 
         Sphere sphere = (Sphere)s;
-        if (!Transformation.AreTransformationsClose(this.Transform, sphere.Transform, epsilon))
+        if (!Transformation.AreTransformationsClose(Transform, sphere.Transform, epsilon))
         {
             return false;
         }
@@ -221,7 +221,7 @@ public class Plane : Shape
         }
 
         Plane plane = (Plane)s;
-        if (!Transformation.AreTransformationsClose(this.Transform, plane.Transform, epsilon))
+        if (!Transformation.AreTransformationsClose(Transform, plane.Transform, epsilon))
         {
             return false;
         }

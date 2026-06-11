@@ -15,7 +15,7 @@ public abstract class Token
 
     public Token(string fileName, int line, int column)
     {
-        this.Location = new SourceLocation(fileName, line, column);
+        Location = new SourceLocation(fileName, line, column);
     }
 }
 

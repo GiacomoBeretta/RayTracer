@@ -75,7 +75,7 @@ public struct Ray
 
     public Point At(float t)
     {
-        return this.Origin + this.Dir * t;
+        return Origin + Dir * t;
     }
 
     public static Ray operator *(Transformation t, Ray r)

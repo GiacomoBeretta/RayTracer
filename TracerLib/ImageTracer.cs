@@ -34,8 +34,8 @@ public class ImageTracer
     
     public ImageTracer(HDRImage image, ICamera camera, PCG? pcg = null, int pixelSideSubdivisions=0)
     {
-        this._image = image;
-        this._camera = camera;
+        _image = image;
+        _camera = camera;
         _pcg = pcg ?? new PCG();
         PixelSideSubdivisions = pixelSideSubdivisions;
     }

@@ -237,15 +237,15 @@ public struct Transformation
 
     public Transformation(in HomMatrix m, in HomMatrix invM)
     {
-        this.M = m;
-        this.InvM = invM;
+        M = m;
+        InvM = invM;
         _CheckConsistency();
     }
 
     public Transformation(float[] m, float[] invM)
     {
-        this.M = new HomMatrix(m);
-        this.InvM = new HomMatrix(invM);
+        M = new HomMatrix(m);
+        InvM = new HomMatrix(invM);
         _CheckConsistency();
     }
 

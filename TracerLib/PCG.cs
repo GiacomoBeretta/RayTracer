@@ -16,9 +16,9 @@ public class PCG
     {
         State = 0;
         Inc = (initSeq << 1) | 1;
-        this.Random();
+        Random();
         State += initState;
-        this.Random();
+        Random();
     }
 
     /// <summary>
@@ -44,6 +44,6 @@ public class PCG
     /// <returns></returns>
     public float RandomFloat()
     {
-        return this.Random() / (float)0x100000000;
+        return Random() / (float)0x100000000;
     }
 }

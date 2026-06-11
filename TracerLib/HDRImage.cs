@@ -282,7 +282,7 @@ public class HDRImage
     /// </summary>
     public void Print()
     {
-        Console.WriteLine(this.ToString());
+        Console.WriteLine(ToString());
     }
 
     /// <summary>
@@ -703,7 +703,7 @@ public class HDRImage
         float? averageLuminosity = null,
         float delta = 1e-10f)
     {
-        HDRImage image = this.Clone();
+        HDRImage image = Clone();
         image._Normalize(luminosityFunction, factor, averageLuminosity, delta);
         image._ClampImage();
         image._ImageTo8BitRGB(gamma);
@@ -728,7 +728,7 @@ public class HDRImage
         float? averageLuminosity = null,
         float delta = 1e-10f)
     {
-        HDRImage LDRimage = this.CreateLDR(luminosityFunction, factor, gamma, averageLuminosity, delta);
+        HDRImage LDRimage = CreateLDR(luminosityFunction, factor, gamma, averageLuminosity, delta);
 
         Image<Rgb24> bitmap = new Image<Rgb24>(Configuration.Default, Width, Height);
 
@@ -763,7 +763,7 @@ public class HDRImage
         //using (Stream fileStream = File.OpenWrite(outputFilename))
         using (Stream fileStream = new FileStream(outputFilePath, FileMode.Create))
         {
-            this.WritePNG(fileStream, luminosityFunction, factor, gamma, averageLuminosity, delta);
+            WritePNG(fileStream, luminosityFunction, factor, gamma, averageLuminosity, delta);
         }
     }
 }
