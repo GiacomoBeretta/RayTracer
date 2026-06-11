@@ -40,7 +40,7 @@ public class ImageTracer
         PixelSideSubdivisions = samplePerSide;
     }
     
-    // formule diverse da Tomasi
+    // (formule diverse da Tomasi)
     /// <summary>
     /// Returns a <see cref="Ray"/> passing through the pixel at (column, row).
     /// Since a pixel is not a dimensionless point,
