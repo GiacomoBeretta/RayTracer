@@ -265,7 +265,7 @@ public class PfmToPngCommand
     
     [Option("--input", Description = "The input file path")]
     [Required]
-    public required string InputFilePath { get; init; }
+    public required string InputFilePath { get; set; } 
 
     [Option("--output", Description = "The output file path")]
     [Required]
@@ -297,8 +297,7 @@ public class PfmToPngCommand
 public class RenderCommand
 {
     [Option("--input", Description = "The input scene file path")]
-    [Required]
-    public required string InputScene { get; set; }
+    public string InputScene { get; init; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../../Scenes/scene.txt");
     
     [Option("--width", Description = "The width of the image")]
     [Range(1, Int32.MaxValue)]
@@ -312,10 +311,10 @@ public class RenderCommand
     public RenderFunc Algorithm { get; init; } = RenderFunc.PathTracer;
 
     [Option("--output-pfm", Description = "Name of the pfm file output")]
-    public string OutputPfm { get; init; } = "output.pfm";
+    public string OutputPfm { get; init; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../../PfmImages/output.pfm");
 
     [Option("--output-png", Description = "Name of the png file output")]
-    public string OutputPng { get; init; } = "output.png";
+    public string OutputPng { get; init; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../../PngImages/output.png");
 
     [Option("--num-rays",
         Description =
@@ -359,13 +358,17 @@ public class RenderCommand
                                              "(when null, the probability is computed dynamically at each recursive call of RenderFunction)")]
     [Range(0, 1)]
     public float? RussianRouletteFixedProb { get; init; } = null;
-    
-    
-    
-    //Aggiungere opzioni per la roulette russa
 
     public void OnExecute()
     {
+        string currentPath = AppDomain.CurrentDomain.BaseDirectory;
+        
+        string pngFilePath = Path.Combine(currentPath, "../../../../PngImages/" + OutputPng); //"../../../../DemoImages/" dal path dell'eseguibile torna indietro (Controllare)
+        if (OutputPng[^4..] != ".png") pngFilePath += ".png"; //OutputFilename[^4..] Legge gli ultimi 4 caratteri
+
+        string pfmFilePath = Path.Combine(currentPath, "../../../../PfmImages" + OutputPfm);
+        if (OutputPfm[^4..] != ".pfm") pfmFilePath += ".pfm";
+        
         var scene = new Scene();
         var input = new InputStream(InputScene);
         var variables = Functions.VariableTable(Definitions);
@@ -406,8 +409,8 @@ public class RenderCommand
         var tracer = new ImageTracer(image, scene.Camera, samplePerSide: SampleSide);
         tracer.FireAllRays(ray => renderer.RenderFunction(ray));
         
-        HDRImage.WritePFM_File(image, OutputPfm);
-        image.WritePNG(OutputPng, LuminosityFunction, Factor, Gamma, averageLuminosity: 0.5f); 
+        HDRImage.WritePFM_File(image, pfmFilePath);
+        image.WritePNG(pngFilePath, LuminosityFunction, Factor, Gamma, averageLuminosity: 0.5f); 
         
     }
 }
