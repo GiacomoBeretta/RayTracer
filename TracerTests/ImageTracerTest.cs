@@ -21,8 +21,6 @@ public class ImageTracerTest
     [Fact]
     public void TestFireRay_uv_PixelSubmapping()
     {
-        //ImageTracerTest test = new ImageTracerTest();
-
         // pixel at top left corner, and top left corner of the pixel
         Ray ray1 = tracer.FireRayAtPixel(0, 0, 0f, 0f); 
         Assert.True(Point._ArePointsClose(new Point(0f, 2f, 1f), ray1.At(1.0f)));

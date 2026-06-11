@@ -45,8 +45,11 @@ public class RenderTest
     public void FlatTest()
     {
         Color sphereColor = new Color(1.0f, 2.0f, 3.0f);
-        
-        Sphere sphere = new Sphere(new Transformation(new Vector(2.0f, 0f, 0f)) * new Transformation(0.2f, 0.2f, 0.2f), new Material(new UniformPigment(sphereColor), new DiffuseBRDF()));
+
+        Transformation sphereTransformation =
+            new Transformation(new Vector(2.0f, 0f, 0f)) * new Transformation(0.2f, 0.2f, 0.2f);
+        Material sphereMaterial = new Material(new UniformPigment(sphereColor), new DiffuseBRDF());
+        Sphere sphere = new Sphere( sphereTransformation, sphereMaterial );
 
         HDRImage image = new HDRImage(3, 3);
 
@@ -60,18 +63,22 @@ public class RenderTest
         Renderer render = new FlatRenderer(world);
 
         tracer.FireAllRays(ray => render.RenderFunction(ray));
-        
-        _testOutputHelper.WriteLine(image[1].ToString());
-        
-        Assert.True(Color._AreColorsClose(new Color(0f,0f,0f), image[0]));
-        Assert.True(Color._AreColorsClose(new Color(0f,0f,0f), image[1]));
-        Assert.True(Color._AreColorsClose(new Color(0f,0f,0f), image[2]));
-        Assert.True(Color._AreColorsClose(new Color(0f,0f,0f), image[3]));
-        Assert.True(Color._AreColorsClose(sphereColor, image[4]));
-        Assert.True(Color._AreColorsClose(new Color(0f,0f,0f), image[5]));
-        Assert.True(Color._AreColorsClose(new Color(0f,0f,0f), image[6]));
-        Assert.True(Color._AreColorsClose(new Color(0f,0f,0f), image[7]));
-        Assert.True(Color._AreColorsClose(new Color(0f,0f,0f), image[8]));
+
+        /*for (int i = 0; i < 9; i++)
+        {
+            _testOutputHelper.WriteLine(image[i].ToString());
+        }*/
+
+        Color black = new Color(0f, 0f, 0f);
+        Assert.True(Color._AreColorsClose(black, image[0,0]));
+        Assert.True(Color._AreColorsClose(black, image[1,0]));
+        Assert.True(Color._AreColorsClose(black, image[2,0]));
+        Assert.True(Color._AreColorsClose(black, image[0,1]));
+        Assert.True(Color._AreColorsClose(sphereColor, image[1,1]));
+        Assert.True(Color._AreColorsClose(black, image[2,1]));
+        Assert.True(Color._AreColorsClose(black, image[0,2]));
+        Assert.True(Color._AreColorsClose(black, image[1,2]));
+        Assert.True(Color._AreColorsClose(black, image[2,2]));
     }
 
     //Test della fornace
