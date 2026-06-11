@@ -169,6 +169,8 @@ public class InputStreamTest
             Assert.Equal('k', str.ReadChar());
             str.SkipLine();
             Assert.Equal('s', str.ReadChar());
+            //if you try to skipline without any escape sequence and is reached the end of file
+            Assert.Throws<SceneSyntaxException>(() => str.SkipLine());
         }
         finally
         {
@@ -232,7 +234,7 @@ public class InputStreamTest
             InputStream stream1 = new InputStream(filePath1);
             StringToken st1 = stream1._ParseStringToken(stream1.Location);
             Assert.Equal("Hello, World!", st1.String);
-            
+
             InputStream stream2 = new InputStream(filePath2);
             Assert.Throws<SceneSyntaxException>(() => stream2._ParseStringToken(stream2.Location));
         }
@@ -302,7 +304,8 @@ public class InputStreamTest
                       "7..2\n" +
                       "4ee2\n" +
                       "--3.4\n" +
-                      "3.5e--2";
+                      "3.5e--2\n" +
+                      "3+4";
         string filePath2 = Path.GetTempFileName();
         File.WriteAllText(filePath2, fail);
         try
@@ -326,6 +329,10 @@ public class InputStreamTest
             stream2.SkipLine();
             ch = stream2.ReadChar();
             Assert.Throws<SceneSyntaxException>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
+
+            stream2.SkipLine();
+            ch = stream2.ReadChar();
+           // Assert.Throws<SceneSyntaxException>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
         }
         finally
         {
@@ -405,12 +412,12 @@ public class InputStreamTest
             ch = str.ReadChar();
             keywordToken = (KeywordToken)str._ParseKeywordIdentifierToken(ch.Value, str.Location);
             Assert.Equal(Keyword.Image, keywordToken.Keyword);
-            
+
             str.SkipLine();
             ch = str.ReadChar();
             keywordToken = (KeywordToken)str._ParseKeywordIdentifierToken(ch.Value, str.Location);
             Assert.Equal(Keyword.Identity, keywordToken.Keyword);
-            
+
             str.SkipLine();
             ch = str.ReadChar();
             keywordToken = (KeywordToken)str._ParseKeywordIdentifierToken(ch.Value, str.Location);
@@ -962,7 +969,7 @@ public class InputStreamTest
             Assert.Equal(")", symbolToken.Symbol);
 
             #endregion
-            
+
             Assert.Equal(typeof(StopToken), ((StopToken)stream.ReadNextToken()).GetType());
         }
 
