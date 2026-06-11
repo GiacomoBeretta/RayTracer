@@ -189,7 +189,7 @@ public class InputStream
         {
             char? ch = ReadChar();
 
-            if (ch == null) throw new GrammarException(tokenLocation, "unterminated string");
+            if (ch == null) throw new SceneSyntaxException(tokenLocation, "unterminated string");
             if (ch.Value == '\"') break;
 
             stringToken += ch;
@@ -227,7 +227,7 @@ public class InputStream
         }
         catch (Exception)
         {
-            throw new GrammarException(tokenLocation, $"{floatString} is an invalid floating point number");
+            throw new SceneSyntaxException(tokenLocation, $"{floatString} is an invalid floating point number");
         }
         
         return new LiteralNumberToken(tokenLocation, value: value);
@@ -264,7 +264,7 @@ public class InputStream
     /// Reads and returns the next Token that appears in the stream (skipping whitespaces, new lines and comments)
     /// </summary>
     /// <returns></returns>
-    /// <exception cref="GrammarException"></exception>
+    /// <exception cref="SceneSyntaxException"></exception>
     public Token ReadNextToken()
     {
         // '<>' are for the colors, '[]' for the vectors and points, ',' for separating numbers,
@@ -308,7 +308,7 @@ public class InputStream
         }
         else
         {
-            throw new GrammarException(Location, $"invalid character {ch}");
+            throw new SceneSyntaxException(Location, $"invalid character {ch}");
         }
     }
 

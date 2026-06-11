@@ -17,7 +17,7 @@ public class Scene
         Token token = inputFile.ReadNextToken();
         if (token is not SymbolToken symbolToken || symbolToken.Symbol != symbol)
         {
-            throw new GrammarException(token.Location, $"got {token} instead of {symbol}");
+            throw new SceneSyntaxException(token.Location, $"got {token} instead of {symbol}");
         }
     }
 
@@ -27,11 +27,11 @@ public class Scene
 
         if (token is not KeywordToken keywordToken)
         {
-            throw new GrammarException(token.Location, $"expected keyword instead of {token}");
+            throw new SceneSyntaxException(token.Location, $"expected keyword instead of {token}");
         }
         else if (!keywords.Contains(keywordToken.Keyword))
         {
-            throw new GrammarException(token.Location,
+            throw new SceneSyntaxException(token.Location,
                 $"expect one of the following keywords: {string.Join(',', keywords)} instead of {token}");
         }
 
@@ -47,11 +47,11 @@ public class Scene
         {
             string variableName = identifierToken.Identifier;
             if (!Variables.ContainsKey(variableName))
-                throw new GrammarException(token.Location, $"unknow variable {token}");
+                throw new SceneSyntaxException(token.Location, $"unknow variable {token}");
             return Variables[variableName];
         }
 
-        throw new GrammarException(token.Location, $"got {token} instead of a number");
+        throw new SceneSyntaxException(token.Location, $"got {token} instead of a number");
     }
 
     public string ExpectString(InputStream inputFile)
@@ -59,7 +59,7 @@ public class Scene
         Token token = inputFile.ReadNextToken();
 
         if (token is not StringToken stringToken)
-            throw new GrammarException(token.Location, $"got {token} instead of a string");
+            throw new SceneSyntaxException(token.Location, $"got {token} instead of a string");
 
         return stringToken.String;
     }
@@ -69,7 +69,7 @@ public class Scene
         Token token = inputFile.ReadNextToken();
 
         if (token is not IdentifierToken identifierToken)
-            throw new GrammarException(token.Location, $"got {token} instead of an identifier");
+            throw new SceneSyntaxException(token.Location, $"got {token} instead of an identifier");
 
         return identifierToken.Identifier;
     }
@@ -131,7 +131,7 @@ public class Scene
 
                 break;
             default:
-                throw new GrammarException(inputFile.Location, "Keyword doesn't match any of the Pigments types");
+                throw new SceneSyntaxException(inputFile.Location, "Keyword doesn't match any of the Pigments types");
         }
 
         ExpectSymbol(inputFile, ")");
@@ -155,7 +155,7 @@ public class Scene
                 result = new SpecularBRDF(pigment);
                 break;
             default:
-                throw new GrammarException(inputFile.Location, "Keyword doesn't match any of the BRDF types");
+                throw new SceneSyntaxException(inputFile.Location, "Keyword doesn't match any of the BRDF types");
         }
 
         return result;
@@ -224,7 +224,7 @@ public class Scene
                     ExpectSymbol(inputFile, ")");
                     break;
                 default:
-                    throw new GrammarException(inputFile.Location, "Keyword doesn't match any of the Transformation types");
+                    throw new SceneSyntaxException(inputFile.Location, "Keyword doesn't match any of the Transformation types");
             }
 
             Token nextToken = inputFile.ReadNextToken();
@@ -244,7 +244,7 @@ public class Scene
 
         string material = ExpectIdentifier(inputFile);
         if (!Materials.ContainsKey(material))
-            throw new GrammarException(inputFile.Location, $"unknown material {material}");
+            throw new SceneSyntaxException(inputFile.Location, $"unknown material {material}");
 
         ExpectSymbol(inputFile, ",");
         Transformation transformation = ParseTransformation(inputFile);
@@ -259,7 +259,7 @@ public class Scene
 
         string material = ExpectIdentifier(inputFile);
         if (!Materials.ContainsKey(material))
-            throw new GrammarException(inputFile.Location, $"unknown material {material}");
+            throw new SceneSyntaxException(inputFile.Location, $"unknown material {material}");
 
         ExpectSymbol(inputFile, ",");
         Transformation transformation = ParseTransformation(inputFile);
@@ -291,7 +291,7 @@ public class Scene
                 result = new OrthogonalCamera(transformation, aspectRatio);
                 break;
             default:
-                throw new GrammarException(inputFile.Location, "Keyword doesn't match any of the Cameras types");
+                throw new SceneSyntaxException(inputFile.Location, "Keyword doesn't match any of the Cameras types");
         }
 
         return result;
@@ -309,7 +309,7 @@ public class Scene
             Token token = inputFile.ReadNextToken();
             if (token is StopToken) break;
             if (token is not KeywordToken)
-                throw new GrammarException(token.Location, $"expected keyword instead of {token}");
+                throw new SceneSyntaxException(token.Location, $"expected keyword instead of {token}");
             if (token is KeywordToken { Keyword: Keyword.Float })
             {
                 string variableName = ExpectIdentifier(inputFile);
@@ -321,7 +321,7 @@ public class Scene
                 ExpectSymbol(inputFile, ")");
 
                 if (scene.Variables.ContainsKey(variableName))
-                    throw new GrammarException(variableLocation,
+                    throw new SceneSyntaxException(variableLocation,
                         $"{variableName} cannot be redefined"); //Aggiungere controllo overridden variables 
                 //Aggiungere controllo overridden variables anche qui
                 scene.Variables[variableName] = variableValue;
@@ -330,7 +330,7 @@ public class Scene
             else if (token is KeywordToken { Keyword: Keyword.Plane }) scene.World.Add(ParsePlane(inputFile));
             else if (token is KeywordToken { Keyword: Keyword.Camera })
             {
-                if (scene.Camera != null) throw new GrammarException(token.Location, "Cannot define more Cameras");
+                if (scene.Camera != null) throw new SceneSyntaxException(token.Location, "Cannot define more Cameras");
 
                 scene.Camera = ParseCamera(inputFile);
             }

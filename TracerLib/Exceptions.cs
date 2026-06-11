@@ -3,7 +3,7 @@
 namespace TracerLib;
 
 /// <summary>
-/// The class <see cref="InvalidPfmFileFormatException"/> inherit from the FormatException's class and is used in the error management during the reading/writing of a file.pfm
+/// Thrown when a PFM file has an invalid format.
 /// </summary>
 public class InvalidPfmFileFormatException : FormatException
 {
@@ -17,18 +17,21 @@ public class InvalidPfmFileFormatException : FormatException
 }
 
 /// <summary>
-/// The class <see cref="GrammarException"/> is used in the error management during the reading of a scene file
+/// Thrown when a syntax error is encountered while parsing a scene file.
 /// </summary>
-public class GrammarException : Exception
+public class SceneSyntaxException : Exception
 {
+    /// <summary>
+    /// The location of the error (file name, column and row). See <see cref="SourceLocation"/>.
+    /// </summary>
     SourceLocation Location;
 
-    public GrammarException(SourceLocation location, string message) : base($"Grammar Error at ${location}: {message}")
+    public SceneSyntaxException(SourceLocation location, string message) : base($"Grammar Error at ${location}: {message}")
     {
         Location = location;
     }
 
-    public GrammarException(SourceLocation location, string message, Exception inner) : base(
+    public SceneSyntaxException(SourceLocation location, string message, Exception inner) : base(
         $"Grammar Error at ${location}: {message}", inner)
     {
         Location = location;
