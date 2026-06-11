@@ -162,7 +162,7 @@ public class PlaneTest
     [Fact]
     public void TestPlaneConstructor()
     {
-        var plane = new Plane();
+        Plane plane = new Plane();
 
         Assert.True(Transformation.AreTransformationsClose(new Transformation(), plane.Transform));
     }
@@ -170,8 +170,8 @@ public class PlaneTest
     [Fact]
     public void TestPlaneConstructorWithTransformation()
     {
-        var transformation = new Transformation('x', MathF.PI / 2);
-        var plane = new Plane(transformation);
+        Transformation transformation = new Transformation('x', MathF.PI / 2); 
+        Plane plane = new Plane(transformation);
 
         Assert.True(Transformation.AreTransformationsClose(transformation, plane.Transform));
     }
@@ -179,10 +179,10 @@ public class PlaneTest
     [Fact]
     public void TestPlaneNormal()
     {
-        var plane = new Plane();
+        Plane plane = new Plane();
 
-        var d1 = new Vector(6, 0, -4);
-        var d2 = new Vector(73, 5, 48);
+        Vector d1 = new Vector(6, 0, -4);
+        Vector d2 = new Vector(73, 5, 48);
 
         Assert.True(Normal._AreNormalsClose(new Normal(0, 0, 1), plane._PlaneNormal(d1)));
         Assert.True(Normal._AreNormalsClose(new Normal(0, 0, -1), plane._PlaneNormal(d2)));
@@ -191,13 +191,13 @@ public class PlaneTest
     [Fact]
     public void TestPlanePointToUV()
     {
-        var plane = new Plane();
+        Plane plane = new Plane();
 
-        var p1 = new Point(0, 0, 1.0f);
+        Point p1 = new Point(0, 0, 1.0f);
         Assert.True(Functions.AreClose(0, plane._PlanePointToUV(p1).U));
         Assert.True(Functions.AreClose(0, plane._PlanePointToUV(p1).V));
 
-        var p2 = new Point(2.3f, 5.7f, 0);
+        Point p2 = new Point(2.3f, 5.7f, 0);
         Assert.True(Functions.AreClose(0.3f, plane._PlanePointToUV(p2).U));
         Assert.True(Functions.AreClose(0.7f, plane._PlanePointToUV(p2).V));
     }

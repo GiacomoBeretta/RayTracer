@@ -18,9 +18,9 @@ public class TokenTest
     {
        const string token = "orthogonal";
 
-       Keywords.Map.TryGetValue(token, out var keyword);
+       Keywords.Map.TryGetValue(token, out Keyword keyword);
 
-       var keywordToken = new KeywordToken(_location, keyword);
+       KeywordToken keywordToken = new KeywordToken(_location, keyword);
        
        _testOutputHelper.WriteLine(keywordToken.ToString());
        
@@ -33,7 +33,7 @@ public class TokenTest
     public void IdentifierTokenTest()
     {
         const string identifier = "clock";
-        var identifierToken = new IdentifierToken(_location, identifier);
+        IdentifierToken identifierToken = new IdentifierToken(_location, identifier);
         
         _testOutputHelper.WriteLine(identifierToken.ToString());
         
@@ -47,7 +47,7 @@ public class TokenTest
     {
         const string s = "Hello, World!";
 
-        var stringToken = new StringToken(_location, s);
+        StringToken stringToken = new StringToken(_location, s);
         
         _testOutputHelper.WriteLine(stringToken.ToString());
         
@@ -61,7 +61,7 @@ public class TokenTest
     {
         const float f = 8.67f;
 
-        var literalNumberToken = new LiteralNumberToken(_location, f);
+        LiteralNumberToken literalNumberToken = new LiteralNumberToken(_location, f);
         
         _testOutputHelper.WriteLine(literalNumberToken.ToString());
         
@@ -75,7 +75,7 @@ public class TokenTest
     {
         const string op = "+";
 
-        var symbolToken = new SymbolToken(_location, op);
+        SymbolToken symbolToken = new SymbolToken(_location, op);
         
         _testOutputHelper.WriteLine(symbolToken.ToString());
         

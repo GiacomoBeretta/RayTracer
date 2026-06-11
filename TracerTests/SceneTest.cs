@@ -17,7 +17,7 @@ public class SceneTest
         
         try
         {
-            var str = new InputStream(filepath);
+            InputStream str = new InputStream(filepath);
             
             scene.ExpectSymbol(str, "(");
             scene.ExpectSymbol(str, ")");
@@ -45,7 +45,7 @@ public class SceneTest
 
         try
         {
-            var str = new InputStream(filepath);
+            InputStream str = new InputStream(filepath);
 
             Assert.Throws<SceneSyntaxException>(() => scene.ExpectKeywords(str, keywords));
             Assert.Equal(Keyword.Scaling, scene.ExpectKeywords(str, keywords));
@@ -66,7 +66,7 @@ public class SceneTest
 
         try
         {
-            var str = new InputStream(filepath);
+            InputStream str = new InputStream(filepath);
             Assert.Throws<SceneSyntaxException>(() => scene.ExpectNumber(str));
             Assert.Equal(18f, scene.ExpectNumber(str));
             //Controllare perchè il segno + viene saltato
@@ -88,7 +88,7 @@ public class SceneTest
 
         try
         {
-            var str = new InputStream(filepath);
+            InputStream str = new InputStream(filepath);
 
             Assert.Throws<SceneSyntaxException>(() => scene.ExpectString(str));
             Assert.Throws<SceneSyntaxException>(() => scene.ExpectString(str));
@@ -109,7 +109,7 @@ public class SceneTest
 
         try
         {
-            var str = new InputStream(filepath);
+            InputStream str = new InputStream(filepath);
             
             Assert.Equal("clock", scene.ExpectIdentifier(str));
             Assert.Throws<SceneSyntaxException>(() => scene.ExpectIdentifier(str));
@@ -130,7 +130,7 @@ public class SceneTest
 
         try
         {
-            var str = new InputStream(filepath);
+            InputStream str = new InputStream(filepath);
             
             Assert.True(Vector._AreVectorsClose(new Vector(18f, 23f, 0f), scene.ParseVector(str)));
         }
@@ -149,7 +149,7 @@ public class SceneTest
 
         try
         {
-            var str = new InputStream(filepath);
+            InputStream str = new InputStream(filepath);
             
             Assert.True(Color._AreColorsClose(new Color(0.5f, 0.21f, 0.75f), scene.ParseColor(str)));
         }
@@ -169,14 +169,14 @@ public class SceneTest
 
         try
         {
-            var str = new InputStream(filepath);
+            InputStream str = new InputStream(filepath);
 
-            var uniform = scene.ParsePigment(str);
+            Pigment uniform = scene.ParsePigment(str);
             var checkered = (CheckeredPigment)scene.ParsePigment(str);
 
-            var uColor = uniform.GetColor(new Vector2D(0.5f, 0.5f));
-            var cColor1 = checkered.GetColor(new Vector2D(0.1f, 0.1f));
-            var cColor2 = checkered.GetColor(new Vector2D(0.1f, 0.9f));
+            Color uColor = uniform.GetColor(new Vector2D(0.5f, 0.5f));
+            Color cColor1 = checkered.GetColor(new Vector2D(0.1f, 0.1f));
+            Color cColor2 = checkered.GetColor(new Vector2D(0.1f, 0.9f));
             
             Assert.True(Color._AreColorsClose(new Color(0.3f, 0.5f, 0.1f), uColor));
             Assert.True(Color._AreColorsClose(new Color(0.4f, 0.6f, 0.5f), cColor1));
@@ -198,14 +198,14 @@ public class SceneTest
 
         try
         {
-            var str = new InputStream(filepath);
+            InputStream str = new InputStream(filepath);
             
-            var diffuse = scene.ParseBRDF(str);
-            var specular = scene.ParseBRDF(str);
+            BRDF diffuse = scene.ParseBRDF(str);
+            BRDF specular = scene.ParseBRDF(str);
 
-            var uColor = diffuse.Pigment.GetColor(new Vector2D(0.5f, 0.5f));
-            var cColor1 = specular.Pigment.GetColor(new Vector2D(0.1f, 0.1f));
-            var cColor2 = specular.Pigment.GetColor(new Vector2D(0.1f, 0.9f));
+            Color uColor = diffuse.Pigment.GetColor(new Vector2D(0.5f, 0.5f));
+            Color cColor1 = specular.Pigment.GetColor(new Vector2D(0.1f, 0.1f));
+            Color cColor2 = specular.Pigment.GetColor(new Vector2D(0.1f, 0.9f));
             
             Assert.True(Color._AreColorsClose(new Color(0.3f, 0.5f, 0.1f), uColor));
             Assert.True(Color._AreColorsClose(new Color(0.4f, 0.6f, 0.5f), cColor1));
@@ -226,13 +226,13 @@ public class SceneTest
 
         try
         {
-            var str = new InputStream(filepath);
+            InputStream str = new InputStream(filepath);
             
             scene.ParseMaterial(str, out string name, out Material material);
             
-            var cColor1 = material.Pigment.GetColor(new Vector2D(0.1f, 0.1f));
-            var cColor2 = material.Pigment.GetColor(new Vector2D(0.1f, 0.9f));
-            var uColor = material.EmittedRadiance.GetColor(new Vector2D(0.5f, 0.5f));
+            Color cColor1 = material.Pigment.GetColor(new Vector2D(0.1f, 0.1f));
+            Color cColor2 = material.Pigment.GetColor(new Vector2D(0.1f, 0.9f));
+            Color uColor = material.EmittedRadiance.GetColor(new Vector2D(0.5f, 0.5f));
             
             Assert.True(Color._AreColorsClose(new Color(0.3f, 0.5f, 0.1f), cColor1));
             Assert.True(Color._AreColorsClose(new Color(0.1f, 0.2f, 0.5f), cColor2));
@@ -254,10 +254,10 @@ public class SceneTest
 
         try
         {
-            var str = new InputStream(filepath);
+            InputStream str = new InputStream(filepath);
 
-            var transformation = scene.ParseTransformation(str);
-            var t = new Transformation('z', Functions.DegToRad(30)) * new Transformation(new Vector(-4f, 0f, 1f));
+            Transformation transformation = scene.ParseTransformation(str);
+            Transformation t = new Transformation('z', Functions.DegToRad(30)) * new Transformation(new Vector(-4f, 0f, 1f));
             
             Assert.True(Transformation.AreTransformationsClose(t, transformation));
         }
@@ -277,15 +277,15 @@ public class SceneTest
 
         try
         {
-            var str = new InputStream(filepath);
+            InputStream str = new InputStream(filepath);
             
             scene.ParseMaterial(str, out string name, out Material material);
             scene.Materials[name] = material;
-
-            var sphere = scene.ParseSphere(str, scene);
-            var colorSphere = sphere.Material.Pigment.GetColor(new Vector2D(0.5f, 0.5f));
-            var radianceSphere = sphere.Material.EmittedRadiance.GetColor(new Vector2D(0.5f, 0.5f));
-            var transformSphere = sphere.Transform;
+            
+            Sphere sphere = scene.ParseSphere(str, scene);
+            Color colorSphere = sphere.Material.Pigment.GetColor(new Vector2D(0.5f, 0.5f));
+            Color radianceSphere = sphere.Material.EmittedRadiance.GetColor(new Vector2D(0.5f, 0.5f));
+            Transformation transformSphere = sphere.Transform;
             
             Assert.True(Color._AreColorsClose(new Color(0.5f, 0.5f, 0.5f), colorSphere));
             Assert.True(Color._AreColorsClose(new Color(0f, 0f, 0f), radianceSphere));
@@ -308,16 +308,16 @@ public class SceneTest
 
         try
         {
-            var str = new InputStream(filepath);
+            InputStream str = new InputStream(filepath);
             
-            scene.ParseMaterial(str, out string name, out var material);
+            scene.ParseMaterial(str, out string name, out Material material);
             scene.Materials[name] = material;
-
-            var plane = scene.ParsePlane(str, scene);
-            var colorPlane1 = plane.Material.Pigment.GetColor(new Vector2D(0.1f, 0.1f));
-            var colorPlane2 = plane.Material.Pigment.GetColor(new Vector2D(0.1f, 0.9f));
-            var radiancePlane = plane.Material.EmittedRadiance.GetColor(new Vector2D(0.5f, 0.5f));
-            var transformPlane = plane.Transform;
+            
+            Plane plane = scene.ParsePlane(str, scene);
+            Color colorPlane1 = plane.Material.Pigment.GetColor(new Vector2D(0.1f, 0.1f));
+            Color colorPlane2 = plane.Material.Pigment.GetColor(new Vector2D(0.1f, 0.9f));
+            Color radiancePlane = plane.Material.EmittedRadiance.GetColor(new Vector2D(0.5f, 0.5f));
+            Transformation transformPlane = plane.Transform;
             
             Assert.True(Color._AreColorsClose(new Color(0.3f, 0.5f, 0.1f), colorPlane1));
             Assert.True(Color._AreColorsClose(new Color(0.1f, 0.2f, 0.5f), colorPlane2));
@@ -340,8 +340,8 @@ public class SceneTest
 
         try
         {
-            var str = new InputStream(filepath);
-
+            InputStream str = new InputStream(filepath);
+            
             var camera = (PerspectiveCamera)scene.ParseCamera(str,  scene);
             
             Assert.True(Transformation.AreTransformationsClose(new Transformation('z', Functions.DegToRad(30)) * new Transformation(new Vector(-4f, 0f, 1f)), camera.Transformation));

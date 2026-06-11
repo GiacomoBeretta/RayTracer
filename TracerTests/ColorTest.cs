@@ -25,8 +25,8 @@ public class ColorTest
         Color c2 = new Color(509, 24, 627);
         Assert.Equal(new Color(510, 29, 645), c1 + c2);
 
-        var a = new Color(1.0f, 2.0f, 3.0f);
-        var b = new Color(5.0f, 6.0f, 7.0f);
+        Color a = new Color(1.0f, 2.0f, 3.0f);
+        Color b = new Color(5.0f, 6.0f, 7.0f);
         Assert.True(Color._AreColorsClose(new Color(6.0f, 8.0f, 10.0f), a + b));
     }
 
@@ -43,7 +43,7 @@ public class ColorTest
         Assert.Equal(c1 * a, a * c1);
         Assert.True(Color._AreColorsClose(c1 * b, b * c1));
 
-        var c2 = new Color(5.0f, 6.0f, 7.0f);
+        Color c2 = new Color(5.0f, 6.0f, 7.0f);
         const float c = 3f;
         Assert.True(Color._AreColorsClose(new Color(15.0f, 18.0f, 21.0f), c2 * c));
         Assert.True(Color._AreColorsClose(new Color(15.0f, 18.0f, 21.0f), c * c2));
@@ -58,8 +58,8 @@ public class ColorTest
         Color c2 = new Color(873, 94.3f, 3.7f);
         Assert.True(Color._AreColorsClose(new Color(436.5f, 2234.9102f, 1776), c1 * c2));
 
-        var a = new Color(1.0f, 2.0f, 3.0f);
-        var b = new Color(5.0f, 6.0f, 7.0f);
+        Color a = new Color(1.0f, 2.0f, 3.0f);
+        Color b = new Color(5.0f, 6.0f, 7.0f);
         Assert.True(Color._AreColorsClose(new Color(5.0f, 12.0f, 21.0f), a * b));
     }
 
