@@ -22,7 +22,7 @@ public interface ICamera
     /// <summary>
     /// Returns a <see cref="Ray"/> passing through the specified screen's coordinates (u,v).
     /// The coordinate origin is the top-left corner of the screen.
-    /// u and v are in [0, 1], mapped to screen space: y ∈ [R/2, R/2] (R = aspect ratio) and z ∈ [-0.5, 0.5].
+    /// u and v are in [0, 1], mapped to screen space: y ∈ [-R, R] (R = aspect ratio) and z ∈ [-1, 1].
     /// </summary>
     /// <param name="u">Horizontal screen coordinate (within [0,1]).</param>
     /// <param name="v">Vertical screen coordinate (within [0,1]).</param>
@@ -61,12 +61,11 @@ public struct OrthogonalCamera : ICamera
         Transformation = transformation;
     }
     
-    // forse con le nuove formule è più piccola l'immagine
     // forse sarebbe meglio mettere due parametri ulteriori da riga di comando che allargano la dimensione dello schermo.
     /// <summary>
     /// Returns a <see cref="Ray"/> orthogonal to the screen, passing through the specified screen's coordinates (u,v).
     /// The coordinate origin is the top-left corner of the screen.
-    /// u and v are in [0, 1], mapped to screen space: y ∈ [R/2, R/2] (R = aspect ratio) and z ∈ [-0.5, 0.5].
+    /// u and v are in [0, 1], mapped to screen space: y ∈ [-R, R] (R = aspect ratio) and z ∈ [-1, 1].
     /// </summary>
     /// <param name="u">Horizontal screen coordinate (within [0,1]).</param>
     /// <param name="v">Vertical screen coordinate (within [0,1]).</param>
@@ -83,18 +82,18 @@ public struct OrthogonalCamera : ICamera
         // u e v vanno da 0 a 1
         // e così lo schermo ha proporzioni 2x2*AspectRatio
         // il punto per cui passa il raggio va da -AspectRatio a +AspectRatio per y e da -1 a 1 per z 
-        // Point origin = new Point(-1, (-2*u + 1f) * AspectRatio, -2*v + 1f);
+         Point origin = new Point(-1, (-2*u + 1f) * AspectRatio, -2*v + 1f);
 
         // formula per quando u e v partono dall'angolo in alto a sinistra
         // u e v vanno da 0 a 1
         // e così lo schermo ha proporzioni 1xAspectRatio 
         // il punto per cui passa il raggio va da -0.5*AspectRatio a 0.5*AspectRatio per y e da -0.5 a 0.5 per z
         // quindi forse così lo schermo è un po' più piccolo
-        Point origin = new Point(-1, (-u + 0.5f) * AspectRatio, -v + 0.5f);
+        //Point origin = new Point(-1, (-u + 0.5f) * AspectRatio, -v + 0.5f);
 
         //direction orthogonal to the screen.
         Vector direction = new Vector(1, 0, 0);
-        return this.Transformation * new Ray(origin, direction);
+        return Transformation * new Ray(origin, direction);
     }
 }
 
@@ -139,14 +138,13 @@ public struct PerspectiveCamera : ICamera
         Transformation = transformation;
     }
     
-    // forse con le nuove formule è più piccola l'immagine
     // forse sarebbe meglio mettere due parametri ulteriori da riga di comando che allargano la dimensione dello schermo.
     /// <summary>
     /// Returns a <see cref="Ray"/> starting at (-d, 0, 0)
     /// (d = <see cref="Distance"/> from between the observer and the screen)
     /// and passing through the specified screen's coordinates (u,v).
     /// The coordinate origin is the top-left corner of the screen.
-    /// u and v are in [0, 1], mapped to screen space: y ∈ [R/2, R/2] (R = aspect ratio) and z ∈ [-0.5, 0.5].
+    /// u and v are in [0, 1], mapped to screen space: y ∈ [-R, R] (R = aspect ratio) and z ∈ [-1, 1].
     /// </summary>
     /// <param name="u">Horizontal screen coordinate (within [0,1]).</param>
     /// <param name="v">Vertical screen coordinate (within [0,1]).</param>
@@ -154,7 +152,7 @@ public struct PerspectiveCamera : ICamera
     public Ray FireRay(float u, float v)
     {
         // position of the observer
-        Point origin = new Point(-this.Distance, 0.0f, 0.0f);
+        Point origin = new Point(-Distance, 0.0f, 0.0f);
 
         // formula per quando u,v partono dall'angolo in basso a sinistra
         // u e v vanno da 0 a 1
@@ -166,15 +164,15 @@ public struct PerspectiveCamera : ICamera
         // u e v vanno da 0 a 1
         // e così lo schermo ha proporzioni 2x2*AspectRatio
         // il punto per cui passa il raggio va da -AspectRatio a +AspectRatio per y e da -1 a 1 per z
-        // Vector dir = new Vector(Distance, (-2*u + 1f) * AspectRatio, -2*v + 1f);
+        Vector dir = new Vector(Distance, (-2*u + 1f) * AspectRatio, -2*v + 1f);
 
         // formula per quando u e v partono dall'angolo in alto a sinistra
         // u e v vanno da 0 a 1
         // e così lo schermo ha proporzioni 1xAspectRatio
         // il punto per cui passa il raggio va da -0.5*AspectRatio a 0.5*AspectRatio per y e da -0.5 a 0.5 per z
         // quindi forse così lo schermo è un po' più piccolo
-        Vector dir = new Vector(Distance, (-u + 0.5f) * AspectRatio, -v + 0.5f);
+        // Vector dir = new Vector(Distance, (-u + 0.5f) * AspectRatio, -v + 0.5f);
 
-        return this.Transformation * new Ray(origin, dir);
+        return Transformation * new Ray(origin, dir);
     }
 }
