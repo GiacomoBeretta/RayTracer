@@ -169,8 +169,10 @@ public class InputStreamTest
             Assert.Equal('k', str.ReadChar());
             str.SkipLine();
             Assert.Equal('s', str.ReadChar());
-            //if you try to skipline without any escape sequence and is reached the end of file
-            Assert.Throws<SceneSyntaxException>(() => str.SkipLine());
+
+            //if you try to skip the last line without any escape sequence then is reached the end of file
+            str.SkipLine();
+            Assert.Null(str.ReadChar());
         }
         finally
         {
@@ -186,7 +188,7 @@ public class InputStreamTest
                                "\t\r\n" +
                                "\n\n" +
                                "utn\t\r\t\n" +
-                               "r";
+                               "r    ";
         string filePath = Path.GetTempFileName();
         try
         {
@@ -210,6 +212,10 @@ public class InputStreamTest
 
             str.SkipWhitespacesAndComments(); // Now it must not skip anything
             Assert.Equal('r', str.ReadChar());
+
+            //assert that the end of file is reached
+            str.SkipWhitespacesAndComments();
+            Assert.Null(str.ReadChar());
         }
         finally
         {
@@ -254,7 +260,15 @@ public class InputStreamTest
                          "830003.1E9\n" +
                          "9.1e-4\n" +
                          "4.7E-12\n" +
-                         "-34.3e5";
+                         "-34.3e5\n" +
+                         "+6.5\n" +
+                         "-8\n" +
+                         "9.5e+5\n" +
+                         "2.3E-6\n" +
+                         "+4e+7\n" +
+                         "-8.9e-3\n" +
+                         "3+4\n" +
+                         "5.2e+10-3";
         string filePath1 = Path.GetTempFileName();
         File.WriteAllText(filePath1, content);
         try
@@ -294,6 +308,57 @@ public class InputStreamTest
             ch = stream1.ReadChar();
             floatToken = stream1._ParseFloatToken(ch.Value, stream1.Location);
             Assert.Equal(-34.3e5f, floatToken.Value);
+
+            stream1.SkipLine();
+            ch = stream1.ReadChar();
+            floatToken = stream1._ParseFloatToken(ch.Value, stream1.Location);
+            Assert.Equal(6.5f, floatToken.Value);
+
+            stream1.SkipLine();
+            ch = stream1.ReadChar();
+            _testOutputHelper.WriteLine("prova"+ch.Value);
+            floatToken = stream1._ParseFloatToken(ch.Value, stream1.Location);
+            Assert.Equal(-8f, floatToken.Value);
+
+            stream1.SkipLine();
+            ch = stream1.ReadChar();
+            floatToken = stream1._ParseFloatToken(ch.Value, stream1.Location);
+            Assert.Equal(9.5e+5f, floatToken.Value);
+
+            stream1.SkipLine();
+            ch = stream1.ReadChar();
+            floatToken = stream1._ParseFloatToken(ch.Value, stream1.Location);
+            Assert.Equal(2.3E-6f, floatToken.Value);
+
+            stream1.SkipLine();
+            ch = stream1.ReadChar();
+            floatToken = stream1._ParseFloatToken(ch.Value, stream1.Location);
+            Assert.Equal(4e+7f, floatToken.Value);
+
+            stream1.SkipLine();
+            ch = stream1.ReadChar();
+            floatToken = stream1._ParseFloatToken(ch.Value, stream1.Location);
+            Assert.Equal(-8.9e-3f, floatToken.Value);
+
+            // 3+4
+            stream1.SkipLine();
+            ch = stream1.ReadChar(); // '3'
+            floatToken = stream1._ParseFloatToken(ch.Value, stream1.Location);
+            Assert.Equal(3f, floatToken.Value);
+            ch = stream1.ReadChar(); // '+'
+            ch = stream1.ReadChar(); // '4'
+            floatToken = stream1._ParseFloatToken(ch.Value, stream1.Location);
+            Assert.Equal(4f, floatToken.Value);
+
+            // 5.2e+10-3
+            stream1.SkipLine();
+            ch = stream1.ReadChar();
+            floatToken = stream1._ParseFloatToken(ch.Value, stream1.Location); // '5.2e+10'
+            Assert.Equal(5.2e10f, floatToken.Value);
+            ch = stream1.ReadChar(); // '-'
+            ch = stream1.ReadChar(); // '3'
+            floatToken = stream1._ParseFloatToken(ch.Value, stream1.Location);
+            Assert.Equal(3f, floatToken.Value);
         }
         finally
         {
@@ -301,38 +366,68 @@ public class InputStreamTest
         }
 
         string fail = "a\n" +
+                      "++3\n" +
+                      "--6.8\n" +
+                      "+.3\n" +
+                      "-e4\n" +
+                      "4.\n" +
+                      "8.e6\n" +
                       "7..2\n" +
                       "4ee2\n" +
-                      "--3.4\n" +
-                      "3.5e--2\n" +
-                      "3+4";
+                      "3.5e--2";
         string filePath2 = Path.GetTempFileName();
         File.WriteAllText(filePath2, fail);
         try
         {
+            // a
             InputStream stream2 = new InputStream(filePath2);
             char? ch = stream2.ReadChar();
             Assert.Throws<SceneSyntaxException>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
 
+            // ++3
             stream2.SkipLine();
             ch = stream2.ReadChar();
             Assert.Throws<SceneSyntaxException>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
-
+            
+            // --6.8
             stream2.SkipLine();
             ch = stream2.ReadChar();
             Assert.Throws<SceneSyntaxException>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
-
+            
+            // +.3
             stream2.SkipLine();
             ch = stream2.ReadChar();
             Assert.Throws<SceneSyntaxException>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
-
+            
+            // -e4
             stream2.SkipLine();
             ch = stream2.ReadChar();
             Assert.Throws<SceneSyntaxException>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
-
+            
+            // 4.
             stream2.SkipLine();
             ch = stream2.ReadChar();
-           // Assert.Throws<SceneSyntaxException>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
+            Assert.Throws<SceneSyntaxException>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
+            
+            // 8.e6
+            stream2.SkipLine();
+            ch = stream2.ReadChar();
+            Assert.Throws<SceneSyntaxException>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
+            
+            // 7..2
+            stream2.SkipLine();
+            ch = stream2.ReadChar();
+            Assert.Throws<SceneSyntaxException>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
+            
+            // 4ee2
+            stream2.SkipLine();
+            ch = stream2.ReadChar();
+            Assert.Throws<SceneSyntaxException>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
+            
+            // 3.5e--2
+            stream2.SkipLine();
+            ch = stream2.ReadChar();
+            Assert.Throws<SceneSyntaxException>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
         }
         finally
         {
