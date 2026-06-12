@@ -66,8 +66,9 @@ public class ImageTracer
     /// of the <see cref="Renderer"/> class.
     /// </summary>
     /// <remarks>
-    /// If <see cref="PixelSideSubdivisions"/> &gt; 1,
+    /// If <see cref="PixelSideSubdivisions"/> &gt; 0,
     /// multiple rays are fired per pixel and the results are averaged to reduce aliasing.
+    /// Otherwise the rays are fired at the center of each pixel.
     /// </remarks>
     /// <param name="renderFunction">Function that estimates the color for a given ray.</param>
     public void FireAllRays(Func<Ray, Color> renderFunction)
