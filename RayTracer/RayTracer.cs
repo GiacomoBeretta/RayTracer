@@ -8,12 +8,12 @@ using System.ComponentModel.DataAnnotations;
 using SixLabors.ImageSharp.Metadata.Profiles.Exif; // per rendere le opzioni o gli argomenti required
 
 [Command(Name = "RayTracer")]
-[Subcommand(typeof(DemoCommand), typeof(PfmToPngCommand)/*, typeof(AverageImageCommand)*/, typeof(RenderCommand))]
+[Subcommand(typeof(DemoCommand), typeof(PfmToPngCommand) /*, typeof(AverageImageCommand)*/, typeof(RenderCommand))]
 public class RayTracer
 {
     public static int Main(string[] args)
         => CommandLineApplication.Execute<RayTracer>(args);
-    
+
     internal int OnExecute(CommandLineApplication app)
     {
         app.ShowHelp();
@@ -38,9 +38,10 @@ public class DemoCommand
     [Option("--output", Description = "The name of the png file")]
     public string OutputFileName { get; init; } = "referenceShirley.png";
 
-    [Option("--algorithm", Description = "Render's algorithm. OnOffRenderer passed by default")]
-    public RenderFunc Algorithm { get; init; } = RenderFunc.OnOff;      
-    
+    [Option("--algorithm", Description = "Render's algorithm. OnOffRenderer passed by default." +
+                                         "Options are: OnOff, Flat, PathTracer")]
+    public RenderFunc Algorithm { get; init; } = RenderFunc.OnOff;
+
     [Option("--theta", Description = "Observer's azimuthal angle in degrees")]
     [Range(0.0f, 180.0f)]
     public float Theta { get; init; } = 0.0f;
@@ -49,12 +50,13 @@ public class DemoCommand
     [Range(0.0f, 360.0f)]
     public float Phi { get; init; } = 0.0f;
 
-    [Option("--projection", Description = "projection used to render the image.")]
+    [Option("--projection", Description = "projection used to render the image." +
+                                          "Options are: Orthogonal, Perspective")]
     public Projection Projection { get; } = Projection.Perspective;
 
     [Option("--luminosityFunction", Description = "Luminosity function, options are: shirley (default), weighted")]
     public LumFunction LuminosityFunction { get; init; } = LumFunction.Shirley;
-    
+
     //aggiungere range
     [Option("--factor", Description = "The empirical factor to render images")]
     public float Factor { get; init; } = 1.0f;
@@ -63,116 +65,131 @@ public class DemoCommand
     [Option("--gamma", Description = "The gamma factor characteristic of the screen")]
     public float Gamma { get; init; } = 1.0f;
 
+    // demo with the scene.txt file
     private void OnExecute()
-   {
-       Console.WriteLine($"width: {Width}");
-       Console.WriteLine($"height: {Height}");
-       Console.WriteLine($"outputFileName: {OutputFileName}");
-       Console.WriteLine($"Render's algorithm: {Algorithm}");
-       Console.WriteLine($"theta: {Theta}");
-       Console.WriteLine($"phi: {Phi}");
-       Console.WriteLine($"projection: {Projection}");
-       Console.WriteLine();
-       Console.WriteLine("Tone Mapping parameters:");
-       Console.WriteLine($"luminosity function: {LuminosityFunction}");
-       Console.WriteLine($"factor: {Factor}");
-       Console.WriteLine($"gamma: {Gamma}");
+    {
+        Console.WriteLine($"width: {Width}");
+        Console.WriteLine($"height: {Height}");
+        Console.WriteLine($"outputFileName: {OutputFileName}");
+        Console.WriteLine($"Render's algorithm: {Algorithm}");
+        Console.WriteLine($"theta: {Theta}");
+        Console.WriteLine($"phi: {Phi}");
+        Console.WriteLine($"projection: {Projection}");
+        Console.WriteLine();
+        Console.WriteLine("Tone Mapping parameters:");
+        Console.WriteLine($"luminosity function: {LuminosityFunction}");
+        Console.WriteLine($"factor: {Factor}");
+        Console.WriteLine($"gamma: {Gamma}");
 
-       // Adjust parameters
-       float thetaRad = Functions.DegToRad(Theta);
-       float phiRad = Functions.DegToRad(Phi);
-       string currentPath = AppDomain.CurrentDomain.BaseDirectory;
-       string pngFilePath = Path.Combine(currentPath, "../../../../DemoImages/" + OutputFileName); //"../../../../DemoImages/" dal path dell'eseguibile torna indietro (Controllare)
-       if (OutputFileName[^4..] != ".png") pngFilePath += ".png"; //OutputFilename[^4..] Legge gli ultimi 4 caratteri
-       
-       // Define materials
-       var sphereTexture = new HDRImage(2, 2)
-       {
-           [0] = new Color(0.1f, 0.2f, 0.3f),
-           [1] = new Color(0.2f, 0.1f, 0.3f),
-           [2] = new Color(0.3f, 0.2f, 0.1f),
-           [3] = new Color(0.3f, 0.1f, 0.2f)
-       };
-       var material1 = new Material(new UniformPigment(new Color(0.7f, 0.3f, 0.2f)), new DiffuseBRDF());
-       var material2 =
-           new Material(new CheckeredPigment(new Color(0.2f, 0.7f, 0.3f), new Color(0.3f, 0.2f, 0.7f), numsteps: 4),
-               new DiffuseBRDF());
-       var material3 = new Material(new ImagePigment(sphereTexture), new DiffuseBRDF());
+        // Adjust parameters
+        float thetaRad = Functions.DegToRad(Theta);
+        float phiRad = Functions.DegToRad(Phi);
+        string currentPath = AppDomain.CurrentDomain.BaseDirectory;
+        string pngFilePath =
+            Path.Combine(currentPath,
+                "../../../../DemoImages/" +
+                OutputFileName); //"../../../../DemoImages/" dal path dell'eseguibile torna indietro (Controllare)
+        if (OutputFileName[^4..] != ".png") pngFilePath += ".png"; //OutputFilename[^4..] Legge gli ultimi 4 caratteri
 
-       // PER LA CAMERA APPLICARE LA TRASLAZIONE PER PRIMA (ULTIMA NELLA CONCATENAZIONE)
-       ICamera camera;
-       
-       if(Projection == Projection.Perspective)
-       {
-           camera = new PerspectiveCamera(transformation: new Transformation('z', phiRad) *
+        // Define materials
+        var sphereTexture = new HDRImage(2, 2)
+        {
+            [0,0] = new Color(0.1f, 0.2f, 0.3f),
+            [0,1] = new Color(0.2f, 0.1f, 0.3f),
+            [1,0] = new Color(0.3f, 0.2f, 0.1f),
+            [1,1] = new Color(0.3f, 0.1f, 0.2f)
+        };
+        var material1 = new Material(new UniformPigment(new Color(0.7f, 0.3f, 0.2f)), new DiffuseBRDF());
+        var material2 =
+            new Material(new CheckeredPigment(new Color(0.2f, 0.7f, 0.3f), new Color(0.3f, 0.2f, 0.7f), numsteps: 4),
+                new DiffuseBRDF());
+        var material3 = new Material(new ImagePigment(sphereTexture), new DiffuseBRDF());
+
+        // PER LA CAMERA APPLICARE LA TRASLAZIONE PER PRIMA (ULTIMA NELLA CONCATENAZIONE)
+        ICamera camera;
+
+        if (Projection == Projection.Perspective)
+        {
+            camera = new PerspectiveCamera(transformation: new Transformation('z', phiRad) *
+                                                           new Transformation('y', thetaRad) *
+                                                           new Transformation(new Vector(-1.0f, 0f, 0f)));
+        }
+        else if (Projection == Projection.Orthogonal)
+        {
+            camera = new OrthogonalCamera(transformation: new Transformation('z', phiRad) *
                                                           new Transformation('y', thetaRad) *
                                                           new Transformation(new Vector(-1.0f, 0f, 1.0f)));
-       }
-       else if (Projection == Projection.Orthogonal)
-       {
-           camera = new OrthogonalCamera(transformation: new Transformation('z', phiRad) *
-                                                         new Transformation('y', thetaRad) *
-                                                         new Transformation(new Vector(-1.0f, 0f, 1.0f)));
-       }
-       else
-       {
-           throw new ArgumentException("Invalid camera mode, accepted orthogonal or perspective");
-       }
+        }
+        else
+        {
+            throw new ArgumentException("Invalid camera mode, accepted orthogonal or perspective");
+        }
 
-       var image = new HDRImage(Width, Height);
-       var tracer = new ImageTracer(image, camera, pixelSideSubdivisions: 4);
+        var image = new HDRImage(Width, Height);
+        var tracer = new ImageTracer(image, camera, pixelSideSubdivisions: 4);
 
-       //PER LE FORME APPLICARE LA TRASLAZIONE PER ULTIMA (PRIMA NELLA CONCATENAZIONE)
-       var s1 = new Sphere(new Transformation(new Vector(0.5f, 0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f), material1);
-       var s2 = new Sphere(new Transformation(new Vector(-0.5f, 0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f), material1);
-       var s3 = new Sphere(new Transformation(new Vector(0.5f, -0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f), material1);
-       var s4 = new Sphere(new Transformation(new Vector(0.5f, 0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f), material1);
-       var s5 = new Sphere(new Transformation(new Vector(-0.5f, -0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f), material1);
-       var s6 = new Sphere(new Transformation(new Vector(0.5f, -0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f), material1);
-       var s7 = new Sphere(new Transformation(new Vector(-0.5f, 0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f), material1);
-       var s8 = new Sphere(new Transformation(new Vector(-0.5f, -0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f), material1);
-       var s9 = new Sphere(new Transformation(new Vector(0f, 0f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f), material2);
-       var s10 = new Sphere(new Transformation(new Vector(0f, 0.5f, 0f)) * new Transformation(0.1f, 0.1f, 0.1f), material3);
+        //PER LE FORME APPLICARE LA TRASLAZIONE PER ULTIMA (PRIMA NELLA CONCATENAZIONE)
+        var s1 = new Sphere(new Transformation(new Vector(0.5f, 0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f),
+            material1);
+        var s2 = new Sphere(new Transformation(new Vector(-0.5f, 0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f),
+            material1);
+        var s3 = new Sphere(new Transformation(new Vector(0.5f, -0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f),
+            material1);
+        var s4 = new Sphere(new Transformation(new Vector(0.5f, 0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f),
+            material1);
+        var s5 = new Sphere(new Transformation(new Vector(-0.5f, -0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f),
+            material1);
+        var s6 = new Sphere(new Transformation(new Vector(0.5f, -0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f),
+            material1);
+        var s7 = new Sphere(new Transformation(new Vector(-0.5f, 0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f),
+            material1);
+        var s8 = new Sphere(new Transformation(new Vector(-0.5f, -0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f),
+            material1);
+        var s9 = new Sphere(new Transformation(new Vector(0f, 0f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f),
+            material2);
+        var s10 = new Sphere(new Transformation(new Vector(0f, 0.5f, 0f)) * new Transformation(0.1f, 0.1f, 0.1f),
+            material3);
 
-       var shapes = new List<Shape>
-       {
-           s1,
-           s2,
-           s3,
-           s4,
-           s5,
-           s6,
-           s7,
-           s8,
-           s9,
-           s10,
-       };
+        var shapes = new List<Shape>
+        {
+            s1,
+            s2,
+            s3,
+            s4,
+            s5,
+            s6,
+            s7,
+            s8,
+            s9,
+            s10,
+        };
 
-       var world = new World(shapes);
-       
-       Renderer render;
+        var world = new World(shapes);
 
-       switch (Algorithm)
-       {
-           case RenderFunc.OnOff:
-               render = new OnOffRenderer(world);
-               break;
-           case RenderFunc.Flat:
-               render = new FlatRenderer(world);
-               break;
-           //case RenderFunc.PathTracer:
-               //render = new PathTracer(world);
-               //break;
-           default:
-               throw new ArgumentException("Invalid renderer mode, accepted onoff, flat or pathtracer");
-       }
-       
-       tracer.FireAllRays(ray => render.RenderFunction(ray));
-       
-       image.WritePNG(pngFilePath, LuminosityFunction, Factor, Gamma, averageLuminosity: 0.5f);
-       Console.WriteLine("The PNG file has been saved in DemoImages/" + OutputFileName);
-   }
+        Renderer render;
+
+        switch (Algorithm)
+        {
+            case RenderFunc.OnOff:
+                render = new OnOffRenderer(world);
+                break;
+            case RenderFunc.Flat:
+                render = new FlatRenderer(world);
+                break;
+            //case RenderFunc.PathTracer:
+            //render = new PathTracer(world);
+            //break;
+            default:
+                throw new ArgumentException("Invalid renderer mode, accepted onoff, flat or pathtracer");
+        }
+
+        tracer.FireAllRays(ray => render.RenderFunction(ray));
+
+        image.WritePNG(pngFilePath, LuminosityFunction, Factor, Gamma, averageLuminosity: 0.5f);
+        Console.WriteLine("The PNG file has been saved in DemoImages/" + OutputFileName);
+    }
     /*
+     * Demo with the two spheres and the checkered floor
     private void OnExecute()
     {
         // Print the parameters passed on the command line
@@ -195,7 +212,7 @@ public class DemoCommand
         string currentPath = AppDomain.CurrentDomain.BaseDirectory;
         string pngFilePath = Path.Combine(currentPath, "../../../../DemoImages/" + OutputFileName);
         if (OutputFileName[^4..] != ".png") pngFilePath += ".png";
-        
+
         // Define materials
         var skyMaterial = new Material(new UniformPigment(new Color(1.0f, 0.9f, 0.5f)),
             new DiffuseBRDF(new UniformPigment(new Color(0.0f, 0.0f, 0.0f))));
@@ -203,14 +220,14 @@ public class DemoCommand
             new Material(new CheckeredPigment(new Color(0.3f, 0.5f, 0.1f), new Color(0.1f, 0.2f, 0.5f)), new DiffuseBRDF());
         var sphereMaterial = new Material(new UniformPigment(new Color(0.3f, 0.4f, 0.8f)), new DiffuseBRDF());
         var mirrorMaterial = new Material(new UniformPigment(new Color(0.6f, 0.2f, 0.3f)), new SpecularBRDF());
-        
+
         // Define the shapes of the scene
         var world = new World();
         world.Add(new Sphere(new Transformation(new Vector(0f, 0f, 0.4f)) * new Transformation(200f,200f,200f), skyMaterial));
         world.Add(new Plane(new Transformation(), groundMaterial));
         world.Add(new Sphere(new Transformation(new Vector(0f, 0f, 1f)), sphereMaterial));
         world.Add(new Sphere(new Transformation(new Vector(1f, 2.5f, 0f)), mirrorMaterial));
-        
+
         // Choose and position the camera
         ICamera camera;
         if(Projection == Projection.Perspective)
@@ -229,7 +246,7 @@ public class DemoCommand
         {
             throw new ArgumentException("Invalid camera mode, accepted orthogonal or perspective");
         }
-        
+
         // Choose the render algorithm
         Render render;
         switch (Algorithm)
@@ -246,12 +263,12 @@ public class DemoCommand
             default:
                 throw new ArgumentException("Invalid renderer mode, accepted onoff, flat or pathtracer");
         }
-        
+
         // Create the PFM image
         var image = new HDRImage(Width, Height);
         var tracer = new ImageTracer(image, camera, samplePerSide: 4);
         tracer.FireAllRays(ray => render.RenderFunction(ray));
-        
+
         // Write the PNG file
         image.WritePNG(pngFilePath, LuminosityFunction, Factor, Gamma, averageLuminosity: 0.5f);
         Console.WriteLine("The PNG file has been saved in DemoImages/" + OutputFileName);
@@ -262,10 +279,9 @@ public class DemoCommand
 [Command(Name = "pfmtopng", Description = "Converts a PFM image to PNG")]
 public class PfmToPngCommand
 {
-    
     [Option("--input", Description = "The input file path")]
     [Required]
-    public required string InputFilePath { get; set; } 
+    public required string InputFilePath { get; set; }
 
     [Option("--output", Description = "The output file path")]
     [Required]
@@ -287,7 +303,7 @@ public class PfmToPngCommand
         Console.WriteLine($"luminosity function: {LuminosityFunction}");
         Console.WriteLine($"factor: {Factor}");
         Console.WriteLine($"gamma: {Gamma}");
-        
+
         HDRImage image = HDRImage.ReadPFM_File(InputFilePath);
         image.WritePNG(OutputFilePath, LuminosityFunction, Factor, Gamma);
     }
@@ -297,8 +313,9 @@ public class PfmToPngCommand
 public class RenderCommand
 {
     [Option("--input", Description = "The input scene file path")]
-    public string InputScene { get; set; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../../Scenes/scene.txt");
-    
+    public string InputScene { get; set; } =
+        Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../../Scenes/scene.txt");
+
     [Option("--width", Description = "The width of the image")]
     [Range(1, Int32.MaxValue)]
     public int Width { get; set; } = 500;
@@ -311,10 +328,12 @@ public class RenderCommand
     public RenderFunc Algorithm { get; set; } = RenderFunc.PathTracer;
 
     [Option("--outputpfm", Description = "Name of the pfm file output")]
-    public string OutputPfm { get; set; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../../PfmImages/output.pfm");
+    public string OutputPfm { get; set; } =
+        Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../../PfmImages/output.pfm");
 
     [Option("--outputpng", Description = "Name of the png file output")]
-    public string OutputPng { get; set; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../../PngImages/output.png");
+    public string OutputPng { get; set; } =
+        Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../../PngImages/output.png");
 
     [Option("--numrays",
         Description =
@@ -336,10 +355,10 @@ public class RenderCommand
     [Option("--sampleside", Description = "Number of samples per pixel's side")]
     [Range(1, Int32.MaxValue)]
     public int SampleSide { get; set; } = 1;
-    
+
     [Option("--luminosityFunction", Description = "Luminosity function, options are: shirley (default), weighted")]
     public LumFunction LuminosityFunction { get; set; } = LumFunction.Shirley;
-    
+
     [Option("--factor", Description = "The empirical factor to render images")]
     public int Factor { get; set; } = 1;
 
@@ -355,7 +374,7 @@ public class RenderCommand
     public int RussianRouletteStartDepth { get; set; } = 3;
 
     [Option("--rouletteprob", Description = "Optional fixed probability for the Russian roulette algorithm " +
-                                             "(when null, the probability is computed dynamically at each recursive call of RenderFunction)")]
+                                            "(when null, the probability is computed dynamically at each recursive call of RenderFunction)")]
     [Range(0, 1)]
     public float? RussianRouletteFixedProb { get; set; } = null;
 
@@ -377,15 +396,17 @@ public class RenderCommand
         Console.WriteLine($"Gamma: {Gamma}");
         Console.WriteLine($"RouletteStart: {RussianRouletteStartDepth}");
         Console.WriteLine($"RouletteFixedProb: {RussianRouletteFixedProb}");
-        
+
         string currentPath = AppDomain.CurrentDomain.BaseDirectory;
-        
-        string pngFilePath = Path.Combine(currentPath, "../../../../PngImages/", OutputPng); //"../../../../DemoImages/" dal path dell'eseguibile torna indietro (Controllare)
+
+        string pngFilePath =
+            Path.Combine(currentPath, "../../../../PngImages/",
+                OutputPng); //"../../../../DemoImages/" dal path dell'eseguibile torna indietro (Controllare)
         if (OutputPng[^4..] != ".png") pngFilePath += ".png"; //OutputFilename[^4..] Legge gli ultimi 4 caratteri
 
         string pfmFilePath = Path.Combine(currentPath, "../../../../PfmImages", OutputPfm);
         if (OutputPfm[^4..] != ".pfm") pfmFilePath += ".pfm";
-        
+
         var scene = new Scene();
         var input = new InputStream(InputScene);
         var variables = Functions.VariableTable(Definitions);
@@ -400,7 +421,7 @@ public class RenderCommand
         }
 
         var image = new HDRImage(Width, Height);
-        
+
         Renderer renderer;
         switch (Algorithm)
         {
@@ -411,27 +432,27 @@ public class RenderCommand
                 renderer = new FlatRenderer(scene.World);
                 break;
             case RenderFunc.PathTracer:
-                renderer = new PathTracingRenderer(scene.World, new PCG(InitState, InitSeq), backgroundColor: null, NumRays, MaxDepth, RussianRouletteStartDepth, RussianRouletteFixedProb);
+                renderer = new PathTracingRenderer(scene.World, new PCG(InitState, InitSeq), backgroundColor: null,
+                    NumRays, MaxDepth, RussianRouletteStartDepth, RussianRouletteFixedProb);
                 break;
             default:
                 throw new ArgumentException("Invalid renderer mode, accepted onoff, flat or pathtracer");
         }
-        
-        if(scene.Camera == null)
+
+        if (scene.Camera == null)
         {
             Console.WriteLine("Not initialized camera. Follows default initialization [perspective]");
             scene.Camera = new PerspectiveCamera();
         }
-        
+
         var tracer = new ImageTracer(image, scene.Camera, pixelSideSubdivisions: SampleSide);
         tracer.FireAllRays(ray => renderer.RenderFunction(ray));
-        
+
         HDRImage.WritePFM_File(image, pfmFilePath);
         Console.WriteLine($"Pfm file created in: {OutputPfm}");
-        
-        image.WritePNG(pngFilePath, LuminosityFunction, Factor, Gamma, averageLuminosity: 0.5f); 
+
+        image.WritePNG(pngFilePath, LuminosityFunction, Factor, Gamma, averageLuminosity: 0.5f);
         Console.WriteLine($"Png file created in: {OutputPng}");
-        
     }
 }
 
@@ -441,7 +462,7 @@ public  class AverageImageCommand
     [Option("--input", Description = "Input file path")]
     [Required]
     public required string InputFilePath { get; init; }
-    
+
     [Option("--output", Description = "Output file path")]
     [Required]
     public required string OutputFilePath { get; init; }
@@ -455,7 +476,7 @@ public enum Projection
 
 public enum RenderFunc
 {
-    OnOff, 
+    OnOff,
     Flat,
     PathTracer
 }
@@ -482,7 +503,7 @@ private void OnExecute()
        string currentPath = AppDomain.CurrentDomain.BaseDirectory;
        string pngFilePath = Path.Combine(currentPath, "../../../../DemoImages/" + OutputFileName);
        if (OutputFileName[^4..] != ".png") pngFilePath += ".png";
-       
+
        // Define materials
        var sphereTexture = new HDRImage(2, 2)
        {
@@ -499,7 +520,7 @@ private void OnExecute()
 
        // PER LA CAMERA APPLICARE LA TRASLAZIONE PER PRIMA (ULTIMA NELLA CONCATENAZIONE)
        ICamera camera;
-       
+
        if(Projection == Projection.Perspective)
        {
            camera = new PerspectiveCamera(transformation: new Transformation('z', phiRad) *
@@ -547,7 +568,7 @@ private void OnExecute()
        };
 
        var world = new World(shapes);
-       
+
        Render render;
 
        switch (Algorithm)
@@ -564,9 +585,9 @@ private void OnExecute()
            default:
                throw new ArgumentException("Invalid renderer mode, accepted onoff, flat or pathtracer");
        }
-       
+
        tracer.FireAllRays(ray => render.RenderFunction(ray));
-       
+
        image.WritePNG(pngFilePath, LuminosityFunction, Factor, Gamma, averageLuminosity: 0.5f);
        Console.WriteLine("The PNG file has been saved in DemoImages/" + OutputFileName);
    }*/
