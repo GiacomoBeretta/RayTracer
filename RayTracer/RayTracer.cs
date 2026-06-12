@@ -106,13 +106,13 @@ public class DemoCommand
        {
            camera = new PerspectiveCamera(transformation: new Transformation('z', phiRad) *
                                                           new Transformation('y', thetaRad) *
-                                                          new Transformation(new Vector(-1.0f, 0f, 1.0f)));
+                                                          new Transformation(new Vector(-1.0f, 0f, 0.0f)));
        }
        else if (Projection == Projection.Orthogonal)
        {
            camera = new OrthogonalCamera(transformation: new Transformation('z', phiRad) *
                                                          new Transformation('y', thetaRad) *
-                                                         new Transformation(new Vector(-1.0f, 0f, 1.0f)));
+                                                         new Transformation(new Vector(-1.0f, 0f, 0.0f)));
        }
        else
        {
@@ -311,10 +311,10 @@ public class RenderCommand
     public RenderFunc Algorithm { get; set; } = RenderFunc.PathTracer;
 
     [Option("--outputpfm", Description = "Name of the pfm file output")]
-    public string OutputPfm { get; set; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../../PfmImages/output.pfm");
+    public string OutputPfm { get; set; } = "output.pfm";
 
     [Option("--outputpng", Description = "Name of the png file output")]
-    public string OutputPng { get; set; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../../PngImages/output.png");
+    public string OutputPng { get; set; } = "output.png";
 
     [Option("--numrays",
         Description =
@@ -323,7 +323,7 @@ public class RenderCommand
 
     [Option("--maxdepth",
         Description = "Maximum allowed ray depth (this command only works for the Pathtracing algorithm)")]
-    public int MaxDepth { get; set; } = 3;
+    public int MaxDepth { get; set; } = 2;
 
     [Option("--initstate", Description = "Initial seed for the random number generator")]
     [Range(0, ulong.MaxValue)]
@@ -411,7 +411,7 @@ public class RenderCommand
                 renderer = new FlatRenderer(scene.World);
                 break;
             case RenderFunc.PathTracer:
-                renderer = new PathTracingRenderer(scene.World, new PCG(InitState, InitSeq), backgroundColor: null, NumRays, MaxDepth, RussianRouletteStartDepth, RussianRouletteFixedProb);
+                renderer = new PathTracingRenderer(scene.World, new PCG(InitState, InitSeq), backgroundColor: null, numRay: NumRays, maxDepth: MaxDepth, russianRouletteStartDepth: RussianRouletteStartDepth, russianRouletteProbability:RussianRouletteFixedProb);
                 break;
             default:
                 throw new ArgumentException("Invalid renderer mode, accepted onoff, flat or pathtracer");
