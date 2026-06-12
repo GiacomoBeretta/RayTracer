@@ -6,19 +6,19 @@ while [[ $# -gt 0 ]]; do
     --width) width="$2"; shift 2 ;;
     --height) height="$2"; shift 2 ;;
     --algorithm) algorithm="$2"; shift 2 ;;
-    --output-pfm) outputpfm="$2"; shift 2 ;;
-    --output-png) outputpng="$2"; shift 2 ;;
-    --num-rays) numrays="$2"; shift 2 ;;
-    --max-depth) maxdepth="$2"; shift 2 ;;
-    --init-state) initstate="$2"; shift 2 ;;
-    --init-seq) initseq="$2"; shift 2 ;;
-    --sample-side) sampleside="$2"; shift 2 ;;
+    --outputpfm) outputpfm="$2"; shift 2 ;;
+    --outputpng) outputpng="$2"; shift 2 ;;
+    --numrays) numrays="$2"; shift 2 ;;
+    --maxdepth) maxdepth="$2"; shift 2 ;;
+    --initstate) initstate="$2"; shift 2 ;;
+    --initseq) initseq="$2"; shift 2 ;;
+    --sampleside) sampleside="$2"; shift 2 ;;
     --luminosityFunction) lumfunction="$2"; shift 2 ;;
     --factor) factor="$2"; shift 2 ;;
     --gamma) gamma="$2"; shift 2 ;;
-    --roulette-start) roulette_start="$2"; shift 2 ;;
-    --roulette-prob) roulette_prob="$2"; shift 2 ;;
-    --declare-float) declare_float="$2"; shift 2 ;;
+    --roulettestart) roulette_start="$2"; shift 2 ;;
+    --rouletteprob) roulette_prob="$2"; shift 2 ;;
+    --declarefloat) declare_float="$2"; shift 2 ;;
     *) echo "Unknown parameter: $1"; exit 1 ;;
   esac
 done
@@ -52,19 +52,19 @@ cmd=( "$exePath" render )
 [ -n "$width" ]          && cmd+=( --width "$width" )
 [ -n "$height" ]         && cmd+=( --height "$height" )
 [ -n "$algorithm" ]      && cmd+=( --algorithm "$algorithm" )
-[ -n "$outputpfm" ]      && cmd+=( --output-pfm "$outputpfm" )
-[ -n "$outputpng" ]      && cmd+=( --output-png "$outputpng" )
-[ -n "$numrays" ]        && cmd+=( --num-rays "$numrays" )
-[ -n "$maxdepth" ]       && cmd+=( --max-depth "$maxdepth" )
-[ -n "$initstate" ]      && cmd+=( --init-state "$initstate" )
-[ -n "$initseq" ]        && cmd+=( --init-seq "$initseq" )
-[ -n "$sampleside" ]     && cmd+=( --sample-side "$sampleside" )
+[ -n "$outputpfm" ]      && cmd+=( --outputpfm "$outputpfm" )
+[ -n "$outputpng" ]      && cmd+=( --outputpng "$outputpng" )
+[ -n "$numrays" ]        && cmd+=( --numrays "$numrays" )
+[ -n "$maxdepth" ]       && cmd+=( --maxdepth "$maxdepth" )
+[ -n "$initstate" ]      && cmd+=( --initstate "$initstate" )
+[ -n "$initseq" ]        && cmd+=( --initseq "$initseq" )
+[ -n "$sampleside" ]     && cmd+=( --sampleside "$sampleside" )
 [ -n "$lumfunction" ]    && cmd+=( --luminosityFunction "$lumfunction" )
 [ -n "$factor" ]         && cmd+=( --factor "$factor" )
 [ -n "$gamma" ]          && cmd+=( --gamma "$gamma" )
-[ -n "$roulette_start" ] && cmd+=( --roulette-start "$roulette_start" )
-[ -n "$roulette_prob" ]  && cmd+=( --roulette-prob "$roulette_prob" )
-[ -n "$declare_float" ]  && cmd+=( --declare-float "$declare_float" )
+[ -n "$roulette_start" ] && cmd+=( --roulettestart "$roulette_start" )
+[ -n "$roulette_prob" ]  && cmd+=( --rouletteprob "$roulette_prob" )
+[ -n "$declare_float" ]  && cmd+=( --declarefloat "$declare_float" )
 
 dotnet build
 
