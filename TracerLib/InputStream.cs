@@ -111,14 +111,6 @@ public class InputStream
         }
     }
 
-    public void UnreadChar(char c)
-    {
-        {
-            SavedChar = c;
-            Location = SavedLocation;
-        }
-    }
-
     /// <summary>
     /// Returns null if it has been reached the end of file
     /// </summary>
@@ -142,12 +134,24 @@ public class InputStream
         return c;
     }
 
+    public void UnreadChar(char c)
+    {
+        {
+            SavedChar = c;
+            Location = SavedLocation;
+        }
+    }
+
+    /// <summary>
+    /// Reads until a '\n' or '\r\n' is encountered or the end of file is reached.
+    /// </summary>
+    /// <exception cref="SceneSyntaxException"></exception>
     public void SkipLine()
     {
         while (true)
         {
             char? ch = ReadChar();
-            if (ch == null) throw new SceneSyntaxException(Location, "Attempt to Skip Line failed, reached the end of file before encountering the escape sequence \\n");
+            if (ch == null) return;
             if (ch == '\n') break;
             if (ch == '\r')
             {
@@ -157,12 +161,16 @@ public class InputStream
         }
     }
 
+    /// <summary>
+    /// Reads all the whitespaces new line escape sequences and comments starting with the hash character (#).
+    /// </summary>
     public void SkipWhitespacesAndComments()
     {
         const string whitespace = " \t \n \r";
 
         char? ch = ReadChar();
 
+        // if reaches the end of file return to the precedent function
         if (ch == null) return;
 
         while (whitespace.Contains(ch.Value) || ch == '#')
@@ -172,6 +180,7 @@ public class InputStream
             if (ch == null) return;
         }
 
+        // if the character read is useful then save it to read it the next time you use readChar
         UnreadChar(ch.Value);
     }
 
@@ -194,23 +203,182 @@ public class InputStream
         return new StringToken(tokenLocation, stringToken);
     }
 
+    //prova con i caratteri exp ecc. 
+    /// <summary>
+    /// tokenLocation serve perché leggendo mano a mano i caratteri la location si aggiorna e va avanti
+    /// </summary>
+    /// <param name="firstChar"></param>
+    /// <param name="tokenLocation"></param>
+    /// <returns></returns>
+    /// <exception cref="SceneSyntaxException"></exception>
     public LiteralNumberToken _ParseFloatToken(char firstChar, SourceLocation tokenLocation)
     {
         string floatString = firstChar.ToString();
         const string expChar = "eE";
-        const string signs = "+-"; //for exponents
+        const string signs = "+-"; // signs for exponents (the sign of the value is already read in the first char)
+        bool hasReadExpSign = false;
+        bool hasReadExpChar = false;
+        bool hasReadDot = false; // the decimal point
+        float value;
+
+        // if the first char is a sign we expect to read next a digit otherwise we throw an exception
+        if (firstChar == '+' || firstChar == '-')
+        {
+            char? ch = ReadChar();
+            if (ch == null)
+            {
+                throw new SceneSyntaxException(tokenLocation, "unterminated number: reached end of file.");
+            }
+
+            if (!char.IsDigit(ch.Value))
+            {
+                UnreadChar(ch.Value);
+                throw new SceneSyntaxException(tokenLocation,
+                    "invalid number: after the sign of the number must follow a number");
+            }
+
+            floatString += ch.Value;
+        }
+
+        while (true)
+        {
+            char? ch = ReadChar();
+            if (ch == null) break;
+            //  if a dot is encountered then the next char must be a digit otherwise we throw an exception
+            // Furthermore if the dot is read after we have already read the exponent part we throw an exception
+            if (ch.Value == '.')
+            {
+                if (hasReadExpChar)
+                {
+                    UnreadChar(ch.Value);
+                    throw new SceneSyntaxException(tokenLocation, "invalid number: dot following the exponent part.");
+                }
+
+                if (hasReadDot)
+                {
+                    UnreadChar(ch.Value);
+                    throw new SceneSyntaxException(tokenLocation, "invalid number: read two dots.");
+                }
+
+                hasReadDot = true;
+                floatString += ch.Value;
+
+                // Read the char after the dot: it must be a number
+                ch = ReadChar();
+                if (ch == null)
+                {
+                    throw new SceneSyntaxException(tokenLocation, "unterminated number: reached end of file.");
+                }
+
+                if (!char.IsDigit(ch.Value))
+                {
+                    UnreadChar(ch.Value);
+                    throw new SceneSyntaxException(tokenLocation, "invalid number");
+                }
+
+                floatString += ch.Value;
+            }
+
+            // if we read an exponent char then the next char must be:
+            // a number
+            // or
+            // a sign and a following number 
+            else if (ch == 'e' || ch == 'E')
+            {
+                if (hasReadExpChar)
+                {
+                    UnreadChar(ch.Value);
+                    throw new SceneSyntaxException(tokenLocation,
+                        "invalid number: have been read two exponent letters (e or E).");
+                }
+
+                hasReadExpChar = true;
+                floatString += ch.Value;
+
+                ch = ReadChar();
+                if (ch == null)
+                {
+                    throw new SceneSyntaxException(tokenLocation, "unterminated number: reached end of file.");
+                }
+
+                if (ch == '+' || ch == '-')
+                {
+                    if (hasReadExpSign)
+                    {
+                        UnreadChar(ch.Value);
+                        throw new SceneSyntaxException(tokenLocation,
+                            "invalid number: have been read two exponent signs.");
+                    }
+
+                    hasReadExpSign = true;
+                    floatString += ch;
+
+                    ch = ReadChar();
+                    if (ch == null)
+                    {
+                        throw new SceneSyntaxException(tokenLocation, "unterminated number: reached end of file.");
+                    }
+
+                    // after the exponent sign must follow a number
+                    if (!char.IsDigit(ch.Value))
+                    {
+                        UnreadChar(ch.Value);
+                        throw new SceneSyntaxException(tokenLocation,
+                            "invalid number: after the e/E and the exponent sign must follow a number");
+                    }
+
+                    floatString += ch.Value;
+                }
+                //if there is no exponent sign there must be a number
+                else if (Char.IsDigit(ch.Value))
+                {
+                    floatString += ch.Value;
+                }
+                else
+                {
+                    UnreadChar(ch.Value);
+                    throw new SceneSyntaxException(tokenLocation,
+                        "invalid number: after the e/E must follow a sign or a number");
+                }
+            }
+            else if (char.IsDigit(ch.Value))
+            {
+                floatString += ch.Value;
+            }
+            else // if ch is not a '.', 'e', 'E', and neither a digit
+            {
+                UnreadChar(ch.Value);
+                break;
+            }
+        }
+
+        try
+        {
+            value = float.Parse(floatString, CultureInfo.InvariantCulture);
+        }
+        catch (Exception)
+        {
+            throw new SceneSyntaxException(tokenLocation, $"{floatString} is an invalid floating point number");
+        }
+
+        return new LiteralNumberToken(tokenLocation, value: value);
+    }
+
+    // vecchio parseFloatToken
+    /*public LiteralNumberToken _ParseFloatToken(char firstChar, SourceLocation tokenLocation)
+    {
+        string floatString = firstChar.ToString();
+        const string expChar = "eE";
+        const string signs = "+-"; // signs for exponents (the sign of the value is already read in the first char)
 
         float value;
 
-        bool hasReadSign = false;
-        bool hasReadExpSing = false;
-        bool hasReadExpChar = false;
         while (true)
         {
             char? ch = ReadChar();
             // if it has been reached the end of file
             if (ch == null) break;
-            
+
             if (!Char.IsDigit(ch.Value) && ch.Value != '.' &&
                 !expChar.Contains(ch.Value) && !signs.Contains(ch.Value))
             {
@@ -228,9 +396,9 @@ public class InputStream
         {
             throw new SceneSyntaxException(tokenLocation, $"{floatString} is an invalid floating point number");
         }
-        
+
         return new LiteralNumberToken(tokenLocation, value: value);
-    }
+    }*/
 
     public Token _ParseKeywordIdentifierToken(char firstChar, SourceLocation tokenLocation)
     {
@@ -249,6 +417,7 @@ public class InputStream
 
             tokenString += ch;
         }
+
         if (Keywords.Map.TryGetValue(tokenString, out Keyword keyword))
         {
             return new KeywordToken(tokenLocation, keyword);
@@ -291,6 +460,7 @@ public class InputStream
 
         if (symbols.Contains(ch.Value))
         {
+            //invertire location e value per conformare agli altri token o viceversa invertire gli altri
             return new SymbolToken(Location, ch.Value.ToString());
         }
         else if (ch == '\"')
@@ -352,7 +522,7 @@ public class InputStream
            return (char)_stream.ReadByte();
        }
        else
-       { 
+       {
            char c = _savedChar.Value;
            _savedChar = null;
            return c;
