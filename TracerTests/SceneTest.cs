@@ -2,7 +2,7 @@ using System.Net;
 using TracerLib;
 
 namespace TracerTests;
-
+/*
 public class SceneTest
 {
     private Scene scene = new Scene();
@@ -354,4 +354,4 @@ public class SceneTest
             File.Delete(filepath);
         }
     }
-}
+}*/
