@@ -82,7 +82,7 @@ public class ImageTracer
                 // Anti-Aliasing algorithm:
                 // we subdivide the pixel in a PixelSideSubdivisions x PixelSideSubdivisions grid
                 // then for each cell of this grid we fire a ray randomly.
-                if (PixelSideSubdivisions > 1)
+                if (PixelSideSubdivisions > 1) //CONTROLLARE SE 1 SUDDIVISIONE AGGIUNGE UN'ULTERIORE RAGGIO A QUELLO DELL'ALGORITMO NORMALE
                 {
                     for (int pixRow = 0; pixRow < PixelSideSubdivisions; pixRow++)
                     {

@@ -219,8 +219,8 @@ public class InputStream : IDisposable
     public LiteralNumberToken _ParseFloatToken(char firstChar, SourceLocation tokenLocation)
     {
         string floatString = firstChar.ToString();
-        const string expChar = "eE";
-        const string signs = "+-"; // signs for exponents (the sign of the value is already read in the first char)
+        //const string expChar = "eE";
+        //const string signs = "+-"; // signs for exponents (the sign of the value is already read in the first char)
         bool hasReadExpSign = false;
         bool hasReadExpChar = false;
         bool hasReadDot = false; // the decimal point

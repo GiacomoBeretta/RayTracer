@@ -279,7 +279,7 @@ public class DemoCommand
 [Command(Name = "pfmtopng", Description = "Converts a PFM image to PNG")]
 public class PfmToPngCommand
 {
-    [Option("--input", Description = "The input file path")]
+    [Option("--input", Description = "The input file name")]
     [Required]
     public required string InputFilePath { get; set; }
 
@@ -349,7 +349,7 @@ public class RenderCommand
     [Range(0, ulong.MaxValue)]
     public ulong InitSeq { get; set; } = 54;
 
-    [Option("--sampleside", Description = "Number of samples per pixel's side")]
+    [Option("--sampleside", Description = "Number of samples per pixel's side (used for antialiasing)")]
     [Range(1, Int32.MaxValue)]
     public int SampleSide { get; set; } = 1;
 
@@ -362,7 +362,7 @@ public class RenderCommand
     [Option("--gamma", Description = "The gamma factor characteristic of the screen")]
     public float Gamma { get; set; } = 1;
 
-    [Option("--declarefloat|-d", Description = "Declare a variable. The syntax is --declare-float=NAME:VALUE")]
+    [Option("--declarefloat|-d", Description = "Declare a variable. The syntax is --declarefloat=NAME:VALUE")]
     public string[] Definitions { get; set; } = [];
 
     [Option("--roulettestart",
