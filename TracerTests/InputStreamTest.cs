@@ -16,10 +16,9 @@ public class InputStreamTest
     public void TestInputStreamConstructor()
     {
         string filePath = Path.GetTempFileName();
-        try
+        using (InputStream str = new InputStream(filePath))
         {
             SourceLocation location = new SourceLocation(filePath);
-            InputStream str = new InputStream(filePath);
 
             Assert.Equal(location, str.Location);
             Assert.Equal(location, str.SavedLocation);
@@ -27,10 +26,22 @@ public class InputStreamTest
             Assert.Equal(8, str.Tabulations);
             Assert.Null(str.SavedToken);
         }
-        finally
-        {
-            File.Delete(filePath);
-        }
+        File.Delete(filePath);
+        /* try
+         {
+             SourceLocation location = new SourceLocation(filePath);
+             InputStream str = new InputStream(filePath);
+
+             Assert.Equal(location, str.Location);
+             Assert.Equal(location, str.SavedLocation);
+             Assert.Null(str.SavedChar);
+             Assert.Equal(8, str.Tabulations);
+             Assert.Null(str.SavedToken);
+         }
+         finally
+         {
+             File.Delete(filePath);
+         }*/
     }
 
     [Fact]
