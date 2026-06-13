@@ -25,9 +25,13 @@ jobs:
         with:
           dotnet-version: ${{ matrix.dotnet-version }}
 
+      - name: Select SDK version via global.json
+        run: |
+          echo "{\"sdk\":{\"version\":\"${{ matrix.dotnet-version }}\",\"rollForward\":\"latestFeature\"}}" > global.json
+
       - name: Show installed SDKs
         run: dotnet --list-sdks
-
+        
       - name: Verify dotnet version
         run: |
           dotnet --version
@@ -36,7 +40,7 @@ jobs:
       # Prints the image used to run the tests
       - name: Show runner image
         run: |
-          echo "ImageOS=$ImageVersion"
+          echo "ImageOS=$ImageOS"
           echo "ImageVersion=$ImageVersion"
 
       - name: Show OS information (Linux/macOS)
@@ -57,11 +61,11 @@ jobs:
           Write-Host "Runner OS: $env:RUNNER_OS"
           systeminfo | Select-String "OS Name","OS Version"
           
-      - name: Display dotnet version
-        run: dotnet --version
       - name: Install dependencies
         run: dotnet restore
+        
       - name: Build
         run: dotnet build --no-restore
+        
       - name: Test with the dotnet CLI
         run: dotnet test --no-build
