@@ -25,10 +25,31 @@ jobs:
         with:
           dotnet-version: ${{ matrix.dotnet-version }}
 
-      - name: Select SDK version via global.json
+      - name: Create global.json (Linux/macOS)
+        if: runner.os != 'Windows'
         run: |
-          echo "{\"sdk\":{\"version\":\"${{ matrix.dotnet-version }}\",\"rollForward\":\"latestFeature\"}}" > global.json
+          cat > global.json <<EOF
+          {
+            "sdk": {
+              "version": "${{ matrix.dotnet-version }}",
+              "rollForward": "latestFeature"
+            }
+          }
+          EOF
 
+      - name: Create global.json (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          @"
+          {
+            "sdk": {
+              "version": "${{ matrix.dotnet-version }}",
+              "rollForward": "latestFeature"
+            }
+          }
+          "@ | Set-Content -Path global.json -Encoding utf8
+      
       - name: Show installed SDKs
         run: dotnet --list-sdks
         
