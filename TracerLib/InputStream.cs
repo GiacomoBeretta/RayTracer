@@ -1,7 +1,8 @@
 // This file is release under EUPL_v1.2 license. See LICENSE.md
 
 using System.Diagnostics;
-using System.Globalization; //per il metodo cultureInfo
+using System.Globalization;
+using System.Text; //per il metodo cultureInfo
 
 namespace TracerLib;
 
@@ -190,21 +191,32 @@ public class InputStream : IDisposable
 
     // Parse_token methods - Begin
 
+    /// <summary>
+    /// Parses a string literal token starting at the given source location.
+    /// The string is read until the closing quotation mark (") is found.
+    /// Throws a <see cref="SceneSyntaxException"/> if the string is unterminated.
+    /// </summary>
+    /// <param name="tokenLocation">
+    /// The source location where the string token starts.
+    /// </param>
+    /// <returns>
+    /// A <see cref="StringToken"/> containing the parsed string value.
+    /// </returns>
     public StringToken _ParseStringToken(SourceLocation tokenLocation)
     {
-        string stringToken = "";
-
+        StringBuilder sb = new StringBuilder();
+        
         while (true)
         {
             char? ch = ReadChar();
 
             if (ch == null) throw new SceneSyntaxException(tokenLocation, "unterminated string");
-            if (ch.Value == '\"') break;
+            if (ch.Value == '"') break;
 
-            stringToken += ch;
+            sb.Append(ch);
         }
-
-        return new StringToken(tokenLocation, stringToken);
+        
+        return new StringToken(tokenLocation, sb.ToString());
     }
 
     //prova con i caratteri exp ecc. 
