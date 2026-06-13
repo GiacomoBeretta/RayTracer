@@ -4,84 +4,50 @@ using System.Diagnostics;
 using System.Globalization; //per il metodo cultureInfo
 
 namespace TracerLib;
-/*
-//dal python di Tomasi
-public class InputStream
-{
-    private Stream _stream;
-    private SourceLocation _location;
-    private char? _savedChar;
-    private SourceLocation _savedLocation;
-    private int _tabulations;
 
-    public InputStream(string filename, int tabulations)
-    {
-        _stream = new FileStream(filename, FileMode.Open, FileAccess.Read);
-        _location = new SourceLocation(filename, 0, 0);
-        _savedChar = null;
-        _savedLocation = _location;
-        _tabulations = tabulations;
-    }
-
-    public void UnreadChar(char c)
-    {
-        {
-            _savedChar = c;
-            _location = _savedLocation;
-        }
-    }
-
-    public char? ReadChar()
-    {
-        char? c;
-        if (_savedChar == null)
-        {
-            int b = _stream.ReadByte();
-            if (b == -1) c = null;
-            else c = (char)b;
-        }
-        else
-        {
-            c = _savedChar.Value;
-            _savedChar = null;
-        }
-
-        _savedLocation = _location;
-        UpdateLocation(c);
-        return c;
-    }
-
-    //E se si raggiunge la fine del file che valore ha il char?
-    public void UpdateLocation(char? c)
-    {
-        if (c.HasValue)
-        {
-            switch (c.Value)
-            {
-                case '\n':
-                    _location.line += 1;
-                    _location.column = 0;
-                    break;
-                case '\t':
-                    _location.column += _tabulations;
-                    break;
-                default:
-                    _location.column += 1;
-                    break;
-            }
-        }
-    }
-}*/
-
+/// <summary>
+/// A class to parse the tokens in the scene text files.
+/// </summary>
 public class InputStream : IDisposable
 {
+    /// <summary>
+    /// Underlying input stream used for sequential tokenization of scene files.
+    /// </summary>
     public Stream Stream;
+    
+    /// <summary>
+    /// Current read position (row and column) in the source file, used for error reporting and token tracking.
+    /// </summary>
     public SourceLocation Location;
+    
+    /// <summary>
+    /// Previously saved <see cref="SourceLocation"/> used to restore the reader state when unreading a character or token.
+    /// </summary>
     public SourceLocation SavedLocation;
+    
+    /// <summary>
+    /// Cached character used to support one-character lookahead (unread functionality).
+    /// If set, it will be returned on the next read operation before consuming the stream.
+    /// </summary>
     public char? SavedChar;
+    
+    /// <summary>
+    /// Number of spaces used to correctly update the read position during parsing.
+    /// </summary>
     public readonly int Tabulations;
+    
+    /// <summary>
+    /// Cached token used to support token-level lookahead (unread functionality).
+    /// If set, it will be returned on the next token read operation.
+    /// </summary>
     public Token? SavedToken;
-
+    
+    /// <summary>
+    /// Constructs an <see cref="InputStream"/> instance that reads from the specified file path.
+    /// </summary>
+    /// <param name="filePath">Path of the scene file to read.</param>
+    /// <param name="tabulations">Number of spaces used to expand tab characters during parsing.
+    /// If not specified is 8.</param>
     public InputStream(string filePath, int tabulations = 8)
     {
         Stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
@@ -97,13 +63,21 @@ public class InputStream : IDisposable
         Stream.Dispose();
     }
 
+    /// <summary>
+    /// Advances the current source location based on the specified character,
+    /// updating line and column counters.
+    /// The previous location is stored in <see cref="SavedLocation"/> to support the unread functionality.
+    /// Handles line breaks, tab expansion, and standard character advancement.
+    /// </summary>
+    /// <param name="c">
+    /// Consumed character used to update the current position
+    /// </param>
     public void UpdateLocation(char c)
     {
         SavedLocation = Location;
         switch (c)
         {
             case '\n':
-            case '\r':
                 Location.line += 1;
                 Location.column = 0;
                 break;
