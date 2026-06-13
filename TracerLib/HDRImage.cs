@@ -602,40 +602,45 @@ public class HDRImage
 
     //Methods for Read and Write PFM files - End
 
-    // Methods for conversion to an LDR Image - Begin
-
+    // Methods for conversion to an LDR Image (Tone mapping) - Begin
+    
     /// <summary>
-    /// Computes the average luminosity of the entire image,
-    /// using a particular luminosity function of the Color class
-    /// based on the value of the luminosityFunction parameter, see <c>LumFunction</c>
+    /// Computes the logarithmic average luminosity of the image.
+    /// The luminosity of each pixel is evaluated according to the specified <see cref="LumFunction"/>
     /// (Shirley = Shirley and Morley method, Weighted = Weighted Average)
     /// </summary>
-    /// <param name="luminosityFunction"></param>
-    /// <param name="delta"></param>
-    /// <returns></returns>
+    /// <param name="luminosityFunction">The pixel luminosity algorithm to use.</param>
+    /// <param name="delta">Small positive value added to each luminosity sample to avoid
+    /// logarithm singularities when luminance is zero.</param>
+    /// <returns>The logarithmic average luminosity of the image.</returns>
     public float _AverageLuminosity(LumFunction luminosityFunction, float delta = 1e-10f)
     {
         float sum = 0.0f;
-        //perceived value of luminosity follows a logarithmic scale
-        //so we must use a logarithmic average
-        //delta is needed to avoid singular values for the logarithm
-        if (luminosityFunction == LumFunction.Shirley)
+        // perceived value of luminosity follows a logarithmic scale
+        // so we must use a logarithmic average
+        // delta is needed to avoid singular values for the logarithm
+        switch (luminosityFunction)
         {
-            foreach (Color color in Pixels)
-            {
-                sum += MathF.Log10(delta + color.LuminosityShirleyMorley());
-            }
+            case LumFunction.Shirley:
 
-            return MathF.Pow(10, sum / Pixels.Length);
-        }
-        else //if(luminosityFunction == LumFunction.Weighted)
-        {
-            foreach (Color color in Pixels)
-            {
-                sum += MathF.Log10(delta + color.LuminosityWeightedAverage());
-            }
+                foreach (Color color in Pixels)
+                {
+                    sum += MathF.Log10(delta + color.LuminosityShirleyMorley());
+                }
 
-            return MathF.Pow(10, sum / Pixels.Length);
+                return MathF.Pow(10, sum / Pixels.Length);
+
+            case LumFunction.Weighted:
+
+                foreach (Color color in Pixels)
+                {
+                    sum += MathF.Log10(delta + color.LuminosityWeightedAverage());
+                }
+
+                return MathF.Pow(10, sum / Pixels.Length);
+            default:
+                throw new NotImplementedException("Average Luminosity: case not implemented.");
+
         }
     }
 
