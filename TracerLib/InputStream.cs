@@ -73,7 +73,7 @@ public class InputStream
     }
 }*/
 
-public class InputStream
+public class InputStream : IDisposable
 {
     public Stream Stream;
     public SourceLocation Location;
@@ -90,6 +90,11 @@ public class InputStream
         SavedChar = null;
         Tabulations = tabulations;
         SavedToken = null;
+    }
+
+    public void Dispose()
+    {
+        Stream.Dispose();
     }
 
     public void UpdateLocation(char c)
