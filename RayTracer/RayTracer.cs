@@ -126,7 +126,7 @@ public class DemoCommand
         }
 
         var image = new HDRImage(Width, Height);
-        var tracer = new ImageTracer(image, camera, pixelSideSubdivisions: 4);
+        var tracer = new ImageTracer(image, camera, pixelSideSubdivisions: 1);
 
         //PER LE FORME APPLICARE LA TRASLAZIONE PER ULTIMA (PRIMA NELLA CONCATENAZIONE)
         var s1 = new Sphere(new Transformation(new Vector(0.5f, 0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f),

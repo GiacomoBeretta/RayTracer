@@ -32,7 +32,7 @@ public class ImageTracer
     /// </summary>
     public int PixelSideSubdivisions { get; set; }
     
-    public ImageTracer(HDRImage image, ICamera camera, PCG? pcg = null, int pixelSideSubdivisions=0)
+    public ImageTracer(HDRImage image, ICamera camera, PCG? pcg = null, int pixelSideSubdivisions=1)
     {
         _image = image;
         _camera = camera;
