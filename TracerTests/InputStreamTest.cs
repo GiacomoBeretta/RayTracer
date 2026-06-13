@@ -26,6 +26,7 @@ public class InputStreamTest
             Assert.Equal(8, str.Tabulations);
             Assert.Null(str.SavedToken);
         }
+
         File.Delete(filePath);
         /* try
          {
@@ -48,10 +49,8 @@ public class InputStreamTest
     public void TestUpdateLocation()
     {
         string filePath = Path.GetTempFileName();
-        try
+        using (InputStream str = new InputStream(filePath))
         {
-            InputStream str = new InputStream(filePath);
-
             Assert.Equal(0, str.Location.line);
             Assert.Equal(0, str.Location.column);
 
@@ -90,10 +89,8 @@ public class InputStreamTest
             Assert.Equal(3, str.Location.line);
             Assert.Equal(0, str.Location.column);
         }
-        finally
-        {
-            File.Delete(filePath);
-        }
+
+        File.Delete(filePath);
     }
 
     [Fact]
@@ -101,12 +98,11 @@ public class InputStreamTest
     {
         const string content = "abcde";
         string filePath = Path.GetTempFileName();
-        try
+
+        File.WriteAllText(filePath, content);
+
+        using (InputStream str = new InputStream(filePath))
         {
-            File.WriteAllText(filePath, content);
-
-            InputStream str = new InputStream(filePath);
-
             Assert.Equal('a', str.ReadChar());
             Assert.Equal(0, str.SavedLocation.line);
             Assert.Equal(0, str.SavedLocation.column);
@@ -153,10 +149,8 @@ public class InputStreamTest
 
             Assert.Null(str.ReadChar());
         }
-        finally
-        {
-            File.Delete(filePath);
-        }
+
+        File.Delete(filePath);
     }
 
     [Fact]
@@ -167,12 +161,9 @@ public class InputStreamTest
                                "kgiu, gfoian + odsn \r\n" +
                                "sodi, wkje.";
         string filePath = Path.GetTempFileName();
-        try
+        File.WriteAllText(filePath, content);
+        using (InputStream str = new InputStream(filePath))
         {
-            File.WriteAllText(filePath, content);
-
-            InputStream str = new InputStream(filePath);
-
             Assert.Equal('e', str.ReadChar());
             str.SkipLine();
             Assert.Equal('p', str.ReadChar());
@@ -185,10 +176,8 @@ public class InputStreamTest
             str.SkipLine();
             Assert.Null(str.ReadChar());
         }
-        finally
-        {
-            File.Delete(filePath);
-        }
+
+        File.Delete(filePath);
     }
 
     [Fact]
@@ -201,12 +190,11 @@ public class InputStreamTest
                                "utn\t\r\t\n" +
                                "r    ";
         string filePath = Path.GetTempFileName();
-        try
+
+        File.WriteAllText(filePath, content);
+
+        using (InputStream str = new InputStream(filePath))
         {
-            File.WriteAllText(filePath, content);
-
-            InputStream str = new InputStream(filePath);
-
             Assert.Equal('d', str.ReadChar());
             str.SkipWhitespacesAndComments();
             Assert.Equal('s', str.ReadChar());
@@ -228,10 +216,8 @@ public class InputStreamTest
             str.SkipWhitespacesAndComments();
             Assert.Null(str.ReadChar());
         }
-        finally
-        {
-            File.Delete(filePath);
-        }
+
+        File.Delete(filePath);
     }
 
     [Fact]
@@ -246,20 +232,19 @@ public class InputStreamTest
         string filePath2 = Path.GetTempFileName();
         File.WriteAllText(filePath2, fail);
 
-        try
+        using (InputStream stream1 = new InputStream(filePath1))
         {
-            InputStream stream1 = new InputStream(filePath1);
             StringToken st1 = stream1._ParseStringToken(stream1.Location);
             Assert.Equal("Hello, World!", st1.String);
+        }
 
-            InputStream stream2 = new InputStream(filePath2);
+        using (InputStream stream2 = new InputStream(filePath2))
+        {
             Assert.Throws<SceneSyntaxException>(() => stream2._ParseStringToken(stream2.Location));
         }
-        finally
-        {
-            File.Delete(filePath1);
-            File.Delete(filePath2);
-        }
+
+        File.Delete(filePath1);
+        File.Delete(filePath2);
     }
 
     [Fact]
@@ -282,10 +267,8 @@ public class InputStreamTest
                          "5.2e+10-3";
         string filePath1 = Path.GetTempFileName();
         File.WriteAllText(filePath1, content);
-        try
+        using (InputStream stream1 = new InputStream(filePath1))
         {
-            InputStream stream1 = new InputStream(filePath1);
-
             char? ch = stream1.ReadChar();
             LiteralNumberToken floatToken = stream1._ParseFloatToken(ch.Value, stream1.Location);
             Assert.Equal(3496, floatToken.Value);
@@ -327,7 +310,6 @@ public class InputStreamTest
 
             stream1.SkipLine();
             ch = stream1.ReadChar();
-            _testOutputHelper.WriteLine("prova"+ch.Value);
             floatToken = stream1._ParseFloatToken(ch.Value, stream1.Location);
             Assert.Equal(-8f, floatToken.Value);
 
@@ -371,10 +353,8 @@ public class InputStreamTest
             floatToken = stream1._ParseFloatToken(ch.Value, stream1.Location);
             Assert.Equal(3f, floatToken.Value);
         }
-        finally
-        {
-            File.Delete(filePath1);
-        }
+
+        File.Delete(filePath1);
 
         string fail = "a\n" +
                       "++3\n" +
@@ -388,10 +368,9 @@ public class InputStreamTest
                       "3.5e--2";
         string filePath2 = Path.GetTempFileName();
         File.WriteAllText(filePath2, fail);
-        try
+        using (InputStream stream2 = new InputStream(filePath2))
         {
             // a
-            InputStream stream2 = new InputStream(filePath2);
             char? ch = stream2.ReadChar();
             Assert.Throws<SceneSyntaxException>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
 
@@ -399,51 +378,49 @@ public class InputStreamTest
             stream2.SkipLine();
             ch = stream2.ReadChar();
             Assert.Throws<SceneSyntaxException>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
-            
+
             // --6.8
             stream2.SkipLine();
             ch = stream2.ReadChar();
             Assert.Throws<SceneSyntaxException>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
-            
+
             // +.3
             stream2.SkipLine();
             ch = stream2.ReadChar();
             Assert.Throws<SceneSyntaxException>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
-            
+
             // -e4
             stream2.SkipLine();
             ch = stream2.ReadChar();
             Assert.Throws<SceneSyntaxException>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
-            
+
             // 4.
             stream2.SkipLine();
             ch = stream2.ReadChar();
             Assert.Throws<SceneSyntaxException>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
-            
+
             // 8.e6
             stream2.SkipLine();
             ch = stream2.ReadChar();
             Assert.Throws<SceneSyntaxException>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
-            
+
             // 7..2
             stream2.SkipLine();
             ch = stream2.ReadChar();
             Assert.Throws<SceneSyntaxException>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
-            
+
             // 4ee2
             stream2.SkipLine();
             ch = stream2.ReadChar();
             Assert.Throws<SceneSyntaxException>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
-            
+
             // 3.5e--2
             stream2.SkipLine();
             ch = stream2.ReadChar();
             Assert.Throws<SceneSyntaxException>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
         }
-        finally
-        {
-            File.Delete(filePath2);
-        }
+
+        File.Delete(filePath2);
     }
 
     [Fact]
@@ -471,10 +448,8 @@ public class InputStreamTest
                           "float";
         string filePath1 = Path.GetTempFileName();
         File.WriteAllText(filePath1, content1);
-        try
+        using (InputStream str = new InputStream(filePath1))
         {
-            InputStream str = new InputStream(filePath1);
-
             char? ch = str.ReadChar();
             KeywordToken keywordToken = (KeywordToken)str._ParseKeywordIdentifierToken(ch.Value, str.Location);
             Assert.Equal(Keyword.New, keywordToken.Keyword);
@@ -569,10 +544,9 @@ public class InputStreamTest
             keywordToken = (KeywordToken)str._ParseKeywordIdentifierToken(ch.Value, str.Location);
             Assert.Equal(Keyword.Float, keywordToken.Keyword);
         }
-        finally
-        {
-            File.Delete(filePath1);
-        }
+
+        File.Delete(filePath1);
+
 
         // identifier parse
         string content2 = "a\n" +
@@ -588,9 +562,8 @@ public class InputStreamTest
                           "a b"; // fail
         string filePath2 = Path.GetTempFileName();
         File.WriteAllText(filePath2, content2);
-        try
+        using (InputStream str = new InputStream(filePath2))
         {
-            InputStream str = new InputStream(filePath2);
             char? ch = str.ReadChar();
             IdentifierToken identifierToken =
                 (IdentifierToken)str._ParseKeywordIdentifierToken(ch.Value, str.Location);
@@ -646,10 +619,8 @@ public class InputStreamTest
             identifierToken = (IdentifierToken)str._ParseKeywordIdentifierToken(ch.Value, str.Location);
             Assert.NotEqual("a b", identifierToken.Identifier);
         }
-        finally
-        {
-            File.Delete(filePath2);
-        }
+
+        File.Delete(filePath2);
     }
 
     [Fact]
@@ -695,9 +666,8 @@ public class InputStreamTest
         string filePath = Path.GetTempFileName();
         File.WriteAllText(filePath, content);
 
-        try
+        using (InputStream stream = new InputStream(filePath))
         {
-            InputStream stream = new InputStream(filePath);
             KeywordToken keywordToken;
             IdentifierToken identifierToken;
             StringToken stringToken;
@@ -1079,10 +1049,7 @@ public class InputStreamTest
             Assert.Equal(typeof(StopToken), ((StopToken)stream.ReadNextToken()).GetType());
         }
 
-        finally
-        {
-            File.Delete(filePath);
-        }
+        File.Delete(filePath);
     }
 
     [Fact]
@@ -1093,10 +1060,8 @@ public class InputStreamTest
         string filePath = Path.GetTempFileName();
         File.WriteAllText(filePath, content);
 
-        try
+        using (InputStream stream = new InputStream(filePath))
         {
-            InputStream stream = new InputStream(filePath);
-
             Assert.Equal(0, stream.Location.column);
             Assert.Equal(0, stream.Location.line);
 
@@ -1143,9 +1108,7 @@ public class InputStreamTest
 
             Assert.Null(stream.ReadChar());
         }
-        finally
-        {
-            File.Delete(filePath);
-        }
+
+        File.Delete(filePath);
     }
 }
