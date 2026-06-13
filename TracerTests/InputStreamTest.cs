@@ -28,21 +28,6 @@ public class InputStreamTest
         }
 
         File.Delete(filePath);
-        /* try
-         {
-             SourceLocation location = new SourceLocation(filePath);
-             InputStream str = new InputStream(filePath);
-
-             Assert.Equal(location, str.Location);
-             Assert.Equal(location, str.SavedLocation);
-             Assert.Null(str.SavedChar);
-             Assert.Equal(8, str.Tabulations);
-             Assert.Null(str.SavedToken);
-         }
-         finally
-         {
-             File.Delete(filePath);
-         }*/
     }
 
     [Fact]
