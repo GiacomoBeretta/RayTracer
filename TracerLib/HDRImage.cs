@@ -610,8 +610,8 @@ public class HDRImage
     /// (Shirley = Shirley and Morley method, Weighted = Weighted Average)
     /// </summary>
     /// <param name="luminosityFunction">The pixel luminosity algorithm to use.</param>
-    /// <param name="delta">Small positive value added to each luminosity sample to avoid
-    /// logarithm singularities when luminance is zero.</param>
+    /// <param name="delta">Small positive value added to pixel luminosity to avoid
+    /// logarithm singularities when luminosity is zero.</param>
     /// <returns>The logarithmic average luminosity of the image.</returns>
     public float _AverageLuminosity(LumFunction luminosityFunction, float delta = 1e-10f)
     {
@@ -643,17 +643,22 @@ public class HDRImage
 
         }
     }
-
+    
     /// <summary>
-    /// Normalizes the RGB values of each pixel by the average luminosity computed by the AverageLuminosity function
-    /// and by another empirical number (here called factor).
+    /// Scales all pixels so that their RGB values are normalized with respect
+    /// to the image average luminosity.
+    /// Each pixel is multiplied by factor / averageLuminosity.
     /// The luminosityFunction tells which of function of the color class to use to compute the luminosity of the pixel, see <c>LumFunction</c>
-    /// averageLuminosity is an optional parameter you can use if you've already computed it previously.
+    /// If <paramref name="averageLuminosity"/> is not provided, it is computed
+    /// using <see cref="_AverageLuminosity"/> and the specified
+    /// <paramref name="luminosityFunction"/>.
     /// </summary>
-    /// <param name="luminosityFunction"></param>
-    /// <param name="factor"></param>
-    /// <param name="averageLuminosity"></param>
-    /// <param name="delta"></param>
+    /// <param name="luminosityFunction">Function used to compute pixel luminosity when the average luminosity
+    /// needs to be calculated.</param>
+    /// <param name="factor"> An empirical value.</param>
+    /// <param name="averageLuminosity">Optional precomputed average luminosity.</param>
+    /// <param name="delta">Small positive value added to pixel luminosity to avoid
+    /// logarithm singularities in the computation of <see cref="_AverageLuminosity"/></param>
     public void _Normalize(LumFunction luminosityFunction, float factor, float? averageLuminosity = null,
         float delta = 1e-10f)
     {
@@ -662,13 +667,13 @@ public class HDRImage
         for (int i = 0; i < Pixels.Length; i++)
         {
             //averageLuminosity is a nullable type so we must explicitly cast it from float? to float
-            Pixels[i] = Pixels[i] * (factor / (float)averageLuminosity);
+            Pixels[i] = Pixels[i] * (factor / averageLuminosity.Value);
         }
     }
 
     /// <summary>
-    /// Resizes the RGB values of each pixel under 1,
-    /// it also scales possible bright spots.
+    /// Compress all the colors of the image into the range [0,1),
+    /// using the function x / (x + 1), reducing the intensity of bright spots.
     /// </summary>
     public void _ClampImage()
     {
@@ -677,12 +682,13 @@ public class HDRImage
             Pixels[i]._Clamp();
         }
     }
-
+    
     /// <summary>
-    /// Converts each pixel to the corresponding sRGB triple
-    /// corrected by the characteristic gamma factor of the display
+    /// Applies gamma correction and converts all pixels
+    /// to a 0–255 RGB representation.
     /// </summary>
-    /// <param name="gamma"></param>
+    /// <param name="gamma">Gamma exponent used for power-law correction (must be > 0).
+    /// It's characteristic of the display used.</param>
     public void _ImageTo8BitRGB(float gamma)
     {
         for (int i = 0; i < Pixels.Length; i++)
@@ -690,20 +696,22 @@ public class HDRImage
             Pixels[i] = Pixels[i].To8BitRGB(gamma);
         }
     }
-
+    
     //Questa non è tecnicamente un HDR. Rivedere in futuro
     /// <summary>
-    /// Returns the corresponding LDR image
+    /// Returns Creates an LDR representation of the current HDR image.
     /// It accounts for the gamma correction of the display and of the empirical factor here named "factor"
     /// The luminosityFunction parameter allow to choose between some possible ways to compute the luminosity of a pixel.
     /// averageLuminosity is an optional parameter you can use if you've already computed it previously.
     /// </summary>
-    /// <param name="luminosityFunction"></param>
-    /// <param name="factor"></param>
-    /// <param name="gamma"></param>
-    /// <param name="averageLuminosity"></param>
-    /// <param name="delta"></param>
-    /// <returns></returns>
+    /// <param name="luminosityFunction">Function used to compute pixel luminosity.</param>
+    /// <param name="factor">Empirical scaling factor used in normalization.</param>
+    /// <param name="gamma">Gamma exponent used for power-law correction (must be > 0).
+    /// It's characteristic of the display used.</param>
+    /// <param name="averageLuminosity">Optional precomputed average luminosity.</param>
+    /// <param name="delta">Small positive value added to pixel luminosity to avoid
+    /// logarithm singularities in the computation of <see cref="_AverageLuminosity"/></param>
+    /// <returns>The LDR image (0–255 range per channel).</returns>
     public HDRImage CreateLDR(LumFunction luminosityFunction, float factor, float gamma,
         float? averageLuminosity = null,
         float delta = 1e-10f)
@@ -716,19 +724,21 @@ public class HDRImage
     }
 
     // Methods for conversion to an LDR Image - End
-
+    
     /// <summary>
     /// Writes on the outputStream the corresponding LDR image.
-    /// It accounts for the gamma correction of the display and of the empirical factor here named "factor".
+    /// It applies the gamma correction of the display and of the empirical factor here named "factor".
     /// The luminosityFunction parameter allow to choose between some possible ways to compute the luminosity of a pixel.
     /// averageLuminosity is an optional parameter you can use if you've already computed it previously.
     /// </summary>
-    /// <param name="outputStream"></param>
-    /// <param name="luminosityFunction"></param>
-    /// <param name="factor"></param>
-    /// <param name="gamma"></param>
-    /// <param name="averageLuminosity"></param>
-    /// <param name="delta"></param>
+    /// <param name="outputStream">Destination stream where the PNG image will be written.</param>
+    /// <param name="luminosityFunction">Function used to compute pixel luminosity for tone mapping.</param>
+    /// <param name="factor">Empirical scaling factor used in normalization.</param>
+    /// <param name="gamma">Gamma exponent used for power-law correction (must be > 0).
+    /// It's characteristic of the display used.</param>
+    /// <param name="averageLuminosity">Optional precomputed average luminosity.</param>
+    /// <param name="delta">Small positive value added to pixel luminosity to avoid
+    /// logarithm singularities in the computation of <see cref="_AverageLuminosity"/></param>
     public void WritePNG(Stream outputStream, LumFunction luminosityFunction, float factor, float gamma,
         float? averageLuminosity = null,
         float delta = 1e-10f)
@@ -773,12 +783,31 @@ public class HDRImage
     }
 }
 
+/// <summary>
+/// /// Specifies the byte order convention used when reading or writing multibyte values.
+/// 
+/// Big-endian order writes the most significant byte before the least significant (as we, human people, normally do).
+/// Little-endian order writes the least significant byte before the most significant.
+/// 
+/// For example, the decimal number 14943, that is 3A5F in hexadecimal,
+/// is stored as 3A 5F in Big Endian and as 5F 3A in Little Endian. 
+/// </summary>
 public enum Endianness
 {
+    /// <summary>
+    /// Most significant byte first.
+    /// </summary>
     Big,
+    
+    /// <summary>
+    /// Least significant byte first.
+    /// </summary>
     Little
 }
 
+/// <summary>
+/// Specifies the algorithm used to compute pixel luminosity.
+/// </summary>
 public enum LumFunction
 {
     Shirley,

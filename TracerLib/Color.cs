@@ -171,7 +171,8 @@ public struct Color
     }
 
     /// <summary>
-    /// Clamps the value of x under 1.
+    /// Maps a value to the range [0, 1),
+    /// using the transformation x / (x + 1).
     /// </summary>
     /// <param name="x"></param>
     /// <returns></returns>
@@ -181,8 +182,9 @@ public struct Color
     }
 
     /// <summary>
-    /// Clamps the values of RGB under 1
-    /// and resize a potential too bright pixel.
+    /// Applies the function x / (x + 1)
+    /// to each RGB component,
+    /// reducing the intensity of too bright colors.
     /// </summary>
     public void _Clamp()
     {
@@ -192,9 +194,11 @@ public struct Color
     }
     
     /// <summary>
-    /// Returns the corresponding sRGB triple corrected by the characteristic gamma factor of the display.
+    /// Applies gamma correction using a power-law function
+    /// and maps the resulting color to the 0–255 range.
     /// </summary>
-    /// <param name="gamma">Display's gamma factor</param>
+    /// <param name="gamma">Gamma exponent used for power-law correction (must be > 0).
+    /// It's characteristic of the display used.</param>
     /// <returns></returns>
     /// <exception cref="ArgumentOutOfRangeException">
     /// Thrown when gamma is less than or equal to 0.
@@ -209,8 +213,7 @@ public struct Color
         float r = (float)Math.Round(255 * MathF.Pow(R, 1.0f / gamma));
         float g = (float)Math.Round(255 * MathF.Pow(G, 1.0f / gamma));
         float b = (float)Math.Round(255 * MathF.Pow(B, 1.0f / gamma));
-
-
+        
         return new Color(r, g, b);
     }
     
