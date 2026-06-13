@@ -126,7 +126,7 @@ public class DemoCommand
         }
 
         var image = new HDRImage(Width, Height);
-        var tracer = new ImageTracer(image, camera, pixelSideSubdivisions: 4);
+        var tracer = new ImageTracer(image, camera, pixelSideSubdivisions: 1);
 
         //PER LE FORME APPLICARE LA TRASLAZIONE PER ULTIMA (PRIMA NELLA CONCATENAZIONE)
         var s1 = new Sphere(new Transformation(new Vector(0.5f, 0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f),
@@ -313,9 +313,8 @@ public class PfmToPngCommand
 public class RenderCommand
 {
     [Option("--input", Description = "The input scene file path")]
-    public string InputScene { get; set; } =
-        Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../../Scenes/scene.txt");
-
+    public string InputScene { get; set; } = "scene.txt";
+    
     [Option("--width", Description = "The width of the image")]
     [Range(1, Int32.MaxValue)]
     public int Width { get; set; } = 500;
@@ -396,7 +395,9 @@ public class RenderCommand
         Console.WriteLine($"RouletteFixedProb: {RussianRouletteFixedProb}");
 
         string currentPath = AppDomain.CurrentDomain.BaseDirectory;
-
+        
+        string scenePath = Path.Combine(currentPath, "../../../../Scenes/", InputScene);
+        
         string pngFilePath =
             Path.Combine(currentPath, "../../../../PngImages/",
                 OutputPng); //"../../../../DemoImages/" dal path dell'eseguibile torna indietro (Controllare)
@@ -406,7 +407,7 @@ public class RenderCommand
         if (OutputPfm[^4..] != ".pfm") pfmFilePath += ".pfm";
 
         var scene = new Scene();
-        var input = new InputStream(InputScene);
+        var input = new InputStream(scenePath);
         var variables = Functions.VariableTable(Definitions);
 
         try
