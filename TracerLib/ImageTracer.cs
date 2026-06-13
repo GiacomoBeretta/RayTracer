@@ -1,9 +1,5 @@
 // This file is release under EUPL_v1.2 license. See LICENSE.md
 
-//da riscrivere meglio la docstring della classe una volta capito meglio cosa fa e magari rivedere le altre docstring
-
-using SixLabors.ImageSharp.Processing;
-
 namespace TracerLib;
 
 /// <summary>
@@ -68,7 +64,7 @@ public class ImageTracer
     /// <remarks>
     /// If <see cref="PixelSideSubdivisions"/> &gt; 0,
     /// multiple rays are fired per pixel and the results are averaged to reduce aliasing.
-    /// Otherwise the rays are fired at the center of each pixel.
+    /// Otherwise, the rays are fired at the center of each pixel.
     /// </remarks>
     /// <param name="renderFunction">Function that estimates the color for a given ray.</param>
     public void FireAllRays(Func<Ray, Color> renderFunction)
@@ -99,6 +95,7 @@ public class ImageTracer
                 }
                 else
                 {
+                    //otherwise the is fire at the center of each pixel
                     Ray ray = FireRayAtPixel(col, row);
                     Color color = renderFunction(ray);
                     _image[col, row] = color;
@@ -107,7 +104,3 @@ public class ImageTracer
         }
     }
 }
-
-//delegate Color Renderer(Ray ray);
-    
-    //= ray =>world.RayIntersection(ray) != null ? new Color(1.0f, 1.0f, 1.0f) : new Color(0.0f, 0.0f, 0.0f);
