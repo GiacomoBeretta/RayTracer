@@ -1,3 +1,5 @@
+#nullable disable
+
 using TracerLib;
 
 namespace TracerTests;

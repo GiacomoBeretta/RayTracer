@@ -1,3 +1,5 @@
+#nullable disable
+
 using System.Diagnostics.CodeAnalysis;
 using TracerLib;
 
@@ -136,7 +138,7 @@ public class HDRImageTest
     [Fact]
     public void TestConstructorWithColorVector()
     {
-        Color[] colors = null;
+        Color[]? colors = null;
         Assert.Throws<ArgumentNullException>(() => new HDRImage(10, 10, colors));
 
         colors = new Color[99];
