@@ -281,31 +281,45 @@ public class PfmToPngCommand
 {
     [Option("--input", Description = "The input file name")]
     [Required]
-    public required string InputFilePath { get; set; }
+    public required string Input { get; set; }
 
     [Option("--output", Description = "The output file path")]
     [Required]
-    public required string OutputFilePath { get; init; }
+    public required string Output { get; set; }
 
     [Option("--luminosityFunction", Description = "Luminosity function, options are: shirley (default), weighted")]
-    public LumFunction LuminosityFunction { get; init; } = LumFunction.Shirley;
+    public LumFunction LuminosityFunction { get; set; } = LumFunction.Shirley;
 
     [Option("--factor", Description = "The empirical factor to render images")]
-    public int Factor { get; init; } = 1;
+    public int Factor { get; set; } = 1;
 
     [Option("--gamma", Description = "The gamma factor characteristic of the screen")]
-    public float Gamma { get; init; } = 1;
+    public float Gamma { get; set; } = 1;
 
     internal void OnExecute()
     {
-        Console.WriteLine($"input path: {InputFilePath}");
-        Console.WriteLine($"output path: {OutputFilePath}");
+        Console.WriteLine($"input path: {Input}");
+        Console.WriteLine($"output path: {Output}");
         Console.WriteLine($"luminosity function: {LuminosityFunction}");
         Console.WriteLine($"factor: {Factor}");
         Console.WriteLine($"gamma: {Gamma}");
+        
+        string currentPath = AppDomain.CurrentDomain.BaseDirectory;
+        
+        if (Output[^4..] != ".png") Output += ".png"; //OutputFilename[^4..] Legge gli ultimi 4 caratteri
+        string pngFilePath =
+            Path.Combine(currentPath, "../../../../PngImages/",
+                Output); //"../../../../DemoImages/" dal path dell'eseguibile torna indietro (Controllare)
 
-        HDRImage image = HDRImage.ReadPFM_File(InputFilePath);
-        image.WritePNG(OutputFilePath, LuminosityFunction, Factor, Gamma);
+        if (Input[^4..] != ".pfm") Input += ".pfm";
+        string pfmFilePath = Path.Combine(currentPath, "../../../../PfmImages", Input);
+        
+
+        HDRImage image = HDRImage.ReadPFM_File(pfmFilePath);
+        Console.WriteLine($"File read in: {pfmFilePath}");
+        
+        image.WritePNG(pngFilePath, LuminosityFunction, Factor, Gamma, averageLuminosity:0.5f);
+        Console.WriteLine($"File saved in: {pngFilePath}");
     }
 }
 
@@ -398,13 +412,14 @@ public class RenderCommand
         
         string scenePath = Path.Combine(currentPath, "../../../../Scenes/", InputScene);
         
+        if (OutputPng[^4..] != ".png") OutputPng += ".png"; //OutputFilename[^4..] Legge gli ultimi 4 caratteri
         string pngFilePath =
             Path.Combine(currentPath, "../../../../PngImages/",
                 OutputPng); //"../../../../DemoImages/" dal path dell'eseguibile torna indietro (Controllare)
-        if (OutputPng[^4..] != ".png") pngFilePath += ".png"; //OutputFilename[^4..] Legge gli ultimi 4 caratteri
 
+        if (OutputPfm[^4..] != ".pfm") OutputPfm += ".pfm";
         string pfmFilePath = Path.Combine(currentPath, "../../../../PfmImages", OutputPfm);
-        if (OutputPfm[^4..] != ".pfm") pfmFilePath += ".pfm";
+        
 
         var scene = new Scene();
         var input = new InputStream(scenePath);
@@ -448,10 +463,10 @@ public class RenderCommand
         tracer.FireAllRays(ray => renderer.RenderFunction(ray));
 
         HDRImage.WritePFM_File(image, pfmFilePath);
-        Console.WriteLine($"Pfm file created in: {OutputPfm}");
+        Console.WriteLine($"Pfm file created in: {pfmFilePath}");
 
         image.WritePNG(pngFilePath, LuminosityFunction, Factor, Gamma, averageLuminosity: 0.5f);
-        Console.WriteLine($"Png file created in: {OutputPng}");
+        Console.WriteLine($"Png file created in: {pngFilePath}");
     }
 }
 
