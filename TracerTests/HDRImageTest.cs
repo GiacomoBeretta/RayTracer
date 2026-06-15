@@ -155,7 +155,7 @@ public class HDRImageTest
                      "Pixel's matrix:\n" +
                      "\tColumns ->\n" +
                      "Rows\t0\t1\n" +
-                     "0\t(3, 7, 10)\t(4, 21, 15)\n";
+                     "0\t(R=3, G=7, B=10)\t(R=4, G=21, B=15)\n";
         Assert.Equal(str, image.ToString());
     }
 
