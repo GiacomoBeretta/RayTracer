@@ -6,11 +6,11 @@ namespace TracerLib;
 //Considerare di cambiare ExpecteSymbol(InputStream, string) in ExpecteSymbol(InputStream, char)
 public class Scene
 {
-    public Dictionary<string, Material> Materials { get; set; } = new Dictionary<string, Material>();
+    public Dictionary<string, Material> Materials { get; set; } = new();
     public World World { get; set; } = new();
     public ICamera? Camera { get; set; } = null;
     public Dictionary<string, float> Variables { get; set; } = new();
-    //Overridden variables???
+    public HashSet<string> OverriddenVariables { get; set; } = [];
 
     public void ExpectSymbol(InputStream inputFile, string symbol)
     {
@@ -303,7 +303,8 @@ public class Scene
     {
         var scene = new Scene
         {
-            Variables = variables
+            Variables = new Dictionary<string, float>(variables),
+            OverriddenVariables = new HashSet<string>(variables.Keys)
         };
 
         while (true)
@@ -322,11 +323,10 @@ public class Scene
                 float variableValue = ExpectNumber(inputFile);
                 ExpectSymbol(inputFile, ")");
 
-                if (scene.Variables.ContainsKey(variableName))
+                if (scene.Variables.ContainsKey(variableName) && !scene.OverriddenVariables.Contains(variableName))
                     throw new SceneSyntaxException(variableLocation,
-                        $"{variableName} cannot be redefined"); //Aggiungere controllo overridden variables 
-                //Aggiungere controllo overridden variables anche qui
-                scene.Variables[variableName] = variableValue;
+                        $"{variableName} cannot be redefined");
+                if (!scene.OverriddenVariables.Contains(variableName)) scene.Variables[variableName] = variableValue;
             }
             else if (token is KeywordToken { Keyword: Keyword.Sphere })
             {
