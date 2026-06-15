@@ -13,6 +13,8 @@ done
 
 readonly exepath="./RayTracer/bin/Debug/net10.0/RayTracer"
 
+dotnet build
+
 cmd=( "$exepath" pfmtopng )
 
 [ -n "$input" ]       && cmd+=( --input "$input" ) 
@@ -21,11 +23,4 @@ cmd=( "$exepath" pfmtopng )
 [ -n "$factor" ]      && cmd+=( --factor "$factor" ) 
 [ -n "$gamma" ]       && cmd+=( --gamma "$gamma" ) 
 
-dotnet build
-
 time "${cmd[@]}"
-	
-	
-	
-	
-	
