@@ -107,8 +107,8 @@ public class HomMatrixTests
         HomMatrix matrix1 = new HomMatrix(m1);
         HomMatrix matrix2 = new HomMatrix(m2);
 
-        Assert.True(HomMatrix.AreMatrixClose(matrix1, matrix2, 1e-3f));
-        Assert.False(HomMatrix.AreMatrixClose(matrix1, matrix2)); // epsilon = 1e-5f
+        Assert.True(HomMatrix.AreMatricesClose(matrix1, matrix2, 1e-3f));
+        Assert.False(HomMatrix.AreMatricesClose(matrix1, matrix2)); // epsilon = 1e-5f
     }
 
     [Fact]
@@ -375,8 +375,8 @@ public class TransformationTest
         ];
 
         Transformation t = new Transformation(axis, alpha);
-        Assert.True(Functions.AreArrayClose(m, t.M.M));
-        Assert.True(Functions.AreArrayClose(invM, t.InvM.M));
+        Assert.True(Functions.AreArraysClose(m, t.M.M));
+        Assert.True(Functions.AreArraysClose(invM, t.InvM.M));
 
         axis = 'y';
         alpha = MathF.PI;
@@ -388,8 +388,8 @@ public class TransformationTest
             0, 0, 0, 1
         ];
         t = new Transformation(axis, alpha);
-        Assert.True(Functions.AreArrayClose(m, t.M.M));
-        Assert.True(Functions.AreArrayClose(invM, t.InvM.M));
+        Assert.True(Functions.AreArraysClose(m, t.M.M));
+        Assert.True(Functions.AreArraysClose(invM, t.InvM.M));
 
         axis = 'x';
         alpha = MathF.PI * 1.5f;
@@ -408,8 +408,8 @@ public class TransformationTest
             0, 0, 0, 1
         ];
         t = new Transformation(axis, alpha);
-        Assert.True(Functions.AreArrayClose(m, t.M.M));
-        Assert.True(Functions.AreArrayClose(invM, t.InvM.M));
+        Assert.True(Functions.AreArraysClose(m, t.M.M));
+        Assert.True(Functions.AreArraysClose(invM, t.InvM.M));
 
         Assert.Throws<ArgumentOutOfRangeException>(() => new Transformation('a', alpha));
     }

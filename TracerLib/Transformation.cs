@@ -121,9 +121,9 @@ public struct HomMatrix
         return row * 4 + col;
     }
 
-    public static bool AreMatrixClose(HomMatrix a, HomMatrix b, float epsilon = 1e-5f)
+    public static bool AreMatricesClose(HomMatrix a, HomMatrix b, float epsilon = 1e-5f)
     {
-        return Functions.AreArrayClose(a.M, b.M, epsilon);
+        return Functions.AreArraysClose(a.M, b.M, epsilon);
     }
 
     public override string ToString()
@@ -381,7 +381,7 @@ public struct Transformation
     public bool _IsConsistent()
     {
         HomMatrix identity = new HomMatrix();
-        return HomMatrix.AreMatrixClose(M * InvM, identity, 1e-4f);
+        return HomMatrix.AreMatricesClose(M * InvM, identity, 1e-4f);
     }
 
     /// <summary>
@@ -399,8 +399,8 @@ public struct Transformation
 
     public static bool AreTransformationsClose(in Transformation t1, in Transformation t2, float epsilon = 1e-5f)
     {
-        return HomMatrix.AreMatrixClose(t1.M, t2.M, epsilon)
-               && HomMatrix.AreMatrixClose(t1.InvM, t2.InvM, epsilon);
+        return HomMatrix.AreMatricesClose(t1.M, t2.M, epsilon)
+               && HomMatrix.AreMatricesClose(t1.InvM, t2.InvM, epsilon);
     }
 
     /// <summary>

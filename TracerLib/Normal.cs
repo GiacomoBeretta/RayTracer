@@ -40,10 +40,23 @@ public struct Normal
     /// <param name="a"></param>
     /// <param name="b"></param>
     /// <returns></returns>
-    public static bool _AreCloseNormal(Normal a, Normal b, float epsilon = 1e-5f)
+    public static bool _AreNormalsClose(Normal a, Normal b, float epsilon = 1e-5f)
     {
         return Functions.AreClose(a.X, b.X, epsilon) && Functions.AreClose(a.Y, b.Y, epsilon) &&
                Functions.AreClose(a.Z, b.Z, epsilon);
+    }
+
+    public bool IsNormalized(float epsilon = 1e-5f)
+    {
+        return Functions.AreClose(1, this.SquaredNorm(), epsilon);
+    }
+
+    public void CheckNormalized(float epsilon = 1e-5f)
+    {
+        if (!this.IsNormalized())
+        {
+            throw new ArgumentOutOfRangeException($"Normal is not normalized within epsilon={epsilon}");
+        }
     }
 
     /// <summary>
@@ -55,6 +68,7 @@ public struct Normal
         return new Normal(-n.X, -n.Y, -n.Z);
     }
 
+/*
     /// <summary>
     /// Returns the product per component between a <c>Normal</c> and a floating-point scalar
     /// </summary>
@@ -75,7 +89,8 @@ public struct Normal
     public static Normal operator *(float a, Normal n)
     {
         return n * a;
-    }
+    }*/
+
 
     /// <summary>
     /// Returns the scalar product between a <c>Normal</c> and a <c>Vector</c>
@@ -124,12 +139,12 @@ public struct Normal
     /// <summary>
     /// Returns the cross product between 2 <c>Normal</c>
     /// </summary>
-    /// <param name="n"></param>
-    /// <param name="v"></param>
+    /// <param name="n1"></param>
+    /// <param name="n2"></param>
     /// <returns></returns>
-    public static Vector CrossProduct(Normal n, Normal v)
+    public static Vector CrossProduct(Normal n1, Normal n2)
     {
-        return new Vector(n.Y * v.Z - n.Z * v.Y, n.Z * v.X - n.X * v.Z, n.X * v.Y - n.Y * v.X);
+        return new Vector(n1.Y * n2.Z - n1.Z * n2.Y, n1.Z * n2.X - n1.X * n2.Z, n1.X * n2.Y - n1.Y * n2.X);
     }
 
     /// <summary>
@@ -150,12 +165,18 @@ public struct Normal
         return MathF.Sqrt(this.SquaredNorm());
     }
 
+
     /// <summary>
     /// Returns a Normalized Normal 
     /// </summary>
     /// <returns></returns>
     public Normal Normalize()
     {
-        return new Normal(this.X, this.Y, this.Z) * (1 / this.Norm());
+        return new Normal(this.X * 1 / this.Norm(), this.Y * 1 / this.Norm(), this.Z * 1 / this.Norm());
+    }
+
+    public Vector ToVector()
+    {
+        return new Vector(this.X, this.Y, this.Z);
     }
 }

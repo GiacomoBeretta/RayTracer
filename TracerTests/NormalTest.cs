@@ -9,20 +9,22 @@ public class NormalTest
     {
         var n = new Normal(1.0f, 2.0f, 3.0f);
         
-        Assert.True(Normal._AreCloseNormal(new Normal(-1.0f, -2.0f, -3.0f), -n)); 
+        Assert.True(Normal._AreNormalsClose(new Normal(-1.0f, -2.0f, -3.0f), -n)); 
         // La funzione Equal non funziona (Ricotrollare arrotondamento)
         // Assert.Equal(new Normal(-1.0f, -2.0f, -3.0f), n._NormalNegation());
     }
-
+    
+/*
     [Fact]
     public void ScalarProductTest()
     {
         var n = new Normal(1.0f, 2.0f, 3.0f);
         var a = 5.0f;
         
-        Assert.True(Normal._AreCloseNormal(new Normal(5.0f, 10.0f, 15.0f), n * a));
-        Assert.True(Normal._AreCloseNormal(new Normal(5.0f, 10.0f, 15.0f), a * n));
+        Assert.True(Normal._AreNormalsClose(new Normal(5.0f, 10.0f, 15.0f), n * a));
+        Assert.True(Normal._AreNormalsClose(new Normal(5.0f, 10.0f, 15.0f), a * n));
     }
+*/
 
     [Fact]
     public void NormalVectorProductTest()

@@ -3,10 +3,10 @@ namespace TracerLib;
 public class World : Shape
 {
     public List<Shape> Shapes { get; private set; }
-
-    public World(List<Shape> shapes)
+    
+    public World(List<Shape>? shapes = null)
     {
-        Shapes = shapes;
+        Shapes = shapes ?? new List<Shape>();
     }
 
     public void Add(Shape shape)
@@ -31,5 +31,10 @@ public class World : Shape
             }
         }
         return closest;
+    }
+
+    public override bool _IsCloseTo(Shape s, float epsilon = 1E-05f)
+    {
+        throw new NotImplementedException();
     }
 }

@@ -16,19 +16,24 @@ public interface ICamera
 public struct OrthogonalCamera : ICamera
 {
     public float AspectRatio { get; set; }
-    public Transformation Transformation { get; set; }
 
-    public OrthogonalCamera(float aspectRatio = 1.0f, Transformation transformation = default)
+    public Transformation Transform { get; set; }
+
+    public OrthogonalCamera() : this(new Transformation())
+    {
+        
+    }
+    public OrthogonalCamera( Transformation transformation, float aspectRatio = 1.0f)
     {
         AspectRatio = aspectRatio;
-        Transformation = transformation;
+        Transform = transformation;
     }
 
     public Ray FireRay(float u, float v)
     {
         var origin = new Point(-1f, (1f - 2f * u) * this.AspectRatio, 2f * v - 1f);
         var direction = new Vector(1, 0, 0);
-        return this.Transformation * new Ray(origin, direction);
+        return this.Transform * new Ray(origin, direction);
     }
 }
 
@@ -43,12 +48,12 @@ public struct PerspectiveCamera : ICamera
     public float Distance { get; set; }
     public float AspectRatio { get; set; }
     public Transformation Transformation { get; set; }
-
-    public PerspectiveCamera(float distance = 1.0f, float aspectRatio = 1.0f, Transformation transformation = default)
+    
+    public PerspectiveCamera(float distance = 1.0f, float aspectRatio = 1.0f, Transformation? transformation = null)
     {
         Distance = distance;
         AspectRatio = aspectRatio;
-        Transformation = transformation;
+        Transformation = transformation ?? new Transformation();
     }
 
     /// <summary>
