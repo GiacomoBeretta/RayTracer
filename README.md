@@ -129,7 +129,6 @@ If omitted, the probability is computed dynamically at each recursion step.
 
 
 # How to install it
-<<<<<<< HEAD
 This Program works on Ubuntu 24.04 LTS. The unit tests were run on these OSs with the latest version of dotnet 10.0.x and they were all successful:
 Windows family: 
     OS Name:                       Microsoft Windows Server 2025 Datacenter
