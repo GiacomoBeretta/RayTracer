@@ -1,6 +1,11 @@
+// This file is release under EUPL_v1.2 license. See LICENSE.md
+
 namespace TracerLib;
 
-public class World : Shape
+/// <summary>
+/// A class that contains all the shapes of the scene to render.
+/// </summary>
+public class World
 {
     public List<Shape> Shapes { get; private set; }
     
@@ -8,18 +13,24 @@ public class World : Shape
     {
         Shapes = shapes ?? new List<Shape>();
     }
-
+    
     public void Add(Shape shape)
     {
         Shapes.Add(shape);
     }
-
-    public override HitRecord? RayIntersection(Ray ray)
+    
+    /// <summary>
+    /// Finds the closest intersection between the specified ray and the shapes in the scene.
+    /// Returns null if the ray does not intersect any shape.
+    /// </summary>
+    /// <param name="ray">The <see cref="Ray"/> to test for intersections.</param>
+    /// <returns>A <see cref="HitRecord"/> describing the closest intersection, or null if no intersection exists.</returns>
+    public HitRecord? FindIntersection(Ray ray)
     {
         HitRecord? closest = null;
         foreach (var shape in Shapes)
         {
-            var intersection = shape.RayIntersection(ray);
+            HitRecord? intersection = shape.FindIntersection(ray);
             if (intersection == null)
             {
                 continue;
@@ -31,10 +42,5 @@ public class World : Shape
             }
         }
         return closest;
-    }
-
-    public override bool _IsCloseTo(Shape s, float epsilon = 1E-05f)
-    {
-        throw new NotImplementedException();
     }
 }

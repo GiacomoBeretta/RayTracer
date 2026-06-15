@@ -12,6 +12,13 @@ public struct Vector
 
     public float Z { get; private set; }
 
+    public Vector()
+    {
+        X = 0;
+        Y = 0;
+        Z = 0;
+    }
+
     public Vector(float x, float y, float z)
     {
         X = x;
@@ -100,6 +107,6 @@ public struct Vector
     /// <returns></returns>
     public Normal ToNormal()
     {
-        return new Normal(X/this.Norm(), Y/this.Norm(), Z/this.Norm());    
+        return new Normal(X/Norm(), Y/Norm(), Z/Norm());    
     }
 }

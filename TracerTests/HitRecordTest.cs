@@ -17,7 +17,7 @@ public class HitRecordTest
         Assert.Equal(point, record.WorldPoint);
         Assert.Equal(sphere, record.Shape);
         Assert.Equal(normal, record.SurfaceNormal);
-        Assert.Equal(surfacePoint, record.SurfacePoint);
+        Assert.Equal(surfacePoint, record.SurfacePosition);
         Assert.Equal(ray, record.IncomingRay);
         Assert.Equal(2, record.T);
     }

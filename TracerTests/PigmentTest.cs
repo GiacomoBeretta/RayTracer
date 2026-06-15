@@ -9,7 +9,7 @@ public class PigmentTest
     private UniformPigment up;
     private CheckeredPigment cp;
     private ImagePigment ip;
-    
+
     public PigmentTest(ITestOutputHelper testOutputHelper)
     {
         _testOutputHelper = testOutputHelper;
@@ -17,34 +17,33 @@ public class PigmentTest
         cp = new CheckeredPigment(new Color(1.0f, 2.0f, 3.0f), new Color(10.0f, 20.0f, 30.0f), 2);
         ip = new ImagePigment(new HDRImage(2, 2));
     }
-    
+
     [Fact]
     public void UniformConstructorTest()
     {
         Assert.True(Functions.AreClose(1.0f, up.Color.R));
         Assert.True(Functions.AreClose(2.0f, up.Color.G));
         Assert.True(Functions.AreClose(3.0f, up.Color.B));
-        
+
         Assert.True(Color._AreColorsClose(new Color(1.0f, 2.0f, 3.0f), up.Color));
     }
 
     [Fact]
     public void UniformGetColorTest()
     {
-        
-        var v1 = new Vector2D(0.5f, 0.5f);
-        var v2 = new Vector2D(1.0f, 1.0f);
-        var v3 = new Vector2D(0.0f, 0.0f);
-        var v4 = new Vector2D(0.0f, 1.0f);
-        var v5 = new Vector2D(1.0f, 0.0f);
-        
+        Vector2D v1 = new Vector2D(0.5f, 0.5f);
+        Vector2D v2 = new Vector2D(1.0f, 1.0f);
+        Vector2D v3 = new Vector2D(0.0f, 0.0f);
+        Vector2D v4 = new Vector2D(0.0f, 1.0f);
+        Vector2D v5 = new Vector2D(1.0f, 0.0f);
+
         Assert.True(Color._AreColorsClose(new Color(1.0f, 2.0f, 3.0f), up.GetColor(v1)));
         Assert.True(Color._AreColorsClose(new Color(1.0f, 2.0f, 3.0f), up.GetColor(v2)));
         Assert.True(Color._AreColorsClose(new Color(1.0f, 2.0f, 3.0f), up.GetColor(v3)));
         Assert.True(Color._AreColorsClose(new Color(1.0f, 2.0f, 3.0f), up.GetColor(v4)));
         Assert.True(Color._AreColorsClose(new Color(1.0f, 2.0f, 3.0f), up.GetColor(v5)));
     }
-    
+
     //IMPLEMENTARE TEST PER IL COSTRUTTORE IMAGEPIGMENT
 
     [Fact]
@@ -54,11 +53,12 @@ public class PigmentTest
         ip.Image[1] = new Color(2.0f, 3.0f, 1.0f);
         ip.Image[2] = new Color(2.0f, 1.0f, 3.0f);
         ip.Image[3] = new Color(3.0f, 2.0f, 1.0f);
-        
-        Assert.True(Color._AreColorsClose(ip.GetColor(new Vector2D(0.0f, 0.0f)), new Color(1.0f, 2.0f, 3.0f)));
-        Assert.True(Color._AreColorsClose(ip.GetColor(new Vector2D(1.0f, 0.0f)), new Color(2.0f, 3.0f, 1.0f)));
-        Assert.True(Color._AreColorsClose(ip.GetColor(new Vector2D(0.0f, 1.0f)), new Color(2.0f, 1.0f, 3.0f)));
-        Assert.True(Color._AreColorsClose(ip.GetColor(new Vector2D(1.0f, 1.0f)), new Color(3.0f, 2.0f, 1.0f)));
+
+        //Crea problemi al bordo dell'immagine
+        Assert.True(Color._AreColorsClose(ip.GetColor(new Vector2D(0.25f, 0.25f)), new Color(1.0f, 2.0f, 3.0f)));
+        Assert.True(Color._AreColorsClose(ip.GetColor(new Vector2D(0.75f, 0.25f)), new Color(2.0f, 3.0f, 1.0f)));
+        Assert.True(Color._AreColorsClose(ip.GetColor(new Vector2D(0.25f, 0.75f)), new Color(2.0f, 1.0f, 3.0f)));
+        Assert.True(Color._AreColorsClose(ip.GetColor(new Vector2D(0.75f, 0.75f)), new Color(3.0f, 2.0f, 1.0f)));
     }
 
     [Fact]
@@ -67,14 +67,14 @@ public class PigmentTest
         Assert.True(Functions.AreClose(1.0f, cp.Color1.R));
         Assert.True(Functions.AreClose(2.0f, cp.Color1.G));
         Assert.True(Functions.AreClose(3.0f, cp.Color1.B));
-        
+
         Assert.True(Functions.AreClose(10.0f, cp.Color2.R));
         Assert.True(Functions.AreClose(20.0f, cp.Color2.G));
         Assert.True(Functions.AreClose(30.0f, cp.Color2.B));
-        
+
         Assert.True(Color._AreColorsClose(new Color(1.0f, 2.0f, 3.0f), cp.Color1));
         Assert.True(Color._AreColorsClose(new Color(10.0f, 20.0f, 30.0f), cp.Color2));
-        
+
         Assert.Equal(2, cp.NumSteps);
     }
 

@@ -1,3 +1,5 @@
+// This file is release under EUPL_v1.2 license. See LICENSE.md
+
 namespace TracerLib;
 
 public class PCG
@@ -14,9 +16,9 @@ public class PCG
     {
         State = 0;
         Inc = (initSeq << 1) | 1;
-        this.Random();
+        Random();
         State += initState;
-        this.Random();
+        Random();
     }
 
     /// <summary>
@@ -25,13 +27,13 @@ public class PCG
     /// <returns></returns>
     public uint Random()
     {
-        var oldstate = State;
+        ulong oldstate = State;
 
         State = oldstate * 6364136223846793005 + Inc;
 
-        var xorshifted = (uint)(((oldstate >> 18) ^ oldstate) >> 27);
+        uint xorshifted = (uint)(((oldstate >> 18) ^ oldstate) >> 27);
 
-        var rot = (int)(oldstate >> 59); 
+        int rot = (int)(oldstate >> 59); 
 
         return (xorshifted >> rot) | (xorshifted << ((~rot + 1) & 31)); // Rivedere con 32 - rot al posto di ~rot +1
     }
@@ -42,6 +44,6 @@ public class PCG
     /// <returns></returns>
     public float RandomFloat()
     {
-        return this.Random() / (float)0x100000000;
+        return Random() / (float)0x100000000;
     }
 }

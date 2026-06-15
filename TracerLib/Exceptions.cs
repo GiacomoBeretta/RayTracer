@@ -3,28 +3,37 @@
 namespace TracerLib;
 
 /// <summary>
-/// The class <c>InvalidPfmFileFormat</c> inherit from the FormatException's class and is used in the error management during the reading/writing of a file.pfm
+/// Thrown when a PFM file has an invalid format.
 /// </summary>
-public class InvalidPfmFileFormat : FormatException
+public class InvalidPfmFileFormatException : FormatException
 {
-    public InvalidPfmFileFormat(string errorMessage) : base (errorMessage) { }
-    public InvalidPfmFileFormat(string message, Exception inner) : base(message, inner) { }
-}
-
-/* public class ZeroDivision : ArithmeticException
-{
-    public ZeroDivision(string error) : base(error){}
-}
-
-public class Calculator{
-    public static float Divide(float num, float den)
+    public InvalidPfmFileFormatException(string errorMessage) : base(errorMessage)
     {
-        if (den == 0f)
-        {
-            throw new ZeroDivision("Impossibile dividere per zero!");
-        }
+    }
 
-        return num / den;
+    public InvalidPfmFileFormatException(string message, Exception inner) : base(message, inner)
+    {
     }
+}
+
+/// <summary>
+/// Thrown when a syntax error is encountered while parsing a scene file.
+/// </summary>
+public class SceneSyntaxException : Exception
+{
+    /// <summary>
+    /// The location of the error (file name, column and row). See <see cref="SourceLocation"/>.
+    /// </summary>
+    SourceLocation Location;
+
+    public SceneSyntaxException(SourceLocation location, string message) : base($"Grammar Error at ${location}: {message}")
+    {
+        Location = location;
     }
-    */
+
+    public SceneSyntaxException(SourceLocation location, string message, Exception inner) : base(
+        $"Grammar Error at ${location}: {message}", inner)
+    {
+        Location = location;
+    }
+}

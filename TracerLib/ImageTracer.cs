@@ -1,9 +1,5 @@
 // This file is release under EUPL_v1.2 license. See LICENSE.md
 
-//da riscrivere meglio la docstring della classe una volta capito meglio cosa fa e magari rivedere le altre docstring
-
-using SixLabors.ImageSharp.Processing;
-
 namespace TracerLib;
 
 /// <summary>
@@ -11,46 +7,67 @@ namespace TracerLib;
 /// </summary>
 public class ImageTracer
 {
+    /// <summary>
+    /// The image storing the result of the rendering process.
+    /// </summary>
     private HDRImage _image;
+    
+    /// <summary>
+    /// The camera defining the projection model, the observer position, and the aspect ratio.
+    /// </summary>
     private ICamera _camera;
+    
+    /// <summary>
+    /// The random generator used for Monte Carlo integration. 
+    /// </summary>
     private PCG _pcg;
-    public int SamplePerSide { get; set; }
-
-    public ImageTracer(HDRImage image, ICamera camera, PCG? pcg = null, int samplePerSide=0)
+    
+    /// <summary>
+    /// Number of subdivisions per pixel axis.
+    /// The total number of rays per pixel is the square of this value.
+    /// </summary>
+    public int PixelSideSubdivisions { get; set; }
+    
+    public ImageTracer(HDRImage image, ICamera camera, PCG? pcg = null, int pixelSideSubdivisions=1)
     {
-        this._image = image;
-        this._camera = camera;
+        _image = image;
+        _camera = camera;
         _pcg = pcg ?? new PCG();
-        SamplePerSide = samplePerSide;
+        PixelSideSubdivisions = pixelSideSubdivisions;
     }
     
-    //attenzione che Tomasi ha una formula diversa: da chiedere!!
+    // (formule diverse da Tomasi)
     /// <summary>
-    /// Returns the <c>Ray</c> that passes through the pixel at (column, row).
+    /// Returns a <see cref="Ray"/> passing through the pixel at (column, row).
     /// Since a pixel is not a dimensionless point,
-    /// uPixel and vPixel are the coordinates inside the pixel at which the ray will be fired.
-    /// If (uPixel, vPixel)=(0,0) it means the ray will be fired at the left bottom angle of the pixel
-    /// See method FireRay of <c>Camera</c> for more information
+    /// <paramref name="uPixel"/> and <paramref name="vPixel"/> are the coordinates inside the pixel at which the ray will be fired.
+    /// A value of (uPixel, vPixel)=(0,0) corresponds to the top-left corner of the pixel.
+    /// See method FireRay of <see cref="ICamera"/> for more information.
     /// </summary>
-    /// <param name="column"></param>
-    /// <param name="row"></param>
-    /// <param name="uPixel"></param>
-    /// <param name="vPixel"></param>
+    /// <param name="column">Pixel column index in the image (0 to image.Width - 1).</param>
+    /// <param name="row">Pixel row index in the image (0 to image.Height - 1).</param>
+    /// <param name="uPixel">Horizontal coordinate inside the pixel in [0,1].</param>
+    /// <param name="vPixel">Vertical coordinate inside the pixel in [0,1].</param>
     /// <returns></returns>
-    public Ray FireRay(int column, int row, float uPixel = 0.5f, float vPixel = 0.5f)
+    public Ray FireRayAtPixel(int column, int row, float uPixel = 0.5f, float vPixel = 0.5f)
     {
-        //the formulas for u and v are different because columns start from left like the u coordinate
-        //while the rows start from the top, contrary to v that starts from the bottom
+        // the (u,v) coordinates start from the top-left corner of the unit square [0,1]x[0,1].
         float u = (column + uPixel) / _image.Width; 
-        float v = 1 - (1 + row - vPixel) / _image.Height; //equivale a (image.Height - 1 - row + vPixel) / image.Height;
+        float v = (row + vPixel) / _image.Height;
         return _camera.FireRay(u, v);
     }
-
+    
     /// <summary>
-    /// Fires a ray for each pixel and use the <c>Renderer</c> function to solve the rendering equation and compute the color.
+    /// Computes the color of each pixel of the <see cref="HDRImage"/> using the provided RenderFunction
+    /// of the <see cref="Renderer"/> class.
     /// </summary>
-    /// <param name="renderer"></param>
-    public void FireAllRays(Func<Ray, Color> renderer)
+    /// <remarks>
+    /// If <see cref="PixelSideSubdivisions"/> &gt; 0,
+    /// multiple rays are fired per pixel and the results are averaged to reduce aliasing.
+    /// Otherwise, the rays are fired at the center of each pixel.
+    /// </remarks>
+    /// <param name="renderFunction">Function that estimates the color for a given ray.</param>
+    public void FireAllRays(Func<Ray, Color> renderFunction)
     {
         for (int col = 0; col < _image.Width; col++)
         {
@@ -58,32 +75,32 @@ public class ImageTracer
             {
                 var cumcolor = new Color(0.0f,0.0f,0.0f);
 
-                if (SamplePerSide > 0)
+                // Anti-Aliasing algorithm:
+                // we subdivide the pixel in a PixelSideSubdivisions x PixelSideSubdivisions grid
+                // then for each cell of this grid we fire a ray randomly.
+                if (PixelSideSubdivisions > 1) //CONTROLLARE SE 1 SUDDIVISIONE AGGIUNGE UN'ULTERIORE RAGGIO A QUELLO DELL'ALGORITMO NORMALE
                 {
-                    for (var pixRow = 0; pixRow < SamplePerSide; pixRow++)
+                    for (int pixRow = 0; pixRow < PixelSideSubdivisions; pixRow++)
                     {
-                        for (var pixCol = 0; pixCol < SamplePerSide; pixCol++)
+                        for (int pixCol = 0; pixCol < PixelSideSubdivisions; pixCol++)
                         {
-                            var uPix = (pixCol + _pcg.RandomFloat()) / SamplePerSide;
-                            var vPix = (pixRow + _pcg.RandomFloat()) / SamplePerSide;
-                            var ray = FireRay(col, row, uPix, vPix);
-                            cumcolor += renderer(ray);
+                            float uPix = (pixCol + _pcg.RandomFloat()) / PixelSideSubdivisions;
+                            float vPix = (pixRow + _pcg.RandomFloat()) / PixelSideSubdivisions;
+                            Ray ray = FireRayAtPixel(col, row, uPix, vPix);
+                            cumcolor += renderFunction(ray);
                         }
                     }
-
-                    _image[col, row] = cumcolor;
+                    
+                    _image[col, row] = cumcolor * (1.0f / (PixelSideSubdivisions*PixelSideSubdivisions));
                 }
                 else
                 {
-                    var ray = FireRay(col, row);
-                    var color = renderer(ray);
+                    //otherwise the is fire at the center of each pixel
+                    Ray ray = FireRayAtPixel(col, row);
+                    Color color = renderFunction(ray);
                     _image[col, row] = color;
                 }
             }
         }
     }
 }
-
-delegate Color Renderer(Ray ray);
-    
-    //= ray =>world.RayIntersection(ray) != null ? new Color(1.0f, 1.0f, 1.0f) : new Color(0.0f, 0.0f, 0.0f);

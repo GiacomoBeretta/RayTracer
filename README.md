@@ -19,7 +19,6 @@ Reads a scene description from a text file and generates the corresponding image
 ### `pfmtopng`
 
 Converts images from the PFM (Portable Float Map) format to PNG format.
-
 ---
 
 ## Image Generation Script
@@ -66,13 +65,13 @@ The file will be saved in the `PngImages` directory.
 
 #### `--numrays`
 
-Number of rays spawned from each surface interaction.
+Number of rays scattered at each reflection.
 
 Used only when the selected algorithm is `pathtracer`.
 
 #### `--maxdepth`
 
-Maximum recursion depth for each ray.
+Maximum recursion depth for each ray, i.e. the maximum number of reflections a ray can be subjected to, before returning the backgroun color.
 
 Used only when the selected algorithm is `pathtracer`.
 
@@ -89,8 +88,7 @@ Sequence identifier used by the random number generator.
 Number of subdivisions per pixel side used for anti-aliasing.
 
 #### `--luminosityfunction`
-
-Luminosity sampling function.
+Luminosity function used in tone mapping.
 
 Available options:
 
@@ -99,11 +97,19 @@ Available options:
 
 #### `--factor`
 
+<<<<<<< HEAD
 Empirical factor used during image rendering.
 
 #### `--gamma`
 
 Gamma correction factor applied to the final image.
+=======
+Empirical factor used during tone mapping.
+
+#### `--gamma`
+
+Gamma correction factor applied during tone mapping.
+>>>>>>> pathtracing
 
 #### `--declarefloat` or `-d`
 
@@ -131,7 +137,17 @@ If omitted, the probability is computed dynamically at each recursion step.
 
 
 # How to install it
-This Program works on Ubuntu 24.04 LTS. All tests are successful also MacOS 15.7.7. It's not guaranteed to work on Windows.
+<<<<<<< HEAD
+This Program works on Ubuntu 24.04 LTS. The unit tests were run on these OSs with the latest version of dotnet 10.0.x and they were all successful:
+Windows family: 
+    OS Name:                       Microsoft Windows Server 2025 Datacenter
+    OS Version:                    10.0.26100 N/A Build 26100
+    BIOS Version:                  Microsoft Corporation Hyper-V UEFI Release v4.1, 1/8/2026
+
+MacOS:
+    ProductName:		macOS
+    ProductVersion:		15.7.7
+    BuildVersion:		24G720
 
 # Where to ask for help
 
@@ -146,3 +162,4 @@ Giacomo Beretta, Simone Selmi
 See the file LICENSE.md
 
 # State of the project
+

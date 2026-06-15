@@ -36,7 +36,7 @@ public class FunctionsTest
     [Fact]
     public void TestDegToRad()
     {
-        var deg = 180f;
+        float deg = 180f;
         
         Assert.True(Functions.AreClose(Functions.DegToRad(deg), MathF.PI));
         Assert.False(Functions.AreClose(Functions.DegToRad(deg), 64f));

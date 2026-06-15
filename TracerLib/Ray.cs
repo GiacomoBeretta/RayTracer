@@ -2,13 +2,52 @@
 
 namespace TracerLib;
 
+/// <summary>
+/// A struct representing a light ray.
+/// 
+/// Intersections are parameterized by a scalar t such that
+/// P = <see cref="Origin"/> + t * <see cref="Dir"/>.
+/// A valid intersection must satisfy:
+/// <see cref="Tmin"/>  &lt;= t  &lt;= <see cref="Tmax"/>.
+/// 
+/// The Depth property stores the number of reflections
+/// undergone by the ray.
+/// </summary>
 public struct Ray
 {
+    /// <summary>
+    /// Origin is the origin of the <see cref="Dir"/> vector.
+    /// </summary>
     public Point Origin { get; set; }
+    
+    /// <summary>
+    /// Dir is the direction at which the ray points to.
+    /// </summary>
     public Vector Dir { get; set; }
+    
+    /// <summary>
+    /// Lower bound for valid intersection parameters.
+    /// </summary>
     public float Tmin { get; private set; }
+    
+    /// <summary>
+    /// Upper bound for valid intersection parameters.
+    /// </summary>
     public float Tmax { get; private set; }
+    
+    /// <summary>
+    /// Depth counts how many times the ray has been already reflected.
+    /// </summary>
     public int Depth { get; private set; }
+
+    public Ray()
+    {
+        Origin = new Point(0, 0, 0);
+        Dir = new Vector();
+        Tmin = 1e-5f;
+        Tmax = float.PositiveInfinity;
+        Depth = 0;
+    }
 
     public Ray(Point origin, Vector dir, float tmin = 1e-5f, float tmax = float.PositiveInfinity, int depth = 0)
     {
@@ -36,7 +75,7 @@ public struct Ray
 
     public Point At(float t)
     {
-        return this.Origin + this.Dir * t;
+        return Origin + Dir * t;
     }
 
     public static Ray operator *(Transformation t, Ray r)

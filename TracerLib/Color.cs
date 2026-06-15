@@ -9,7 +9,7 @@ namespace TracerLib;
 //magari si può migliorare lo struct usando i primary constructor?
 
 /// <summary>
-/// A Color type is identified by 3 float positive values R,G,B.
+/// The Color type is identified by 3 float positive values R,G,B.
 /// Some basic implemented operations: sum, product of a color by a scalar, product between 2 colors.
 /// </summary>
 public struct Color
@@ -18,13 +18,8 @@ public struct Color
     public float G { get; set; }
     public float B { get; set; }
     
-    public Color() : this(0.0f, 0.0f, 0.0f)
-    {
-        
-    }
-
     /// <summary>
-    /// Basic <c>Color</c> constructor which accepts 3 positive parameters between 0 and 1 : R,G,B 
+    /// Basic <see cref="Color"/> constructor which accepts 3 positive parameters between 0 and 1 : R,G,B 
     /// </summary>
     /// <param name="r"></param>
     /// <param name="g"></param>
@@ -53,7 +48,7 @@ public struct Color
     }
 
     /// <summary>
-    /// Sum per component between two <c>Color</c>
+    /// Sum per component between two <see cref="Color"/>
     /// </summary>
     /// <param name="c1"></param>
     /// <param name="c2"></param>
@@ -64,10 +59,10 @@ public struct Color
     }
 
     /// <summary>
-    /// Product between a <c>Color</c> and a float scalar
+    /// Product between a <see cref="Color"/> and a float scalar
     /// </summary>
-    /// <param name="a"></param>
-    /// <param name="alpha"></param>
+    /// <param name="a">Color</param>
+    /// <param name="alpha">Scalar</param>
     /// <returns></returns>
     public static Color operator *(Color a, float alpha)
     {
@@ -79,10 +74,10 @@ public struct Color
     }
     
     /// <summary>
-    /// Product between a <c>Color</c> and a float scalar
+    /// Product between a <see cref="Color"/> and a float scalar
     /// </summary>
-    /// <param name="alpha"></param>
-    /// <param name="a"></param>
+    /// <param name="alpha">Scalar</param>
+    /// <param name="a">Color</param>
     /// <returns></returns>
     public static Color operator *(float alpha, Color a)
     {
@@ -90,10 +85,10 @@ public struct Color
     }
 
     /// <summary>
-    /// Hadamard's product: Product oper component between two <c>Color</c>
+    /// Hadamard's product: Product oper component between two <see cref="Color"/> (used in RenderFunction).
     /// </summary>
-    /// <param name="c1"></param>
-    /// <param name="c2"></param>
+    /// <param name="c1">First Color</param>
+    /// <param name="c2">Second Color</param>
     /// <returns></returns>
     public static Color operator *(Color c1, Color c2)
     {
@@ -101,10 +96,10 @@ public struct Color
     }
 
     /// <summary>
-    /// Returns if the 2 colors passed are exactly equal.
+    /// Returns whether the 2 Colors passed are exactly equal.
     /// </summary>
-    /// <param name="c1"></param>
-    /// <param name="c2"></param>
+    /// <param name="c1">First Color</param>
+    /// <param name="c2">Second Color</param>
     /// <returns></returns>
     [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
     public static bool _AreSameColor(Color c1, Color c2)
@@ -115,11 +110,12 @@ public struct Color
     }
 
     /// <summary>
-    /// Returns if the 2 colors passed are equal within a difference given by the epsilon parameter to deal with floating numbers.
+    /// Returns whether the 2 Colors passed are equal
+    /// within a difference given by the epsilon parameter to deal with floating numbers.
     /// </summary>
-    /// <param name="c1"></param>
-    /// <param name="c2"></param>
-    /// <param name="epsilon"></param>
+    /// <param name="c1">First Color</param>
+    /// <param name="c2">Second Color</param>
+    /// <param name="epsilon">Epsilon parameter</param>
     /// <returns></returns>
     public static bool _AreColorsClose(Color c1, Color c2, float epsilon = 1e-5f)
     {
@@ -152,7 +148,7 @@ public struct Color
     // }
 
     /// <summary>
-    /// Returns the luminosity of a pixel using the formula given by Shirley and Morley in their book
+    /// Returns the luminosity of a pixel using the formula given by Shirley and Morley 
     /// </summary>
     /// <returns></returns>
     public float LuminosityShirleyMorley()
@@ -175,7 +171,8 @@ public struct Color
     }
 
     /// <summary>
-    /// Clamps the value of x under 1
+    /// Maps a value to the range [0, 1),
+    /// using the transformation x / (x + 1).
     /// </summary>
     /// <param name="x"></param>
     /// <returns></returns>
@@ -185,8 +182,9 @@ public struct Color
     }
 
     /// <summary>
-    /// Clamps the values of RGB under 1
-    /// and resize a potential too bright pixel
+    /// Applies the function x / (x + 1)
+    /// to each RGB component,
+    /// reducing the intensity of too bright colors.
     /// </summary>
     public void _Clamp()
     {
@@ -194,12 +192,17 @@ public struct Color
         G = Color._Clamp(G);
         B = Color._Clamp(B);
     }
-
+    
     /// <summary>
-    /// Returns the corresponding sRGB triple corrected by the characteristic gamma factor of the display
+    /// Applies gamma correction using a power-law function
+    /// and maps the resulting color to the 0–255 range.
     /// </summary>
-    /// <param name="gamma"></param>
+    /// <param name="gamma">Gamma exponent used for power-law correction (must be > 0).
+    /// It's characteristic of the display used.</param>
     /// <returns></returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown when gamma is less than or equal to 0.
+    /// </exception>
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public Color To8BitRGB(float gamma)
     {
@@ -210,8 +213,7 @@ public struct Color
         float r = (float)Math.Round(255 * MathF.Pow(R, 1.0f / gamma));
         float g = (float)Math.Round(255 * MathF.Pow(G, 1.0f / gamma));
         float b = (float)Math.Round(255 * MathF.Pow(B, 1.0f / gamma));
-
-
+        
         return new Color(r, g, b);
     }
     

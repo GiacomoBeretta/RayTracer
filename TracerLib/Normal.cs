@@ -48,12 +48,12 @@ public struct Normal
 
     public bool IsNormalized(float epsilon = 1e-5f)
     {
-        return Functions.AreClose(1, this.SquaredNorm(), epsilon);
+        return Functions.AreClose(1, SquaredNorm(), epsilon);
     }
 
     public void CheckNormalized(float epsilon = 1e-5f)
     {
-        if (!this.IsNormalized())
+        if (!IsNormalized())
         {
             throw new ArgumentOutOfRangeException($"Normal is not normalized within epsilon={epsilon}");
         }
@@ -153,7 +153,7 @@ public struct Normal
     /// <returns></returns>
     public float SquaredNorm()
     {
-        return MathF.Pow(this.X, 2) + MathF.Pow(this.Y, 2) + MathF.Pow(this.Z, 2);
+        return MathF.Pow(X, 2) + MathF.Pow(Y, 2) + MathF.Pow(Z, 2);
     }
 
     /// <summary>
@@ -162,7 +162,7 @@ public struct Normal
     /// <returns></returns>
     public float Norm()
     {
-        return MathF.Sqrt(this.SquaredNorm());
+        return MathF.Sqrt(SquaredNorm());
     }
 
 
@@ -172,11 +172,11 @@ public struct Normal
     /// <returns></returns>
     public Normal Normalize()
     {
-        return new Normal(this.X * 1 / this.Norm(), this.Y * 1 / this.Norm(), this.Z * 1 / this.Norm());
+        return new Normal(X * 1 / Norm(), Y * 1 / Norm(), Z * 1 / Norm());
     }
 
     public Vector ToVector()
     {
-        return new Vector(this.X, this.Y, this.Z);
+        return new Vector(X, Y,Z);
     }
 }

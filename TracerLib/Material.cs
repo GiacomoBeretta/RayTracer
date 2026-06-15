@@ -1,25 +1,25 @@
+// This file is release under EUPL_v1.2 license. See LICENSE.md
+
 namespace TracerLib;
 
 //magari è meglio definire Pigment come un delegate (cioè un function object)
 
 public struct Material
 {
-    public Pigment Pigment;
+    public Pigment Pigment => Brdf.Pigment;
     public Pigment EmittedRadiance;
     public BRDF Brdf;
 
-    public Material(Pigment pigment, BRDF brdf)
+    public Material(BRDF brdf)
     {
-        this.Pigment = pigment;
-        this.Brdf = brdf;
+        Brdf = brdf;
         Color black = new Color(0, 0, 0);
-        this.EmittedRadiance = new UniformPigment(black);
+        EmittedRadiance = new UniformPigment(black);
     }
 
-    public Material(Pigment pigment, Pigment emittedRadiance, BRDF brdf)
+    public Material(Pigment emittedRadiance, BRDF brdf)
     {
-        this.Pigment = pigment;
-        this.EmittedRadiance = emittedRadiance;
-        this.Brdf = brdf;
+        EmittedRadiance = emittedRadiance;
+        Brdf = brdf;
     }
 }
