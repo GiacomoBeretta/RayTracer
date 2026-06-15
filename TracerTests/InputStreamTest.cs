@@ -667,14 +667,28 @@ public class InputStreamTest
 
             keywordToken = (KeywordToken)stream.ReadNextToken();
             Assert.Equal(Keyword.Float, keywordToken.Keyword);
+            Assert.Equal(1, keywordToken.Location.line);
+            Assert.Equal(0, keywordToken.Location.column);
+            
             identifierToken = (IdentifierToken)stream.ReadNextToken();
             Assert.Equal("clock", identifierToken.Identifier);
+            Assert.Equal(1, identifierToken.Location.line);
+            Assert.Equal(6, identifierToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal("(", symbolToken.Symbol);
+            Assert.Equal(1, symbolToken.Location.line);
+            Assert.Equal(11, symbolToken.Location.column);
+            
             numberToken = (LiteralNumberToken)stream.ReadNextToken();
             Assert.Equal(150f, numberToken.Value);
+            Assert.Equal(1, numberToken.Location.line);
+            Assert.Equal(12, numberToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(")", symbolToken.Symbol);
+            Assert.Equal(1, symbolToken.Location.line);
+            Assert.Equal(15, symbolToken.Location.column);
             
             Assert.Equal(1, stream.Location.line);
             Assert.Equal(16, stream.Location.column);
@@ -687,48 +701,113 @@ public class InputStreamTest
 
             keywordToken = (KeywordToken)stream.ReadNextToken();
             Assert.Equal(Keyword.Material, keywordToken.Keyword);
+            Assert.Equal(6, keywordToken.Location.line);
+            Assert.Equal(0, keywordToken.Location.column);
+            
             identifierToken = (IdentifierToken)stream.ReadNextToken();
             Assert.Equal("sky_material", identifierToken.Identifier);
+            Assert.Equal(6, identifierToken.Location.line);
+            Assert.Equal(9, identifierToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal("(", symbolToken.Symbol);
+            Assert.Equal(6, symbolToken.Location.line);
+            Assert.Equal(21, symbolToken.Location.column);
+            
             keywordToken = (KeywordToken)stream.ReadNextToken();
             Assert.Equal(Keyword.Diffuse, keywordToken.Keyword);
+            Assert.Equal(7, keywordToken.Location.line);
+            Assert.Equal(4, keywordToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal("(", symbolToken.Symbol);
+            Assert.Equal(7, symbolToken.Location.line);
+            Assert.Equal(11, symbolToken.Location.column);
+            
             keywordToken = (KeywordToken)stream.ReadNextToken();
             Assert.Equal(Keyword.Image, keywordToken.Keyword);
+            Assert.Equal(7, keywordToken.Location.line);
+            Assert.Equal(12, keywordToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal("(", symbolToken.Symbol);
+            Assert.Equal(7, symbolToken.Location.line);
+            Assert.Equal(17, symbolToken.Location.column);
+            
             stringToken = (StringToken)stream.ReadNextToken();
             Assert.Equal("sky-dome.pfm", stringToken.String);
+            Assert.Equal(7, stringToken.Location.line);
+            Assert.Equal(18, stringToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(")", symbolToken.Symbol);
+            Assert.Equal(7, symbolToken.Location.line);
+            Assert.Equal(32, symbolToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(")", symbolToken.Symbol);
+            Assert.Equal(7, symbolToken.Location.line);
+            Assert.Equal(33, symbolToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(",", symbolToken.Symbol);
+            Assert.Equal(7, symbolToken.Location.line);
+            Assert.Equal(34, symbolToken.Location.column);
+            
             keywordToken = (KeywordToken)stream.ReadNextToken();
             Assert.Equal(Keyword.Uniform, keywordToken.Keyword);
+            Assert.Equal(8, keywordToken.Location.line);
+            Assert.Equal(4, keywordToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal("(", symbolToken.Symbol);
+            Assert.Equal(8, symbolToken.Location.line);
+            Assert.Equal(11, symbolToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal("<", symbolToken.Symbol);
+            Assert.Equal(8, symbolToken.Location.line);
+            Assert.Equal(12, symbolToken.Location.column);
+            
             numberToken = (LiteralNumberToken)stream.ReadNextToken();
             Assert.Equal(0.7f, numberToken.Value);
+            Assert.Equal(8, numberToken.Location.line);
+            Assert.Equal(13, numberToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(",", symbolToken.Symbol);
+            Assert.Equal(8, symbolToken.Location.line);
+            Assert.Equal(16, symbolToken.Location.column);
+            
             numberToken = (LiteralNumberToken)stream.ReadNextToken();
             Assert.Equal(0.5f, numberToken.Value);
+            Assert.Equal(8, numberToken.Location.line);
+            Assert.Equal(18, numberToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(",", symbolToken.Symbol);
+            Assert.Equal(8, symbolToken.Location.line);
+            Assert.Equal(21, symbolToken.Location.column);
+            
             numberToken = (LiteralNumberToken)stream.ReadNextToken();
             Assert.Equal(1f, numberToken.Value);
+            Assert.Equal(8, numberToken.Location.line);
+            Assert.Equal(23, numberToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(">", symbolToken.Symbol);
+            Assert.Equal(8, symbolToken.Location.line);
+            Assert.Equal(24, symbolToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(")", symbolToken.Symbol);
+            Assert.Equal(8, symbolToken.Location.line);
+            Assert.Equal(25, symbolToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(")", symbolToken.Symbol);
+            Assert.Equal(9, symbolToken.Location.line);
+            Assert.Equal(0, symbolToken.Location.column);
             
             Assert.Equal(9, stream.Location.line);
             Assert.Equal(1, stream.Location.column);
@@ -741,80 +820,193 @@ public class InputStreamTest
 
             keywordToken = (KeywordToken)stream.ReadNextToken();
             Assert.Equal(Keyword.Material, keywordToken.Keyword);
+            Assert.Equal(11, keywordToken.Location.line);
+            Assert.Equal(0, keywordToken.Location.column);
+            
             identifierToken = (IdentifierToken)stream.ReadNextToken();
             Assert.Equal("ground_material", identifierToken.Identifier);
+            Assert.Equal(11, identifierToken.Location.line);
+            Assert.Equal(9, identifierToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal("(", symbolToken.Symbol);
+            Assert.Equal(11, symbolToken.Location.line);
+            Assert.Equal(24, symbolToken.Location.column);
+            
             keywordToken = (KeywordToken)stream.ReadNextToken();
             Assert.Equal(Keyword.Diffuse, keywordToken.Keyword);
+            Assert.Equal(12, keywordToken.Location.line);
+            Assert.Equal(4, keywordToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal("(", symbolToken.Symbol);
+            Assert.Equal(12, symbolToken.Location.line);
+            Assert.Equal(11, symbolToken.Location.column);
+            
             keywordToken = (KeywordToken)stream.ReadNextToken();
             Assert.Equal(Keyword.Checkered, keywordToken.Keyword);
+            Assert.Equal(12, keywordToken.Location.line);
+            Assert.Equal(12, keywordToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal("(", symbolToken.Symbol);
+            Assert.Equal(12, symbolToken.Location.line);
+            Assert.Equal(21, symbolToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal("<", symbolToken.Symbol);
+            Assert.Equal(12, symbolToken.Location.line);
+            Assert.Equal(22, symbolToken.Location.column);
+            
             numberToken = (LiteralNumberToken)stream.ReadNextToken();
             Assert.Equal(0.3f, numberToken.Value);
+            Assert.Equal(12, numberToken.Location.line);
+            Assert.Equal(23, numberToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(",", symbolToken.Symbol);
+            Assert.Equal(12, symbolToken.Location.line);
+            Assert.Equal(26, symbolToken.Location.column);
+            
             numberToken = (LiteralNumberToken)stream.ReadNextToken();
             Assert.Equal(0.5f, numberToken.Value);
+            Assert.Equal(12, numberToken.Location.line);
+            Assert.Equal(28, numberToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(",", symbolToken.Symbol);
+            Assert.Equal(12, symbolToken.Location.line);
+            Assert.Equal(31, symbolToken.Location.column);
+            
             numberToken = (LiteralNumberToken)stream.ReadNextToken();
             Assert.Equal(0.1f, numberToken.Value);
+            Assert.Equal(12, numberToken.Location.line);
+            Assert.Equal(33, numberToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(">", symbolToken.Symbol);
+            Assert.Equal(12, symbolToken.Location.line);
+            Assert.Equal(36, symbolToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(",", symbolToken.Symbol);
+            Assert.Equal(12, symbolToken.Location.line);
+            Assert.Equal(37, symbolToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal("<", symbolToken.Symbol);
+            Assert.Equal(13, symbolToken.Location.line);
+            Assert.Equal(22, symbolToken.Location.column);
+            
             numberToken = (LiteralNumberToken)stream.ReadNextToken();
             Assert.Equal(0.1f, numberToken.Value);
+            Assert.Equal(13, numberToken.Location.line);
+            Assert.Equal(23, numberToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(",", symbolToken.Symbol);
+            Assert.Equal(13, symbolToken.Location.line);
+            Assert.Equal(26, symbolToken.Location.column);
+            
             numberToken = (LiteralNumberToken)stream.ReadNextToken();
             Assert.Equal(0.2f, numberToken.Value);
+            Assert.Equal(13, numberToken.Location.line);
+            Assert.Equal(28, numberToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(",", symbolToken.Symbol);
+            Assert.Equal(13, symbolToken.Location.line);
+            Assert.Equal(31, symbolToken.Location.column);
+            
             numberToken = (LiteralNumberToken)stream.ReadNextToken();
             Assert.Equal(0.5f, numberToken.Value);
+            Assert.Equal(13, numberToken.Location.line);
+            Assert.Equal(33, numberToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(">", symbolToken.Symbol);
+            Assert.Equal(13, symbolToken.Location.line);
+            Assert.Equal(36, symbolToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(",", symbolToken.Symbol);
+            Assert.Equal(13, symbolToken.Location.line);
+            Assert.Equal(37, symbolToken.Location.column);
+            
             numberToken = (LiteralNumberToken)stream.ReadNextToken();
             Assert.Equal(4f, numberToken.Value);
+            Assert.Equal(13, numberToken.Location.line);
+            Assert.Equal(39, numberToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(")", symbolToken.Symbol);
+            Assert.Equal(13, symbolToken.Location.line);
+            Assert.Equal(40, symbolToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(")", symbolToken.Symbol);
+            Assert.Equal(13, symbolToken.Location.line);
+            Assert.Equal(41, symbolToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(",", symbolToken.Symbol);
+            Assert.Equal(13, symbolToken.Location.line);
+            Assert.Equal(42, symbolToken.Location.column);
+            
             keywordToken = (KeywordToken)stream.ReadNextToken();
             Assert.Equal(Keyword.Uniform, keywordToken.Keyword);
+            Assert.Equal(14, keywordToken.Location.line);
+            Assert.Equal(4, keywordToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal("(", symbolToken.Symbol);
+            Assert.Equal(14, symbolToken.Location.line);
+            Assert.Equal(11, symbolToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal("<", symbolToken.Symbol);
+            Assert.Equal(14, symbolToken.Location.line);
+            Assert.Equal(12, symbolToken.Location.column);
+            
             numberToken = (LiteralNumberToken)stream.ReadNextToken();
             Assert.Equal(0f, numberToken.Value);
+            Assert.Equal(14, numberToken.Location.line);
+            Assert.Equal(13, numberToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(",", symbolToken.Symbol);
+            Assert.Equal(14, symbolToken.Location.line);
+            Assert.Equal(14, symbolToken.Location.column);
+            
             numberToken = (LiteralNumberToken)stream.ReadNextToken();
             Assert.Equal(0f, numberToken.Value);
+            Assert.Equal(14, numberToken.Location.line);
+            Assert.Equal(16, numberToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(",", symbolToken.Symbol);
+            Assert.Equal(14, symbolToken.Location.line);
+            Assert.Equal(17, symbolToken.Location.column);
+            
             numberToken = (LiteralNumberToken)stream.ReadNextToken();
             Assert.Equal(0f, numberToken.Value);
+            Assert.Equal(14, numberToken.Location.line);
+            Assert.Equal(19, numberToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(">", symbolToken.Symbol);
+            Assert.Equal(14, symbolToken.Location.line);
+            Assert.Equal(20, symbolToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(")", symbolToken.Symbol);
+            Assert.Equal(14, symbolToken.Location.line);
+            Assert.Equal(21, symbolToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(")", symbolToken.Symbol);
+            Assert.Equal(15, symbolToken.Location.line);
+            Assert.Equal(0, symbolToken.Location.column);
 
             Assert.Equal(15, stream.Location.line);
             Assert.Equal(1, stream.Location.column);
@@ -893,34 +1085,78 @@ public class InputStreamTest
 
             keywordToken = (KeywordToken)stream.ReadNextToken();
             Assert.Equal(Keyword.Sphere, keywordToken.Keyword);
+            Assert.Equal(23, keywordToken.Location.line);
+            Assert.Equal(0, keywordToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal("(", symbolToken.Symbol);
+            Assert.Equal(23, symbolToken.Location.line);
+            Assert.Equal(6, symbolToken.Location.column);
+
             identifierToken = (IdentifierToken)stream.ReadNextToken();
             Assert.Equal("sphere_material", identifierToken.Identifier);
+            Assert.Equal(23, identifierToken.Location.line);
+            Assert.Equal(7, identifierToken.Location.column);
+
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(",", symbolToken.Symbol);
+            Assert.Equal(23, symbolToken.Location.line);
+            Assert.Equal(22, symbolToken.Location.column);
+
             keywordToken = (KeywordToken)stream.ReadNextToken();
             Assert.Equal(Keyword.Translation, keywordToken.Keyword);
+            Assert.Equal(23, keywordToken.Location.line);
+            Assert.Equal(24, keywordToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal("(", symbolToken.Symbol);
+            Assert.Equal(23, symbolToken.Location.line);
+            Assert.Equal(35, symbolToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal("[", symbolToken.Symbol);
+            Assert.Equal(23, symbolToken.Location.line);
+            Assert.Equal(36, symbolToken.Location.column);
+            
             numberToken = (LiteralNumberToken)stream.ReadNextToken();
             Assert.Equal(0f, numberToken.Value);
+            Assert.Equal(23, numberToken.Location.line);
+            Assert.Equal(37, numberToken.Location.column);
+
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(",", symbolToken.Symbol);
+            Assert.Equal(23, symbolToken.Location.line);
+            Assert.Equal(38, symbolToken.Location.column);
+
             numberToken = (LiteralNumberToken)stream.ReadNextToken();
             Assert.Equal(0f, numberToken.Value);
+            Assert.Equal(23, numberToken.Location.line);
+            Assert.Equal(40, numberToken.Location.column);
+
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(",", symbolToken.Symbol);
+            Assert.Equal(23, symbolToken.Location.line);
+            Assert.Equal(41, symbolToken.Location.column);
+
             numberToken = (LiteralNumberToken)stream.ReadNextToken();
             Assert.Equal(1f, numberToken.Value);
+            Assert.Equal(23, numberToken.Location.line);
+            Assert.Equal(43, numberToken.Location.column);
+
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal("]", symbolToken.Symbol);
+            Assert.Equal(23, symbolToken.Location.line);
+            Assert.Equal(44, symbolToken.Location.column);
+
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(")", symbolToken.Symbol);
+            Assert.Equal(23, symbolToken.Location.line);
+            Assert.Equal(45, symbolToken.Location.column);
+
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(")", symbolToken.Symbol);
+            Assert.Equal(23, symbolToken.Location.line);
+            Assert.Equal(46, symbolToken.Location.column);
 
             Assert.Equal(23, stream.Location.line);
             Assert.Equal(47, stream.Location.column);
@@ -933,17 +1169,34 @@ public class InputStreamTest
 
             keywordToken = (KeywordToken)stream.ReadNextToken();
             Assert.Equal(Keyword.Plane, keywordToken.Keyword);
+            Assert.Equal(26, keywordToken.Location.line);
+            Assert.Equal(0, keywordToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal("(", symbolToken.Symbol);
+            Assert.Equal(26, symbolToken.Location.line);
+            Assert.Equal(6, symbolToken.Location.column);
+            
             identifierToken = (IdentifierToken)stream.ReadNextToken();
             Assert.Equal("ground_material", identifierToken.Identifier);
+            Assert.Equal(26, identifierToken.Location.line);
+            Assert.Equal(7, identifierToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(",", symbolToken.Symbol);
+            Assert.Equal(26, symbolToken.Location.line);
+            Assert.Equal(22, symbolToken.Location.column);
+            
             keywordToken = (KeywordToken)stream.ReadNextToken();
             Assert.Equal(Keyword.Identity, keywordToken.Keyword);
+            Assert.Equal(26, keywordToken.Location.line);
+            Assert.Equal(24, keywordToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(")", symbolToken.Symbol);
-
+            Assert.Equal(26, symbolToken.Location.line);
+            Assert.Equal(32, symbolToken.Location.column);
+            
             Assert.Equal(26, stream.Location.line);
             Assert.Equal(33, stream.Location.column);
             
@@ -955,45 +1208,104 @@ public class InputStreamTest
 
             keywordToken = (KeywordToken)stream.ReadNextToken();
             Assert.Equal(Keyword.Plane, keywordToken.Keyword);
+            Assert.Equal(31, keywordToken.Location.line);
+            Assert.Equal(0, keywordToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal("(", symbolToken.Symbol);
+            Assert.Equal(31, symbolToken.Location.line);
+            Assert.Equal(5, symbolToken.Location.column);
+            
             identifierToken = (IdentifierToken)stream.ReadNextToken();
             Assert.Equal("sky_material", identifierToken.Identifier);
+            Assert.Equal(31, identifierToken.Location.line);
+            Assert.Equal(6, identifierToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(",", symbolToken.Symbol);
+            Assert.Equal(31, symbolToken.Location.line);
+            Assert.Equal(18, symbolToken.Location.column);
+            
             keywordToken = (KeywordToken)stream.ReadNextToken();
             Assert.Equal(Keyword.Translation, keywordToken.Keyword);
+            Assert.Equal(31, keywordToken.Location.line);
+            Assert.Equal(20, keywordToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal("(", symbolToken.Symbol);
+            Assert.Equal(31, symbolToken.Location.line);
+            Assert.Equal(31, symbolToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal("[", symbolToken.Symbol);
+            Assert.Equal(31, symbolToken.Location.line);
+            Assert.Equal(32, symbolToken.Location.column);
+            
             numberToken = (LiteralNumberToken)stream.ReadNextToken();
             Assert.Equal(0f, numberToken.Value);
+            Assert.Equal(31, numberToken.Location.line);
+            Assert.Equal(33, numberToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(",", symbolToken.Symbol);
+            Assert.Equal(31, symbolToken.Location.line);
+            Assert.Equal(34, symbolToken.Location.column);
+            
             numberToken = (LiteralNumberToken)stream.ReadNextToken();
             Assert.Equal(0f, numberToken.Value);
+            Assert.Equal(31, numberToken.Location.line);
+            Assert.Equal(36, numberToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(",", symbolToken.Symbol);
+            Assert.Equal(31, symbolToken.Location.line);
+            Assert.Equal(37, symbolToken.Location.column);
+            
             numberToken = (LiteralNumberToken)stream.ReadNextToken();
             Assert.Equal(100f, numberToken.Value);
+            Assert.Equal(31, numberToken.Location.line);
+            Assert.Equal(39, numberToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal("]", symbolToken.Symbol);
+            Assert.Equal(31, symbolToken.Location.line);
+            Assert.Equal(42, symbolToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(")", symbolToken.Symbol);
+            Assert.Equal(31, symbolToken.Location.line);
+            Assert.Equal(43, symbolToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal("*", symbolToken.Symbol);
+            Assert.Equal(31, symbolToken.Location.line);
+            Assert.Equal(45, symbolToken.Location.column);
+            
             keywordToken = (KeywordToken)stream.ReadNextToken();
             Assert.Equal(Keyword.RotationY, keywordToken.Keyword);
+            Assert.Equal(31, keywordToken.Location.line);
+            Assert.Equal(47, keywordToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal("(", symbolToken.Symbol);
+            Assert.Equal(31, symbolToken.Location.line);
+            Assert.Equal(57, symbolToken.Location.column);
+            
             identifierToken = (IdentifierToken)stream.ReadNextToken();
             Assert.Equal("clock", identifierToken.Identifier);
+            Assert.Equal(31, identifierToken.Location.line);
+            Assert.Equal(58, identifierToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(")", symbolToken.Symbol);
+            Assert.Equal(31, symbolToken.Location.line);
+            Assert.Equal(63, symbolToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(")", symbolToken.Symbol);
-
+            Assert.Equal(31, symbolToken.Location.line);
+            Assert.Equal(64, symbolToken.Location.column);
+            
             Assert.Equal(31, stream.Location.line);
             Assert.Equal(65, stream.Location.column);
             
@@ -1005,52 +1317,123 @@ public class InputStreamTest
 
             keywordToken = (KeywordToken)stream.ReadNextToken();
             Assert.Equal(Keyword.Camera, keywordToken.Keyword);
+            Assert.Equal(34, keywordToken.Location.line);
+            Assert.Equal(0, keywordToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal("(", symbolToken.Symbol);
+            Assert.Equal(34, symbolToken.Location.line);
+            Assert.Equal(6, symbolToken.Location.column);
+            
             keywordToken = (KeywordToken)stream.ReadNextToken();
             Assert.Equal(Keyword.Perspective, keywordToken.Keyword);
+            Assert.Equal(34, keywordToken.Location.line);
+            Assert.Equal(7, keywordToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(",", symbolToken.Symbol);
+            Assert.Equal(34, symbolToken.Location.line);
+            Assert.Equal(18, symbolToken.Location.column);
+            
             keywordToken = (KeywordToken)stream.ReadNextToken();
             Assert.Equal(Keyword.RotationZ, keywordToken.Keyword);
+            Assert.Equal(34, keywordToken.Location.line);
+            Assert.Equal(20, keywordToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal("(", symbolToken.Symbol);
+            Assert.Equal(34, symbolToken.Location.line);
+            Assert.Equal(30, symbolToken.Location.column);
+            
             numberToken = (LiteralNumberToken)stream.ReadNextToken();
             Assert.Equal(30f, numberToken.Value);
+            Assert.Equal(34, numberToken.Location.line);
+            Assert.Equal(31, numberToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(")", symbolToken.Symbol);
+            Assert.Equal(34, symbolToken.Location.line);
+            Assert.Equal(33, symbolToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal("*", symbolToken.Symbol);
+            Assert.Equal(34, symbolToken.Location.line);
+            Assert.Equal(35, symbolToken.Location.column);
+            
             keywordToken = (KeywordToken)stream.ReadNextToken();
             Assert.Equal(Keyword.Translation, keywordToken.Keyword);
+            Assert.Equal(34, keywordToken.Location.line);
+            Assert.Equal(37, keywordToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal("(", symbolToken.Symbol);
+            Assert.Equal(34, symbolToken.Location.line);
+            Assert.Equal(48, symbolToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal("[", symbolToken.Symbol);
+            Assert.Equal(34, symbolToken.Location.line);
+            Assert.Equal(49, symbolToken.Location.column);
+            
             numberToken = (LiteralNumberToken)stream.ReadNextToken();
             Assert.Equal(-4f, numberToken.Value);
+            Assert.Equal(34, numberToken.Location.line);
+            Assert.Equal(50, numberToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(",", symbolToken.Symbol);
+            Assert.Equal(34, symbolToken.Location.line);
+            Assert.Equal(52, symbolToken.Location.column);
+            
             numberToken = (LiteralNumberToken)stream.ReadNextToken();
             Assert.Equal(0f, numberToken.Value);
+            Assert.Equal(34, numberToken.Location.line);
+            Assert.Equal(54, numberToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(",", symbolToken.Symbol);
+            Assert.Equal(34, symbolToken.Location.line);
+            Assert.Equal(55, symbolToken.Location.column);
+            
             numberToken = (LiteralNumberToken)stream.ReadNextToken();
             Assert.Equal(1f, numberToken.Value);
+            Assert.Equal(34, numberToken.Location.line);
+            Assert.Equal(57, numberToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal("]", symbolToken.Symbol);
+            Assert.Equal(34, symbolToken.Location.line);
+            Assert.Equal(58, symbolToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(")", symbolToken.Symbol);
+            Assert.Equal(34, symbolToken.Location.line);
+            Assert.Equal(59, symbolToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(",", symbolToken.Symbol);
+            Assert.Equal(34, symbolToken.Location.line);
+            Assert.Equal(60, symbolToken.Location.column);
+            
             numberToken = (LiteralNumberToken)stream.ReadNextToken();
             Assert.Equal(1.0f, numberToken.Value);
+            Assert.Equal(34, numberToken.Location.line);
+            Assert.Equal(62, numberToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(",", symbolToken.Symbol);
+            Assert.Equal(34, symbolToken.Location.line);
+            Assert.Equal(65, symbolToken.Location.column);
+            
             numberToken = (LiteralNumberToken)stream.ReadNextToken();
             Assert.Equal(1.0f, numberToken.Value);
+            Assert.Equal(34, numberToken.Location.line);
+            Assert.Equal(67, numberToken.Location.column);
+            
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(")", symbolToken.Symbol);
+            Assert.Equal(34, symbolToken.Location.line);
+            Assert.Equal(70, symbolToken.Location.column);
 
             Assert.Equal(34, stream.Location.line);
             Assert.Equal(71, stream.Location.column);
