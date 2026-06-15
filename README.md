@@ -71,7 +71,7 @@ Used only when the selected algorithm is `pathtracer`.
 
 #### `--maxdepth`
 
-Maximum recursion depth for each ray, i.e. the maximum number of reflections a ray can be subjected to, before returning the backgroun color.
+Maximum recursion depth for each ray, i.e. the maximum number of reflections a ray can be subjected to, before returning the background color.
 
 Used only when the selected algorithm is `pathtracer`.
 
@@ -97,19 +97,11 @@ Available options:
 
 #### `--factor`
 
-<<<<<<< HEAD
 Empirical factor used during image rendering.
 
 #### `--gamma`
 
-Gamma correction factor applied to the final image.
-=======
-Empirical factor used during tone mapping.
-
-#### `--gamma`
-
 Gamma correction factor applied during tone mapping.
->>>>>>> pathtracing
 
 #### `--declarefloat` or `-d`
 
