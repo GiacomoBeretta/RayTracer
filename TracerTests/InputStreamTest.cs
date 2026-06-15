@@ -675,6 +675,9 @@ public class InputStreamTest
             Assert.Equal(150f, numberToken.Value);
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(")", symbolToken.Symbol);
+            
+            Assert.Equal(1, stream.Location.line);
+            Assert.Equal(16, stream.Location.column);
 
             #endregion
 
@@ -726,6 +729,9 @@ public class InputStreamTest
             Assert.Equal(")", symbolToken.Symbol);
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(")", symbolToken.Symbol);
+            
+            Assert.Equal(9, stream.Location.line);
+            Assert.Equal(1, stream.Location.column);
 
             #endregion
 
@@ -810,6 +816,9 @@ public class InputStreamTest
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(")", symbolToken.Symbol);
 
+            Assert.Equal(15, stream.Location.line);
+            Assert.Equal(1, stream.Location.column);
+            
             #endregion
 
             // line 4: material sphere_material(specular(uniform(<0.5, 0.5, 0.5>)),uniform(<0, 0, 0>))
@@ -873,6 +882,9 @@ public class InputStreamTest
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(")", symbolToken.Symbol);
 
+            Assert.Equal(20, stream.Location.line);
+            Assert.Equal(1, stream.Location.column);
+            
             #endregion
 
             // line 5: sphere(sphere_material, translation([0, 0, 1]))
@@ -910,6 +922,9 @@ public class InputStreamTest
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(")", symbolToken.Symbol);
 
+            Assert.Equal(23, stream.Location.line);
+            Assert.Equal(47, stream.Location.column);
+            
             #endregion
 
             // line 6: plane (ground_material, identity)
@@ -929,6 +944,9 @@ public class InputStreamTest
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(")", symbolToken.Symbol);
 
+            Assert.Equal(26, stream.Location.line);
+            Assert.Equal(33, stream.Location.column);
+            
             #endregion
 
             // line 7: plane(sky_material, translation([0, 0, 100]) * rotation_y(clock))
@@ -976,6 +994,9 @@ public class InputStreamTest
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(")", symbolToken.Symbol);
 
+            Assert.Equal(31, stream.Location.line);
+            Assert.Equal(65, stream.Location.column);
+            
             #endregion
 
             // line 8: camera(perspective, rotation_z(30) * translation([-4, 0, 1]), 1.0, 1.0)
@@ -1031,6 +1052,9 @@ public class InputStreamTest
             symbolToken = (SymbolToken)stream.ReadNextToken();
             Assert.Equal(")", symbolToken.Symbol);
 
+            Assert.Equal(34, stream.Location.line);
+            Assert.Equal(71, stream.Location.column);
+            
             #endregion
 
             Assert.Equal(typeof(StopToken), ((StopToken)stream.ReadNextToken()).GetType());
