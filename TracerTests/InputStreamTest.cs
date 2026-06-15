@@ -30,28 +30,13 @@ public class InputStreamTest
         }
 
         File.Delete(filePath);
-        /* try
-         {
-             SourceLocation location = new SourceLocation(filePath);
-             InputStream str = new InputStream(filePath);
-
-             Assert.Equal(location, str.Location);
-             Assert.Equal(location, str.SavedLocation);
-             Assert.Null(str.SavedChar);
-             Assert.Equal(8, str.Tabulations);
-             Assert.Null(str.SavedToken);
-         }
-         finally
-         {
-             File.Delete(filePath);
-         }*/
     }
 
     [Fact]
     public void TestUpdateLocation()
     {
-        string filePath = Path.GetTempFileName();
-        using (InputStream str = new InputStream(filePath))
+        string filePath1 = Path.GetTempFileName();
+        using (InputStream str = new InputStream(filePath1))
         {
             Assert.Equal(0, str.Location.line);
             Assert.Equal(0, str.Location.column);
@@ -68,31 +53,31 @@ public class InputStreamTest
 
             ch = '\r';
             str.UpdateLocation(ch);
-            Assert.Equal(2, str.Location.line);
-            Assert.Equal(0, str.Location.column);
+            Assert.Equal(1, str.Location.line);
+            Assert.Equal(1, str.Location.column);
 
             ch = '\t';
             str.UpdateLocation(ch);
-            Assert.Equal(2, str.Location.line);
-            Assert.Equal(8, str.Location.column);
+            Assert.Equal(1, str.Location.line);
+            Assert.Equal(9, str.Location.column);
 
             ch = '\t';
             str.UpdateLocation(ch);
-            Assert.Equal(2, str.Location.line);
-            Assert.Equal(16, str.Location.column);
+            Assert.Equal(1, str.Location.line);
+            Assert.Equal(17, str.Location.column);
 
             ch = 'f';
             str.UpdateLocation(ch);
-            Assert.Equal(2, str.Location.line);
-            Assert.Equal(17, str.Location.column);
+            Assert.Equal(1, str.Location.line);
+            Assert.Equal(18, str.Location.column);
 
             ch = '\n';
             str.UpdateLocation(ch);
-            Assert.Equal(3, str.Location.line);
+            Assert.Equal(2, str.Location.line);
             Assert.Equal(0, str.Location.column);
         }
 
-        File.Delete(filePath);
+        File.Delete(filePath1);
     }
 
     [Fact]

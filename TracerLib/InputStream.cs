@@ -1,87 +1,55 @@
 // This file is release under EUPL_v1.2 license. See LICENSE.md
 
 using System.Diagnostics;
-using System.Globalization; //per il metodo cultureInfo
+using System.Globalization;
+using System.Text; //per il metodo cultureInfo
 
 namespace TracerLib;
-/*
-//dal python di Tomasi
-public class InputStream
-{
-    private Stream _stream;
-    private SourceLocation _location;
-    private char? _savedChar;
-    private SourceLocation _savedLocation;
-    private int _tabulations;
 
-    public InputStream(string filename, int tabulations)
-    {
-        _stream = new FileStream(filename, FileMode.Open, FileAccess.Read);
-        _location = new SourceLocation(filename, 0, 0);
-        _savedChar = null;
-        _savedLocation = _location;
-        _tabulations = tabulations;
-    }
-
-    public void UnreadChar(char c)
-    {
-        {
-            _savedChar = c;
-            _location = _savedLocation;
-        }
-    }
-
-    public char? ReadChar()
-    {
-        char? c;
-        if (_savedChar == null)
-        {
-            int b = _stream.ReadByte();
-            if (b == -1) c = null;
-            else c = (char)b;
-        }
-        else
-        {
-            c = _savedChar.Value;
-            _savedChar = null;
-        }
-
-        _savedLocation = _location;
-        UpdateLocation(c);
-        return c;
-    }
-
-    //E se si raggiunge la fine del file che valore ha il char?
-    public void UpdateLocation(char? c)
-    {
-        if (c.HasValue)
-        {
-            switch (c.Value)
-            {
-                case '\n':
-                    _location.line += 1;
-                    _location.column = 0;
-                    break;
-                case '\t':
-                    _location.column += _tabulations;
-                    break;
-                default:
-                    _location.column += 1;
-                    break;
-            }
-        }
-    }
-}*/
-
+//rivedere dopo aver scritto le docstring di tutta la classe
+/// <summary>
+/// A class to parse the tokens in the scene text files written in ASCII.
+/// </summary>
 public class InputStream : IDisposable
 {
+    /// <summary>
+    /// Underlying input stream used for sequential tokenization of scene files.
+    /// </summary>
     public Stream Stream;
+
+    /// <summary>
+    /// Current read position (row and column) in the source file, used for error reporting and token tracking.
+    /// </summary>
     public SourceLocation Location;
+
+    /// <summary>
+    /// Previously saved <see cref="SourceLocation"/> used to restore the reader state when unreading a character or token.
+    /// </summary>
     public SourceLocation SavedLocation;
+
+    /// <summary>
+    /// Cached character used to support one-character lookahead (unread functionality).
+    /// If set, it will be returned on the next read operation before consuming the stream.
+    /// </summary>
     public char? SavedChar;
+
+    /// <summary>
+    /// Number of spaces used to correctly update the read position during parsing.
+    /// </summary>
     public readonly int Tabulations;
+
+    /// <summary>
+    /// Cached token used to support token-level lookahead (unread functionality).
+    /// If set, it will be returned on the next token read operation.
+    /// </summary>
     public Token? SavedToken;
 
+    /// <summary>
+    /// Constructs an <see cref="InputStream"/> instance that reads from the specified file path.
+    /// </summary>
+    /// <param name="filePath">Path of the scene file to read.</param>
+    /// <param name="tabulations">Number of spaces used to expand tab characters during parsing.
+    /// If not specified is 8.</param>
     public InputStream(string filePath, int tabulations = 8)
     {
         Stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
@@ -97,29 +65,39 @@ public class InputStream : IDisposable
         Stream.Dispose();
     }
 
+    /// <summary>
+    /// Advances the current source location based on the specified character,
+    /// updating line and column counters.
+    /// The previous location is stored in <see cref="SavedLocation"/> to support the unread functionality.
+    /// Handles line breaks, tab expansion, and standard character advancement.
+    /// </summary>
+    /// <param name="c">
+    /// Consumed character used to update the current position
+    /// </param>
     public void UpdateLocation(char c)
     {
         SavedLocation = Location;
         switch (c)
         {
             case '\n':
-            case '\r':
-                Location.line += 1;
+                Location.line++;
                 Location.column = 0;
                 break;
             case '\t':
                 Location.column += Tabulations;
                 break;
             default:
-                Location.column += 1;
+                Location.column++;
                 break;
         }
     }
 
     /// <summary>
-    /// Returns null if it has been reached the end of file
+    /// Reads the next char in the stream, updating the current source location accordingly.
+    /// If a saved character is available, it is returned before reading from the underlying stream.
+    /// Returns <c>null</c> when the end of the stream is reached.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The next character in the input stream, or <c>null</c> if the end of the file has been reached.</returns>
     public char? ReadChar()
     {
         char c;
@@ -127,7 +105,7 @@ public class InputStream : IDisposable
         {
             int b = Stream.ReadByte();
             if (b == -1) return null; // if it has reached the end of file
-            else c = (char)b;
+            c = (char)b;
         }
         else
         {
@@ -135,77 +113,110 @@ public class InputStream : IDisposable
             SavedChar = null;
         }
 
+        // if there was a saved char, the location was behind of this char c, so we need to update the position now.
         UpdateLocation(c);
         return c;
     }
 
+    /// <summary>
+    /// Saves the char specified, so that it is returned at the next call of <see cref="ReadChar"/>.
+    /// Update the <see cref="Location"/> at the one it was before calling <see cref="UpdateLocation"/>.
+    /// </summary>
+    /// <param name="c">The character to unread.</param>
     public void UnreadChar(char c)
     {
+        if (SavedChar != null)
         {
-            SavedChar = c;
-            Location = SavedLocation;
+            throw new InvalidOperationException("Tried to unread char, but there was already a previously saved char");
         }
+
+        SavedChar = c;
+        Location = SavedLocation;
     }
 
     /// <summary>
-    /// Reads until a '\n' or '\r\n' is encountered or the end of file is reached.
+    /// Skips all remaining characters in the current line.
+    /// Reading stops when a line terminator or the end of the file is reached.
+    /// Supports both LF ('\n') and CRLF ('\r\n') line endings.
     /// </summary>
-    /// <exception cref="SceneSyntaxException"></exception>
     public void SkipLine()
     {
         while (true)
         {
             char? ch = ReadChar();
             if (ch == null) return;
-            if (ch == '\n') break;
+            if (ch == '\n') return;
             if (ch == '\r')
             {
                 ch = ReadChar();
-                if (ch == '\n') break;
+                if (ch == null) return;
+                if (ch == '\n') return;
             }
         }
     }
 
     /// <summary>
-    /// Reads all the whitespaces new line escape sequences and comments starting with the hash character (#).
+    /// Skips whitespace characters (including spaces, tabs, and newline characters)
+    /// and comments (that starts with '#' and extend to the end of the line) from the input stream.
+    /// Stops when the next non-whitespace, non-comment character is reached,
+    /// which is left available for reading.
     /// </summary>
     public void SkipWhitespacesAndComments()
     {
-        const string whitespace = " \t \n \r";
-
-        char? ch = ReadChar();
-
-        // if reaches the end of file return to the precedent function
-        if (ch == null) return;
-
-        while (whitespace.Contains(ch.Value) || ch == '#')
+        while (true)
         {
-            if (ch == '#') SkipLine();
-            ch = ReadChar();
+            char? ch = ReadChar();
+            
             if (ch == null) return;
+            
+            switch (ch.Value)
+            {
+                case '#':
+                    SkipLine();
+                    continue;
+                
+                case ' ':
+                case '\t':
+                case '\r':
+                case '\n':
+                    continue;
+                
+                default:
+                    // push back non-whitespace, non-comment character
+                    UnreadChar(ch.Value);
+                    return;
+            }
         }
-
-        // if the character read is useful then save it to read it the next time you use readChar
-        UnreadChar(ch.Value);
     }
 
     // Parse_token methods - Begin
 
+    /// <summary>
+    /// Parses a string literal token starting at the given source location.
+    /// The string is read until the closing quotation mark (") is found.
+    /// Throws a <see cref="SceneSyntaxException"/> if the string is unterminated.
+    /// </summary>
+    /// <param name="tokenLocation">
+    /// The source location where the string token starts.
+    /// </param>
+    /// <returns>
+    /// A <see cref="StringToken"/> containing the parsed string value.
+    /// </returns>
     public StringToken _ParseStringToken(SourceLocation tokenLocation)
     {
-        string stringToken = "";
-
+        StringBuilder sb = new StringBuilder();
+        
         while (true)
         {
             char? ch = ReadChar();
 
             if (ch == null) throw new SceneSyntaxException(tokenLocation, "unterminated string");
-            if (ch.Value == '\"') break;
+            if (ch.Value == '"') break;
 
-            stringToken += ch;
+            sb.Append(ch);
         }
-
-        return new StringToken(tokenLocation, stringToken);
+        
+        return new StringToken(tokenLocation, sb.ToString());
     }
 
     //prova con i caratteri exp ecc. 
