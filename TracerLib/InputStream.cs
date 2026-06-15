@@ -95,7 +95,7 @@ public class InputStream : IDisposable
     /// <summary>
     /// Reads the next char in the stream, updating the current source location accordingly.
     /// If a saved character is available, it is returned before reading from the underlying stream.
-    /// Returns <c>null</c> when the end of the stream is reached.
+    /// Returns <c>null</c> when the end of the stream is reached (without updating the <see cref="Location"/>).
     /// </summary>
     /// <returns>The next character in the input stream, or <c>null</c> if the end of the file has been reached.</returns>
     public char? ReadChar()
@@ -453,6 +453,10 @@ public class InputStream : IDisposable
         }
 
         SkipWhitespacesAndComments();
+
+        //save the token location as the position before reading the first char of the token
+        SourceLocation tokenLocation = Location;
+        
         char? ch = ReadChar();
         if (ch == null)
         {
@@ -464,19 +468,19 @@ public class InputStream : IDisposable
         if (symbols.Contains(ch.Value))
         {
             //invertire location e value per conformare agli altri token o viceversa invertire gli altri
-            return new SymbolToken(Location, ch.Value.ToString());
+            return new SymbolToken(tokenLocation, ch.Value.ToString());
         }
         else if (ch == '\"')
         {
-            return _ParseStringToken(Location);
+            return _ParseStringToken(tokenLocation);
         }
         else if (char.IsDigit(ch.Value) || signs.Contains(ch.Value))
         {
-            return _ParseFloatToken(ch.Value, Location);
+            return _ParseFloatToken(ch.Value,tokenLocation);
         }
         else if (char.IsLetter(ch.Value) || ch.Value == '_')
         {
-            return _ParseKeywordIdentifierToken(ch.Value, Location);
+            return _ParseKeywordIdentifierToken(ch.Value, tokenLocation);
         }
         else
         {
