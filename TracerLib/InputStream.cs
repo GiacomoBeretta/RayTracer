@@ -119,6 +119,30 @@ public class InputStream : IDisposable
     }
 
     /// <summary>
+    /// Reads the next character from the input stream.
+    /// Throws a <see cref="SceneSyntaxException"/> if the end of the input
+    /// is reached before a character can be read.
+    /// </summary>
+    /// <param name="errorLocation">
+    /// The source location to associate with the generated exception.
+    /// </param>
+    /// <returns>
+    /// The next character from the input stream.
+    /// </returns>
+    /// <exception cref="SceneSyntaxException">
+    /// Thrown when the end of the input is reached.
+    /// </exception>
+    public char ReadRequiredChar(SourceLocation errorLocation)
+    {
+        char? ch = ReadChar();
+        if (ch == null)
+        {
+            throw new SceneSyntaxException(errorLocation, "unterminated number: reached end of file.");
+        }
+        return  ch.Value;
+    }
+
+    /// <summary>
     /// Saves the char specified, so that it is returned at the next call of <see cref="ReadChar"/>.
     /// Update the <see cref="Location"/> at the one it was before calling <see cref="UpdateLocation"/>.
     /// </summary>
@@ -166,21 +190,21 @@ public class InputStream : IDisposable
         while (true)
         {
             char? ch = ReadChar();
-            
+
             if (ch == null) return;
-            
+
             switch (ch.Value)
             {
                 case '#':
                     SkipLine();
                     continue;
-                
+
                 case ' ':
                 case '\t':
                 case '\r':
                 case '\n':
                     continue;
-                
+
                 default:
                     // push back non-whitespace, non-comment character
                     UnreadChar(ch.Value);
@@ -193,7 +217,7 @@ public class InputStream : IDisposable
 
     /// <summary>
     /// Parses a string literal token starting at the given source location.
-    /// The string is read until the closing quotation mark (") is found.
+    /// Characters are read verbatim until the next quotation mark (").
     /// Throws a <see cref="SceneSyntaxException"/> if the string is unterminated.
     /// </summary>
     /// <param name="tokenLocation">
@@ -205,34 +229,36 @@ public class InputStream : IDisposable
     public StringToken _ParseStringToken(SourceLocation tokenLocation)
     {
         StringBuilder sb = new StringBuilder();
-        
+
         while (true)
         {
             char? ch = ReadChar();
 
             if (ch == null) throw new SceneSyntaxException(tokenLocation, "unterminated string");
             if (ch.Value == '"') break;
-
-            sb.Append(ch);
+            sb.Append(ch.Value);
         }
-        
+
         return new StringToken(tokenLocation, sb.ToString());
     }
 
-    //prova con i caratteri exp ecc. 
     /// <summary>
-    /// tokenLocation serve perché leggendo mano a mano i caratteri la location si aggiorna e va avanti
+    ///Parses a floating-point numeric literal starting with the specified character.
+    /// Supports optional leading sign (+/-), decimal notation, and scientific
+    /// notation using an exponent (e.g. 1.23e-4).
     /// </summary>
-    /// <param name="firstChar"></param>
-    /// <param name="tokenLocation"></param>
-    /// <returns></returns>
-    /// <exception cref="SceneSyntaxException"></exception>
+    /// <param name="firstChar">The first character of the numeric literal that has already been read.
+    /// This may be a digit or a leading sign (+/-).</param>
+    /// <param name="tokenLocation">The source location where the numeric token begins,
+    /// (used in the constructor of <see cref="LiteralNumberToken"/>, and to throw the exceptions.
+    /// </param>
+    /// <returns>A <see cref="LiteralNumberToken"/> containing the parsed floating-point value.</returns>
+    /// <exception cref="SceneSyntaxException">Thrown when the numeric literal is malformed or reaches the end of the
+    /// input before a valid number can be completed.</exception>
     public LiteralNumberToken _ParseFloatToken(char firstChar, SourceLocation tokenLocation)
     {
-        string floatString = firstChar.ToString();
-        //const string expChar = "eE";
-        //const string signs = "+-"; // signs for exponents (the sign of the value is already read in the first char)
-        bool hasReadExpSign = false;
+        string floatString = firstChar.ToString(); 
+       // bool hasReadExpSign = false;
         bool hasReadExpChar = false;
         bool hasReadDot = false; // the decimal point
         float value;
@@ -240,20 +266,16 @@ public class InputStream : IDisposable
         // if the first char is a sign we expect to read next a digit otherwise we throw an exception
         if (firstChar == '+' || firstChar == '-')
         {
-            char? ch = ReadChar();
-            if (ch == null)
-            {
-                throw new SceneSyntaxException(tokenLocation, "unterminated number: reached end of file.");
-            }
+            char ch = ReadRequiredChar(tokenLocation);
 
-            if (!char.IsDigit(ch.Value))
+            if (!char.IsDigit(ch))
             {
-                UnreadChar(ch.Value);
+                UnreadChar(ch);
                 throw new SceneSyntaxException(tokenLocation,
                     "invalid number: after the sign of the number must follow a number");
             }
 
-            floatString += ch.Value;
+            floatString += ch;
         }
 
         while (true)
@@ -280,11 +302,7 @@ public class InputStream : IDisposable
                 floatString += ch.Value;
 
                 // Read the char after the dot: it must be a number
-                ch = ReadChar();
-                if (ch == null)
-                {
-                    throw new SceneSyntaxException(tokenLocation, "unterminated number: reached end of file.");
-                }
+                ch = ReadRequiredChar(tokenLocation);
 
                 if (!char.IsDigit(ch.Value))
                 {
@@ -311,31 +329,15 @@ public class InputStream : IDisposable
                 hasReadExpChar = true;
                 floatString += ch.Value;
 
-                ch = ReadChar();
-                if (ch == null)
-                {
-                    throw new SceneSyntaxException(tokenLocation, "unterminated number: reached end of file.");
-                }
+                ch = ReadRequiredChar(tokenLocation);
 
+                // if there is an exponent sign after it there must be a number
                 if (ch == '+' || ch == '-')
                 {
-                    if (hasReadExpSign)
-                    {
-                        UnreadChar(ch.Value);
-                        throw new SceneSyntaxException(tokenLocation,
-                            "invalid number: have been read two exponent signs.");
-                    }
+                    floatString += ch.Value;
 
-                    hasReadExpSign = true;
-                    floatString += ch;
-
-                    ch = ReadChar();
-                    if (ch == null)
-                    {
-                        throw new SceneSyntaxException(tokenLocation, "unterminated number: reached end of file.");
-                    }
-
-                    // after the exponent sign must follow a number
+                    ch = ReadRequiredChar(tokenLocation);
+                    
                     if (!char.IsDigit(ch.Value))
                     {
                         UnreadChar(ch.Value);
@@ -368,72 +370,57 @@ public class InputStream : IDisposable
             }
         }
 
-        try
-        {
-            value = float.Parse(floatString, CultureInfo.InvariantCulture);
-        }
-        catch (Exception)
+        if (!float.TryParse(floatString, CultureInfo.InvariantCulture, out value))
         {
             throw new SceneSyntaxException(tokenLocation, $"{floatString} is an invalid floating point number");
         }
 
-        return new LiteralNumberToken(tokenLocation, value: value);
+        return new LiteralNumberToken(tokenLocation, value);
     }
-
-    // vecchio parseFloatToken
-    /*public LiteralNumberToken _ParseFloatToken(char firstChar, SourceLocation tokenLocation)
-    {
-        string floatString = firstChar.ToString();
-        const string expChar = "eE";
-        const string signs = "+-"; // signs for exponents (the sign of the value is already read in the first char)
-
-        float value;
-
-        while (true)
-        {
-            char? ch = ReadChar();
-            // if it has been reached the end of file
-            if (ch == null) break;
-
-            if (!Char.IsDigit(ch.Value) && ch.Value != '.' &&
-                !expChar.Contains(ch.Value) && !signs.Contains(ch.Value))
-            {
-                UnreadChar(ch.Value);
-                break;
-            }
-            floatString += ch;
-        }
-
-        try
-        {
-            value = float.Parse(floatString, CultureInfo.InvariantCulture);
-        }
-        catch (Exception)
-        {
-            throw new SceneSyntaxException(tokenLocation, $"{floatString} is an invalid floating point number");
-        }
-
-        return new LiteralNumberToken(tokenLocation, value: value);
-    }*/
-
+    
+    /// <summary>
+    /// Parses an identifier or keyword token starting from the first character already read.
+    /// </summary>
+    /// <param name="firstChar">The first character of the identifier, already read from the input.</param>
+    /// <param name="tokenLocation">The source location where the token starts.</param>
+    /// <returns>
+    /// A <see cref="KeywordToken"/> if the parsed lexeme matches a known keyword;
+    /// otherwise an <see cref="IdentifierToken"/> containing the parsed identifier.
+    /// </returns>
+    /// <remarks>
+    /// This method reads characters from the input stream until it encounters a character
+    /// that is not a letter, digit, or underscore ('_').
+    /// The first non-matching character is unread.
+    ///
+    /// The initial character (<paramref name="firstChar"/>) is assumed to already be validated
+    /// as a valid identifier start character.
+    /// 
+    /// Identifier grammar:
+    /// <code>
+    /// identifier := (letter | '_') (letter | digit | '_')*
+    /// </code>
+    /// </remarks>
     public Token _ParseKeywordIdentifierToken(char firstChar, SourceLocation tokenLocation)
     {
-        string tokenString = firstChar.ToString();
+        StringBuilder sb = new StringBuilder();
+        sb.Append(firstChar);
 
         while (true)
         {
             char? ch = ReadChar();
 
             if (ch == null) break;
-            if (!char.IsLetterOrDigit(ch.Value) && ch.Value != '_')
+            if (ch.Value != '_' && !char.IsLetterOrDigit(ch.Value))
             {
                 UnreadChar(ch.Value);
                 break;
             }
 
-            tokenString += ch;
+            sb.Append(ch.Value);
         }
-
+        
+        string tokenString = sb.ToString();
+        
         if (Keywords.Map.TryGetValue(tokenString, out Keyword keyword))
         {
             return new KeywordToken(tokenLocation, keyword);
