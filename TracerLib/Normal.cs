@@ -26,7 +26,7 @@ public struct Normal
     /// <returns></returns>
     public override string ToString()
     {
-        return $"({X}, {Y}, {Z})";
+        return $"Normal(x={X}, y={Y}, z={Z})";
     }
 
     public void Print()
@@ -40,18 +40,19 @@ public struct Normal
     /// <param name="a"></param>
     /// <param name="b"></param>
     /// <returns></returns>
-    public static bool _AreCloseNormal(Normal a, Normal b)
+    public static bool _AreCloseNormal(Normal a, Normal b, float epsilon = 1e-5f)
     {
-        return Functions.AreClose(a.X, b.X) && Functions.AreClose(a.Y, b.Y) && Functions.AreClose(a.Z, b.Z);
+        return Functions.AreClose(a.X, b.X, epsilon) && Functions.AreClose(a.Y, b.Y, epsilon) &&
+               Functions.AreClose(a.Z, b.Z, epsilon);
     }
 
     /// <summary>
     /// Returns the negated <c>Normal</c> vector
     /// </summary>
     /// <returns></returns>
-    public Normal _NormalNegation()
+    public static Normal operator -(Normal n)
     {
-        return new Normal(-this.X, -this.Y, -this.Z);
+        return new Normal(-n.X, -n.Y, -n.Z);
     }
 
     /// <summary>

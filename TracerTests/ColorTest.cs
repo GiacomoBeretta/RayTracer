@@ -1,6 +1,6 @@
 using TracerLib;
 
-namespace ColorTests;
+namespace TracerTests;
 //Per avviare un test occorre solo premere il triangolo verde accanto a ogni singolo test (oppure accanto alla classe test per farli tutti)
 
 public class ColorTest
@@ -31,7 +31,7 @@ public class ColorTest
     }
 
     [Fact]
-    public void TestScalarProduct()
+    public void TestProductWithFloat()
     {
         Color c1 = new Color(1, 22, 333);
         float a = 2f;
@@ -94,7 +94,7 @@ public class ColorTest
     public void TestToString()
     {
         Color a = new Color(2, 9, 5);
-        Assert.Equal("(2, 9, 5)", a.ToString());
+        Assert.Equal("(R=2, G=9, B=5)", a.ToString());
     }
 
     [Fact]
