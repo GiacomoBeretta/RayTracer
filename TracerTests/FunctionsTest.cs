@@ -41,13 +41,4 @@ public class FunctionsTest
         Assert.True(Functions.AreClose(Functions.DegToRad(deg), MathF.PI));
         Assert.False(Functions.AreClose(Functions.DegToRad(deg), 64f));
     }
-
-    [Fact]
-    public void TestDegToRad()
-    {
-        var deg = 180f;
-        
-        Assert.True(Functions.AreClose(Functions.DegToRad(deg), MathF.PI));
-        Assert.False(Functions.AreClose(Functions.DegToRad(deg), 64f));
-    }
 }
