@@ -1,5 +1,5 @@
 # Global default 
-luminosityfunction="shirley"
+lumfunction="shirley"
 factor=1
 gamma=1
 
@@ -7,7 +7,7 @@ gamma=1
 inputrender="scene.txt"
 width=500
 height=500
-algorithm="onoff"
+algorithm="flat"
 outputpfm="output.pfm"
 outputpng="output.png"
 numrays=10
@@ -24,5 +24,5 @@ inputpfm=""
 output=""
 
 # Cycle parameters
-pcgcycle=true
+pcgcycle=false
 

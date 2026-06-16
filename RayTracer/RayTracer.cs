@@ -326,7 +326,7 @@ public class PfmToPngCommand
 [Command(Name = "render", Description = "Read a scene file and creates the corresponding image")]
 public class RenderCommand
 {
-    [Option("--input", Description = "The input scene file path")]
+    [Option("--inputrender", Description = "The input scene file path")]
     public string InputScene { get; set; } = "scene.txt";
     
     [Option("--width", Description = "The width of the image")]

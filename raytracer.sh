@@ -22,7 +22,7 @@ esac
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --input) input="$2"; shift 2 ;;
+    --inputrender) inputrender="$2"; shift 2 ;;
     --width) width="$2"; shift 2 ;;
     --height) height="$2"; shift 2 ;;
     --algorithm) algorithm="$2"; shift 2 ;;
@@ -36,21 +36,25 @@ while [[ $# -gt 0 ]]; do
     --luminosityFunction) lumfunction="$2"; shift 2 ;;
     --factor) factor="$2"; shift 2 ;;
     --gamma) gamma="$2"; shift 2 ;;
-    --roulettestart) roulette_start="$2"; shift 2 ;;
-    --rouletteprob) roulette_prob="$2"; shift 2 ;;
-    --declarefloat) declare_float+=( "$2" ); shift 2 ;;
+    --roulettestart) roulettestart="$2"; shift 2 ;;
+    --rouletteprob) rouletteprob="$2"; shift 2 ;;
+    --declarefloat) declarefloat+=( "$2" ); shift 2 ;;
     --inputpfm) inputpfm="$2"; shift 2 ;;
     --output) output="$2"; shift 2 ;;
     *) echo "Unknown parameter: $1"; exit 1 ;;
   esac
 done
 
+# Base command
+
 readonly exepath="./RayTracer/bin/Debug/net10.0/RayTracer"
 
 cmd=( "$exepath" "$subcommand" )
 
+# Render
+
 if [[ "$subcommand" == "render" ]]; then
-	[ -n "$input" ]          && cmd+=( --input "$input" )
+	[ -n "$inputrender" ]          && cmd+=( --inputrender "$inputrender" )
 	[ -n "$width" ]          && cmd+=( --width "$width" )
 	[ -n "$height" ]         && cmd+=( --height "$height" )
 	[ -n "$algorithm" ]      && cmd+=( --algorithm "$algorithm" )
@@ -60,10 +64,14 @@ if [[ "$subcommand" == "render" ]]; then
 	[ -n "$lumfunction" ]    && cmd+=( --luminosityFunction "$lumfunction" )
 	[ -n "$factor" ]         && cmd+=( --factor "$factor" )	
 	[ -n "$gamma" ]          && cmd+=( --gamma "$gamma" )
-	[ -n "$roulette_start" ] && cmd+=( --roulettestart "$roulette_start" )
-	[ -n "$roulette_prob" ]  && cmd+=( --rouletteprob "$roulette_prob" )
-	[ -n "$declare_float" ]  && cmd+=( --declarefloat "$declare_float" )
+	[ -n "$roulettestart" ] && cmd+=( --roulettestart "$roulettestart" )
+	[ -n "$rouletteprob" ]  && cmd+=( --rouletteprob "$rouletteprob" )
+	for def in "${declarefloat[@]}"; do
+        cmd+=( --declarefloat "$def" )
+    	done
 fi
+
+# Pfm to Png
 
 if [[ "$subcommand" == "pfmtopng" ]]; then
 	[ -n "$inputpfm" ]    && cmd+=( --inputpfm "$inputpfm" ) 
@@ -73,10 +81,14 @@ if [[ "$subcommand" == "pfmtopng" ]]; then
 	[ -n "$gamma" ]       && cmd+=( --gamma "$gamma" ) 
 fi
 
-dotnet build
+# Build
+
+# dotnet build || exit 1
+
+# Random generator cycle
 
 if [[ "$subcommand" == "render" ]]; then
-	if [[ "$pcgcycle" == true ]]; then
+	 if [[ "$pcgcycle" == "true" ]]; then
 
 		for state in "${initstate[@]}"; do
 			for seq in "${initseq[@]}"; do
@@ -102,11 +114,11 @@ if [[ "$subcommand" == "render" ]]; then
 
 		run_cmd=( "${cmd[@]}" )
 
-		[ -n "${initstates[0]}" ] && run_cmd+=( --initstate "${initstates[0]}" )
-		[ -n "${initseqs[0]}" ]   && run_cmd+=( --initseq "${initseqs[0]}" )
+		[ -n "${initstate[0]}" ] && run_cmd+=( --initstate "${initstate[0]}" )
+		[ -n "${initseq[0]}" ]   && run_cmd+=( --initseq "${initseq[0]}" )
 		
-		[ -n "$outputpfm" ]      && cmd+=( --outputpfm "$outputpfm" )
-		[ -n "$outputpng" ]      && cmd+=( --outputpng "$outputpng" )
+		[ -n "$outputpfm" ]      && run_cmd+=( --outputpfm "$outputpfm" )
+		[ -n "$outputpng" ]      && run_cmd+=( --outputpng "$outputpng" )
 
 		time "${run_cmd[@]}"
 
