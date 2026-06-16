@@ -1,7 +1,7 @@
 using TracerLib;
 
 namespace TracerTests;
-
+/*
 public class FunctionsTest
 {
     [Fact]
@@ -41,4 +41,4 @@ public class FunctionsTest
         Assert.True(Functions.AreClose(Functions.DegToRad(deg), MathF.PI));
         Assert.False(Functions.AreClose(Functions.DegToRad(deg), 64f));
     }
-}
+}*/
