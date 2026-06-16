@@ -139,7 +139,8 @@ public class InputStream : IDisposable
         {
             throw new SceneSyntaxException(errorLocation, "unterminated number: reached end of file.");
         }
-        return  ch.Value;
+
+        return ch.Value;
     }
 
     /// <summary>
@@ -257,8 +258,8 @@ public class InputStream : IDisposable
     /// input before a valid number can be completed.</exception>
     public LiteralNumberToken _ParseFloatToken(char firstChar, SourceLocation tokenLocation)
     {
-        string floatString = firstChar.ToString(); 
-       // bool hasReadExpSign = false;
+        string floatString = firstChar.ToString();
+        // bool hasReadExpSign = false;
         bool hasReadExpChar = false;
         bool hasReadDot = false; // the decimal point
         float value;
@@ -337,7 +338,7 @@ public class InputStream : IDisposable
                     floatString += ch.Value;
 
                     ch = ReadRequiredChar(tokenLocation);
-                    
+
                     if (!char.IsDigit(ch.Value))
                     {
                         UnreadChar(ch.Value);
@@ -377,7 +378,7 @@ public class InputStream : IDisposable
 
         return new LiteralNumberToken(tokenLocation, value);
     }
-    
+
     /// <summary>
     /// Parses an identifier or keyword token starting from the first character already read.
     /// </summary>
@@ -418,9 +419,9 @@ public class InputStream : IDisposable
 
             sb.Append(ch.Value);
         }
-        
+
         string tokenString = sb.ToString();
-        
+
         if (Keywords.Map.TryGetValue(tokenString, out Keyword keyword))
         {
             return new KeywordToken(tokenLocation, keyword);
@@ -440,10 +441,6 @@ public class InputStream : IDisposable
     {
         // '<>' are for the colors, '[]' for the vectors and points, ',' for separating numbers,
         // '*' for composing transformations
-        const string symbols = "()<>[],*";
-        // const string op = "+-."; // non so a cosa serve il punto e per ora
-        // lo commento così quando salta fuori ce ne accorgiamo subito
-        const string signs = "+-";
 
         if (SavedToken != null)
         {
@@ -454,29 +451,34 @@ public class InputStream : IDisposable
 
         SkipWhitespacesAndComments();
 
-        //save the token location as the position before reading the first char of the token
+        // save the token location as the position before reading the first char of the token
         SourceLocation tokenLocation = Location;
-        
+
         char? ch = ReadChar();
         if (ch == null)
         {
             return new StopToken(Location);
         }
 
-        //SourceLocation tokenLocation = Location;
+        switch (ch.Value)
+        {
+            case '(':
+            case ')':
+            case '[':
+            case ']':
+            case '<':
+            case '>':
+            case ',':
+            case '*':
+                //invertire location e value per conformare agli altri token o viceversa invertire gli altri
+                return new SymbolToken(tokenLocation, ch.Value.ToString());
+            case '\"':
+                return _ParseStringToken(tokenLocation);
+        }
 
-        if (symbols.Contains(ch.Value))
+        if (char.IsDigit(ch.Value) || ch.Value == '+' || ch.Value == '-')
         {
-            //invertire location e value per conformare agli altri token o viceversa invertire gli altri
-            return new SymbolToken(tokenLocation, ch.Value.ToString());
-        }
-        else if (ch == '\"')
-        {
-            return _ParseStringToken(tokenLocation);
-        }
-        else if (char.IsDigit(ch.Value) || signs.Contains(ch.Value))
-        {
-            return _ParseFloatToken(ch.Value,tokenLocation);
+            return _ParseFloatToken(ch.Value, tokenLocation);
         }
         else if (char.IsLetter(ch.Value) || ch.Value == '_')
         {
