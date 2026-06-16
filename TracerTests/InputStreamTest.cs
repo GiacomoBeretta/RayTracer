@@ -141,6 +141,26 @@ public class InputStreamTest
     }
 
     [Fact]
+    public void TestReadRequiredChar()
+    {
+        const string content = "5.4e";
+        string filePath = Path.GetTempFileName();
+
+        File.WriteAllText(filePath, content);
+
+        using (InputStream str = new InputStream(filePath))
+        {
+            Assert.Equal('5', str.ReadChar());
+            Assert.Equal('.', str.ReadChar());
+            Assert.Equal('4', str.ReadRequiredChar(str.Location));
+            Assert.Equal('e', str.ReadChar());
+            Assert.Throws<SceneSyntaxException>(() => str.ReadRequiredChar(str.Location));
+        }
+
+        File.Delete(filePath);
+    }
+    
+    [Fact]
     public void TestSkipLine()
     {
         const string content = "example dshhe, siunw 3,4,5\n" +
@@ -1446,6 +1466,39 @@ public class InputStreamTest
         File.Delete(filePath);
     }
 
+    [Fact]
+    public void TestUnreadToken()
+    {
+        const string content = "plane (ground_material, identity)";
+        string filePath = Path.GetTempFileName();
+        File.WriteAllText(filePath, content);
+
+        using (InputStream stream = new InputStream(filePath))
+        {
+            KeywordToken keywordToken = (KeywordToken)stream.ReadNextToken();
+            Assert.Equal(Keyword.Plane, keywordToken.Keyword);
+
+            SymbolToken symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal("(", symbolToken.Symbol);
+            
+            IdentifierToken identifierToken = (IdentifierToken)stream.ReadNextToken();
+            Assert.Equal("ground_material", identifierToken.Identifier);
+            stream.UnreadToken(identifierToken);
+            Assert.Equal(identifierToken, stream.ReadNextToken());
+            
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(",", symbolToken.Symbol);
+            stream.UnreadToken(symbolToken);
+            Assert.Equal(symbolToken, stream.ReadNextToken());
+            
+            keywordToken = (KeywordToken)stream.ReadNextToken();
+            Assert.Equal(Keyword.Identity, keywordToken.Keyword);
+            stream.UnreadToken(keywordToken);
+            Assert.Equal(keywordToken, stream.ReadNextToken());
+        }
+        File.Delete(filePath);
+    }
+    
     [Fact]
     public void TestSceneFile()
     {
