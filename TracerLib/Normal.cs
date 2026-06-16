@@ -112,7 +112,7 @@ public struct Normal
     }
 
     /// <summary>
-    /// Returns the cross product between a <c>Normal</c> and a <c>Vector</c>
+    /// Returns the cross product between a <see cref="Normal"/> and a <see cref="Vector"/>.
     /// </summary>
     /// <param name="v"></param>
     /// <param name="n"></param>
@@ -123,7 +123,7 @@ public struct Normal
     }
 
     /// <summary>
-    /// Returns the cross product between a <c>Normal</c> and a <c>Vector</c>
+    /// Returns the cross product between a <see cref="Normal"/> and a <see cref="Vector"/>.
     /// </summary>
     /// <param name="n"></param>
     /// <param name="v"></param>
@@ -134,7 +134,7 @@ public struct Normal
     }
 
     /// <summary>
-    /// Returns the cross product between 2 <c>Normal</c>
+    /// Returns the cross product between 2 <see cref="Normal"/>.
     /// </summary>
     /// <param name="n1"></param>
     /// <param name="n2"></param>
@@ -145,7 +145,7 @@ public struct Normal
     }
 
     /// <summary>
-    /// Returns the squared norm of a <c>Normal</c> variable
+    /// Returns the squared norm of a <see cref="Normal"/> vector.
     /// </summary>
     /// <returns></returns>
     public float SquaredNorm()
@@ -154,24 +154,31 @@ public struct Normal
     }
 
     /// <summary>
-    /// If you want to compute the squared norm, use the SquaredNorm method, is more efficient.
+    /// Returns the norm of a <see cref="Normal"/> vector.
     /// </summary>
+    ///<remarks>
+    /// If you want to compute the squared norm, use the SquaredNorm method, is more efficient.
+    /// </remarks>
     /// <returns></returns>
     public float Norm()
     {
         return MathF.Sqrt(SquaredNorm());
     }
 
-
-    /// <summary>
-    /// Returns a Normalized Normal 
+    /*/// <summary>
+    /// Returns a normalized version of *this* <see cref="Normal"/> (that should already be normalized).
     /// </summary>
-    /// <returns></returns>
+    /// <returns>A new normalized <see cref="Normal"/>. The original vector is not modified.</returns>
     public Normal Normalize()
     {
-        return new Normal(X * 1 / Norm(), Y * 1 / Norm(), Z * 1 / Norm());
-    }
+        float norm = Norm();
+        return new Normal(X * 1 /norm, Y * 1 / norm, Z * 1 / norm);
+    }*/
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
     public Vector ToVector()
     {
         return new Vector(X, Y, Z);
