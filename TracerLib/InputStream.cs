@@ -439,9 +439,6 @@ public class InputStream : IDisposable
     /// <exception cref="SceneSyntaxException"></exception>
     public Token ReadNextToken()
     {
-        // '<>' are for the colors, '[]' for the vectors and points, ',' for separating numbers,
-        // '*' for composing transformations
-
         if (SavedToken != null)
         {
             Token result = SavedToken;
@@ -457,19 +454,19 @@ public class InputStream : IDisposable
         char? ch = ReadChar();
         if (ch == null)
         {
-            return new StopToken(Location);
+            return new StopToken(tokenLocation);
         }
-
+        
         switch (ch.Value)
         {
             case '(':
             case ')':
-            case '[':
+            case '[': // '[]' for the vectors and points,
             case ']':
-            case '<':
+            case '<': // '<>' are for the colors,
             case '>':
             case ',':
-            case '*':
+            case '*': // '*' for composing transformations
                 //invertire location e value per conformare agli altri token o viceversa invertire gli altri
                 return new SymbolToken(tokenLocation, ch.Value.ToString());
             case '\"':
@@ -480,14 +477,13 @@ public class InputStream : IDisposable
         {
             return _ParseFloatToken(ch.Value, tokenLocation);
         }
-        else if (char.IsLetter(ch.Value) || ch.Value == '_')
+
+        if (char.IsLetter(ch.Value) || ch.Value == '_')
         {
             return _ParseKeywordIdentifierToken(ch.Value, tokenLocation);
         }
-        else
-        {
-            throw new SceneSyntaxException(Location, $"invalid character {ch}");
-        }
+
+        throw new SceneSyntaxException(tokenLocation, $"invalid character {ch}");
     }
 
     public void UnreadToken(Token token)
