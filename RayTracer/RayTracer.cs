@@ -279,7 +279,7 @@ public class DemoCommand
 [Command(Name = "pfmtopng", Description = "Converts a PFM image to PNG")]
 public class PfmToPngCommand
 {
-    [Option("--input", Description = "The input file name")]
+    [Option("--inputpfm", Description = "The input file name")]
     [Required]
     public required string Input { get; set; }
 
@@ -475,11 +475,11 @@ public  class AverageImageCommand
 {
     [Option("--input", Description = "Input file path")]
     [Required]
-    public required string InputFilePath { get; init; }
+    public required string InputFilePath { get; set; }
 
     [Option("--output", Description = "Output file path")]
     [Required]
-    public required string OutputFilePath { get; init; }
+    public required string OutputFilePath { get; set; }
 }
 
 public enum Projection
