@@ -3,7 +3,7 @@
 namespace TracerLib;
 
 /// <summary>
-/// The class Normal create a Normal 3D Vector
+/// A class that represents a Normalized 3D Vector
 /// </summary>
 public struct Normal
 {
@@ -33,13 +33,16 @@ public struct Normal
     {
         Console.WriteLine(ToString());
     }
-
+    
     /// <summary>
-    /// Closeness criterion between two <c>Normal</c> type variables 
+    /// Returns whether the two normals are approximately equal within a given tolerance.
     /// </summary>
-    /// <param name="a"></param>
-    /// <param name="b"></param>
-    /// <returns></returns>
+    /// <param name="a">First normal vector.</param>
+    /// <param name="b">Second normal vector.</param>
+    /// <param name="epsilon">
+    /// Tolerance threshold used for floating-point comparison of each component. Defaults to 1e-5.
+    /// </param>
+    /// <returns> True if the normals are equal within the given tolerance on all axes.</returns>
     public static bool _AreNormalsClose(Normal a, Normal b, float epsilon = 1e-5f)
     {
         return Functions.AreClose(a.X, b.X, epsilon) && Functions.AreClose(a.Y, b.Y, epsilon) &&
@@ -177,6 +180,6 @@ public struct Normal
 
     public Vector ToVector()
     {
-        return new Vector(X, Y,Z);
+        return new Vector(X, Y, Z);
     }
 }
