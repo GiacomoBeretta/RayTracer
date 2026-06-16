@@ -58,6 +58,9 @@ jobs:
         run: |
           find . -name "*Test*.cs"
           
+      - name: Show FunctionsTest.cs
+        run: cat TracerTests/FunctionsTest.cs
+          
       - name: Install dependencies
         run: dotnet restore
         
