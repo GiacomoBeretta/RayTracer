@@ -174,11 +174,13 @@ public struct Normal
         float norm = Norm();
         return new Normal(X * 1 /norm, Y * 1 / norm, Z * 1 / norm);
     }*/
-
+    
     /// <summary>
-    /// 
+    /// Returns a <see cref="Vector"/> from this normal without modifying its values.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>
+    /// A new <see cref="Vector"/> instance with identical X, Y, and Z components.
+    /// </returns>
     public Vector ToVector()
     {
         return new Vector(X, Y, Z);
