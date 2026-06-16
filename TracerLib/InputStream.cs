@@ -436,6 +436,14 @@ public class InputStream : IDisposable
     /// Reads the next token from the input stream, skipping whitespace,
     /// newlines, and comments.
     /// </summary>
+    /// <remarks>
+    /// If a previously saved token is available, it is returned immediately.
+    /// Otherwise, the lexer skips whitespace and comments, determines the token
+    /// type based on the next character, and parses the corresponding token.
+    /// Supported token categories include symbols, string literals, numeric values,
+    /// identifiers, and keywords. If the end of the input is reached, a
+    /// <see cref="StopToken"/> is returned.
+    /// </remarks>
     /// <returns>The next token in the stream.</returns>
     /// <exception cref="SceneSyntaxException">
     /// Thrown when an invalid character is encountered.
@@ -488,10 +496,17 @@ public class InputStream : IDisposable
 
         throw new SceneSyntaxException(tokenLocation, $"invalid character '{ch}'");
     }
-
+    
+    /// <summary>
+    /// Saves a token to be returned by the next call to <see cref="ReadNextToken"/>.
+    /// Only one unread token can be saved at a time.
+    /// </summary>
+    /// <exception cref="SceneSyntaxException">
+    /// Thrown if a token is already saved.
+    /// </exception>
     public void UnreadToken(Token token)
     {
-        if (SavedToken == null)
+        if (SavedToken != null)
         {
             throw new SceneSyntaxException(token.Location, $"Tried to unread the token {token}, but there was already a saved token {SavedToken}.");
         }
