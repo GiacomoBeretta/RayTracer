@@ -491,7 +491,10 @@ public class InputStream : IDisposable
 
     public void UnreadToken(Token token)
     {
-        Debug.Assert(SavedToken == null);
+        if (SavedToken == null)
+        {
+            throw new SceneSyntaxException(token.Location, $"Tried to unread the token {token}, but there was already a saved token {SavedToken}.");
+        }
         SavedToken = token;
     }
 }
