@@ -23,6 +23,10 @@ rouletteprob=""
 inputpfm=""
 output=""
 
+# Default averageimage
+inputaverage=""
+outputaverage=""
+
 # Cycle parameters
 pcgcycle=false
 

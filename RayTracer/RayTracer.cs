@@ -291,10 +291,10 @@ public class PfmToPngCommand
     public LumFunction LuminosityFunction { get; set; } = LumFunction.Shirley;
 
     [Option("--factor", Description = "The empirical factor to render images")]
-    public int Factor { get; set; } = 1;
+    public float Factor { get; set; } = 1f;
 
     [Option("--gamma", Description = "The gamma factor characteristic of the screen")]
-    public float Gamma { get; set; } = 1;
+    public float Gamma { get; set; } = 1f;
 
     internal void OnExecute()
     {
@@ -371,10 +371,10 @@ public class RenderCommand
     public LumFunction LuminosityFunction { get; set; } = LumFunction.Shirley;
 
     [Option("--factor", Description = "The empirical factor to render images")]
-    public int Factor { get; set; } = 1;
+    public float Factor { get; set; } = 1f;
 
     [Option("--gamma", Description = "The gamma factor characteristic of the screen")]
-    public float Gamma { get; set; } = 1;
+    public float Gamma { get; set; } = 1f;
 
     [Option("--declarefloat|-d", Description = "Declare a variable. The syntax is --declarefloat=NAME:VALUE")]
     public string[] Definitions { get; set; } = [];
@@ -473,13 +473,77 @@ public class RenderCommand
 [Command(Name = "averageimage", Description = "Generate an image averaging the color of multiple images using different seed in pathtracing renderer")]
 public  class AverageImageCommand
 {
-    [Option("--input", Description = "Input file path")]
+    [Option("--inputaverage", Description = "Input file folder")]
     [Required]
-    public required string InputFilePath { get; set; }
+    public required string InputFileFolder { get; set; }
 
-    [Option("--output", Description = "Output file path")]
+    [Option("--outputaverage", Description = "Output file path")]
     [Required]
     public required string OutputFilePath { get; set; }
+    
+    [Option("--luminosityFunction", Description = "Luminosity function, options are: shirley (default), weighted")]
+    public LumFunction LuminosityFunction { get; set; } = LumFunction.Shirley;
+
+    [Option("--factor", Description = "The empirical factor to render images")]
+    public float Factor { get; set; } = 1f;
+
+    [Option("--gamma", Description = "The gamma factor characteristic of the screen")]
+    public float Gamma { get; set; } = 1f;
+
+    public void OnExecute()
+    {
+        Console.WriteLine($"Input file folder: {InputFileFolder}");
+        Console.WriteLine($"Output file path: {OutputFilePath}");
+        
+        //Aggiungere cartella e path specifico
+
+        var files = Directory.GetFiles(InputFileFolder, "*_state*_seq*.pfm"); //search for pattern in folder
+
+        if (files.Length == 0)
+        {
+            Console.WriteLine("The folder is empty");
+            return;
+        }
+        
+        //Using first file as accumulator
+
+        var acc = HDRImage.ReadPFM_File(files[0]);
+
+        var width = acc.Width;
+        var height = acc.Height;
+        var length = acc._PixelOffset(width, height);
+
+        Color[] average = new Color[length];
+
+        HDRImage[] images = new HDRImage[files.Length];
+
+        for (var i = 0; i < files.Length; i++) images[i] = HDRImage.ReadPFM_File(files[i]);
+
+        foreach (var image in images)
+        { 
+            if (image.Width != acc.Width || image.Height != acc.Height) throw new ArgumentException("Images must have equal width and height");
+        }
+
+        for (var i = 0; i < length; i++)
+        {
+            foreach (var image in images)
+            {
+                average[i] += image[i];
+            }
+
+            average[i] *= (1.0f / files.Length);
+
+        }
+
+        var output = new HDRImage(acc.Width, acc.Height, average);
+        
+        HDRImage.WritePFM_File(output, OutputFilePath);
+        Console.WriteLine($"Pfm file created in: {OutputFilePath}");
+        
+        output.WritePNG(OutputFilePath, LuminosityFunction, Factor, Gamma, averageLuminosity: 0.5f);
+        Console.WriteLine($"Png file created in: {OutputFilePath}");
+
+    }
 }
 
 public enum Projection
