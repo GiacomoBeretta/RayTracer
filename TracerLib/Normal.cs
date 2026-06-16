@@ -21,9 +21,9 @@ public struct Normal
     // Constructor -end
 
     /// <summary>
-    /// This function return a string showing the component of a <c>Normal</c> type variable 
+    /// Returns a string representation of the vector in the format:
+    /// Normal(x={X}, y={Y}, z={Z}).
     /// </summary>
-    /// <returns></returns>
     public override string ToString()
     {
         return $"Normal(x={X}, y={Y}, z={Z})";
@@ -48,22 +48,40 @@ public struct Normal
         return Functions.AreClose(a.X, b.X, epsilon) && Functions.AreClose(a.Y, b.Y, epsilon) &&
                Functions.AreClose(a.Z, b.Z, epsilon);
     }
-
+    
+    /// <summary>
+    /// Determines whether this vector is normalized, within a given numerical tolerance.
+    /// </summary>
+    /// <param name="epsilon">
+    /// The tolerance used for floating-point comparison (default is 1e-5f).
+    /// </param>
+    /// <returns>
+    /// True if the vector is approximately unit length; otherwise, false.
+    /// </returns>
     public bool IsNormalized(float epsilon = 1e-5f)
     {
         return Functions.AreClose(1, SquaredNorm(), epsilon);
     }
 
+    /// <summary>
+    /// Validates that this vector is normalized within a given tolerance.
+    /// </summary>
+    /// <param name="epsilon">
+    /// The numerical tolerance used to determine whether the vector is normalized (default is 1e-5f).
+    /// </param>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown if the vector is not normalized within the specified tolerance.
+    /// </exception>
     public void CheckNormalized(float epsilon = 1e-5f)
     {
-        if (!IsNormalized())
+        if (!IsNormalized(epsilon))
         {
             throw new ArgumentOutOfRangeException($"Normal is not normalized within epsilon={epsilon}");
         }
     }
 
     /// <summary>
-    /// Returns the negated <c>Normal</c> vector
+    /// Returns the negated normal.
     /// </summary>
     /// <returns></returns>
     public static Normal operator -(Normal n)
@@ -71,32 +89,8 @@ public struct Normal
         return new Normal(-n.X, -n.Y, -n.Z);
     }
 
-/*
     /// <summary>
-    /// Returns the product per component between a <c>Normal</c> and a floating-point scalar
-    /// </summary>
-    /// <param name="n"></param>
-    /// <param name="a"></param>
-    /// <returns></returns>
-    public static Normal operator *(Normal n, float a)
-    {
-        return new Normal(a * n.X, a * n.Y, a * n.Z);
-    }
-
-    /// <summary>
-    /// Returns the product per component between a <c>Normal</c> and a floating-point scalar
-    /// </summary>
-    /// <param name="a"></param>
-    /// <param name="n"></param>
-    /// <returns></returns>
-    public static Normal operator *(float a, Normal n)
-    {
-        return n * a;
-    }*/
-
-
-    /// <summary>
-    /// Returns the scalar product between a <c>Normal</c> and a <c>Vector</c>
+    /// Returns the scalar product between a <see cref="Normal"/> and a <see cref="Vector"/>.
     /// </summary>
     /// <param name="n"></param>
     /// <param name="v"></param>
@@ -107,7 +101,7 @@ public struct Normal
     }
 
     /// <summary>
-    /// Returns the scalar product between a <c>Normal</c> and a <c>Vector</c>
+    /// Returns the scalar product between a <see cref="Normal"/> and a <see cref="Vector"/>.
     /// </summary>
     /// <param name="v"></param>
     /// <param name="n"></param>
