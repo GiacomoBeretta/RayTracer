@@ -243,20 +243,20 @@ public class InputStream : IDisposable
         return new StringToken(tokenLocation, sb.ToString());
     }
 
-    /// <summary>
-    ///Parses a floating-point numeric literal starting with the specified character.
-    /// Supports optional leading sign (+/-), decimal notation, and scientific
-    /// notation using an exponent (e.g. 1.23e-4).
-    /// </summary>
-    /// <param name="firstChar">The first character of the numeric literal that has already been read.
-    /// This may be a digit or a leading sign (+/-).</param>
-    /// <param name="tokenLocation">The source location where the numeric token begins,
-    /// (used in the constructor of <see cref="LiteralNumberToken"/>, and to throw the exceptions.
-    /// </param>
-    /// <returns>A <see cref="LiteralNumberToken"/> containing the parsed floating-point value.</returns>
-    /// <exception cref="SceneSyntaxException">Thrown when the numeric literal is malformed or reaches the end of the
-    /// input before a valid number can be completed.</exception>
-    public LiteralNumberToken _ParseFloatToken(char firstChar, SourceLocation tokenLocation)
+    ///  <summary>
+    /// Parses a floating-point numeric literal starting with the specified character.
+    ///  Supports optional leading sign (+/-), decimal notation, and scientific
+    ///  notation using an exponent (e.g. 1.23e-4).
+    ///  </summary>
+    ///  <param name="tokenLocation">The source location where the numeric token begins,
+    ///      (used in the constructor of <see cref="LiteralNumberToken"/>, and to throw the exceptions.
+    ///  </param>
+    ///  <param name="firstChar">The first character of the numeric literal that has already been read.
+    ///      This may be a digit or a leading sign (+/-).</param>
+    ///  <returns>A <see cref="LiteralNumberToken"/> containing the parsed floating-point value.</returns>
+    ///  <exception cref="SceneSyntaxException">Thrown when the numeric literal is malformed or reaches the end of the
+    ///  input before a valid number can be completed.</exception>
+    public LiteralNumberToken _ParseFloatToken(SourceLocation tokenLocation, char firstChar)
     {
         string floatString = firstChar.ToString();
         // bool hasReadExpSign = false;
@@ -382,8 +382,8 @@ public class InputStream : IDisposable
     /// <summary>
     /// Parses an identifier or keyword token starting from the first character already read.
     /// </summary>
-    /// <param name="firstChar">The first character of the identifier, already read from the input.</param>
     /// <param name="tokenLocation">The source location where the token starts.</param>
+    /// <param name="firstChar">The first character of the identifier, already read from the input.</param>
     /// <returns>
     /// A <see cref="KeywordToken"/> if the parsed lexeme matches a known keyword;
     /// otherwise an <see cref="IdentifierToken"/> containing the parsed identifier.
@@ -392,7 +392,7 @@ public class InputStream : IDisposable
     /// This method reads characters from the input stream until it encounters a character
     /// that is not a letter, digit, or underscore ('_').
     /// The first non-matching character is unread.
-    ///
+    /// 
     /// The initial character (<paramref name="firstChar"/>) is assumed to already be validated
     /// as a valid identifier start character.
     /// 
@@ -401,7 +401,7 @@ public class InputStream : IDisposable
     /// identifier := (letter | '_') (letter | digit | '_')*
     /// </code>
     /// </remarks>
-    public Token _ParseKeywordIdentifierToken(char firstChar, SourceLocation tokenLocation)
+    public Token _ParseKeywordIdentifierToken(SourceLocation tokenLocation, char firstChar)
     {
         StringBuilder sb = new StringBuilder();
         sb.Append(firstChar);
@@ -475,12 +475,12 @@ public class InputStream : IDisposable
 
         if (char.IsDigit(ch.Value) || ch.Value == '+' || ch.Value == '-')
         {
-            return _ParseFloatToken(ch.Value, tokenLocation);
+            return _ParseFloatToken(tokenLocation, ch.Value);
         }
 
         if (char.IsLetter(ch.Value) || ch.Value == '_')
         {
-            return _ParseKeywordIdentifierToken(ch.Value, tokenLocation);
+            return _ParseKeywordIdentifierToken(tokenLocation, ch.Value);
         }
 
         throw new SceneSyntaxException(tokenLocation, $"invalid character {ch}");

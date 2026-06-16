@@ -257,87 +257,87 @@ public class InputStreamTest
         using (InputStream stream1 = new InputStream(filePath1))
         {
             char? ch = stream1.ReadChar();
-            LiteralNumberToken floatToken = stream1._ParseFloatToken(ch.Value, stream1.Location);
+            LiteralNumberToken floatToken = stream1._ParseFloatToken(stream1.Location, ch.Value);
             Assert.Equal(3496, floatToken.Value);
 
             stream1.SkipLine();
             ch = stream1.ReadChar();
-            floatToken = stream1._ParseFloatToken(ch.Value, stream1.Location);
+            floatToken = stream1._ParseFloatToken(stream1.Location, ch.Value);
             Assert.Equal(2.4f, floatToken.Value);
 
             stream1.SkipLine();
             ch = stream1.ReadChar();
-            floatToken = stream1._ParseFloatToken(ch.Value, stream1.Location);
+            floatToken = stream1._ParseFloatToken(stream1.Location, ch.Value);
             Assert.Equal(6.92e3f, floatToken.Value);
 
             stream1.SkipLine();
             ch = stream1.ReadChar();
-            floatToken = stream1._ParseFloatToken(ch.Value, stream1.Location);
+            floatToken = stream1._ParseFloatToken(stream1.Location, ch.Value);
             Assert.Equal(830003.1E9f, floatToken.Value);
 
             stream1.SkipLine();
             ch = stream1.ReadChar();
-            floatToken = stream1._ParseFloatToken(ch.Value, stream1.Location);
+            floatToken = stream1._ParseFloatToken(stream1.Location, ch.Value);
             Assert.Equal(9.1e-4f, floatToken.Value);
 
             stream1.SkipLine();
             ch = stream1.ReadChar();
-            floatToken = stream1._ParseFloatToken(ch.Value, stream1.Location);
+            floatToken = stream1._ParseFloatToken(stream1.Location, ch.Value);
             Assert.Equal(4.7E-12f, floatToken.Value);
 
             stream1.SkipLine();
             ch = stream1.ReadChar();
-            floatToken = stream1._ParseFloatToken(ch.Value, stream1.Location);
+            floatToken = stream1._ParseFloatToken(stream1.Location, ch.Value);
             Assert.Equal(-34.3e5f, floatToken.Value);
 
             stream1.SkipLine();
             ch = stream1.ReadChar();
-            floatToken = stream1._ParseFloatToken(ch.Value, stream1.Location);
+            floatToken = stream1._ParseFloatToken(stream1.Location, ch.Value);
             Assert.Equal(6.5f, floatToken.Value);
 
             stream1.SkipLine();
             ch = stream1.ReadChar();
-            floatToken = stream1._ParseFloatToken(ch.Value, stream1.Location);
+            floatToken = stream1._ParseFloatToken(stream1.Location, ch.Value);
             Assert.Equal(-8f, floatToken.Value);
 
             stream1.SkipLine();
             ch = stream1.ReadChar();
-            floatToken = stream1._ParseFloatToken(ch.Value, stream1.Location);
+            floatToken = stream1._ParseFloatToken(stream1.Location, ch.Value);
             Assert.Equal(9.5e+5f, floatToken.Value);
 
             stream1.SkipLine();
             ch = stream1.ReadChar();
-            floatToken = stream1._ParseFloatToken(ch.Value, stream1.Location);
+            floatToken = stream1._ParseFloatToken(stream1.Location, ch.Value);
             Assert.Equal(2.3E-6f, floatToken.Value);
 
             stream1.SkipLine();
             ch = stream1.ReadChar();
-            floatToken = stream1._ParseFloatToken(ch.Value, stream1.Location);
+            floatToken = stream1._ParseFloatToken(stream1.Location, ch.Value);
             Assert.Equal(4e+7f, floatToken.Value);
 
             stream1.SkipLine();
             ch = stream1.ReadChar();
-            floatToken = stream1._ParseFloatToken(ch.Value, stream1.Location);
+            floatToken = stream1._ParseFloatToken(stream1.Location, ch.Value);
             Assert.Equal(-8.9e-3f, floatToken.Value);
 
             // 3+4
             stream1.SkipLine();
             ch = stream1.ReadChar(); // '3'
-            floatToken = stream1._ParseFloatToken(ch.Value, stream1.Location);
+            floatToken = stream1._ParseFloatToken(stream1.Location, ch.Value);
             Assert.Equal(3f, floatToken.Value);
             ch = stream1.ReadChar(); // '+'
             ch = stream1.ReadChar(); // '4'
-            floatToken = stream1._ParseFloatToken(ch.Value, stream1.Location);
+            floatToken = stream1._ParseFloatToken(stream1.Location, ch.Value);
             Assert.Equal(4f, floatToken.Value);
 
             // 5.2e+10-3
             stream1.SkipLine();
             ch = stream1.ReadChar();
-            floatToken = stream1._ParseFloatToken(ch.Value, stream1.Location); // '5.2e+10'
+            floatToken = stream1._ParseFloatToken(stream1.Location, ch.Value); // '5.2e+10'
             Assert.Equal(5.2e10f, floatToken.Value);
             ch = stream1.ReadChar(); // '-'
             ch = stream1.ReadChar(); // '3'
-            floatToken = stream1._ParseFloatToken(ch.Value, stream1.Location);
+            floatToken = stream1._ParseFloatToken(stream1.Location, ch.Value);
             Assert.Equal(3f, floatToken.Value);
         }
 
@@ -359,52 +359,52 @@ public class InputStreamTest
         {
             // a
             char? ch = stream2.ReadChar();
-            Assert.Throws<SceneSyntaxException>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
+            Assert.Throws<SceneSyntaxException>(() => stream2._ParseFloatToken(stream2.Location, ch.Value));
 
             // ++3
             stream2.SkipLine();
             ch = stream2.ReadChar();
-            Assert.Throws<SceneSyntaxException>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
+            Assert.Throws<SceneSyntaxException>(() => stream2._ParseFloatToken(stream2.Location, ch.Value));
 
             // --6.8
             stream2.SkipLine();
             ch = stream2.ReadChar();
-            Assert.Throws<SceneSyntaxException>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
+            Assert.Throws<SceneSyntaxException>(() => stream2._ParseFloatToken(stream2.Location, ch.Value));
 
             // +.3
             stream2.SkipLine();
             ch = stream2.ReadChar();
-            Assert.Throws<SceneSyntaxException>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
+            Assert.Throws<SceneSyntaxException>(() => stream2._ParseFloatToken(stream2.Location, ch.Value));
 
             // -e4
             stream2.SkipLine();
             ch = stream2.ReadChar();
-            Assert.Throws<SceneSyntaxException>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
+            Assert.Throws<SceneSyntaxException>(() => stream2._ParseFloatToken(stream2.Location, ch.Value));
 
             // 4.
             stream2.SkipLine();
             ch = stream2.ReadChar();
-            Assert.Throws<SceneSyntaxException>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
+            Assert.Throws<SceneSyntaxException>(() => stream2._ParseFloatToken(stream2.Location, ch.Value));
 
             // 8.e6
             stream2.SkipLine();
             ch = stream2.ReadChar();
-            Assert.Throws<SceneSyntaxException>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
+            Assert.Throws<SceneSyntaxException>(() => stream2._ParseFloatToken(stream2.Location, ch.Value));
 
             // 7..2
             stream2.SkipLine();
             ch = stream2.ReadChar();
-            Assert.Throws<SceneSyntaxException>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
+            Assert.Throws<SceneSyntaxException>(() => stream2._ParseFloatToken(stream2.Location, ch.Value));
 
             // 4ee2
             stream2.SkipLine();
             ch = stream2.ReadChar();
-            Assert.Throws<SceneSyntaxException>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
+            Assert.Throws<SceneSyntaxException>(() => stream2._ParseFloatToken(stream2.Location, ch.Value));
 
             // 3.5e--2
             stream2.SkipLine();
             ch = stream2.ReadChar();
-            Assert.Throws<SceneSyntaxException>(() => stream2._ParseFloatToken(ch.Value, stream2.Location));
+            Assert.Throws<SceneSyntaxException>(() => stream2._ParseFloatToken(stream2.Location, ch.Value));
         }
 
         File.Delete(filePath2);
@@ -438,97 +438,97 @@ public class InputStreamTest
         using (InputStream str = new InputStream(filePath1))
         {
             char? ch = str.ReadChar();
-            KeywordToken keywordToken = (KeywordToken)str._ParseKeywordIdentifierToken(ch.Value, str.Location);
+            KeywordToken keywordToken = (KeywordToken)str._ParseKeywordIdentifierToken(str.Location, ch.Value);
             Assert.Equal(Keyword.New, keywordToken.Keyword);
 
             str.SkipLine();
             ch = str.ReadChar();
-            keywordToken = (KeywordToken)str._ParseKeywordIdentifierToken(ch.Value, str.Location);
+            keywordToken = (KeywordToken)str._ParseKeywordIdentifierToken(str.Location, ch.Value);
             Assert.Equal(Keyword.Material, keywordToken.Keyword);
 
             str.SkipLine();
             ch = str.ReadChar();
-            keywordToken = (KeywordToken)str._ParseKeywordIdentifierToken(ch.Value, str.Location);
+            keywordToken = (KeywordToken)str._ParseKeywordIdentifierToken(str.Location, ch.Value);
             Assert.Equal(Keyword.Plane, keywordToken.Keyword);
 
             str.SkipLine();
             ch = str.ReadChar();
-            keywordToken = (KeywordToken)str._ParseKeywordIdentifierToken(ch.Value, str.Location);
+            keywordToken = (KeywordToken)str._ParseKeywordIdentifierToken(str.Location, ch.Value);
             Assert.Equal(Keyword.Sphere, keywordToken.Keyword);
 
             str.SkipLine();
             ch = str.ReadChar();
-            keywordToken = (KeywordToken)str._ParseKeywordIdentifierToken(ch.Value, str.Location);
+            keywordToken = (KeywordToken)str._ParseKeywordIdentifierToken(str.Location, ch.Value);
             Assert.Equal(Keyword.Diffuse, keywordToken.Keyword);
 
             str.SkipLine();
             ch = str.ReadChar();
-            keywordToken = (KeywordToken)str._ParseKeywordIdentifierToken(ch.Value, str.Location);
+            keywordToken = (KeywordToken)str._ParseKeywordIdentifierToken(str.Location, ch.Value);
             Assert.Equal(Keyword.Specular, keywordToken.Keyword);
 
             str.SkipLine();
             ch = str.ReadChar();
-            keywordToken = (KeywordToken)str._ParseKeywordIdentifierToken(ch.Value, str.Location);
+            keywordToken = (KeywordToken)str._ParseKeywordIdentifierToken(str.Location, ch.Value);
             Assert.Equal(Keyword.Uniform, keywordToken.Keyword);
 
             str.SkipLine();
             ch = str.ReadChar();
-            keywordToken = (KeywordToken)str._ParseKeywordIdentifierToken(ch.Value, str.Location);
+            keywordToken = (KeywordToken)str._ParseKeywordIdentifierToken(str.Location, ch.Value);
             Assert.Equal(Keyword.Checkered, keywordToken.Keyword);
 
             str.SkipLine();
             ch = str.ReadChar();
-            keywordToken = (KeywordToken)str._ParseKeywordIdentifierToken(ch.Value, str.Location);
+            keywordToken = (KeywordToken)str._ParseKeywordIdentifierToken(str.Location, ch.Value);
             Assert.Equal(Keyword.Image, keywordToken.Keyword);
 
             str.SkipLine();
             ch = str.ReadChar();
-            keywordToken = (KeywordToken)str._ParseKeywordIdentifierToken(ch.Value, str.Location);
+            keywordToken = (KeywordToken)str._ParseKeywordIdentifierToken(str.Location, ch.Value);
             Assert.Equal(Keyword.Identity, keywordToken.Keyword);
 
             str.SkipLine();
             ch = str.ReadChar();
-            keywordToken = (KeywordToken)str._ParseKeywordIdentifierToken(ch.Value, str.Location);
+            keywordToken = (KeywordToken)str._ParseKeywordIdentifierToken(str.Location, ch.Value);
             Assert.Equal(Keyword.Translation, keywordToken.Keyword);
 
             str.SkipLine();
             ch = str.ReadChar();
-            keywordToken = (KeywordToken)str._ParseKeywordIdentifierToken(ch.Value, str.Location);
+            keywordToken = (KeywordToken)str._ParseKeywordIdentifierToken(str.Location, ch.Value);
             Assert.Equal(Keyword.RotationX, keywordToken.Keyword);
 
             str.SkipLine();
             ch = str.ReadChar();
-            keywordToken = (KeywordToken)str._ParseKeywordIdentifierToken(ch.Value, str.Location);
+            keywordToken = (KeywordToken)str._ParseKeywordIdentifierToken(str.Location, ch.Value);
             Assert.Equal(Keyword.RotationY, keywordToken.Keyword);
 
             str.SkipLine();
             ch = str.ReadChar();
-            keywordToken = (KeywordToken)str._ParseKeywordIdentifierToken(ch.Value, str.Location);
+            keywordToken = (KeywordToken)str._ParseKeywordIdentifierToken(str.Location, ch.Value);
             Assert.Equal(Keyword.RotationZ, keywordToken.Keyword);
 
             str.SkipLine();
             ch = str.ReadChar();
-            keywordToken = (KeywordToken)str._ParseKeywordIdentifierToken(ch.Value, str.Location);
+            keywordToken = (KeywordToken)str._ParseKeywordIdentifierToken(str.Location, ch.Value);
             Assert.Equal(Keyword.Scaling, keywordToken.Keyword);
 
             str.SkipLine();
             ch = str.ReadChar();
-            keywordToken = (KeywordToken)str._ParseKeywordIdentifierToken(ch.Value, str.Location);
+            keywordToken = (KeywordToken)str._ParseKeywordIdentifierToken(str.Location, ch.Value);
             Assert.Equal(Keyword.Camera, keywordToken.Keyword);
 
             str.SkipLine();
             ch = str.ReadChar();
-            keywordToken = (KeywordToken)str._ParseKeywordIdentifierToken(ch.Value, str.Location);
+            keywordToken = (KeywordToken)str._ParseKeywordIdentifierToken(str.Location, ch.Value);
             Assert.Equal(Keyword.Orthogonal, keywordToken.Keyword);
 
             str.SkipLine();
             ch = str.ReadChar();
-            keywordToken = (KeywordToken)str._ParseKeywordIdentifierToken(ch.Value, str.Location);
+            keywordToken = (KeywordToken)str._ParseKeywordIdentifierToken(str.Location, ch.Value);
             Assert.Equal(Keyword.Perspective, keywordToken.Keyword);
 
             str.SkipLine();
             ch = str.ReadChar();
-            keywordToken = (KeywordToken)str._ParseKeywordIdentifierToken(ch.Value, str.Location);
+            keywordToken = (KeywordToken)str._ParseKeywordIdentifierToken(str.Location, ch.Value);
             Assert.Equal(Keyword.Float, keywordToken.Keyword);
         }
 
@@ -553,57 +553,57 @@ public class InputStreamTest
         {
             char? ch = str.ReadChar();
             IdentifierToken identifierToken =
-                (IdentifierToken)str._ParseKeywordIdentifierToken(ch.Value, str.Location);
+                (IdentifierToken)str._ParseKeywordIdentifierToken(str.Location, ch.Value);
             Assert.Equal("a", identifierToken.Identifier);
 
             str.SkipLine();
             ch = str.ReadChar();
-            identifierToken = (IdentifierToken)str._ParseKeywordIdentifierToken(ch.Value, str.Location);
+            identifierToken = (IdentifierToken)str._ParseKeywordIdentifierToken(str.Location, ch.Value);
             Assert.Equal("_tmp", identifierToken.Identifier);
 
             str.SkipLine();
             ch = str.ReadChar();
-            identifierToken = (IdentifierToken)str._ParseKeywordIdentifierToken(ch.Value, str.Location);
+            identifierToken = (IdentifierToken)str._ParseKeywordIdentifierToken(str.Location, ch.Value);
             Assert.Equal("variable", identifierToken.Identifier);
 
             str.SkipLine();
             ch = str.ReadChar();
-            identifierToken = (IdentifierToken)str._ParseKeywordIdentifierToken(ch.Value, str.Location);
+            identifierToken = (IdentifierToken)str._ParseKeywordIdentifierToken(str.Location, ch.Value);
             Assert.Equal("r3", identifierToken.Identifier);
 
             str.SkipLine();
             ch = str.ReadChar();
-            identifierToken = (IdentifierToken)str._ParseKeywordIdentifierToken(ch.Value, str.Location);
+            identifierToken = (IdentifierToken)str._ParseKeywordIdentifierToken(str.Location, ch.Value);
             Assert.Equal("t_2_float_", identifierToken.Identifier);
 
             str.SkipLine();
             ch = str.ReadChar();
-            identifierToken = (IdentifierToken)str._ParseKeywordIdentifierToken(ch.Value, str.Location);
+            identifierToken = (IdentifierToken)str._ParseKeywordIdentifierToken(str.Location, ch.Value);
             Assert.Equal("___4a", identifierToken.Identifier);
 
             str.SkipLine();
             ch = str.ReadChar();
-            identifierToken = (IdentifierToken)str._ParseKeywordIdentifierToken(ch.Value, str.Location);
+            identifierToken = (IdentifierToken)str._ParseKeywordIdentifierToken(str.Location, ch.Value);
             Assert.Equal("New", identifierToken.Identifier);
 
             str.SkipLine();
             ch = str.ReadChar();
-            identifierToken = (IdentifierToken)str._ParseKeywordIdentifierToken(ch.Value, str.Location);
+            identifierToken = (IdentifierToken)str._ParseKeywordIdentifierToken(str.Location, ch.Value);
             Assert.Equal("nEw", identifierToken.Identifier);
 
             str.SkipLine();
             ch = str.ReadChar();
-            identifierToken = (IdentifierToken)str._ParseKeywordIdentifierToken(ch.Value, str.Location);
+            identifierToken = (IdentifierToken)str._ParseKeywordIdentifierToken(str.Location, ch.Value);
             Assert.Equal("nnew", identifierToken.Identifier);
 
             str.SkipLine();
             ch = str.ReadChar();
-            identifierToken = (IdentifierToken)str._ParseKeywordIdentifierToken(ch.Value, str.Location);
+            identifierToken = (IdentifierToken)str._ParseKeywordIdentifierToken(str.Location, ch.Value);
             Assert.Equal("rotationX", identifierToken.Identifier);
 
             str.SkipLine();
             ch = str.ReadChar();
-            identifierToken = (IdentifierToken)str._ParseKeywordIdentifierToken(ch.Value, str.Location);
+            identifierToken = (IdentifierToken)str._ParseKeywordIdentifierToken(str.Location, ch.Value);
             Assert.NotEqual("a b", identifierToken.Identifier);
         }
 
