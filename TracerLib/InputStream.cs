@@ -431,12 +431,15 @@ public class InputStream : IDisposable
     }
 
     // Parse_Token methods - End 
-
+    
     /// <summary>
-    /// Reads and returns the next Token that appears in the stream (skipping whitespaces, new lines and comments)
+    /// Reads the next token from the input stream, skipping whitespace,
+    /// newlines, and comments.
     /// </summary>
-    /// <returns></returns>
-    /// <exception cref="SceneSyntaxException"></exception>
+    /// <returns>The next token in the stream.</returns>
+    /// <exception cref="SceneSyntaxException">
+    /// Thrown when an invalid character is encountered.
+    /// </exception>
     public Token ReadNextToken()
     {
         if (SavedToken != null)
@@ -483,7 +486,7 @@ public class InputStream : IDisposable
             return _ParseKeywordIdentifierToken(tokenLocation, ch.Value);
         }
 
-        throw new SceneSyntaxException(tokenLocation, $"invalid character {ch}");
+        throw new SceneSyntaxException(tokenLocation, $"invalid character '{ch}'");
     }
 
     public void UnreadToken(Token token)
