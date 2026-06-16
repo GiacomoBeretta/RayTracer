@@ -159,7 +159,7 @@ public class InputStreamTest
 
         File.Delete(filePath);
     }
-
+    
     [Fact]
     public void TestSkipLine()
     {
