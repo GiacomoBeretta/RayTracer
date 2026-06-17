@@ -87,8 +87,8 @@ public class DemoCommand
         string currentPath = AppDomain.CurrentDomain.BaseDirectory;
         string pngFilePath =
             Path.Combine(currentPath,
-                "../../../../DemoImages/" +
-                OutputFileName); //"../../../../DemoImages/" dal path dell'eseguibile torna indietro (Controllare)
+                "../../../../PngImages/" +
+                OutputFileName); //"../../../../PngImages/" dal path dell'eseguibile torna indietro (Controllare)
         if (OutputFileName[^4..] != ".png") pngFilePath += ".png"; //OutputFilename[^4..] Legge gli ultimi 4 caratteri
 
         // Define materials
@@ -186,7 +186,7 @@ public class DemoCommand
         tracer.FireAllRays(ray => render.RenderFunction(ray));
 
         image.WritePNG(pngFilePath, LuminosityFunction, Factor, Gamma, averageLuminosity: 0.5f);
-        Console.WriteLine("The PNG file has been saved in DemoImages/" + OutputFileName);
+        Console.WriteLine("The PNG file has been saved in PngImages/" + OutputFileName);
     }
     /*
      * Demo with the two spheres and the checkered floor
