@@ -22,7 +22,7 @@ public abstract class BRDF
     /// </summary>
     protected BRDF()
     {
-        Pigment = new UniformPigment(new Color(0f, 0f, 0f));
+        Pigment = new UniformPigment();
     }
 
     protected BRDF(Pigment pigment)

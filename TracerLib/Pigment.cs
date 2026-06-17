@@ -25,6 +25,15 @@ public class UniformPigment : Pigment
     /// </summary>
     public Color Color { get; }
 
+    /// <summary>
+    /// Constructs a new instance of the <see cref="UniformPigment"/> class,
+    /// with a uniform black color.
+    /// </summary>
+    public UniformPigment()
+    {
+        this.Color = new Color(0,0,0);
+    }
+    
     public UniformPigment(Color color)
     {
         Color = color;
