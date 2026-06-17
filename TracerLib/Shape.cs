@@ -13,6 +13,9 @@ public abstract class Shape
     /// </summary>
     public Material Material { get; }
 
+    /// <summary>
+    /// Base abstract class constructor that initialize a shape with a uniform black color.
+    /// </summary>
     public Shape()
     {
         Material = new Material();
@@ -30,6 +33,13 @@ public abstract class Shape
     /// <returns>A <see cref="HitRecord"/> describing the closest intersection, or null if no intersection exists.</returns>
     public abstract HitRecord? FindIntersection(Ray ray);
 
+    /// <summary>
+    /// Returns whether this shape is approximately equal to the specified shape within a given tolerance.
+    /// The <see cref="Material"/> is not considered for the comparison.
+    /// </summary>
+    /// <param name="s">The shape to compare to this.</param>
+    /// <param name="epsilon">Tolerance threshold used for floating-point comparison.</param>
+    /// <returns></returns>
     public abstract bool _IsCloseTo(Shape s, float epsilon = 1e-5f);
 
     /// <summary>
@@ -61,19 +71,31 @@ public abstract class Shape
 }
 
 /// <summary>
-/// A 3D unit Sphere.
-/// The transform field allows to represent also translated and rotated ellipsoids.
+/// A 3D unit Sphere centered at the origin.
+/// The <see cref="Transform"/> property allows to represent also translated and rotated ellipsoids.
 /// </summary>
 public class Sphere : Shape
 {
+    /// <summary>
+    /// The transformation applied to the unit sphere.
+    /// </summary>
     public Transformation Transform { get; }
 
-    public Sphere()
+    /// <summary>
+    /// Constructs a unit sphere centered at the origin.
+    /// The material is initialized by the base class and defaults to a uniform black color.
+    /// </summary>
+    public Sphere() : base()
     {
         Transform = new Transformation();
     }
 
-    public Sphere(Transformation transform)
+    /// <summary>
+    /// Initializes a new instance of the Sphere class with the specified transform.
+    /// The material is initialized by the base class and defaults to a uniform black color.
+    /// </summary>
+    /// <param name="transform">The transformation to apply to this sphere.</param>
+    public Sphere(Transformation transform) : base()
     {
         Transform = transform;
     }
@@ -89,11 +111,18 @@ public class Sphere : Shape
     }
 
     /// <summary>
-    /// Returns true if the shape passed as parameter is a Sphere and if it has the Transform member close within epsilon
+    /// Determines whether this sphere is geometrically close to another sphere,
+    /// comparing only their Transform within a given tolerance.
+    /// Material properties are ignored.
     /// </summary>
-    /// <param name="s"></param>
-    /// <param name="epsilon"></param>
-    /// <returns></returns>
+    /// <param name="s">The sphere to compare against.</param>
+    /// <param name="epsilon">Tolerance used for floating-point comparisons.</param>
+    /// <returns>
+    /// True if the transforms of the two spheres are approximately equal within epsilon; otherwise false.
+    /// </returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown if the provided shape is not of type Sphere.
+    /// </exception>
     public override bool _IsCloseTo(Shape s, float epsilon = 1E-05F)
     {
         if (s.GetType() != typeof(Sphere))
@@ -111,20 +140,20 @@ public class Sphere : Shape
     }
 
     /// <summary>
-    /// Returns the normal to the Sphere surface
-    /// depending on the direction dir of the Ray incident on the Point p of the unit sphere.
+    /// Returns the surface normal of the unit sphere at point p,
+    /// oriented opposite to the incident direction.
     /// </summary>
-    /// <param name="p"></param>
-    /// <param name="dir"></param>
-    /// <returns></returns>
-    public Normal _SphereNormal(Point p, Vector dir)
+    /// <param name="p">The intersection point between the sphere and the ray.</param>
+    /// <param name="incidentDir">Incident direction (typically the ray direction at intersection).</param>
+    /// <returns>The correctly oriented normal at the given point.</returns>
+    public Normal _SphereNormal(Point p, Vector incidentDir)
     {
         Normal normal = new Normal(p.X, p.Y, p.Z);
-        return normal * dir < 0 ? normal : -normal;
+        return normal * incidentDir < 0 ? normal : -normal;
     }
-    
+
     /// <summary>
-    /// Returns the normalized longitude and colatitude of the <c>Point</c> p on the unit sphere.
+    /// Returns the normalized longitude and colatitude of the Point p on the unit sphere.
     /// The (u,v) coordinates of the 2D vector are in [0,1]x[0,1].
     /// </summary>
     /// <param name="p">A point on the unit sphere.</param>
@@ -136,26 +165,19 @@ public class Sphere : Shape
     {
         // Atan2 codomain is (-pi, pi] and for Acos is [0,pi].
         // so that u is in (-0.5, 0.5], but we want u, v in [0,1]
-        // Then we put in correspondance the angles in [-pi, 0] with the angles in [pi, 2pi]
-        // Then if the angle is negative we translate by 2pi. We did this with u translating it by 1 if negative.
+        // Then we put in correspondence the angles in [-pi, 0] with the angles in [pi, 2pi]
+        // Then if the angle is negative we translate by 2pi. We did this with u, translating it by 1 if negative.
         float u = MathF.Atan2(p.Y, p.X) / (2 * MathF.PI);
         float v = MathF.Acos(p.Z) / MathF.PI;
-        
+
         if (u < 0)
         {
             u += 1;
         }
+
         return new Vector2D(u, v);
     }
 
-    /// <summary>
-    /// Returns a <c>HitRecord</c> object if there is an intersection between the <c>Ray</c> passed as argument
-    /// and *this* shape, otherwise returns a null value.
-    /// See <c>HitRecord</c> for more information.
-    /// (For the sphere the (U,V) coordinates are longitude and colatitude, normalized).
-    /// </summary>
-    /// <param name="ray"></param>
-    /// <returns></returns>
     public override HitRecord? FindIntersection(Ray ray)
     {
         // instead of transforming the sphere to represent all sorts of ellipsoids
@@ -206,16 +228,32 @@ public class Sphere : Shape
     }
 }
 
+/// <summary>
+/// The XY plane.
+/// The <see cref="Transform"/> property can be used to represent any plane in 3D space.
+/// </summary>
 public class Plane : Shape
 {
+    /// <summary>
+    /// The transformation applied to the unit sphere.
+    /// </summary>
     public Transformation Transform { get; }
-
-    public Plane()
+    
+    /// <summary>
+    /// Constructs the XY plane.
+    /// The material is initialized by the base class and defaults to a uniform black color.
+    /// </summary>
+    public Plane() : base()
     {
         Transform = new Transformation();
     }
-
-    public Plane(Transformation transform)
+    
+    /// <summary>
+    /// Initializes a new instance of the Plane class with the specified transform.
+    /// The material is initialized by the base class and defaults to a uniform black color.
+    /// </summary>
+    /// <param name="transform">The transformation to apply to this plane.</param>
+    public Plane(Transformation transform) : base()
     {
         Transform = transform;
     }
@@ -226,12 +264,18 @@ public class Plane : Shape
     }
 
     /// <summary>
-    /// Returns true if the shape passed as argument is a Plane and if it has the Transform member close within epsilon
+    /// Determines whether this plane is geometrically close to another plane,
+    /// comparing only their Transform within a given tolerance.
+    /// Material properties are ignored.
     /// </summary>
-    /// <param name="s"></param>
-    /// <param name="epsilon"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentException"></exception>
+    /// <param name="s">The plane to compare against.</param>
+    /// <param name="epsilon">Tolerance used for floating-point comparisons.</param>
+    /// <returns>
+    /// True if the transforms of the two planes are approximately equal within epsilon; otherwise false.
+    /// </returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown if the provided shape is not of type Plane.
+    /// </exception>
     public override bool _IsCloseTo(Shape s, float epsilon = 1E-05F)
     {
         if (s.GetType() != typeof(Plane))
