@@ -33,7 +33,7 @@ public struct Normal
     {
         Console.WriteLine(ToString());
     }
-    
+
     /// <summary>
     /// Returns whether the two normals are approximately equal within a given tolerance.
     /// </summary>
@@ -45,10 +45,11 @@ public struct Normal
     /// <returns> True if the normals are equal within the given tolerance on all axes.</returns>
     public static bool _AreNormalsClose(Normal a, Normal b, float epsilon = 1e-5f)
     {
-        return Functions.AreClose(a.X, b.X, epsilon) && Functions.AreClose(a.Y, b.Y, epsilon) &&
-               Functions.AreClose(a.Z, b.Z, epsilon);
+        return Functions.AreClose(a.X, b.X, epsilon)
+               && Functions.AreClose(a.Y, b.Y, epsilon)
+               && Functions.AreClose(a.Z, b.Z, epsilon);
     }
-    
+
     /// <summary>
     /// Determines whether this vector is normalized, within a given numerical tolerance.
     /// </summary>
@@ -79,11 +80,13 @@ public struct Normal
             throw new ArgumentOutOfRangeException($"Normal is not normalized within epsilon={epsilon}");
         }
     }
-
+    
     /// <summary>
-    /// Returns the negated normal.
+    /// Negates the normal vector, reversing its direction.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>
+    /// A new <see cref="Normal"/> pointing in the opposite direction.
+    /// </returns>
     public static Normal operator -(Normal n)
     {
         return new Normal(-n.X, -n.Y, -n.Z);
@@ -174,7 +177,7 @@ public struct Normal
         float norm = Norm();
         return new Normal(X * 1 /norm, Y * 1 / norm, Z * 1 / norm);
     }*/
-    
+
     /// <summary>
     /// Returns a <see cref="Vector"/> from this normal without modifying its values.
     /// </summary>
