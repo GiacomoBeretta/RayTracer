@@ -18,7 +18,7 @@ public abstract class BRDF
     //public abstract Color Eval(Normal normal, Vector Vin, Vector Vout, Vector2D uv);
     
     /// <summary>
-    /// Constructs a BRDF with a uniform black color.
+    /// Base abstract class constructor that initialize a BRDF with a uniform black color.
     /// </summary>
     protected BRDF()
     {
