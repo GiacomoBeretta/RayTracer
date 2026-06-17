@@ -3,7 +3,7 @@
 namespace TracerLib;
 
 //Verificare se modificare {token} in {type(token)} nei messaggi d'errore cambia qualcosa
-//Considerare di cambiare ExpecteSymbol(InputStream, string) in ExpecteSymbol(InputStream, char)
+//Considerare di cambiare ExpectSymbol(InputStream, string) in ExpecteSymbol(InputStream, char)
 public class Scene
 {
     public Dictionary<string, Material> Materials { get; set; } = new Dictionary<string, Material>();

@@ -7,6 +7,10 @@ namespace TracerLib;
 /// </summary>
 public abstract class Shape
 {
+    /// <summary>
+    /// Specifies the optical properties of a surface material,
+    /// including its reflection model and any emitted radiance.
+    /// </summary>
     public Material Material { get; }
 
     public Shape()
