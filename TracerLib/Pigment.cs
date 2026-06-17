@@ -56,6 +56,7 @@ public class ImagePigment : Pigment
         Image = image;
     }
     
+    //TOGLIERE MATHFLOOR SUL BRANCH AVERAGEIMAGE
     /// <summary>
     /// Returns the color sampled from the image at the specified UV coordinates.
     /// </summary>
