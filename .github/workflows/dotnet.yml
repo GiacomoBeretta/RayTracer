@@ -54,13 +54,6 @@ jobs:
           Write-Host "Runner OS: $env:RUNNER_OS"
           systeminfo | Select-String "OS Name","OS Version"
           
-      - name: List test files
-        run: |
-          find . -name "*Test*.cs"
-          
-      - name: Show FunctionsTest.cs
-        run: cat TracerTests/FunctionsTest.cs
-          
       - name: Install dependencies
         run: dotnet restore
         
