@@ -25,7 +25,7 @@ public abstract class Shape
     /// <param name="ray">The <see cref="Ray"/> to test for intersections.</param>
     /// <returns>A <see cref="HitRecord"/> describing the closest intersection, or null if no intersection exists.</returns>
     public abstract HitRecord? FindIntersection(Ray ray);
-    
+
     public abstract bool _IsCloseTo(Shape s, float epsilon = 1e-5f);
 
     /// <summary>
@@ -63,7 +63,7 @@ public abstract class Shape
 public class Sphere : Shape
 {
     public Transformation Transform { get; }
-    
+
     public Sphere()
     {
         Transform = new Transformation();
@@ -73,12 +73,12 @@ public class Sphere : Shape
     {
         Transform = transform;
     }
-    
+
     public Sphere(Material material) : base(material)
     {
         Transform = new Transformation();
     }
-    
+
     public Sphere(Transformation transform, Material material) : base(material)
     {
         Transform = transform;
@@ -118,15 +118,30 @@ public class Sphere : Shape
         Normal normal = new Normal(p.X, p.Y, p.Z);
         return normal * dir < 0 ? normal : -normal;
     }
-
+    
     /// <summary>
     /// Returns the normalized longitude and colatitude of the <c>Point</c> p on the unit sphere.
+    /// The (u,v) coordinates of the 2D vector are in [0,1]x[0,1].
     /// </summary>
-    /// <param name="p"></param>
-    /// <returns></returns>
+    /// <param name="p">A point on the unit sphere.</param>
+    /// <returns>A <see cref="Vector2D"/> whose U component is the normalized longitude
+    /// in the range [0,1] and whose V component is the normalized colatitude
+    /// in the range [0,1], with V = 0 at the north pole and V = 1 at the south pole.
+    /// </returns>
     public Vector2D _SpherePointToUV(Point p)
     {
-        return new Vector2D(MathF.Atan2(p.Y, p.X) / (2 * MathF.PI), MathF.Acos(p.Z) / MathF.PI);
+        // Atan2 codomain is (-pi, pi] and for Acos is [0,pi].
+        // so that u is in (-0.5, 0.5], but we want u, v in [0,1]
+        // Then we put in correspondance the angles in [-pi, 0] with the angles in [pi, 2pi]
+        // Then if the angle is negative we translate by 2pi. We did this with u translating it by 1 if negative.
+        float u = MathF.Atan2(p.Y, p.X) / (2 * MathF.PI);
+        float v = MathF.Acos(p.Z) / MathF.PI;
+        
+        if (u < 0)
+        {
+            u += 1;
+        }
+        return new Vector2D(u, v);
     }
 
     /// <summary>
