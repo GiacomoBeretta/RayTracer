@@ -4,13 +4,8 @@ namespace TracerLib;
 
 /// <summary>
 /// Represents the optical properties of a surface material,
-/// including its reflection model and any emitted radiance.
+/// including its reflection model (<see cref="Brdf"/>) and any emitted radiance.
 /// </summary>
-/// <remarks>
-/// A material is defined by a <see cref="BRDF"/>, which describes
-/// how incoming light is reflected, and an optional emitted radiance,
-/// allowing the material to act as a light source.
-/// </remarks>
 public struct Material
 {
     /// <summary>
@@ -30,7 +25,16 @@ public struct Material
     public BRDF Brdf;
 
     /// <summary>
-    /// Initializes a non-emissive material with the specified BRDF.
+    /// Constructs a diffusive material with zero emittance and a uniform black color.
+    /// </summary>
+    public Material()
+    {
+        EmittedRadiance = new UniformPigment();
+        Brdf = new DiffuseBRDF();
+    }
+    
+    /// <summary>
+    /// Initializes a non-emissive material and a uniform black color, with the specified BRDF.
     /// </summary>
     /// <param name="brdf">
     /// The reflection model used by the material.
@@ -38,8 +42,7 @@ public struct Material
     public Material(BRDF brdf)
     {
         Brdf = brdf;
-        Color black = new Color(0, 0, 0);
-        EmittedRadiance = new UniformPigment(black);
+        EmittedRadiance = new UniformPigment();
     }
 
     /// <summary>
