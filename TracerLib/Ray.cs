@@ -96,12 +96,24 @@ public struct Ray
     {
         Console.WriteLine(ToString());
     }
-
+    
+    /// <summary>
+    /// Returns the point given by the formula p = Origin + Direction * t
+    /// where O is the origin of the ray and v is the direction of the ray.
+    /// </summary>
+    /// <param name="t">Distance parameter along the ray.</param>
+    /// <returns></returns>
     public Point At(float t)
     {
         return Origin + Dir * t;
     }
 
+    /// <summary>
+    /// Transforms a ray by applying the given transformation to both its origin and direction.
+    /// </summary>
+    /// <param name="t">The transformation to apply.</param>
+    /// <param name="r">The ray to transform.</param>
+    /// <returns>A new ray with transformed origin and direction.</returns>
     public static Ray operator *(Transformation t, Ray r)
     {
         return new Ray(t * r.Origin, t * r.Dir);
