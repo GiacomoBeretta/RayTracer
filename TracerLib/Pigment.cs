@@ -2,8 +2,6 @@
 
 namespace TracerLib;
 
-//non ho capito se le coordinate uv sono tra 0 e 1 o possono essere più grandi o addirittura negative
-
 /// <summary>
 /// A base class representing the texture of a surface.
 /// </summary>
@@ -22,6 +20,9 @@ public abstract class Pigment
 /// </summary>
 public class UniformPigment : Pigment
 {
+    /// <summary>
+    /// The uniform color of this pigment.
+    /// </summary>
     public Color Color { get; }
 
     public UniformPigment(Color color)
@@ -40,35 +41,36 @@ public class UniformPigment : Pigment
 /// </summary>
 public class ImagePigment : Pigment
 {
+    /// <summary>
+    /// The texture image used to determine the pigment's color at each point.
+    /// </summary>
     public HDRImage Image { get; }
 
     public ImagePigment(HDRImage image)
     {
         Image = image;
     }
-
-    //forse qui c'è un errore
+    
     /// <summary>
-    /// Returns the color sampled from the image at the given UV coordinates.
-    /// UV coordinates are defined such that (0,0) corresponds to the top-left
-    /// corner of the <see cref="HDRImage"/>, consistent with its row/column indexing.
+    /// Returns the color sampled from the image at the specified UV coordinates.
     /// </summary>
     /// <param name="uv">
     /// Surface texture coordinates expressed as a <see cref="Vector2D"/>.
+    /// UV coordinates are defined such that (0,0) corresponds to the top-left
+    /// corner of the <see cref="HDRImage"/>, consistent with its row/column indexing.
+    /// Both U and V are expected to be in the range [0,1].
     /// </param>
     /// <returns>
-    /// The <see cref="Color"/> sampled from the image at the specified UV position.
+    /// The <see cref="Color"/> sampled from the image at the specified UV coordinates.
     /// </returns>
     public override Color GetColor(Vector2D uv)
     {
-        float u = uv.U - MathF.Floor(uv.U); // magari può essere utile scrivere mathf.Floor(uv.U-epsilon) così se
-        // uv.U vale 1 viene fuori 1-math.floor(0.99) = 1-0 =1 (e non 1-1=0)
-        float v = uv.V - MathF.Floor(uv.V); // idem per uv.V
+        int col = (int)(uv.U * Image.Width);
+        int row = (int)(uv.V * Image.Height);
+        // now col is in [0, Image.Width] but the image is indexed with col in [0, Image.Width - 1]
+        // similarly for row
 
-        int col = (int)(u * Image.Width);
-        int row = (int)(v * Image.Height);
-
-        if (col >= Image.Width) col = Image.Width - 1; //come mai questo if?
+        if (col >= Image.Width) col = Image.Width - 1;
         if (row >= Image.Height) row = Image.Height - 1;
 
         return Image[col, row];
