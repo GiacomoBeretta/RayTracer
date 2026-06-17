@@ -141,20 +141,20 @@ public class Sphere : Shape
 
     /// <summary>
     /// Returns the surface normal of the unit sphere at point p,
-    /// oriented opposite to the incident direction.
+    /// oriented opposite to the incident vector.
     /// </summary>
     /// <param name="p">The intersection point between the sphere and the ray.</param>
-    /// <param name="incidentDir">Incident direction (typically the ray direction at intersection).</param>
+    /// <param name="incidentVec">Incident vector (typically the ray direction at intersection).</param>
     /// <returns>The correctly oriented normal at the given point.</returns>
-    public Normal _SphereNormal(Point p, Vector incidentDir)
+    public Normal _SphereNormal(Point p, Vector incidentVec)
     {
         Normal normal = new Normal(p.X, p.Y, p.Z);
-        return normal * incidentDir < 0 ? normal : -normal;
+        return normal * incidentVec < 0 ? normal : -normal;
     }
 
     /// <summary>
     /// Returns the normalized longitude and colatitude of the Point p on the unit sphere.
-    /// The (u,v) coordinates of the 2D vector are in [0,1]x[0,1].
+    /// The (u,v) coordinates of the returned 2D vector are in [0,1]x[0,1].
     /// </summary>
     /// <param name="p">A point on the unit sphere.</param>
     /// <returns>A <see cref="Vector2D"/> whose U component is the normalized longitude
@@ -170,10 +170,7 @@ public class Sphere : Shape
         float u = MathF.Atan2(p.Y, p.X) / (2 * MathF.PI);
         float v = MathF.Acos(p.Z) / MathF.PI;
 
-        if (u < 0)
-        {
-            u += 1;
-        }
+        if (u < 0) u += 1;
 
         return new Vector2D(u, v);
     }
@@ -238,7 +235,7 @@ public class Plane : Shape
     /// The transformation applied to the unit sphere.
     /// </summary>
     public Transformation Transform { get; }
-    
+
     /// <summary>
     /// Constructs the XY plane.
     /// The material is initialized by the base class and defaults to a uniform black color.
@@ -247,7 +244,7 @@ public class Plane : Shape
     {
         Transform = new Transformation();
     }
-    
+
     /// <summary>
     /// Initializes a new instance of the Plane class with the specified transform.
     /// The material is initialized by the base class and defaults to a uniform black color.
@@ -292,19 +289,38 @@ public class Plane : Shape
         return true;
     }
 
-    public Normal _PlaneNormal(Vector dir)
+    /// <summary>
+    /// Returns the one of the two normals of the XY plane facing the incoming direction.
+    /// </summary>
+    /// <param name="incidentVec">Incident vector (typically the ray direction at intersection).</param>
+    /// <returns>(0,0,1) if <paramref name="incidentVec"/> has a negative Z component;
+    /// otherwise (0,0,-1).</returns>
+    public Normal _PlaneNormal(Vector incidentVec)
     {
         var normal = new Normal(0, 0, 1);
-        return dir.Z < 0 ? normal : -normal;
+        return incidentVec.Z < 0 ? normal : -normal;
     }
-
+    
+    /// <summary>
+    /// Returns periodic UV coordinates for a point on the XY plane.
+    /// The texture pattern repeats every unit length along both axes.
+    /// The (u,v) coordinates of the returned 2D vector are in [0,1]x[0,1].
+    /// </summary>
+    /// <param name="p">A point on the XY plane</param>
+    /// <returns></returns>
     public Vector2D _PlanePointToUV(Point p)
     {
-        return new Vector2D(p.X - MathF.Floor(p.X), p.Y - MathF.Floor(p.Y));
+        // map X,Y in [0,1]x[0,1]
+        // e.g. X = 2.4, Y = -2.7 then
+        // u = 2.4 - Floor(2.4) = 2.4 - 2 = 0.4
+        // v = -2.7 - Floor(-2.7) = -2.7 - (-3) = -2.7 + 3 = 0.3
+        return new Vector2D( p.X - MathF.Floor(p.X),p.Y - MathF.Floor(p.Y));
     }
 
     public override HitRecord? FindIntersection(Ray ray)
     {
+        // instead of transforming the plane to represent all the possible planes in 3D space,
+        // we transform the ray with the inverse transformation
         Ray invRay = Transform.Inverse() * ray;
         Point origin = invRay.Origin;
         Vector dir = invRay.Dir;
