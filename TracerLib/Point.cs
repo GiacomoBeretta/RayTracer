@@ -2,6 +2,9 @@
 
 namespace TracerLib;
 
+/// <summary>
+/// Represents a point in 3D space.
+/// </summary>
 public struct Point
 {
     public float X { get; }
@@ -14,7 +17,7 @@ public struct Point
         Y = 0;
         Z = 0;
     }
-    
+
     public Point(float x, float y, float z)
     {
         X = x;
@@ -33,21 +36,72 @@ public struct Point
         Console.WriteLine(ToString());
     }
 
-    public static bool _ArePointsClose(Point a, Point b, float epsilon=1e-5f)
+    /// <summary>
+    /// Determines whether the two points are approximately equal within a given tolerance.
+    /// </summary>
+    /// <param name="a">The first point to compare.</param>
+    /// <param name="b">The second point to compare.</param>
+    /// <param name="epsilon">
+    /// Tolerance threshold used for floating-point comparison of each component. Defaults to 1e-5.
+    /// </param>
+    /// <returns>True if all corresponding components of the two points differ by no more than epsilon.</returns>
+    public static bool _ArePointsClose(Point a, Point b, float epsilon = 1e-5f)
     {
-        return Functions.AreClose(a.X, b.X,epsilon) && Functions.AreClose(a.Y, b.Y,epsilon) && Functions.AreClose(a.Z, b.Z,epsilon);
+        return Functions.AreClose(a.X, b.X, epsilon)
+               && Functions.AreClose(a.Y, b.Y, epsilon)
+               && Functions.AreClose(a.Z, b.Z, epsilon);
     }
 
-    public static Point operator +(in Point a, in Vector b)
+    /// <summary>
+    /// Translates a point by a vector, returning a new resulting point in 3D space.
+    /// </summary>
+    /// <param name="p">The original point.</param>
+    /// <param name="v">The vector to add.</param>
+    /// <returns>A new <see cref="Point"/> obtained by applying the vector translation to the input point.</returns>
+    public static Point operator +(in Point p, in Vector v)
+    {
+        return new Point(p.X + v.X, p.Y + v.Y, p.Z + v.Z);
+    }
+    
+    /// <summary>
+    /// Translates a point by subtracting a vector, returning the resulting point.
+    /// </summary>
+    /// <param name="a">The original point.</param>
+    /// <param name="b">The vector to subtract from the point.</param>
+    /// <returns>
+    /// A new <see cref="Point"/> resulting from translating the input point by the opposite of the vector.
+    /// </returns>
+    
+    /// <summary>
+    /// Applies a reverse translation to a point using a vector (p - v).
+    /// </summary>
+    /// <returns>
+    /// The translated point.
+    /// </returns>
+    
+    /// <summary>
+    /// Translates backward a point by a vector, returning a new resulting point in 3D space.
+    /// </summary>
+    /// <param name="p">The original point.</param>
+    /// <param name="v">The vector to subtract.</param>
+    /// <returns>A new <see cref="Point"/> obtained by applying the vector translation to the input point.</returns>
+    public static Point operator -(in Point p, in Vector v)
+    {
+        return new Point(p.X - v.X, p.Y - v.Y, p.Z - v.Z);
+    }
+
+    //this operation shouldn't be allowed
+    /*public static Point operator +(in Vector a, in Point b)
     {
         return new Point(a.X + b.X, a.Y + b.Y, a.Z + b.Z);
-    }
-
-    public static Point operator +(in Vector a, in Point b)
-    {
-        return new Point(a.X + b.X, a.Y + b.Y, a.Z + b.Z);
-    }
-
+    }*/
+    
+    /// <summary>
+    /// Returns a new point, inverting all the coordinates of the specified point.
+    /// </summary>
+    /// <returns>
+    /// A <see cref="Point"/> located at (-X, -Y, -Z).
+    /// </returns>
     public static Point operator -(Point p)
     {
         return new Point(-p.X, -p.Y, -p.Z);
@@ -58,11 +112,6 @@ public struct Point
         return new Vector(a.X - b.X, a.Y - b.Y, a.Z - b.Z);
     }
 
-    public static Point operator -(in Point a, in Vector b)
-    {
-        return new Point(a.X - b.X, a.Y - b.Y, a.Z - b.Z);
-    }
-    
     public static Point operator *(Point p, float alpha)
     {
         return new Point(p.X * alpha, p.Y * alpha, p.Z * alpha);
@@ -73,6 +122,12 @@ public struct Point
         return new Point(p.X * alpha, p.Y * alpha, p.Z * alpha);
     }
 
+    /// <summary>
+    /// Converts this point into a vector originating from the origin.
+    /// </summary>
+    /// <returns>
+    /// A <see cref="Vector"/> with the same components as this point.
+    /// </returns>
     public Vector ToVector()
     {
         return new Vector(X, Y, Z);
