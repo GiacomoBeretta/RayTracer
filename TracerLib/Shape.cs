@@ -180,8 +180,8 @@ public class Sphere : Shape
         // instead of transforming the sphere to represent all sorts of ellipsoids
         // we transform the ray with the inverse transformation
         Ray invRay = (Transform.Inverse()) * ray;
+        Vector origin = invRay.Origin.ToVector(); // This is the difference between the origin point of the vector and the point (0,0,0)
         Vector dir = invRay.Dir;
-        Vector origin = invRay.Origin.ToVector();
         float delta_4 = (origin * dir) * (origin * dir) - dir.SquaredNorm() * (origin.SquaredNorm() - 1);
         // if delta_4 < 0 there are no intersection, if delta_4 == 0 there is no reflection
         // then we take only one of the two solutions depending on whether they represent
@@ -316,7 +316,7 @@ public class Plane : Shape
         // v = -2.7 - Floor(-2.7) = -2.7 - (-3) = -2.7 + 3 = 0.3
         return new Vector2D( p.X - MathF.Floor(p.X),p.Y - MathF.Floor(p.Y));
     }
-
+    
     public override HitRecord? FindIntersection(Ray ray)
     {
         // instead of transforming the plane to represent all the possible planes in 3D space,
@@ -329,6 +329,7 @@ public class Plane : Shape
         if (t > invRay.Tmin && t < invRay.Tmax)
         {
             Point intersectionPoint = invRay.At(t);
+            
             return new HitRecord(
                 Transform * intersectionPoint,
                 this,
