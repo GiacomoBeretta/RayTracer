@@ -4,6 +4,9 @@ using System.Globalization;
 
 namespace TracerLib;
 
+/// <summary>
+/// A base abstract class t
+/// </summary>
 public abstract class Token
 {
     public SourceLocation Location { get; }
@@ -129,6 +132,9 @@ public sealed class StringToken : Token
     }
 }
 
+/// <summary>
+/// Represents a 32-bit floating-point literal.
+/// </summary>
 public sealed class LiteralNumberToken : Token
 {
     public float Value { get; }
@@ -144,6 +150,9 @@ public sealed class LiteralNumberToken : Token
     }
 }
 
+/// <summary>
+/// Represents a symbol token, such as '(', ')', '<', or '+'.
+/// </summary>
 public sealed class SymbolToken : Token
 {
     public string Symbol { get; }
