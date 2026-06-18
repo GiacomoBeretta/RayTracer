@@ -287,8 +287,8 @@ public class PfmToPngCommand
     [Required]
     public required string Output { get; set; }
 
-    [Option("--luminosityFunction", Description = "Luminosity function, options are: shirley (default), weighted")]
-    public LumFunction LuminosityFunction { get; set; } = LumFunction.Shirley;
+    [Option("--luminosityfunction", Description = "Luminosity function, options are: shirley (default), weighted")]
+    public LumFunction Luminosityfunction { get; set; } = LumFunction.Shirley;
     
     [Option("--averageluminosity", Description = "Fixed luminosity for the tone mapping. If the value is null is computed with the luminosity function")]
     public float? AverageLuminosity { get; set; } = null;
@@ -303,7 +303,7 @@ public class PfmToPngCommand
     {
         Console.WriteLine($"input path: {Input}");
         Console.WriteLine($"output path: {Output}");
-        Console.WriteLine($"luminosity function: {LuminosityFunction}");
+        Console.WriteLine($"luminosityFunction: {Luminosityfunction}");
         Console.WriteLine($"Averageluminosity: {AverageLuminosity}");
         Console.WriteLine($"factor: {Factor}");
         Console.WriteLine($"gamma: {Gamma}");
@@ -322,7 +322,7 @@ public class PfmToPngCommand
         HDRImage image = HDRImage.ReadPFM_File(pfmFilePath);
         Console.WriteLine($"File read in: {pfmFilePath}");
 
-        image.WritePNG(pngFilePath, LuminosityFunction, Factor, Gamma, AverageLuminosity);
+        image.WritePNG(pngFilePath, Luminosityfunction, Factor, Gamma, AverageLuminosity);
         Console.WriteLine($"File saved in: {pngFilePath}");
     }
 }
@@ -371,8 +371,8 @@ public class RenderCommand
     [Range(1, Int32.MaxValue)]
     public int SampleSide { get; set; } = 1;
 
-    [Option("--luminosityFunction", Description = "Luminosity function, options are: shirley (default), weighted")]
-    public LumFunction LuminosityFunction { get; set; } = LumFunction.Shirley;
+    [Option("--luminosityfunction", Description = "Luminosity function, options are: shirley (default), weighted")]
+    public LumFunction Luminosityfunction { get; set; } = LumFunction.Shirley;
     
     [Option("--averageluminosity", Description = "Fixed luminosity for the tone mapping. If the value is null is computed with the luminosity function")]
     public float? AverageLuminosity { get; set; } = null;
@@ -409,7 +409,7 @@ public class RenderCommand
         Console.WriteLine($"InitState: {InitState}");
         Console.WriteLine($"InitSeq: {InitSeq}");
         Console.WriteLine($"SampleSide: {SampleSide}");
-        Console.WriteLine($"LuminosityFunction: {LuminosityFunction}");
+        Console.WriteLine($"Luminosityfunction: {Luminosityfunction}");
         Console.WriteLine($"Averageluminosity: {AverageLuminosity}");
         Console.WriteLine($"Factor: {Factor}");
         Console.WriteLine($"Gamma: {Gamma}");
@@ -473,7 +473,7 @@ public class RenderCommand
         HDRImage.WritePFM_File(image, pfmFilePath);
         Console.WriteLine($"Pfm file created in: {pfmFilePath}");
 
-        image.WritePNG(pngFilePath, LuminosityFunction, Factor, Gamma, AverageLuminosity);
+        image.WritePNG(pngFilePath, Luminosityfunction, Factor, Gamma, AverageLuminosity);
         Console.WriteLine($"Png file created in: {pngFilePath}");
     }
 }
@@ -495,8 +495,8 @@ public class AverageImageCommand
     [Required]
     public required string OutputFilePathPng { get; set; }
 
-    [Option("--luminosityFunction", Description = "Luminosity function, options are: shirley (default), weighted")]
-    public LumFunction LuminosityFunction { get; set; } = LumFunction.Shirley;
+    [Option("--luminosityfunction", Description = "Luminosity function, options are: shirley (default), weighted")]
+    public LumFunction Luminosityfunction { get; set; } = LumFunction.Shirley;
 
     [Option("--averageluminosity", Description = "Fixed luminosity for the tone mapping. If the value is null is computed with the luminosity function")]
     public float? AverageLuminosity { get; set; } = null;
@@ -512,7 +512,7 @@ public class AverageImageCommand
         Console.WriteLine($"Input file folder: {InputFileFolder}");
         Console.WriteLine($"Name of the output pfm file path: {OutputFilePathPfm}");
         Console.WriteLine($"Name of the output png file path: {OutputFilePathPng}");
-        Console.WriteLine($"LuminosityFunction: {LuminosityFunction}");
+        Console.WriteLine($"Luminosityfunction: {Luminosityfunction}");
         Console.WriteLine($"Averageluminosity: {AverageLuminosity}");
         Console.WriteLine($"Factor: {Factor}");
         Console.WriteLine($"Gamma: {Gamma}");
@@ -570,7 +570,7 @@ public class AverageImageCommand
         HDRImage.WritePFM_File(output, pfmFilePath);
         Console.WriteLine($"Pfm file created in: {pfmFilePath}");
 
-        output.WritePNG(OutputFilePathPfm, LuminosityFunction, Factor, Gamma, AverageLuminosity);
+        output.WritePNG(OutputFilePathPfm, Luminosityfunction, Factor, Gamma, AverageLuminosity);
         Console.WriteLine($"Png file created in: {pngFilePath}");
     }
 }

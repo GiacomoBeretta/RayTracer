@@ -33,7 +33,7 @@ while [[ $# -gt 0 ]]; do
     --initstate) initstate+=( "$2" ); shift 2 ;;
     --initseq) initseq+=( "$2" ); shift 2 ;;
     --sampleside) sampleside="$2"; shift 2 ;;
-    --luminosityFunction) lumfunction="$2"; shift 2 ;;
+    --luminosityfunction) lumfunction="$2"; shift 2 ;;
     --averageluminosity) averageluminosity="$2"; shift 2 ;; 
     --factor) factor="$2"; shift 2 ;;
     --gamma) gamma="$2"; shift 2 ;;
@@ -64,7 +64,7 @@ if [[ "$subcommand" == "render" ]]; then
 	[ -n "$numrays" ]           && cmd+=( --numrays "$numrays" )
 	[ -n "$maxdepth" ]          && cmd+=( --maxdepth "$maxdepth" )
 	[ -n "$sampleside" ]        && cmd+=( --sampleside "$sampleside" )
-	[ -n "$lumfunction" ]       && cmd+=( --luminosityFunction "$lumfunction" )
+	[ -n "$lumfunction" ]       && cmd+=( --luminosityfunction "$lumfunction" )
 	[ -n "$averageluminosity" ] && cmd+=( --averageluminosity "$averageluminosity" )
 	[ -n "$factor" ]            && cmd+=( --factor "$factor" )	
 	[ -n "$gamma" ]             && cmd+=( --gamma "$gamma" )
@@ -80,7 +80,7 @@ fi
 if [[ "$subcommand" == "pfmtopng" ]]; then
 	[ -n "$inputpfm" ]          && cmd+=( --inputpfm "$inputpfm" ) 
 	[ -n "$output" ]            && cmd+=( --output "$output" ) 
-	[ -n "$lumfunction" ]       && cmd+=( --luminosityFunction "$lumfunction" ) 
+	[ -n "$lumfunction" ]       && cmd+=( --luminosityfunction "$lumfunction" ) 
 	[ -n "$averageluminosity" ] && cmd+=( --averageluminosity "$averageluminosity" )
 	[ -n "$factor" ]            && cmd+=( --factor "$factor" ) 
 	[ -n "$gamma" ]             && cmd+=( --gamma "$gamma" ) 
@@ -89,7 +89,7 @@ fi
 if [[ "$subcommand" == "averageimage" ]]; then
 	[ -n "$inputaverage" ]      && cmd+=( --inputaverage "$inputaverage" ) 
 	[ -n "$outputaverage" ]     && cmd+=( --outputaverage "$outputaverage" ) 
-	[ -n "$lumfunction" ]       && cmd+=( --luminosityFunction "$lumfunction" ) 
+	[ -n "$lumfunction" ]       && cmd+=( --luminosityfunction "$lumfunction" ) 
 	[ -n "$averageluminosity" ] && cmd+=( --averageluminosity "$averageluminosity" )
 	[ -n "$factor" ]            && cmd+=( --factor "$factor" ) 
 	[ -n "$gamma" ]             && cmd+=( --gamma "$gamma" ) 
