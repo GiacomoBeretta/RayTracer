@@ -8,7 +8,7 @@ using System.ComponentModel.DataAnnotations;
 using SixLabors.ImageSharp.Metadata.Profiles.Exif; // per rendere le opzioni o gli argomenti required
 
 [Command(Name = "RayTracer")]
-[Subcommand(typeof(DemoCommand), typeof(PfmToPngCommand) , typeof(AverageImageCommand), typeof(RenderCommand))]
+[Subcommand(typeof(DemoCommand), typeof(PfmToPngCommand), typeof(AverageImageCommand), typeof(RenderCommand))]
 public class RayTracer
 {
     public static int Main(string[] args)
@@ -94,10 +94,10 @@ public class DemoCommand
         // Define materials
         var sphereTexture = new HDRImage(2, 2)
         {
-            [0,0] = new Color(0.1f, 0.2f, 0.3f),
-            [0,1] = new Color(0.2f, 0.1f, 0.3f),
-            [1,0] = new Color(0.3f, 0.2f, 0.1f),
-            [1,1] = new Color(0.3f, 0.1f, 0.2f)
+            [0, 0] = new Color(0.1f, 0.2f, 0.3f),
+            [0, 1] = new Color(0.2f, 0.1f, 0.3f),
+            [1, 0] = new Color(0.3f, 0.2f, 0.1f),
+            [1, 1] = new Color(0.3f, 0.1f, 0.2f)
         };
         var material1 = new Material(new UniformPigment(new Color(0.7f, 0.3f, 0.2f)), new DiffuseBRDF());
         var material2 =
@@ -303,9 +303,9 @@ public class PfmToPngCommand
         Console.WriteLine($"luminosity function: {LuminosityFunction}");
         Console.WriteLine($"factor: {Factor}");
         Console.WriteLine($"gamma: {Gamma}");
-        
+
         string currentPath = AppDomain.CurrentDomain.BaseDirectory;
-        
+
         if (Output[^4..] != ".png") Output += ".png"; //OutputFilename[^4..] Legge gli ultimi 4 caratteri
         string pngFilePath =
             Path.Combine(currentPath, "../../../../PngImages/",
@@ -313,12 +313,12 @@ public class PfmToPngCommand
 
         if (Input[^4..] != ".pfm") Input += ".pfm";
         string pfmFilePath = Path.Combine(currentPath, "../../../../PfmImages", Input);
-        
+
 
         HDRImage image = HDRImage.ReadPFM_File(pfmFilePath);
         Console.WriteLine($"File read in: {pfmFilePath}");
-        
-        image.WritePNG(pngFilePath, LuminosityFunction, Factor, Gamma, averageLuminosity:0.5f);
+
+        image.WritePNG(pngFilePath, LuminosityFunction, Factor, Gamma, averageLuminosity: 0.5f);
         Console.WriteLine($"File saved in: {pngFilePath}");
     }
 }
@@ -328,7 +328,7 @@ public class RenderCommand
 {
     [Option("--inputrender", Description = "The input scene file path")]
     public string InputScene { get; set; } = "scene.txt";
-    
+
     [Option("--width", Description = "The width of the image")]
     [Range(1, Int32.MaxValue)]
     public int Width { get; set; } = 500;
@@ -409,9 +409,9 @@ public class RenderCommand
         Console.WriteLine($"RouletteFixedProb: {RussianRouletteFixedProb}");
 
         string currentPath = AppDomain.CurrentDomain.BaseDirectory;
-        
+
         string scenePath = Path.Combine(currentPath, "../../../../Scenes/", InputScene);
-        
+
         if (OutputPng[^4..] != ".png") OutputPng += ".png"; //OutputFilename[^4..] Legge gli ultimi 4 caratteri
         string pngFilePath =
             Path.Combine(currentPath, "../../../../PngImages/",
@@ -419,7 +419,7 @@ public class RenderCommand
 
         if (OutputPfm[^4..] != ".pfm") OutputPfm += ".pfm";
         string pfmFilePath = Path.Combine(currentPath, "../../../../PfmImages", OutputPfm);
-        
+
 
         var scene = new Scene();
         var input = new InputStream(scenePath);
@@ -470,8 +470,10 @@ public class RenderCommand
     }
 }
 
-[Command(Name = "averageimage", Description = "Generate an image averaging the color of multiple images using different seed in pathtracing renderer")]
-public  class AverageImageCommand
+[Command(Name = "averageimage",
+    Description =
+        "Generate an image averaging the color of multiple images using different seed in pathtracing renderer")]
+public class AverageImageCommand
 {
     [Option("--inputaverage", Description = "Input file folder")]
     [Required]
@@ -480,7 +482,7 @@ public  class AverageImageCommand
     [Option("--outputaverage", Description = "Output file path")]
     [Required]
     public required string OutputFilePath { get; set; }
-    
+
     [Option("--luminosityFunction", Description = "Luminosity function, options are: shirley (default), weighted")]
     public LumFunction LuminosityFunction { get; set; } = LumFunction.Shirley;
 
@@ -494,7 +496,7 @@ public  class AverageImageCommand
     {
         Console.WriteLine($"Input file folder: {InputFileFolder}");
         Console.WriteLine($"Output file path: {OutputFilePath}");
-        
+
         //Aggiungere cartella e path specifico
 
         var files = Directory.GetFiles(InputFileFolder, "*_state*_seq*.pfm"); //search for pattern in folder
@@ -504,14 +506,14 @@ public  class AverageImageCommand
             Console.WriteLine("The folder is empty");
             return;
         }
-        
+
         //Using first file as accumulator
 
         var acc = HDRImage.ReadPFM_File(files[0]);
 
         var width = acc.Width;
         var height = acc.Height;
-        var length = acc._PixelOffset(width, height);
+        var length = width * height;
 
         Color[] average = new Color[length];
 
@@ -520,8 +522,9 @@ public  class AverageImageCommand
         for (var i = 0; i < files.Length; i++) images[i] = HDRImage.ReadPFM_File(files[i]);
 
         foreach (var image in images)
-        { 
-            if (image.Width != acc.Width || image.Height != acc.Height) throw new ArgumentException("Images must have equal width and height");
+        {
+            if (image.Width != acc.Width || image.Height != acc.Height)
+                throw new ArgumentException("Images must have equal width and height");
         }
 
         for (var i = 0; i < length; i++)
@@ -532,17 +535,15 @@ public  class AverageImageCommand
             }
 
             average[i] *= (1.0f / files.Length);
-
         }
 
         var output = new HDRImage(acc.Width, acc.Height, average);
-        
+
         HDRImage.WritePFM_File(output, OutputFilePath);
         Console.WriteLine($"Pfm file created in: {OutputFilePath}");
-        
+
         output.WritePNG(OutputFilePath, LuminosityFunction, Factor, Gamma, averageLuminosity: 0.5f);
         Console.WriteLine($"Png file created in: {OutputFilePath}");
-
     }
 }
 
