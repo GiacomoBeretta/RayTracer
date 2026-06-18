@@ -198,19 +198,19 @@ public class Scene
                 case Keyword.RotationX:
                     ExpectSymbol(inputFile, "(");
                     float degx = ExpectNumber(inputFile);
-                    result *= new Transformation('x', Functions.DegToRad(degx));
+                    result *= new Transformation(Axis.X, Functions.DegToRad(degx));
                     ExpectSymbol(inputFile, ")");
                     break;
                 case Keyword.RotationY:
                     ExpectSymbol(inputFile, "(");
                     float degy = ExpectNumber(inputFile);
-                    result *= new Transformation('y', Functions.DegToRad(degy));
+                    result *= new Transformation(Axis.Y, Functions.DegToRad(degy));
                     ExpectSymbol(inputFile, ")");
                     break;
                 case Keyword.RotationZ:
                     ExpectSymbol(inputFile, "(");
                     float degz = ExpectNumber(inputFile);
-                    result *= new Transformation('z', Functions.DegToRad(degz));
+                    result *= new Transformation(Axis.Z, Functions.DegToRad(degz));
                     ExpectSymbol(inputFile, ")");
                     break;
                 case Keyword.Scaling:

@@ -23,6 +23,8 @@ public struct HomMatrix
 
     //Constructors - Begin
 
+    #region Constructors
+
     /// <summary>
     /// Constructs a 4x4 identity matrix.
     /// </summary>
@@ -88,6 +90,8 @@ public struct HomMatrix
     /*public Transformation(Vector axis, float angle)
     {
     }*/
+
+    #endregion
 
     //Constructors - End
 
@@ -207,7 +211,7 @@ public struct HomMatrix
         }
         return invMatrix;
     }*/
-    
+
     /// <summary>
     /// Returns the product of two homogeneous transformation matrices.
     /// The computation is optimized by exploiting the fact that the last row
@@ -311,7 +315,9 @@ public struct Transformation
     public HomMatrix InvM { get; private set; }
 
     //Constructors - Begin
-    
+
+    #region Constructors
+
     /// <summary>
     /// Initializes an identity transformation.
     /// Both the transformation matrix and its inverse are set to the 4×4 identity matrix.
@@ -351,9 +357,9 @@ public struct Transformation
     }
 
     /// <summary>
-    /// Constructs a translation of vector k
+    /// Constructs a homogeneous transformation representing a pure translation using the given vector.
     /// </summary>
-    /// <param name="k"></param>
+    /// <param name="k">Translation vector.</param>
     public Transformation(Vector k)
     {
         M = new HomMatrix(k);
@@ -362,11 +368,11 @@ public struct Transformation
     }
 
     /// <summary>
-    /// Constructs a scale transformation along the x,y,z coordinates
+    /// Initializes a homogeneous transformation representing a diagonal scaling matrix.
     /// </summary>
-    /// <param name="scaleX"></param>
-    /// <param name="scaleY"></param>
-    /// <param name="scaleZ"></param>
+    /// <param name="scaleX">Scaling factor along the x-axis.</param>
+    /// <param name="scaleY">Scaling factor along the y-axis.</param>
+    /// <param name="scaleZ">Scaling factor along the z-axis.</param>
     public Transformation(float scaleX, float scaleY, float scaleZ)
     {
         if (scaleX == 0 || scaleY == 0 || scaleZ == 0)
@@ -381,24 +387,20 @@ public struct Transformation
     }
 
     /// <summary>
-    /// Constructs a rotation around one of the x,y,z axis
-    /// The angle is in radian
+    /// Initializes a homogeneous transformation representing a rotation
+    /// around one of the principal coordinate axes (X, Y, or Z).
+    /// The rotation follows the right-hand rule and uses radians.
     /// </summary>
-    /// <param name="axis"></param>
-    /// <param name="angle"></param>
-    public Transformation(char axis, float angle)
+    /// <param name="axis">Rotation axis (X, Y, or Z).</param>
+    /// <param name="angle">Rotation angle in radians.</param>
+    public Transformation(Axis axis, float angle)
     {
-        if (axis != 'x' && axis != 'y' && axis != 'z')
-        {
-            throw new ArgumentOutOfRangeException(nameof(axis), axis, nameof(axis) + " must be one of x,y,z");
-        }
-
         float c = MathF.Cos(angle);
         float s = MathF.Sin(angle);
 
         switch (axis)
         {
-            case 'x':
+            case Axis.X:
 
                 M = new HomMatrix
                 ([
@@ -415,7 +417,7 @@ public struct Transformation
                     0, 0, 0, 1
                 ]);
                 break;
-            case 'y':
+            case Axis.Y:
                 M = new HomMatrix
                 ([
                     c, 0, s, 0,
@@ -431,7 +433,7 @@ public struct Transformation
                     0, 0, 0, 1
                 ]);
                 break;
-            case 'z':
+            case Axis.Z:
                 M = new HomMatrix
                 ([
                     c, -s, 0, 0,
@@ -447,6 +449,8 @@ public struct Transformation
                     0, 0, 0, 1
                 ]);
                 break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(axis), axis, "Unsupported axis value.");
         }
 
         _CheckConsistency();
@@ -462,45 +466,55 @@ public struct Transformation
     /*public Transformation(Vector axis, float angle)
     {
     }*/
-    
+
+    #endregion
+
     //Constructors - End
 
     /// <summary>
-    /// 1D read only index for the matrix M
+    /// 1D index for the transformation atrix
+    /// (coefficients are stored in row-major order).
+    /// Valid range: 0–15.
     /// </summary>
     /// <param name="index"></param>
     public float this[Index index] => M[index];
 
     /// <summary>
-    /// 2D read only index for the matrix M
+    /// 2D read only index for the transformation matrix M
     /// </summary>
     /// <param name="row"></param>
     /// <param name="col"></param>
     public float this[int row, int col] => M[M._MatrixOffset(row, col)];
 
     /// <summary>
-    /// Returns if the product of the matrix M and its inverse InvM is (close) to the identity.
+    /// Verifies that <c>InvM</c> is the inverse of <c>M</c> by checking that
+    /// their product is approximately equal to the identity matrix.
     /// </summary>
-    /// <returns></returns>
-    public bool _IsConsistent()
-    {
-        HomMatrix identity = new HomMatrix();
-        return HomMatrix.AreMatricesClose(M * InvM, identity, 1e-4f);
-    }
-
-    /// <summary>
-    /// Checks if the product of the matrix M and its inverse InvM is (close) to the identity,
-    /// if not throws an exception.
-    /// </summary>
-    /// <exception cref="ArgumentException"></exception>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <c>M * InvM</c> is not sufficiently close to the identity matrix.
+    /// </exception>
     public void _CheckConsistency()
     {
-        if (!_IsConsistent())
+        HomMatrix identity = new HomMatrix();
+
+        if (!HomMatrix.AreMatricesClose(M * InvM, identity, 1e-4f))
         {
             throw new ArgumentException("if multiplied the matrix and its inverse do not return the identity matrix");
         }
     }
 
+    /// <summary>
+    /// Determines whether two transformations are approximately equal within
+    /// the specified tolerance by comparing both their transformation matrices
+    /// and inverse transformation matrices.
+    /// </summary>
+    /// <param name="t1">The first transformation to compare.</param>
+    /// <param name="t2">The second transformation to compare.</param>
+    /// <param name="epsilon">The maximum allowed difference between corresponding matrix elements.</param>
+    /// <returns>
+    /// True if both the transformation matrices and inverse matrices are
+    /// approximately equal; otherwise false.
+    /// </returns>
     public static bool AreTransformationsClose(in Transformation t1, in Transformation t2, float epsilon = 1e-5f)
     {
         return HomMatrix.AreMatricesClose(t1.M, t2.M, epsilon)
@@ -525,22 +539,24 @@ public struct Transformation
     }
 
     /// <summary>
-    /// Returns the inverse transformation, where the matrix corresponds to the inverse matrix and viceversa.
+    /// Returns the inverse of this transformation by swapping the transformation
+    /// matrix and its inverse.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>
+    /// A new transformation whose matrix is <c>InvM</c> and whose inverse matrix
+    /// is <c>M</c>.
+    /// </returns>
     public Transformation Inverse()
     {
         return new Transformation(InvM, M);
     }
-
+    
     /// <summary>
-    /// Returns the composition of the two transformations,
-    /// the matrix of the transformation is obtained by multiplying the two matrices M,
-    /// the inverse is computed as (AB)^-1 = (B^-1)(A^-1).
+    /// Returns the composition of two transformations.
+    /// The resulting transformation has matrix <c>t1.M * t2.M</c> and inverse
+    /// matrix <c>t2.InvM * t1.InvM</c>, according to
+    /// (AB)<sup>-1</sup> = B<sup>-1</sup>A<sup>-1</sup>.
     /// </summary>
-    /// <param name="t1"></param>
-    /// <param name="t2"></param>
-    /// <returns></returns>
     public static Transformation operator *(in Transformation t1, in Transformation t2)
     {
         HomMatrix prod = t1.M * t2.M;
@@ -587,10 +603,8 @@ public struct Transformation
         {
             return p2;
         }
-        else
-        {
-            return p2 * (1.0f / w);
-        }
+
+        return p2 * (1.0f / w);
     }
 
     /// <summary>
@@ -610,4 +624,11 @@ public struct Transformation
         );
         return n2;
     }
+}
+
+public enum Axis
+{
+    X,
+    Y,
+    Z
 }

@@ -110,14 +110,14 @@ public class DemoCommand
 
         if (Projection == Projection.Perspective)
         {
-            camera = new PerspectiveCamera(transformation: new Transformation('z', phiRad) *
-                                                           new Transformation('y', thetaRad) *
+            camera = new PerspectiveCamera(transformation: new Transformation(Axis.Z, phiRad) *
+                                                           new Transformation(Axis.Y, thetaRad) *
                                                            new Transformation(new Vector(-1.0f, 0f, 0f)));
         }
         else if (Projection == Projection.Orthogonal)
         {
-            camera = new OrthogonalCamera(transformation: new Transformation('z', phiRad) *
-                                                          new Transformation('y', thetaRad) *
+            camera = new OrthogonalCamera(transformation: new Transformation(Axis.Z, phiRad) *
+                                                          new Transformation(Axis.Y, thetaRad) *
                                                           new Transformation(new Vector(-1.0f, 0f, 0f)));
         }
         else
