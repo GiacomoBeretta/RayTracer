@@ -273,7 +273,7 @@ Example:
 Materials are defined using the following grammar:
 
 ```text
-material name_material(BRDF(pigment), emittedradiance)
+material name_material(BRDF(pigment), emitted_radiance)
 ```
 
 Example:
