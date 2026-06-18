@@ -517,7 +517,15 @@ public class AverageImageCommand
         Console.WriteLine($"Factor: {Factor}");
         Console.WriteLine($"Gamma: {Gamma}");
 
-        //Aggiungere cartella e path specifico
+        string currentPath = AppDomain.CurrentDomain.BaseDirectory;
+
+        if (OutputFilePathPng[^4..] != ".png") OutputFilePathPng += ".png"; //OutputFilename[^4..] Legge gli ultimi 4 caratteri
+        string pngFilePath =
+            Path.Combine(currentPath, "../../../../PngImages/",
+                OutputFilePathPng); //"../../../../DemoImages/" dal path dell'eseguibile torna indietro (Controllare)
+
+        if (OutputFilePathPfm[^4..] != ".pfm") OutputFilePathPfm += ".pfm";
+        string pfmFilePath = Path.Combine(currentPath, "../../../../PfmImages", OutputFilePathPfm);
 
         var files = Directory.GetFiles(InputFileFolder, "*_state*_seq*.pfm"); //search for pattern in folder
 
@@ -559,11 +567,11 @@ public class AverageImageCommand
 
         var output = new HDRImage(acc.Width, acc.Height, average);
 
-        HDRImage.WritePFM_File(output, OutputFilePathPfm);
-        Console.WriteLine($"Pfm file created in: {OutputFilePathPfm}");
+        HDRImage.WritePFM_File(output, pfmFilePath);
+        Console.WriteLine($"Pfm file created in: {pfmFilePath}");
 
         output.WritePNG(OutputFilePathPfm, LuminosityFunction, Factor, Gamma, AverageLuminosity);
-        Console.WriteLine($"Png file created in: {OutputFilePathPfm}");
+        Console.WriteLine($"Png file created in: {pngFilePath}");
     }
 }
 
