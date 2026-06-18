@@ -161,6 +161,446 @@ and can subsequently be combined into an MP4 animation using `generate-animation
 
 ---
 
+# Scene Description Language
+
+Scenes are described through a custom text-based language.
+
+The language allows the definition of:
+
+- floating-point variables;
+- vectors;
+- colors;
+- materials;
+- pigments;
+- BRDFs;
+- transformations;
+- geometric primitives;
+- cameras.
+
+An example scene is shown below:
+
+```text
+# Declare a floating-point variable named "clock"
+float clock(150)
+
+material sky_material(
+    diffuse(uniform(<0.5, 0.3, 0.1>)),
+    uniform(<0.7, 0.5, 1>)
+)
+
+material ground_material(
+    diffuse(checkered(<0.3, 0.5, 0.1>,
+                      <0.1, 0.2, 0.5>, 4)),
+    uniform(<0, 0, 0>)
+)
+
+material sphere_material(
+    specular(uniform(<0.5, 0.5, 0.5>)),
+    uniform(<0, 0, 0>)
+)
+
+sphere(sphere_material, translation([0, 0, 1]))
+
+plane(ground_material, identity)
+
+plane(sky_material,
+      translation([0, 0, 100]) * rotation_y(150))
+
+camera(
+    perspective,
+    rotation_z(clock) * translation([-4, 0, 1]),
+    1.0,
+    1.0
+)
+```
+
+---
+
+## Floating-Point Variables
+
+Floating-point variables can be declared using the following syntax:
+
+```text
+float name(value)
+```
+
+Example:
+
+```text
+float clock(150)
+```
+
+Variables can be used wherever a floating-point value is expected.
+
+---
+
+## Vectors
+
+Vectors are defined using square brackets:
+
+```text
+[x, y, z]
+```
+
+Example:
+
+```text
+[1, 2, 3]
+```
+
+---
+
+## Colors
+
+Colors are defined using angular brackets:
+
+```text
+<r, g, b>
+```
+
+Example:
+
+```text
+<0.5, 0.3, 0.1>
+```
+
+> **TODO:** document the valid range for `r`, `g`, and `b`.
+
+---
+
+## Materials
+
+Materials are defined using the following grammar:
+
+```text
+material name_material(BRDF(pigment), emittedradiance)
+```
+
+Example:
+
+```text
+material sphere_material(
+    specular(uniform(<0.5, 0.5, 0.5>)),
+    uniform(<0, 0, 0>)
+)
+```
+
+A material is composed of:
+
+- a BRDF;
+- an emitted radiance pigment.
+
+Materials are stored using their declared identifier and can be referenced by geometric primitives.
+
+The material name is used to associate a material with an object.
+
+---
+
+## BRDFs
+
+A BRDF is defined as:
+
+```text
+Keyword_BRDF(pigment)
+```
+
+where `Keyword_BRDF` can be:
+
+- `diffuse`
+- `specular`
+
+Examples:
+
+```text
+diffuse(uniform(<1, 0, 0>))
+```
+
+```text
+specular(uniform(<1, 1, 1>))
+```
+
+---
+
+## Pigments
+
+Pigments are defined as:
+
+```text
+Keyword_Pigment(...)
+```
+
+where `Keyword_Pigment` can be:
+
+- `uniform`
+- `checkered`
+- `image`
+
+### Uniform Pigment
+
+```text
+uniform(color)
+```
+
+Example:
+
+```text
+uniform(<1, 0, 0>)
+```
+
+### Checkered Pigment
+
+```text
+checkered(color1, color2, num_step)
+```
+
+Example:
+
+```text
+checkered(<1,0,0>, <0,0,1>, 8)
+```
+
+### Image Pigment
+
+```text
+image(filename)
+```
+
+Example:
+
+```text
+image("texture.pfm")
+```
+
+---
+
+## Geometric Primitives
+
+Currently supported primitives are:
+
+- `sphere`
+- `plane`
+
+Both primitives require a previously defined material identifier and a transformation.
+
+---
+
+## Sphere
+
+A sphere is defined as:
+
+```text
+sphere(name_material, transformation)
+```
+
+Example:
+
+```text
+sphere(
+    sphere_material,
+    translation([0,0,1])
+)
+```
+
+---
+
+## Plane
+
+A plane is defined as:
+
+```text
+plane(name_material, transformation)
+```
+
+Example:
+
+```text
+plane(
+    ground_material,
+    identity
+)
+```
+
+---
+
+## Material Declaration Order
+
+Materials must be declared before the geometric primitives that use them.
+
+The material identifier passed to a primitive must refer to an existing material.
+
+For example, this is valid:
+
+```text
+material sphere_material(
+    diffuse(uniform(<1, 0, 0>)),
+    uniform(<0, 0, 0>)
+)
+
+sphere(
+    sphere_material,
+    identity
+)
+```
+
+while this is not valid:
+
+```text
+sphere(
+    sphere_material,
+    identity
+)
+
+material sphere_material(
+    diffuse(uniform(<1, 0, 0>)),
+    uniform(<0, 0, 0>)
+)
+```
+
+The parser must know the material before the primitive is defined.
+
+A material definition cannot be directly embedded inside a primitive definition.
+
+For example, the following syntax is not supported:
+
+```text
+sphere(
+    material(
+        diffuse(uniform(<1, 0, 0>)),
+        uniform(<0, 0, 0>)
+    ),
+    identity
+)
+```
+
+The material must always be defined separately and referenced by its identifier.
+
+---
+
+## Transformations
+
+Transformations are defined using specific keywords.
+
+### Identity
+
+```text
+identity
+```
+
+### Translation
+
+```text
+translation(vector)
+```
+
+Example:
+
+```text
+translation([1, 0, 0])
+```
+
+### Rotation Around X
+
+```text
+rotation_x(angle)
+```
+
+### Rotation Around Y
+
+```text
+rotation_y(angle)
+```
+
+### Rotation Around Z
+
+```text
+rotation_z(angle)
+```
+
+where `angle` is expressed in degrees.
+
+### Scaling
+
+```text
+scaling(x, y, z)
+```
+
+Example:
+
+```text
+scaling(2, 1, 1)
+```
+
+### Transformation Composition
+
+An arbitrary number of transformations can be concatenated using the `*` operator.
+
+Example:
+
+```text
+translation([0,0,1]) *
+rotation_y(45) *
+scaling(2,2,2)
+```
+
+---
+
+## Cameras
+
+Cameras are defined as:
+
+```text
+camera(
+    Keyword_camera,
+    transformation,
+    aspect_ratio,
+    distance
+)
+```
+
+where `Keyword_camera` can be:
+
+- `orthogonal`
+- `perspective`
+
+Example:
+
+```text
+camera(
+    perspective,
+    identity,
+    1.0,
+    1.0
+)
+```
+
+### Note on Orthogonal Cameras
+
+Although an orthogonal camera does not use the `distance` parameter internally, the parameter must still be specified in order for the scene to be parsed correctly.
+
+Example:
+
+```text
+camera(
+    orthogonal,
+    identity,
+    1.0,
+    1.0
+)
+```
+
+---
+
+## Comments
+
+Comments can be inserted using the `#` character.
+
+Example:
+
+```text
+# This is a comment
+float clock(45)
+```
+
 ## Common Options
 
 The following options are available in multiple commands.
@@ -319,6 +759,13 @@ The following options are also available:
 ## Examples
 
 *Examples will be added here.*
+
+## Dependencies
+
+- .NET 10 SDK
+- Bash
+- GNU Parallel (optional, required for animation generation)
+- FFmpeg (required by generate-animation.sh)
 
 # How to install it
 
