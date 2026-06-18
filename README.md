@@ -2,27 +2,88 @@
 
 A C# application for generating photorealistic images using different rendering algorithms.
 
+## Table of Contents
+
+- [Purpose](#purpose)
+- [Dependencies](#dependencies)
+- [How to install it](#how-to-install-it)
+- [Usage](#usage)
+- [Workflow](#workflow)
+- [Scripts](#scripts)
+- [Scene Description Language](#scene-description-language)
+- [Command Options](#command-options)
+- [Examples](#examples)
+- [Where to ask for help](#where-to-ask-for-help)
+- [Future developments](#future-developments)
+- [How to contribute](#how-to-contribute)
+- [Authors](#authors)
+- [License](#license)
+- [State of the project](#state-of-the-project)
+
+---
+
 ## Purpose
 
 This project is a ray tracing renderer written in C# that generates photorealistic images from scene descriptions provided in text files.
 
-## Usage
+---
+
+## Dependencies
+
+- .NET 10 SDK
+- Bash
+- GNU Parallel (optional, required for animation generation)
+- FFmpeg (required by generate-animation.sh)
+
+---
+
+## How to install it
+
+This program works on Ubuntu 24.04 LTS.
+
+The unit tests were run on the following operating systems with the latest version of dotnet 10.0.x and they were all successful:
+
+Windows family:
+
+```
+OS Name:                       Microsoft Windows Server 2025 Datacenter
+OS Version:                    10.0.26100 N/A Build 26100
+BIOS Version:                  Microsoft Corporation Hyper-V UEFI Release v4.1, 1/8/2026
+```
+
+MacOS:
+
+```
+ProductName:                   macOS
+ProductVersion:                15.7.7
+BuildVersion:                  24G720
+```
+
+---
+
+# Usage
 
 The program provides several commands:
 
-### `render`
+## Commands
+
+### render
 
 Reads a scene description from a text file and generates the corresponding image.
 
 > **Note:** The scene files must be located inside the `Scene` directory.
 
-### `averageimage`
+---
 
-Generates a new image by averaging multiple PFM images of the same scene rendered using different seeds and sequence identifiers for the random number generator.
+### averageimage
+
+Generates a new image by averaging multiple PFM (Portable Float Map) images of the same scene rendered using different random generator states and sequence identifiers.
 
 The averaging is performed pixel by pixel in order to reduce image variance and noise.
 
-This command is designed to work together with the `raytracer.sh` script. When the script is configured to generate multiple renders using different random generator states and sequence identifiers, the generated PFM files are saved using the naming convention:
+This command is designed to work together with the `raytracer.sh` script.
+
+When the script is configured to generate multiple renders using different random generator states and sequence identifiers, the generated PFM files are saved using the naming convention:
 
 ```bash
 ${outputpfm%.pfm}_state${state}_seq${seq}.pfm
@@ -30,21 +91,25 @@ ${outputpfm%.pfm}_state${state}_seq${seq}.pfm
 
 The command automatically filters the files contained in the input directory and processes only the files matching this pattern.
 
-### `pfmtopng`
+---
 
-Converts images from the PFM (Portable Float Map) format to PNG format.
+### pfmtopng
+
+Converts images from the PFM (Portable Float Map) image format to PNG format.
 
 ---
 
-## Scripts
+# Scripts
 
 The project includes three Bash scripts that simplify image generation and post-processing operations:
 
-* `raytracer.sh`
-* `config.sh`
-* `generate-animation.sh`
+- `raytracer.sh`
+- `config.sh`
+- `generate-animation.sh`
 
-### `config.sh`
+---
+
+## config.sh
 
 This file contains the default values used by the different commands supported by the renderer.
 
@@ -52,9 +117,9 @@ By modifying the values in this file it is possible to generate different images
 
 In particular, the following options can be specified as arrays:
 
-* `initstate`
-* `initseq`
-* `declarefloat`
+- `initstate`
+- `initseq`
+- `declarefloat`
 
 The file also defines a boolean variable named:
 
@@ -68,14 +133,14 @@ When `pcgcycle` is set to `false` (default value), only the first value of the `
 
 When `pcgcycle` is set to `true`, the renderer is executed for every combination of state and sequence identifier contained in the two arrays.
 
-For example:
+Example:
 
 ```bash
 initstate=(45 12)
 initseq=(54 2)
 ```
 
-produces the following combinations:
+produces:
 
 ```text
 state=45, seq=54
@@ -84,7 +149,9 @@ state=12, seq=54
 state=12, seq=2
 ```
 
-### `raytracer.sh`
+---
+
+## raytracer.sh
 
 This script automates the execution of the renderer.
 
@@ -92,13 +159,13 @@ It loads the default values from `config.sh`, allows them to be overridden from 
 
 When `pcgcycle=true`, the script automatically executes the rendering process for every combination of random generator state and sequence identifier defined in `config.sh`.
 
-The generated files are named according to the following convention:
+The generated files are named:
 
 ```bash
 ${outputpfm%.pfm}_state${state}_seq${seq}.pfm
 ```
 
-and
+and:
 
 ```bash
 ${outputpng%.png}_state${state}_seq${seq}.png
@@ -106,7 +173,9 @@ ${outputpng%.png}_state${state}_seq${seq}.png
 
 This naming scheme is also used by the `averageimage` command to identify the images that must be averaged.
 
-### `generate-animation.sh`
+---
+
+## generate-animation.sh
 
 This script converts a sequence of PNG images into an MP4 video.
 
@@ -127,26 +196,30 @@ frame_002.png
 
 All matching images are combined into a single MP4 animation.
 
-The images can be generated automatically using the GNU Parallel library. A generic command has the following form:
+The images can be generated automatically using the GNU Parallel library.
+
+A generic command has the following form:
 
 ```bash
-seq -w START_ANGLE END_ANGLE | parallel -j NUM_CORES ./raytracer.sh render --declarefloat VARIABLE_NAME:{} --outputpfm frame_{}.pfm --outputpng frame_{}.png
+seq -w START_VALUE END_VALUE | parallel -j NUM_CORES ./raytracer.sh render --declarefloat VARIABLE_NAME:{} --outputpfm frame_{}.pfm --outputpng frame_{}.png
 ```
 
 where:
 
-* `START_ANGLE` and `END_ANGLE` define the range of values over which the animation is generated. A common use case is to let these values represent rotation angles.
-* `NUM_CORES` is the number of CPU cores used in parallel by GNU Parallel.
-* `VARIABLE_NAME` is the name of a floating-point variable declared inside the scene description file (`scene.txt`).
+- `START_VALUE` and `END_VALUE` define the range of values over which the animation is generated. A common use case is to let these values represent rotation angles.
+- `NUM_CORES` is the number of CPU cores used in parallel by GNU Parallel.
+- `VARIABLE_NAME` is the name of a floating-point variable declared inside the scene description file (`scene.txt`).
 
-The variable can then be used inside transformations defined in the scene. For example, if a transformation depends on a variable named `clock`, the command will render one frame for each value in the specified range and substitute the current value into the variable.
+The variable can then be used inside transformations defined in the scene.
+
+For example, if a transformation depends on a variable named `clock`, the command will render one frame for each value in the specified range and substitute the current value into the variable.
 
 This mechanism allows the generation of animation frames by varying a scene parameter such as:
 
-* object rotation;
-* object translation;
-* camera movement;
-* any other transformation controlled by a floating-point variable declared in the scene file.
+- object rotation;
+- object translation;
+- camera movement;
+- any other transformation controlled by a floating-point variable declared in the scene file.
 
 The generated frames are saved using the naming convention:
 
@@ -165,7 +238,7 @@ and can subsequently be combined into an MP4 animation using `generate-animation
 
 Scenes are described through a custom text-based language.
 
-The language allows the definition of:
+The scene language allows the definition of:
 
 - floating-point variables;
 - vectors;
@@ -218,7 +291,7 @@ camera(
 
 ## Floating-Point Variables
 
-Floating-point variables can be declared using the following syntax:
+Floating-point variables can be declared using:
 
 ```text
 float name(value)
@@ -270,10 +343,10 @@ Example:
 
 ## Materials
 
-Materials are defined using the following grammar:
+Materials are defined using:
 
 ```text
-material name_material(BRDF(pigment), emittedradiance)
+material name_material(BRDF(pigment), emitted_radiance)
 ```
 
 Example:
@@ -296,7 +369,7 @@ The material name is used to associate a material with an object.
 
 ---
 
-## BRDFs
+### BRDFs
 
 A BRDF is defined as:
 
@@ -321,7 +394,7 @@ specular(uniform(<1, 1, 1>))
 
 ---
 
-## Pigments
+### Pigments
 
 Pigments are defined as:
 
@@ -335,7 +408,9 @@ where `Keyword_Pigment` can be:
 - `checkered`
 - `image`
 
-### Uniform Pigment
+---
+
+#### Uniform Pigment
 
 ```text
 uniform(color)
@@ -347,7 +422,9 @@ Example:
 uniform(<1, 0, 0>)
 ```
 
-### Checkered Pigment
+---
+
+#### Checkered Pigment
 
 ```text
 checkered(color1, color2, num_step)
@@ -359,7 +436,9 @@ Example:
 checkered(<1,0,0>, <0,0,1>, 8)
 ```
 
-### Image Pigment
+---
+
+#### Image Pigment
 
 ```text
 image(filename)
@@ -384,7 +463,7 @@ Both primitives require a previously defined material identifier and a transform
 
 ---
 
-## Sphere
+### Sphere
 
 A sphere is defined as:
 
@@ -403,7 +482,7 @@ sphere(
 
 ---
 
-## Plane
+### Plane
 
 A plane is defined as:
 
@@ -422,55 +501,15 @@ plane(
 
 ---
 
-## Material Declaration Order
+### Material Declaration Order
 
 Materials must be declared before the geometric primitives that use them.
 
 The material identifier passed to a primitive must refer to an existing material.
 
-For example, this is valid:
-
-```text
-material sphere_material(
-    diffuse(uniform(<1, 0, 0>)),
-    uniform(<0, 0, 0>)
-)
-
-sphere(
-    sphere_material,
-    identity
-)
-```
-
-while this is not valid:
-
-```text
-sphere(
-    sphere_material,
-    identity
-)
-
-material sphere_material(
-    diffuse(uniform(<1, 0, 0>)),
-    uniform(<0, 0, 0>)
-)
-```
-
 The parser must know the material before the primitive is defined.
 
 A material definition cannot be directly embedded inside a primitive definition.
-
-For example, the following syntax is not supported:
-
-```text
-sphere(
-    material(
-        diffuse(uniform(<1, 0, 0>)),
-        uniform(<0, 0, 0>)
-    ),
-    identity
-)
-```
 
 The material must always be defined separately and referenced by its identifier.
 
@@ -486,6 +525,8 @@ Transformations are defined using specific keywords.
 identity
 ```
 
+---
+
 ### Translation
 
 ```text
@@ -495,8 +536,10 @@ translation(vector)
 Example:
 
 ```text
-translation([1, 0, 0])
+translation([1,0,0])
 ```
+
+---
 
 ### Rotation Around X
 
@@ -504,11 +547,15 @@ translation([1, 0, 0])
 rotation_x(angle)
 ```
 
+---
+
 ### Rotation Around Y
 
 ```text
 rotation_y(angle)
 ```
+
+---
 
 ### Rotation Around Z
 
@@ -517,6 +564,8 @@ rotation_z(angle)
 ```
 
 where `angle` is expressed in degrees.
+
+---
 
 ### Scaling
 
@@ -527,8 +576,10 @@ scaling(x, y, z)
 Example:
 
 ```text
-scaling(2, 1, 1)
+scaling(2,1,1)
 ```
+
+---
 
 ### Transformation Composition
 
@@ -573,20 +624,11 @@ camera(
 )
 ```
 
+---
+
 ### Note on Orthogonal Cameras
 
 Although an orthogonal camera does not use the `distance` parameter internally, the parameter must still be specified in order for the scene to be parsed correctly.
-
-Example:
-
-```text
-camera(
-    orthogonal,
-    identity,
-    1.0,
-    1.0
-)
-```
 
 ---
 
@@ -601,26 +643,13 @@ Example:
 float clock(45)
 ```
 
+---
+
+# Command Options
+
 ## Common Options
 
 The following options are available in multiple commands.
-
-### `--luminosityfunction`
-
-Luminosity function used in tone mapping.
-
-Available options:
-
-* `shirley`
-* `weighted`
-
-### `--factor`
-
-Empirical factor used during tone mapping.
-
-### `--gamma`
-
-Gamma correction factor applied during tone mapping.
 
 ---
 
@@ -648,9 +677,9 @@ Rendering algorithm to use.
 
 Available options:
 
-* `onoff`
-* `flat`
-* `pathtracer`
+- `onoff`
+- `flat`
+- `pathtracer`
 
 #### `--outputpfm`
 
@@ -672,13 +701,15 @@ Used only when the selected algorithm is `pathtracer`.
 
 #### `--maxdepth`
 
-Maximum recursion depth for each ray, i.e. the maximum number of reflections a ray can be subjected to, before returning the background color.
+Maximum recursion depth for each ray.
+
+It represents the maximum number of reflections a ray can undergo before returning the background color.
 
 Used only when the selected algorithm is `pathtracer`.
 
 #### `--initstate`
 
-Initial seed for the random number generator.
+Initial state for the random number generator.
 
 #### `--initseq`
 
@@ -690,7 +721,7 @@ Number of subdivisions per pixel side used for anti-aliasing.
 
 #### `--declarefloat` or `-d`
 
-Declares a floating-point variable using the following syntax:
+Declares a floating-point variable using:
 
 ```bash
 --declarefloat=NAME:VALUE
@@ -706,11 +737,11 @@ Optional fixed probability used by the Russian Roulette algorithm.
 
 If omitted, the probability is computed dynamically at each recursion step.
 
-The following options are also available:
+The following common options are also available:
 
-* `--luminosityfunction`
-* `--factor`
-* `--gamma`
+- `--luminosityfunction`
+- `--factor`
+- `--gamma`
 
 ---
 
@@ -728,11 +759,11 @@ Name of the generated averaged image.
 
 The command generates both a PFM image and its corresponding PNG representation.
 
-The following options are also available:
+The following common options are also available:
 
-* `--luminosityfunction`
-* `--factor`
-* `--gamma`
+- `--luminosityfunction`
+- `--factor`
+- `--gamma`
 
 ---
 
@@ -748,58 +779,42 @@ Name of the PFM file to convert.
 
 Name of the generated PNG image.
 
-The following options are also available:
+The following common options are also available:
 
-* `--luminosityfunction`
-* `--factor`
-* `--gamma`
+- `--luminosityfunction`
+- `--factor`
+- `--gamma`
 
 ---
 
-## Examples
+# Examples
 
 *Examples will be added here.*
 
-## Dependencies
-
-- .NET 10 SDK
-- Bash
-- GNU Parallel (optional, required for animation generation)
-- FFmpeg (required by generate-animation.sh)
-
-# How to install it
-
-This Program works on Ubuntu 24.04 LTS. The unit tests were run on these OSs with the latest version of dotnet 10.0.x and they were all successful:
-
-Windows family:
-
-```
-OS Name:                       Microsoft Windows Server 2025 Datacenter
-OS Version:                    10.0.26100 N/A Build 26100
-BIOS Version:                  Microsoft Corporation Hyper-V UEFI Release v4.1, 1/8/2026
-```
-
-MacOS:
-
-```
-ProductName:                   macOS
-ProductVersion:                15.7.7
-BuildVersion:                  24G720
-```
+---
 
 # Where to ask for help
 
+---
+
 # Future developments
 
+---
+
 # How to contribute
+
+---
 
 # Authors
 
 Giacomo Beretta, Simone Selmi
 
+---
+
 # License
 
 See the file LICENSE.md
 
-# State of the project
+---
 
+# State of the project
