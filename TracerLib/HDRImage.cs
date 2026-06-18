@@ -150,15 +150,13 @@ public class HDRImage
     }
 
     public Color[] this[Range range] => Pixels[range];
-
-    //forse è troppo mettere l'eccezione per offset?
+    
     /// <summary>
-    /// Gives the index integer for the one dimensional vector,
-    /// given the column and row of the corresponding matrix
+    /// Returns the index in a 1D array corresponding to the specified matrix column and row.
     /// </summary>
-    /// <param name="column"></param>
-    /// <param name="row"></param>
-    /// <returns></returns>
+    /// <param name="column">The column index.</param>
+    /// <param name="row">The row index.</param>
+    /// <returns>The computed 1D array index.</returns>
     public int _PixelOffset(int column, int row)
     {
         _ValidateCoordinates(column, row);
