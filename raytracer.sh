@@ -34,6 +34,7 @@ while [[ $# -gt 0 ]]; do
     --initseq) initseq+=( "$2" ); shift 2 ;;
     --sampleside) sampleside="$2"; shift 2 ;;
     --luminosityFunction) lumfunction="$2"; shift 2 ;;
+    --averageluminosity) averageluminosity="$2"; shift 2 ;; 
     --factor) factor="$2"; shift 2 ;;
     --gamma) gamma="$2"; shift 2 ;;
     --roulettestart) roulettestart="$2"; shift 2 ;;
@@ -56,18 +57,19 @@ cmd=( "$exepath" "$subcommand" )
 # Render
 
 if [[ "$subcommand" == "render" ]]; then
-	[ -n "$inputrender" ]          && cmd+=( --inputrender "$inputrender" )
-	[ -n "$width" ]          && cmd+=( --width "$width" )
-	[ -n "$height" ]         && cmd+=( --height "$height" )
-	[ -n "$algorithm" ]      && cmd+=( --algorithm "$algorithm" )
-	[ -n "$numrays" ]        && cmd+=( --numrays "$numrays" )
-	[ -n "$maxdepth" ]       && cmd+=( --maxdepth "$maxdepth" )
-	[ -n "$sampleside" ]     && cmd+=( --sampleside "$sampleside" )
-	[ -n "$lumfunction" ]    && cmd+=( --luminosityFunction "$lumfunction" )
-	[ -n "$factor" ]         && cmd+=( --factor "$factor" )	
-	[ -n "$gamma" ]          && cmd+=( --gamma "$gamma" )
-	[ -n "$roulettestart" ] && cmd+=( --roulettestart "$roulettestart" )
-	[ -n "$rouletteprob" ]  && cmd+=( --rouletteprob "$rouletteprob" )
+	[ -n "$inputrender" ]       && cmd+=( --inputrender "$inputrender" )
+	[ -n "$width" ]             && cmd+=( --width "$width" )
+	[ -n "$height" ]            && cmd+=( --height "$height" )
+	[ -n "$algorithm" ]         && cmd+=( --algorithm "$algorithm" )
+	[ -n "$numrays" ]           && cmd+=( --numrays "$numrays" )
+	[ -n "$maxdepth" ]          && cmd+=( --maxdepth "$maxdepth" )
+	[ -n "$sampleside" ]        && cmd+=( --sampleside "$sampleside" )
+	[ -n "$lumfunction" ]       && cmd+=( --luminosityFunction "$lumfunction" )
+	[ -n "$averageluminosity" ] && cmd+=( --averageluminosity "$averageluminosity" )
+	[ -n "$factor" ]            && cmd+=( --factor "$factor" )	
+	[ -n "$gamma" ]             && cmd+=( --gamma "$gamma" )
+	[ -n "$roulettestart" ]     && cmd+=( --roulettestart "$roulettestart" )
+	[ -n "$rouletteprob" ]      && cmd+=( --rouletteprob "$rouletteprob" )
 	for def in "${declarefloat[@]}"; do
         cmd+=( --declarefloat "$def" )
     	done
@@ -76,24 +78,26 @@ fi
 # Pfm to Png
 
 if [[ "$subcommand" == "pfmtopng" ]]; then
-	[ -n "$inputpfm" ]    && cmd+=( --inputpfm "$inputpfm" ) 
-	[ -n "$output" ]      && cmd+=( --output "$output" ) 
-	[ -n "$lumfunction" ] && cmd+=( --luminosityFunction "$lumfunction" ) 
-	[ -n "$factor" ]      && cmd+=( --factor "$factor" ) 
-	[ -n "$gamma" ]       && cmd+=( --gamma "$gamma" ) 
+	[ -n "$inputpfm" ]          && cmd+=( --inputpfm "$inputpfm" ) 
+	[ -n "$output" ]            && cmd+=( --output "$output" ) 
+	[ -n "$lumfunction" ]       && cmd+=( --luminosityFunction "$lumfunction" ) 
+	[ -n "$averageluminosity" ] && cmd+=( --averageluminosity "$averageluminosity" )
+	[ -n "$factor" ]            && cmd+=( --factor "$factor" ) 
+	[ -n "$gamma" ]             && cmd+=( --gamma "$gamma" ) 
 fi
 
 if [[ "$subcommand" == "averageimage" ]]; then
-	[ -n "$inputaverage" ]  && cmd+=( --inputaverage "$inputaverage" ) 
-	[ -n "$outputaverage" ] && cmd+=( --outputaverage "$outputaverage" ) 
-	[ -n "$lumfunction" ]   && cmd+=( --luminosityFunction "$lumfunction" ) 
-	[ -n "$factor" ]        && cmd+=( --factor "$factor" ) 
-	[ -n "$gamma" ]         && cmd+=( --gamma "$gamma" ) 
+	[ -n "$inputaverage" ]      && cmd+=( --inputaverage "$inputaverage" ) 
+	[ -n "$outputaverage" ]     && cmd+=( --outputaverage "$outputaverage" ) 
+	[ -n "$lumfunction" ]       && cmd+=( --luminosityFunction "$lumfunction" ) 
+	[ -n "$averageluminosity" ] && cmd+=( --averageluminosity "$averageluminosity" )
+	[ -n "$factor" ]            && cmd+=( --factor "$factor" ) 
+	[ -n "$gamma" ]             && cmd+=( --gamma "$gamma" ) 
 fi
 
 # Build
 
-# dotnet build || exit 1
+dotnet build || exit 1
 
 # Random generator cycle
 
