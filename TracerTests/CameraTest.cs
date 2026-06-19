@@ -65,7 +65,7 @@ public class CameraTest
     public void OrthogonalTransformTest()
     {
         OrthogonalCamera cam = new OrthogonalCamera(transformation: new Transformation(new Vector(0.0f, -2.0f, 0.0f)) *
-                                                                    new Transformation('z', MathF.PI / 2));
+                                                                    new Transformation(Axis.Z, MathF.PI / 2));
         Ray ray = cam.FireRay(0.5f, 0.5f);
 
         Assert.True(Point._ArePointsClose(ray.At(1.0f), new Point(0.0f, -2.0f, 0.0f)));
@@ -75,7 +75,7 @@ public class CameraTest
     public void PerspectiveTransformTest()
     {
         OrthogonalCamera cam = new OrthogonalCamera(transformation: new Transformation(new Vector(0.0f, -2.0f, 0.0f)) *
-                                                                    new Transformation('z', MathF.PI / 2));
+                                                                    new Transformation(Axis.Z, MathF.PI / 2));
         Ray ray = cam.FireRay(0.5f, 0.5f);
 
         Assert.True(Point._ArePointsClose(ray.At(1.0f), new Point(0.0f, -2.0f, 0.0f)));
