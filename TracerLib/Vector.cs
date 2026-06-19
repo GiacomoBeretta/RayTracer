@@ -47,7 +47,7 @@ public struct Vector
     /// <param name="v2">The second vector to compare.</param>
     /// <param name="epsilon">The tolerance used when comparing each coefficient of the vectors.</param>
     /// <returns>
-    /// /// True if the absolute difference between corresponding coefficients of the two vectors
+    /// True if the absolute difference between corresponding coefficients of the two vectors
     /// is less than or equal to the specified tolerance; otherwise, false.
     /// </returns>
     public static bool _AreVectorsClose(Vector v1, Vector v2, float epsilon = 1e-5f)
