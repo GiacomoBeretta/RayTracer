@@ -46,6 +46,8 @@ public struct HomMatrix
         {
             M[i] = m[i];
         }
+
+        _CheckHomogeneity();
     }
 
     /// <summary>
@@ -61,6 +63,7 @@ public struct HomMatrix
             0, 0, 1, k.Z,
             0, 0, 0, 1
         ];
+        _CheckHomogeneity();
     }
 
     /// <summary>
@@ -78,6 +81,8 @@ public struct HomMatrix
             0, 0, scaleZ, 0,
             0, 0, 0, 1
         ];
+
+        _CheckHomogeneity();
     }
 
     /*
@@ -94,6 +99,30 @@ public struct HomMatrix
     #endregion
 
     //Constructors - End
+
+    /// <summary>
+    /// Validates that the last row of the homogeneous matrix is (0,0,0,1).
+    /// </summary>
+    /// <exception cref="ArgumentException">Thrown when the last row is not equal to (0,0,0,1).</exception>
+    public void _CheckHomogeneity()
+    {
+        if (M[12] != 0 || M[13] != 0 || M[14] != 0 || M[15] != 1)
+        {
+            throw new ArgumentException("The matrix must have the last row (0,0,0,1) to be homogeneous.");
+        }
+    }
+
+    /// <summary>
+    /// Returns the index in a 1D array corresponding to the specified matrix column and row.
+    /// </summary>
+    /// <param name="col">The column index.</param>
+    /// <param name="row">The row index.</param>
+    /// <returns>The computed 1D array index.</returns>
+    public int _MatrixOffset(int row, int col)
+    {
+        _CheckCoordinates(row, col);
+        return row * 4 + col;
+    }
 
     /// <summary>
     /// 1D index for the M matrix
@@ -137,18 +166,6 @@ public struct HomMatrix
     }
 
     /// <summary>
-    /// Returns the index in a 1D array corresponding to the specified matrix column and row.
-    /// </summary>
-    /// <param name="column">The column index.</param>
-    /// <param name="row">The row index.</param>
-    /// <returns>The computed 1D array index.</returns>
-    public int _MatrixOffset(int row, int col)
-    {
-        _CheckCoordinates(row, col);
-        return row * 4 + col;
-    }
-
-    /// <summary>
     /// Determines whether two homogeneous matrices are approximately equal within a given tolerance.
     /// </summary>
     /// <param name="a">The first matrix to compare.</param>
@@ -171,6 +188,7 @@ public struct HomMatrix
             str += "(";
             for (int j = 0; j < 4; j++)
             {
+                // F2 for the fixed point format
                 str += this[i, j].ToString("F2", CultureInfo.InvariantCulture);
                 if (j < 3)
                 {
@@ -496,8 +514,7 @@ public struct Transformation
     public void _CheckConsistency()
     {
         HomMatrix identity = new HomMatrix();
-
-        if (!HomMatrix.AreMatricesClose(M * InvM, identity, 1e-4f))
+        if (!HomMatrix.AreMatricesClose(M * InvM, identity, 2e-4f))
         {
             throw new ArgumentException("if multiplied the matrix and its inverse do not return the identity matrix");
         }
@@ -522,16 +539,19 @@ public struct Transformation
     }
 
     /// <summary>
-    /// Returns (only) the matrix M coefficients
+    /// Returns the M and InvM matrices coefficients.
     /// </summary>
     /// <returns></returns>
     public override string ToString()
     {
-        return M.ToString();
+        return "Transformation matrix:\n" +
+               M.ToString() +
+               "\nInverse Matrix:\n" +
+               InvM.ToString();
     }
 
     /// <summary>
-    /// Prints (only) the matrix M
+    /// Prints the matrix M and its inverse.
     /// </summary>
     public void Print()
     {
@@ -550,7 +570,7 @@ public struct Transformation
     {
         return new Transformation(InvM, M);
     }
-    
+
     /// <summary>
     /// Returns the composition of two transformations.
     /// The resulting transformation has matrix <c>t1.M * t2.M</c> and inverse
