@@ -176,6 +176,9 @@ public class HDRImage
     }
 
     //Constructors - Begin
+
+    #region Constructors
+
     public HDRImage(int width, int height)
     {
         _CheckWidthHeight(width, height);
@@ -240,6 +243,8 @@ public class HDRImage
         }
     }
 
+    #endregion
+    
     //Constructors - End
 
     //meglio usare stringBuilder qua
@@ -293,6 +298,8 @@ public class HDRImage
     }
 
     //Methods for Read and Write PFM files - Begin
+
+    #region PFM_Files
 
     /// <summary>
     /// Parses an image size string and extracts width and height values.
@@ -598,11 +605,15 @@ public class HDRImage
         }
     }
 
-    //Methods for Read and Write PFM files - End
+    #endregion
+    
+    // Methods for Read and Write PFM files - End
 
     // Methods for conversion to an LDR Image (Tone mapping) - Begin
-    
-    /// <summary>
+
+    #region Tone_mapping
+
+     /// <summary>
     /// Computes the logarithmic average luminosity of the image.
     /// The luminosity of each pixel is evaluated according to the specified <see cref="LumFunction"/>
     /// (Shirley = Shirley and Morley method, Weighted = Weighted Average)
@@ -721,6 +732,8 @@ public class HDRImage
         return image;
     }
 
+    #endregion
+    
     // Methods for conversion to an LDR Image - End
     
     /// <summary>
