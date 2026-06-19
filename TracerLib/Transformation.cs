@@ -583,14 +583,15 @@ public struct Transformation
         HomMatrix invProd = t2.InvM * t1.InvM;
         return new Transformation(prod, invProd);
     }
-
+    
     /// <summary>
-    /// Returns the transformed vector obtained by multiplying the matrix by the vector (matrix–vector multiplication).
-    /// We use homogeneous coordinates, so the vectors have their 4th coordinate equal to 0.
+    /// Transforms a vector using the specified transformation matrix.
+    /// We use homogeneous coordinates, so the vectors are expected to have their 4th coordinate equal to 0.
     /// </summary>
-    /// <param name="t"></param>
-    /// <param name="v"></param>
-    /// <returns></returns>
+    /// <param name="t">The transformation to apply.</param>
+    /// <param name="v">The vector to transform.</param>
+    /// <returns>A new vector resulting from the matrix–vector multiplication.
+    /// </returns>
     public static Vector operator *(in Transformation t, Vector v)
     {
         Vector v2 = new Vector
@@ -601,24 +602,24 @@ public struct Transformation
         );
         return v2;
     }
-
+    
     /// <summary>
-    /// Returns the transformed point obtained by multiplying the matrix by the point (matrix–vector multiplication).
+    /// Applies the transformation to a point.
     /// We use homogeneous coordinates, so the points have their 4th coordinate equal to 1.
     /// </summary>
-    /// <param name="t"></param>
-    /// <param name="p1"></param>
+    /// <param name="t">The transformation to apply.</param>
+    /// <param name="p">The point to transform.</param>
     /// <returns></returns>
-    public static Point operator *(in Transformation t, Point p1)
+    public static Point operator *(in Transformation t, Point p)
     {
         Point p2 = new Point
         (
-            t[0] * p1.X + t[1] * p1.Y + t[2] * p1.Z + t[3],
-            t[4] * p1.X + t[5] * p1.Y + t[6] * p1.Z + t[7],
-            t[8] * p1.X + t[9] * p1.Y + t[10] * p1.Z + t[11]
+            t[0] * p.X + t[1] * p.Y + t[2] * p.Z + t[3],
+            t[4] * p.X + t[5] * p.Y + t[6] * p.Z + t[7],
+            t[8] * p.X + t[9] * p.Y + t[10] * p.Z + t[11]
         );
 
-        float w = t[12] * p1.X + t[13] * p1.Y + t[14] * p1.Z + t[15];
+        float w = t[12] * p.X + t[13] * p.Y + t[14] * p.Z + t[15];
         if (w == 1.0f)
         {
             return p2;
@@ -626,14 +627,14 @@ public struct Transformation
 
         return p2 * (1.0f / w);
     }
-
+    
     /// <summary>
-    /// Returns the transformed normal,
-    /// obtained multiplying the transpose of the inverse matrix by the normal.
+    /// Transforms a normal vector using the inverse transpose of the
+    /// transformation matrix.
     /// </summary>
-    /// <param name="t"></param>
-    /// <param name="n1"></param>
-    /// <returns></returns>
+    /// <param name="t">The transformation to apply.</param>
+    /// <param name="n1">The normal to transform.</param>
+    /// <returns>The transformed normal.</returns>
     public static Normal operator *(in Transformation t, Normal n1)
     {
         Normal n2 = new Normal
