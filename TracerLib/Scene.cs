@@ -16,6 +16,12 @@ public class Scene
     public Dictionary<string, float> Variables { get; set; } = new();
     //Overridden variables???
 
+    /// <summary>
+    /// Reads the next token and validates that it is a symbol token that contains the symbol expected.
+    /// </summary>
+    /// <param name="inputFile"></param>
+    /// <param name="symbol">The symbol expected.</param>
+    /// <exception cref="SceneSyntaxException"></exception>
     public void ExpectSymbol(InputStream inputFile, string symbol)
     {
         Token token = inputFile.ReadNextToken();
@@ -33,10 +39,11 @@ public class Scene
         {
             throw new SceneSyntaxException(token.Location, $"expected keyword instead of {token}");
         }
-        else if (!keywords.Contains(keywordToken.Keyword))
+        
+        if (!keywords.Contains(keywordToken.Keyword))
         {
             throw new SceneSyntaxException(token.Location,
-                $"expect one of the following keywords: {string.Join(',', keywords)} instead of {token}");
+                $"expect one of the following keywords: {string.Join(", ", keywords)} instead of {token}");
         }
 
         return keywordToken.Keyword;
