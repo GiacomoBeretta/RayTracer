@@ -334,20 +334,21 @@ public class HDRImage
             throw new InvalidPfmFileFormatException("height must be greater than zero.");
         }
     }
-
-    /* /// <summary>
+    
+     /// <summary>
      /// Parses the endianness value from a PFM file string.
      /// </summary>
      /// <param name="stringEndianness">
-     /// The endianness value as string. Valid values are "1", "+1", "1.0", "+1.0" for Big Endian,
-     /// and "-1", "-1.0" for Little Endian.
+     /// A string representing a floating-point scale factor.
+     /// Positive values indicate Big Endian byte order, while non-positive values
+     /// indicate Little Endian byte order.
      /// </param>
      /// <returns>
-     /// The parsed <see cref="Endianness"/> value corresponding to the input string.
+     /// The <see cref="Endianness"/> corresponding to the sign of the parsed value.
      /// </returns>
      /// <exception cref="InvalidPfmFileFormatException">
-     /// Thrown when the input string is not a valid endianness value.
-     /// </exception>*/
+     /// Thrown when <paramref name="stringEndianness"/> cannot be parsed as a floating-point number.
+     /// </exception>
     public static Endianness _ParseEndianness(string stringEndianness)
     {
         if (Single.TryParse(stringEndianness, out float number))
