@@ -95,7 +95,7 @@ public class InputStream : IDisposable
     /// <summary>
     /// Reads the next char in the stream, updating the current source location accordingly.
     /// If a saved character is available, it is returned before reading from the underlying stream.
-    /// Returns <c>null</c> when the end of the stream is reached.
+    /// Returns <c>null</c> when the end of the stream is reached (without updating the <see cref="Location"/>).
     /// </summary>
     /// <returns>The next character in the input stream, or <c>null</c> if the end of the file has been reached.</returns>
     public char? ReadChar()
@@ -116,6 +116,31 @@ public class InputStream : IDisposable
         // if there was a saved char, the location was behind of this char c, so we need to update the position now.
         UpdateLocation(c);
         return c;
+    }
+
+    /// <summary>
+    /// Reads the next character from the input stream.
+    /// Throws a <see cref="SceneSyntaxException"/> if the end of the input
+    /// is reached before a character can be read.
+    /// </summary>
+    /// <param name="errorLocation">
+    /// The source location to associate with the generated exception.
+    /// </param>
+    /// <returns>
+    /// The next character from the input stream.
+    /// </returns>
+    /// <exception cref="SceneSyntaxException">
+    /// Thrown when the end of the input is reached.
+    /// </exception>
+    public char ReadRequiredChar(SourceLocation errorLocation)
+    {
+        char? ch = ReadChar();
+        if (ch == null)
+        {
+            throw new SceneSyntaxException(errorLocation, "unterminated number: reached end of file.");
+        }
+
+        return ch.Value;
     }
 
     /// <summary>
@@ -166,21 +191,21 @@ public class InputStream : IDisposable
         while (true)
         {
             char? ch = ReadChar();
-            
+
             if (ch == null) return;
-            
+
             switch (ch.Value)
             {
                 case '#':
                     SkipLine();
                     continue;
-                
+
                 case ' ':
                 case '\t':
                 case '\r':
                 case '\n':
                     continue;
-                
+
                 default:
                     // push back non-whitespace, non-comment character
                     UnreadChar(ch.Value);
@@ -193,7 +218,7 @@ public class InputStream : IDisposable
 
     /// <summary>
     /// Parses a string literal token starting at the given source location.
-    /// The string is read until the closing quotation mark (") is found.
+    /// Characters are read verbatim until the next quotation mark (").
     /// Throws a <see cref="SceneSyntaxException"/> if the string is unterminated.
     /// </summary>
     /// <param name="tokenLocation">
@@ -205,34 +230,36 @@ public class InputStream : IDisposable
     public StringToken _ParseStringToken(SourceLocation tokenLocation)
     {
         StringBuilder sb = new StringBuilder();
-        
+
         while (true)
         {
             char? ch = ReadChar();
 
             if (ch == null) throw new SceneSyntaxException(tokenLocation, "unterminated string");
             if (ch.Value == '"') break;
-
-            sb.Append(ch);
+            sb.Append(ch.Value);
         }
-        
+
         return new StringToken(tokenLocation, sb.ToString());
     }
 
-    //prova con i caratteri exp ecc. 
-    /// <summary>
-    /// tokenLocation serve perché leggendo mano a mano i caratteri la location si aggiorna e va avanti
-    /// </summary>
-    /// <param name="firstChar"></param>
-    /// <param name="tokenLocation"></param>
-    /// <returns></returns>
-    /// <exception cref="SceneSyntaxException"></exception>
-    public LiteralNumberToken _ParseFloatToken(char firstChar, SourceLocation tokenLocation)
+    ///  <summary>
+    /// Parses a floating-point numeric literal starting with the specified character.
+    ///  Supports optional leading sign (+/-), decimal notation, and scientific
+    ///  notation using an exponent (e.g. 1.23e-4).
+    ///  </summary>
+    ///  <param name="tokenLocation">The source location where the numeric token begins,
+    ///      (used in the constructor of <see cref="LiteralNumberToken"/>, and to throw the exceptions.
+    ///  </param>
+    ///  <param name="firstChar">The first character of the numeric literal that has already been read.
+    ///      This may be a digit or a leading sign (+/-).</param>
+    ///  <returns>A <see cref="LiteralNumberToken"/> containing the parsed floating-point value.</returns>
+    ///  <exception cref="SceneSyntaxException">Thrown when the numeric literal is malformed or reaches the end of the
+    ///  input before a valid number can be completed.</exception>
+    public LiteralNumberToken _ParseFloatToken(SourceLocation tokenLocation, char firstChar)
     {
         string floatString = firstChar.ToString();
-        //const string expChar = "eE";
-        //const string signs = "+-"; // signs for exponents (the sign of the value is already read in the first char)
-        bool hasReadExpSign = false;
+        // bool hasReadExpSign = false;
         bool hasReadExpChar = false;
         bool hasReadDot = false; // the decimal point
         float value;
@@ -240,20 +267,16 @@ public class InputStream : IDisposable
         // if the first char is a sign we expect to read next a digit otherwise we throw an exception
         if (firstChar == '+' || firstChar == '-')
         {
-            char? ch = ReadChar();
-            if (ch == null)
-            {
-                throw new SceneSyntaxException(tokenLocation, "unterminated number: reached end of file.");
-            }
+            char ch = ReadRequiredChar(tokenLocation);
 
-            if (!char.IsDigit(ch.Value))
+            if (!char.IsDigit(ch))
             {
-                UnreadChar(ch.Value);
+                UnreadChar(ch);
                 throw new SceneSyntaxException(tokenLocation,
                     "invalid number: after the sign of the number must follow a number");
             }
 
-            floatString += ch.Value;
+            floatString += ch;
         }
 
         while (true)
@@ -280,11 +303,7 @@ public class InputStream : IDisposable
                 floatString += ch.Value;
 
                 // Read the char after the dot: it must be a number
-                ch = ReadChar();
-                if (ch == null)
-                {
-                    throw new SceneSyntaxException(tokenLocation, "unterminated number: reached end of file.");
-                }
+                ch = ReadRequiredChar(tokenLocation);
 
                 if (!char.IsDigit(ch.Value))
                 {
@@ -311,31 +330,15 @@ public class InputStream : IDisposable
                 hasReadExpChar = true;
                 floatString += ch.Value;
 
-                ch = ReadChar();
-                if (ch == null)
-                {
-                    throw new SceneSyntaxException(tokenLocation, "unterminated number: reached end of file.");
-                }
+                ch = ReadRequiredChar(tokenLocation);
 
+                // if there is an exponent sign after it there must be a number
                 if (ch == '+' || ch == '-')
                 {
-                    if (hasReadExpSign)
-                    {
-                        UnreadChar(ch.Value);
-                        throw new SceneSyntaxException(tokenLocation,
-                            "invalid number: have been read two exponent signs.");
-                    }
+                    floatString += ch.Value;
 
-                    hasReadExpSign = true;
-                    floatString += ch;
+                    ch = ReadRequiredChar(tokenLocation);
 
-                    ch = ReadChar();
-                    if (ch == null)
-                    {
-                        throw new SceneSyntaxException(tokenLocation, "unterminated number: reached end of file.");
-                    }
-
-                    // after the exponent sign must follow a number
                     if (!char.IsDigit(ch.Value))
                     {
                         UnreadChar(ch.Value);
@@ -368,71 +371,56 @@ public class InputStream : IDisposable
             }
         }
 
-        try
-        {
-            value = float.Parse(floatString, CultureInfo.InvariantCulture);
-        }
-        catch (Exception)
+        if (!float.TryParse(floatString, CultureInfo.InvariantCulture, out value))
         {
             throw new SceneSyntaxException(tokenLocation, $"{floatString} is an invalid floating point number");
         }
 
-        return new LiteralNumberToken(tokenLocation, value: value);
+        return new LiteralNumberToken(tokenLocation, value);
     }
 
-    // vecchio parseFloatToken
-    /*public LiteralNumberToken _ParseFloatToken(char firstChar, SourceLocation tokenLocation)
+    /// <summary>
+    /// Parses an identifier or keyword token starting from the first character already read.
+    /// </summary>
+    /// <param name="tokenLocation">The source location where the token starts.</param>
+    /// <param name="firstChar">The first character of the identifier, already read from the input.</param>
+    /// <returns>
+    /// A <see cref="KeywordToken"/> if the parsed lexeme matches a known keyword;
+    /// otherwise an <see cref="IdentifierToken"/> containing the parsed identifier.
+    /// </returns>
+    /// <remarks>
+    /// This method reads characters from the input stream until it encounters a character
+    /// that is not a letter, digit, or underscore ('_').
+    /// The first non-matching character is unread.
+    /// 
+    /// The initial character (<paramref name="firstChar"/>) is assumed to already be validated
+    /// as a valid identifier start character.
+    /// 
+    /// Identifier grammar:
+    /// <code>
+    /// identifier := (letter | '_') (letter | digit | '_')*
+    /// </code>
+    /// </remarks>
+    public Token _ParseKeywordIdentifierToken(SourceLocation tokenLocation, char firstChar)
     {
-        string floatString = firstChar.ToString();
-        const string expChar = "eE";
-        const string signs = "+-"; // signs for exponents (the sign of the value is already read in the first char)
-
-        float value;
-
-        while (true)
-        {
-            char? ch = ReadChar();
-            // if it has been reached the end of file
-            if (ch == null) break;
-
-            if (!Char.IsDigit(ch.Value) && ch.Value != '.' &&
-                !expChar.Contains(ch.Value) && !signs.Contains(ch.Value))
-            {
-                UnreadChar(ch.Value);
-                break;
-            }
-            floatString += ch;
-        }
-
-        try
-        {
-            value = float.Parse(floatString, CultureInfo.InvariantCulture);
-        }
-        catch (Exception)
-        {
-            throw new SceneSyntaxException(tokenLocation, $"{floatString} is an invalid floating point number");
-        }
-
-        return new LiteralNumberToken(tokenLocation, value: value);
-    }*/
-
-    public Token _ParseKeywordIdentifierToken(char firstChar, SourceLocation tokenLocation)
-    {
-        string tokenString = firstChar.ToString();
+        StringBuilder sb = new StringBuilder();
+        sb.Append(firstChar);
 
         while (true)
         {
             char? ch = ReadChar();
 
             if (ch == null) break;
-            if (!char.IsLetterOrDigit(ch.Value) && ch.Value != '_')
+            if (ch.Value != '_' && !char.IsLetterOrDigit(ch.Value))
             {
                 UnreadChar(ch.Value);
                 break;
             }
 
-            tokenString += ch;
+            sb.Append(ch.Value);
         }
+
+        string tokenString = sb.ToString();
 
         if (Keywords.Map.TryGetValue(tokenString, out Keyword keyword))
         {
@@ -443,21 +431,25 @@ public class InputStream : IDisposable
     }
 
     // Parse_Token methods - End 
-
+    
     /// <summary>
-    /// Reads and returns the next Token that appears in the stream (skipping whitespaces, new lines and comments)
+    /// Reads the next token from the input stream, skipping whitespace,
+    /// newlines, and comments.
     /// </summary>
-    /// <returns></returns>
-    /// <exception cref="SceneSyntaxException"></exception>
+    /// <remarks>
+    /// If a previously saved token is available, it is returned immediately.
+    /// Otherwise, the lexer skips whitespace and comments, determines the token
+    /// type based on the next character, and parses the corresponding token.
+    /// Supported token categories include symbols, string literals, numeric values,
+    /// identifiers, and keywords. If the end of the input is reached, a
+    /// <see cref="StopToken"/> is returned.
+    /// </remarks>
+    /// <returns>The next token in the stream.</returns>
+    /// <exception cref="SceneSyntaxException">
+    /// Thrown when an invalid character is encountered.
+    /// </exception>
     public Token ReadNextToken()
     {
-        // '<>' are for the colors, '[]' for the vectors and points, ',' for separating numbers,
-        // '*' for composing transformations
-        const string symbols = "()<>[],*";
-        // const string op = "+-."; // non so a cosa serve il punto e per ora
-        // lo commento così quando salta fuori ce ne accorgiamo subito
-        const string signs = "+-";
-
         if (SavedToken != null)
         {
             Token result = SavedToken;
@@ -466,40 +458,58 @@ public class InputStream : IDisposable
         }
 
         SkipWhitespacesAndComments();
+
+        // save the token location as the position before reading the first char of the token
+        SourceLocation tokenLocation = Location;
+
         char? ch = ReadChar();
         if (ch == null)
         {
-            return new StopToken(Location);
+            return new StopToken(tokenLocation);
+        }
+        
+        switch (ch.Value)
+        {
+            case '(':
+            case ')':
+            case '[': // '[]' for the vectors and points,
+            case ']':
+            case '<': // '<>' are for the colors,
+            case '>':
+            case ',':
+            case '*': // '*' for composing transformations
+                //invertire location e value per conformare agli altri token o viceversa invertire gli altri
+                return new SymbolToken(tokenLocation, ch.Value.ToString());
+            case '\"':
+                return _ParseStringToken(tokenLocation);
         }
 
-        //SourceLocation tokenLocation = Location;
+        if (char.IsDigit(ch.Value) || ch.Value == '+' || ch.Value == '-')
+        {
+            return _ParseFloatToken(tokenLocation, ch.Value);
+        }
 
-        if (symbols.Contains(ch.Value))
+        if (char.IsLetter(ch.Value) || ch.Value == '_')
         {
-            //invertire location e value per conformare agli altri token o viceversa invertire gli altri
-            return new SymbolToken(Location, ch.Value.ToString());
+            return _ParseKeywordIdentifierToken(tokenLocation, ch.Value);
         }
-        else if (ch == '\"')
-        {
-            return _ParseStringToken(Location);
-        }
-        else if (char.IsDigit(ch.Value) || signs.Contains(ch.Value))
-        {
-            return _ParseFloatToken(ch.Value, Location);
-        }
-        else if (char.IsLetter(ch.Value) || ch.Value == '_')
-        {
-            return _ParseKeywordIdentifierToken(ch.Value, Location);
-        }
-        else
-        {
-            throw new SceneSyntaxException(Location, $"invalid character {ch}");
-        }
+
+        throw new SceneSyntaxException(tokenLocation, $"invalid character '{ch}'");
     }
-
+    
+    /// <summary>
+    /// Saves a token to be returned by the next call to <see cref="ReadNextToken"/>.
+    /// Only one unread token can be saved at a time.
+    /// </summary>
+    /// <exception cref="SceneSyntaxException">
+    /// Thrown if a token is already saved.
+    /// </exception>
     public void UnreadToken(Token token)
     {
-        Debug.Assert(SavedToken == null);
+        if (SavedToken != null)
+        {
+            throw new SceneSyntaxException(token.Location, $"Tried to unread the token {token}, but there was already a saved token {SavedToken}.");
+        }
         SavedToken = token;
     }
 }

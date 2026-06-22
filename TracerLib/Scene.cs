@@ -3,7 +3,11 @@
 namespace TracerLib;
 
 //Verificare se modificare {token} in {type(token)} nei messaggi d'errore cambia qualcosa
-//Considerare di cambiare ExpecteSymbol(InputStream, string) in ExpecteSymbol(InputStream, char)
+//Considerare di cambiare ExpectSymbol(InputStream, string) in ExpecteSymbol(InputStream, char)
+
+/// <summary>
+/// A class that serves for interpret the txt file that contains the informations of the scene to render.
+/// </summary>
 public class Scene
 {
     public Dictionary<string, Material> Materials { get; set; } = new Dictionary<string, Material>();
@@ -12,15 +16,22 @@ public class Scene
     public Dictionary<string, float> Variables { get; set; } = new();
     //Overridden variables???
 
+    /// <summary>
+    /// Reads the next token and validates that it is a symbol token that contains the symbol expected.
+    /// </summary>
+    /// <param name="inputFile"></param>
+    /// <param name="symbol">The symbol expected.</param>
+    /// <exception cref="SceneSyntaxException"></exception>
     public void ExpectSymbol(InputStream inputFile, string symbol)
     {
         Token token = inputFile.ReadNextToken();
         if (token is not SymbolToken symbolToken || symbolToken.Symbol != symbol)
         {
-            throw new SceneSyntaxException(token.Location, $"got {token} instead of {symbol}");
+            throw new SceneSyntaxException(token.Location, $"expected {symbol} but got {token}");
         }
     }
 
+    
     public Keyword ExpectKeywords(InputStream inputFile, List<Keyword> keywords)
     {
         Token token = inputFile.ReadNextToken();
@@ -29,10 +40,11 @@ public class Scene
         {
             throw new SceneSyntaxException(token.Location, $"expected keyword instead of {token}");
         }
-        else if (!keywords.Contains(keywordToken.Keyword))
+        
+        if (!keywords.Contains(keywordToken.Keyword))
         {
             throw new SceneSyntaxException(token.Location,
-                $"expect one of the following keywords: {string.Join(',', keywords)} instead of {token}");
+                $"expect one of the following keywords: {string.Join(", ", keywords)} instead of {token}");
         }
 
         return keywordToken.Keyword;
@@ -43,7 +55,8 @@ public class Scene
         Token token = inputFile.ReadNextToken();
 
         if (token is LiteralNumberToken literalNumberToken) return literalNumberToken.Value;
-        else if (token is IdentifierToken identifierToken)
+        
+        if (token is IdentifierToken identifierToken)
         {
             string variableName = identifierToken.Identifier;
             if (!Variables.ContainsKey(variableName))
@@ -198,19 +211,19 @@ public class Scene
                 case Keyword.RotationX:
                     ExpectSymbol(inputFile, "(");
                     float degx = ExpectNumber(inputFile);
-                    result *= new Transformation('x', Functions.DegToRad(degx));
+                    result *= new Transformation(Axis.X, Functions.DegToRad(degx));
                     ExpectSymbol(inputFile, ")");
                     break;
                 case Keyword.RotationY:
                     ExpectSymbol(inputFile, "(");
                     float degy = ExpectNumber(inputFile);
-                    result *= new Transformation('y', Functions.DegToRad(degy));
+                    result *= new Transformation(Axis.Y, Functions.DegToRad(degy));
                     ExpectSymbol(inputFile, ")");
                     break;
                 case Keyword.RotationZ:
                     ExpectSymbol(inputFile, "(");
                     float degz = ExpectNumber(inputFile);
-                    result *= new Transformation('z', Functions.DegToRad(degz));
+                    result *= new Transformation(Axis.Z, Functions.DegToRad(degz));
                     ExpectSymbol(inputFile, ")");
                     break;
                 case Keyword.Scaling:

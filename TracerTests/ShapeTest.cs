@@ -170,7 +170,7 @@ public class PlaneTest
     [Fact]
     public void TestPlaneConstructorWithTransformation()
     {
-        Transformation transformation = new Transformation('x', MathF.PI / 2); 
+        Transformation transformation = new Transformation(Axis.X, MathF.PI / 2); 
         Plane plane = new Plane(transformation);
 
         Assert.True(Transformation.AreTransformationsClose(transformation, plane.Transform));

@@ -3,16 +3,20 @@
 namespace TracerLib;
 
 /// <summary>
-/// This struct specify a position in a file.
-/// line and column start from 0
+/// Represents a position within a source file.
+/// Line and column start from 0.
 /// </summary>
 public struct SourceLocation
 {
     private string filePath;
-    //private int indexName;
     public int line;
     public int column;
 
+    /// <summary>
+    /// Initializes a new <see cref="SourceLocation"/> for the specified file,
+    /// with line and column set to 0.
+    /// </summary>
+    /// <param name="filePath">The path of the source file.</param>
     public SourceLocation(string filePath)
     {
         this.filePath = filePath;

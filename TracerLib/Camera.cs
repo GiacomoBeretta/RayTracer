@@ -17,7 +17,7 @@ public interface ICamera
     /// <summary>
     /// The transformation applied to the camera.
     /// </summary>
-    public Transformation Transform { get; set; }
+    public Transformation Transformation { get; set; }
     
     /// <summary>
     /// Returns a <see cref="Ray"/> passing through the specified screen's coordinates (u,v).
@@ -38,7 +38,7 @@ public interface ICamera
 public struct OrthogonalCamera : ICamera
 {
     public float AspectRatio { get; set; }
-    public Transformation Transform { get; set; }
+    public Transformation Transformation { get; set; }
 
     /// <summary>
     /// Constructs an <see cref="OrthogonalCamera"/> with an aspect ratio of 1:1 and an identity <c>Transformation</c>
@@ -46,7 +46,7 @@ public struct OrthogonalCamera : ICamera
     public OrthogonalCamera()
     {
         AspectRatio = 1.0f;
-        Transform = new Transformation();
+        Transformation = new Transformation();
     }
 
     /// <summary>
@@ -57,7 +57,7 @@ public struct OrthogonalCamera : ICamera
     public OrthogonalCamera(Transformation transformation, float aspectRatio = 1.0f)
     {
         AspectRatio = aspectRatio;
-        Transform = transformation;
+        Transformation = transformation;
     }
     
     // forse sarebbe meglio mettere due parametri ulteriori da riga di comando che allargano la dimensione dello schermo.
@@ -92,7 +92,7 @@ public struct OrthogonalCamera : ICamera
 
         //direction orthogonal to the screen.
         Vector direction = new Vector(1, 0, 0);
-        return Transform * new Ray(origin, direction);
+        return Transformation * new Ray(origin, direction);
     }
 }
 
@@ -110,22 +110,22 @@ public struct PerspectiveCamera : ICamera
     public float Distance { get; set; }
 
     public float AspectRatio { get; set; }
-    public Transformation Transform { get; set; }
+    public Transformation Transformation { get; set; }
 
     /// <summary>
     /// Initialize a perspective <c>Camera</c> with unity <see cref="Distance"/>,
-    /// an <see cref="AspectRatio"/> of 1:1 and an identity <see cref="Transform"/>.
+    /// an <see cref="AspectRatio"/> of 1:1 and an identity <see cref="Transformation"/>.
     /// </summary>
     public PerspectiveCamera()
     {
         Distance = 1.0f;
         AspectRatio = 1.0f;
-        Transform = new Transformation();
+        Transformation = new Transformation();
     }
 
     /// <summary>
     /// Constructs a camera that uses a perspective projection,
-    /// with specified <see cref="Distance"/>, <see cref="AspectRatio"/> and <see cref="Transform"/>.
+    /// with specified <see cref="Distance"/>, <see cref="AspectRatio"/> and <see cref="Transformation"/>.
     /// </summary>
     /// <param name="transformation">Possible <c>Transformation</c>: Identity, Translation, Scaling and Rotation around a specified axis</param>
     /// <param name="distance">Distance between the observer and the screen</param>
@@ -134,7 +134,7 @@ public struct PerspectiveCamera : ICamera
     {
         Distance = distance;
         AspectRatio = aspectRatio;
-        Transform = transformation;
+        Transformation = transformation;
     }
     
     // forse sarebbe meglio mettere due parametri ulteriori da riga di comando che allargano la dimensione dello schermo.
@@ -172,6 +172,6 @@ public struct PerspectiveCamera : ICamera
         // quindi forse così lo schermo è un po' più piccolo
         // Vector dir = new Vector(Distance, (-u + 0.5f) * AspectRatio, -v + 0.5f);
 
-        return Transform * new Ray(origin, dir);
+        return Transformation * new Ray(origin, dir);
     }
 }

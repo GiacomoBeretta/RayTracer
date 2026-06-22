@@ -3,7 +3,7 @@
 namespace TracerLib;
 
 /// <summary>
-/// The class Normal create a Normal 3D Vector
+/// A class that represents a Normalized 3D Vector
 /// </summary>
 public struct Normal
 {
@@ -21,9 +21,9 @@ public struct Normal
     // Constructor -end
 
     /// <summary>
-    /// This function return a string showing the component of a <c>Normal</c> type variable 
+    /// Returns a string representation of the vector in the format:
+    /// Normal(x={X}, y={Y}, z={Z}).
     /// </summary>
-    /// <returns></returns>
     public override string ToString()
     {
         return $"Normal(x={X}, y={Y}, z={Z})";
@@ -35,65 +35,65 @@ public struct Normal
     }
 
     /// <summary>
-    /// Closeness criterion between two <c>Normal</c> type variables 
+    /// Returns whether the two normals are approximately equal within a given tolerance.
     /// </summary>
-    /// <param name="a"></param>
-    /// <param name="b"></param>
-    /// <returns></returns>
+    /// <param name="a">First normal vector.</param>
+    /// <param name="b">Second normal vector.</param>
+    /// <param name="epsilon">
+    /// Tolerance threshold used for floating-point comparison of each component. Defaults to 1e-5.
+    /// </param>
+    /// <returns> True if the normals are equal within the given tolerance on all axes.</returns>
     public static bool _AreNormalsClose(Normal a, Normal b, float epsilon = 1e-5f)
     {
-        return Functions.AreClose(a.X, b.X, epsilon) && Functions.AreClose(a.Y, b.Y, epsilon) &&
-               Functions.AreClose(a.Z, b.Z, epsilon);
+        return Functions.AreClose(a.X, b.X, epsilon)
+               && Functions.AreClose(a.Y, b.Y, epsilon)
+               && Functions.AreClose(a.Z, b.Z, epsilon);
     }
 
+    /// <summary>
+    /// Determines whether this vector is normalized, within a given numerical tolerance.
+    /// </summary>
+    /// <param name="epsilon">
+    /// The tolerance used for floating-point comparison (default is 1e-5f).
+    /// </param>
+    /// <returns>
+    /// True if the vector is approximately unit length; otherwise, false.
+    /// </returns>
     public bool IsNormalized(float epsilon = 1e-5f)
     {
         return Functions.AreClose(1, SquaredNorm(), epsilon);
     }
 
+    /// <summary>
+    /// Validates that this vector is normalized within a given tolerance.
+    /// </summary>
+    /// <param name="epsilon">
+    /// The numerical tolerance used to determine whether the vector is normalized (default is 1e-5f).
+    /// </param>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown if the vector is not normalized within the specified tolerance.
+    /// </exception>
     public void CheckNormalized(float epsilon = 1e-5f)
     {
-        if (!IsNormalized())
+        if (!IsNormalized(epsilon))
         {
             throw new ArgumentOutOfRangeException($"Normal is not normalized within epsilon={epsilon}");
         }
     }
-
+    
     /// <summary>
-    /// Returns the negated <c>Normal</c> vector
+    /// Negates the normal vector, reversing its direction.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>
+    /// A new <see cref="Normal"/> pointing in the opposite direction.
+    /// </returns>
     public static Normal operator -(Normal n)
     {
         return new Normal(-n.X, -n.Y, -n.Z);
     }
 
-/*
     /// <summary>
-    /// Returns the product per component between a <c>Normal</c> and a floating-point scalar
-    /// </summary>
-    /// <param name="n"></param>
-    /// <param name="a"></param>
-    /// <returns></returns>
-    public static Normal operator *(Normal n, float a)
-    {
-        return new Normal(a * n.X, a * n.Y, a * n.Z);
-    }
-
-    /// <summary>
-    /// Returns the product per component between a <c>Normal</c> and a floating-point scalar
-    /// </summary>
-    /// <param name="a"></param>
-    /// <param name="n"></param>
-    /// <returns></returns>
-    public static Normal operator *(float a, Normal n)
-    {
-        return n * a;
-    }*/
-
-
-    /// <summary>
-    /// Returns the scalar product between a <c>Normal</c> and a <c>Vector</c>
+    /// Returns the scalar product between a <see cref="Normal"/> and a <see cref="Vector"/>.
     /// </summary>
     /// <param name="n"></param>
     /// <param name="v"></param>
@@ -104,7 +104,7 @@ public struct Normal
     }
 
     /// <summary>
-    /// Returns the scalar product between a <c>Normal</c> and a <c>Vector</c>
+    /// Returns the scalar product between a <see cref="Normal"/> and a <see cref="Vector"/>.
     /// </summary>
     /// <param name="v"></param>
     /// <param name="n"></param>
@@ -115,7 +115,7 @@ public struct Normal
     }
 
     /// <summary>
-    /// Returns the cross product between a <c>Normal</c> and a <c>Vector</c>
+    /// Returns the cross product between a <see cref="Normal"/> and a <see cref="Vector"/>.
     /// </summary>
     /// <param name="v"></param>
     /// <param name="n"></param>
@@ -126,7 +126,7 @@ public struct Normal
     }
 
     /// <summary>
-    /// Returns the cross product between a <c>Normal</c> and a <c>Vector</c>
+    /// Returns the cross product between a <see cref="Normal"/> and a <see cref="Vector"/>.
     /// </summary>
     /// <param name="n"></param>
     /// <param name="v"></param>
@@ -137,7 +137,7 @@ public struct Normal
     }
 
     /// <summary>
-    /// Returns the cross product between 2 <c>Normal</c>
+    /// Returns the cross product between 2 <see cref="Normal"/>.
     /// </summary>
     /// <param name="n1"></param>
     /// <param name="n2"></param>
@@ -148,7 +148,7 @@ public struct Normal
     }
 
     /// <summary>
-    /// Returns the squared norm of a <c>Normal</c> variable
+    /// Returns the squared norm of a <see cref="Normal"/> vector.
     /// </summary>
     /// <returns></returns>
     public float SquaredNorm()
@@ -157,26 +157,35 @@ public struct Normal
     }
 
     /// <summary>
-    /// If you want to compute the squared norm, use the SquaredNorm method, is more efficient.
+    /// Returns the norm of a <see cref="Normal"/> vector.
     /// </summary>
+    ///<remarks>
+    /// If you want to compute the squared norm, use the SquaredNorm method, is more efficient.
+    /// </remarks>
     /// <returns></returns>
     public float Norm()
     {
         return MathF.Sqrt(SquaredNorm());
     }
 
-
-    /// <summary>
-    /// Returns a Normalized Normal 
+    /*/// <summary>
+    /// Returns a normalized version of *this* <see cref="Normal"/> (that should already be normalized).
     /// </summary>
-    /// <returns></returns>
+    /// <returns>A new normalized <see cref="Normal"/>. The original vector is not modified.</returns>
     public Normal Normalize()
     {
-        return new Normal(X * 1 / Norm(), Y * 1 / Norm(), Z * 1 / Norm());
-    }
+        float norm = Norm();
+        return new Normal(X * 1 /norm, Y * 1 / norm, Z * 1 / norm);
+    }*/
 
+    /// <summary>
+    /// Returns a <see cref="Vector"/> from this normal without modifying its values.
+    /// </summary>
+    /// <returns>
+    /// A new <see cref="Vector"/> instance with identical X, Y, and Z components.
+    /// </returns>
     public Vector ToVector()
     {
-        return new Vector(X, Y,Z);
+        return new Vector(X, Y, Z);
     }
 }

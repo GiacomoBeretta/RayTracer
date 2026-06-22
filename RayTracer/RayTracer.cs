@@ -86,17 +86,17 @@ public class DemoCommand
         string currentPath = AppDomain.CurrentDomain.BaseDirectory;
         string pngFilePath =
             Path.Combine(currentPath,
-                "../../../../DemoImages/" +
-                OutputFileName); //"../../../../DemoImages/" dal path dell'eseguibile torna indietro (Controllare)
+                "../../../../PngImages/" +
+                OutputFileName); //"../../../../PngImages/" dal path dell'eseguibile torna indietro (Controllare)
         if (OutputFileName[^4..] != ".png") pngFilePath += ".png"; //OutputFilename[^4..] Legge gli ultimi 4 caratteri
 
         // Define materials
         var sphereTexture = new HDRImage(2, 2)
         {
-            [0,0] = new Color(0.1f, 0.2f, 0.3f),
-            [0,1] = new Color(0.2f, 0.1f, 0.3f),
-            [1,0] = new Color(0.3f, 0.2f, 0.1f),
-            [1,1] = new Color(0.3f, 0.1f, 0.2f)
+            [0, 0] = new Color(0.1f, 0.2f, 0.3f),
+            [0, 1] = new Color(0.2f, 0.1f, 0.3f),
+            [1, 0] = new Color(0.3f, 0.2f, 0.1f),
+            [1, 1] = new Color(0.3f, 0.1f, 0.2f)
         };
         var material1 = new Material(new UniformPigment(new Color(0.7f, 0.3f, 0.2f)), new DiffuseBRDF());
         var material2 =
@@ -109,14 +109,14 @@ public class DemoCommand
 
         if (Projection == Projection.Perspective)
         {
-            camera = new PerspectiveCamera(transformation: new Transformation('z', phiRad) *
-                                                           new Transformation('y', thetaRad) *
+            camera = new PerspectiveCamera(transformation: new Transformation(Axis.Z, phiRad) *
+                                                           new Transformation(Axis.Y, thetaRad) *
                                                            new Transformation(new Vector(-1.0f, 0f, 0f)));
         }
         else if (Projection == Projection.Orthogonal)
         {
-            camera = new OrthogonalCamera(transformation: new Transformation('z', phiRad) *
-                                                          new Transformation('y', thetaRad) *
+            camera = new OrthogonalCamera(transformation: new Transformation(Axis.Z, phiRad) *
+                                                          new Transformation(Axis.Y, thetaRad) *
                                                           new Transformation(new Vector(-1.0f, 0f, 0f)));
         }
         else
@@ -185,7 +185,7 @@ public class DemoCommand
         tracer.FireAllRays(ray => render.RenderFunction(ray));
 
         image.WritePNG(pngFilePath, LuminosityFunction, Factor, Gamma, averageLuminosity: 0.5f);
-        Console.WriteLine("The PNG file has been saved in DemoImages/" + OutputFileName);
+        Console.WriteLine("The PNG file has been saved in PngImages/" + OutputFileName);
     }
     /*
      * Demo with the two spheres and the checkered floor
@@ -357,9 +357,9 @@ public class PfmToPngCommand
         Console.WriteLine($"luminosity function: {LuminosityFunction}");
         Console.WriteLine($"factor: {Factor}");
         Console.WriteLine($"gamma: {Gamma}");
-        
+
         string currentPath = AppDomain.CurrentDomain.BaseDirectory;
-        
+
         if (Output[^4..] != ".png") Output += ".png"; //OutputFilename[^4..] Legge gli ultimi 4 caratteri
         string pngFilePath =
             Path.Combine(currentPath, "../../../../PngImages/",
@@ -367,12 +367,12 @@ public class PfmToPngCommand
 
         if (Input[^4..] != ".pfm") Input += ".pfm";
         string pfmFilePath = Path.Combine(currentPath, "../../../../PfmImages", Input);
-        
+
 
         HDRImage image = HDRImage.ReadPFM_File(pfmFilePath);
         Console.WriteLine($"File read in: {pfmFilePath}");
-        
-        image.WritePNG(pngFilePath, LuminosityFunction, Factor, Gamma, averageLuminosity:0.5f);
+
+        image.WritePNG(pngFilePath, LuminosityFunction, Factor, Gamma, averageLuminosity: 0.5f);
         Console.WriteLine($"File saved in: {pngFilePath}");
     }
 }
@@ -382,7 +382,7 @@ public class RenderCommand
 {
     [Option("--input", Description = "The input scene file path")]
     public string InputScene { get; set; } = "scene.txt";
-    
+
     [Option("--width", Description = "The width of the image")]
     [Range(1, Int32.MaxValue)]
     public int Width { get; set; } = 500;
@@ -463,9 +463,9 @@ public class RenderCommand
         Console.WriteLine($"RouletteFixedProb: {RussianRouletteFixedProb}");
 
         string currentPath = AppDomain.CurrentDomain.BaseDirectory;
-        
+
         string scenePath = Path.Combine(currentPath, "../../../../Scenes/", InputScene);
-        
+
         if (OutputPng[^4..] != ".png") OutputPng += ".png"; //OutputFilename[^4..] Legge gli ultimi 4 caratteri
         string pngFilePath =
             Path.Combine(currentPath, "../../../../PngImages/",
@@ -473,7 +473,7 @@ public class RenderCommand
 
         if (OutputPfm[^4..] != ".pfm") OutputPfm += ".pfm";
         string pfmFilePath = Path.Combine(currentPath, "../../../../PfmImages", OutputPfm);
-        
+
 
         var scene = new Scene();
         var input = new InputStream(scenePath);

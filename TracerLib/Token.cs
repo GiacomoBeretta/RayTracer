@@ -4,6 +4,9 @@ using System.Globalization;
 
 namespace TracerLib;
 
+/// <summary>
+/// A base abstract class t
+/// </summary>
 public abstract class Token
 {
     public SourceLocation Location { get; }
@@ -17,6 +20,8 @@ public abstract class Token
     {
         Location = new SourceLocation(fileName, line, column);
     }
+
+    public abstract override string ToString();
 }
 
 public enum Keyword
@@ -74,6 +79,11 @@ public sealed class StopToken : Token
     public StopToken(SourceLocation location) : base(location)
     {
     }
+
+    public override string ToString()
+    {
+        return $"{typeof(StopToken)}: a token to signal the end of file";
+    }
 }
 
 //Cambiare in sealed anche tutte le altre classi che non verranno ereditate (orthogonal, sphere, etc)
@@ -88,7 +98,7 @@ public sealed class KeywordToken : Token
 
     public override string ToString()
     {
-        return Keyword.ToString();
+        return $"{typeof(KeywordToken)}: " + Keyword.ToString();
     }
 }
 
@@ -103,7 +113,7 @@ public sealed class IdentifierToken : Token
 
     public override string ToString()
     {
-        return Identifier;
+        return $"{typeof(IdentifierToken)}: " + Identifier;
     }
 }
 
@@ -118,10 +128,13 @@ public sealed class StringToken : Token
 
     public override string ToString()
     {
-        return String;
+        return $"{typeof(StringToken)}: " + String;
     }
 }
 
+/// <summary>
+/// Represents a 32-bit floating-point literal.
+/// </summary>
 public sealed class LiteralNumberToken : Token
 {
     public float Value { get; }
@@ -133,10 +146,13 @@ public sealed class LiteralNumberToken : Token
 
     public override string ToString()
     {
-        return Value.ToString(CultureInfo.InvariantCulture);
+        return $"{typeof(LiteralNumberToken)}: " + Value.ToString(CultureInfo.InvariantCulture);
     }
 }
 
+/// <summary>
+/// Represents a symbol token, such as '(', ')', '<', or '+'.
+/// </summary>
 public sealed class SymbolToken : Token
 {
     public string Symbol { get; }
@@ -148,6 +164,6 @@ public sealed class SymbolToken : Token
 
     public override string ToString()
     {
-        return Symbol;
+        return $"{typeof(SymbolToken)}: " + Symbol;
     }
 }

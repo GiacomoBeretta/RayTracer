@@ -3,17 +3,30 @@
 namespace TracerLib;
 
 /// <summary>
-/// A class that contains all the shapes of the scene to render.
+/// Represents a scene containing all the shapes to be rendered.
 /// </summary>
 public class World
 {
+    /// <summary>
+    /// The collection of shapes contained in the world.
+    /// </summary>
     public List<Shape> Shapes { get; private set; }
     
+    /// <summary>
+    /// Initializes a new world containing the specified shapes.
+    /// </summary>
+    /// <param name="shapes">
+    /// The shapes to add to the world. If <c>null</c>, an empty List of shapes is created.
+    /// </param>
     public World(List<Shape>? shapes = null)
     {
         Shapes = shapes ?? new List<Shape>();
     }
     
+    /// <summary>
+    /// Add the shape specified to the list of shapes.
+    /// </summary>
+    /// <param name="shape"></param>
     public void Add(Shape shape)
     {
         Shapes.Add(shape);
@@ -28,7 +41,7 @@ public class World
     public HitRecord? FindIntersection(Ray ray)
     {
         HitRecord? closest = null;
-        foreach (var shape in Shapes)
+        foreach (Shape shape in Shapes)
         {
             HitRecord? intersection = shape.FindIntersection(ray);
             if (intersection == null)
