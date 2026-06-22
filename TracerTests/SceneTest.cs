@@ -15,10 +15,8 @@ public class SceneTest
 
         File.WriteAllText(filepath, symbol);
 
-        try
+        using (InputStream str = new InputStream(filepath))
         {
-            InputStream str = new InputStream(filepath);
-
             scene.ExpectSymbol(str, "(");
             scene.ExpectSymbol(str, ")");
             scene.ExpectSymbol(str, "[");
@@ -29,10 +27,8 @@ public class SceneTest
             scene.ExpectSymbol(str, "*");
             Assert.Throws<SceneSyntaxException>(() => scene.ExpectSymbol(str, ","));
         }
-        finally
-        {
-            File.Delete(filepath);
-        }
+
+        File.Delete(filepath);
     }
 
     [Fact]
@@ -43,18 +39,14 @@ public class SceneTest
 
         File.WriteAllText(filepath, key);
 
-        try
+        using (InputStream str = new InputStream(filepath))
         {
-            InputStream str = new InputStream(filepath);
-
             Assert.Throws<SceneSyntaxException>(() => scene.ExpectKeywords(str, keywords));
             Assert.Equal(Keyword.Scaling, scene.ExpectKeywords(str, keywords));
             Assert.Throws<SceneSyntaxException>(() => scene.ExpectKeywords(str, keywords));
         }
-        finally
-        {
-            File.Delete(filepath);
-        }
+
+        File.Delete(filepath);
     }
 
     [Fact]
@@ -64,19 +56,16 @@ public class SceneTest
 
         File.WriteAllText(filepath, number);
 
-        try
+        using (InputStream str = new InputStream(filepath))
         {
-            InputStream str = new InputStream(filepath);
             Assert.Throws<SceneSyntaxException>(() => scene.ExpectNumber(str));
             Assert.Equal(18f, scene.ExpectNumber(str));
             //Controllare perchè il segno + viene saltato
             Assert.Equal(15f, scene.ExpectNumber(str));
             Assert.True(Functions.AreClose(1e18f, scene.ExpectNumber(str)));
         }
-        finally
-        {
-            File.Delete(filepath);
-        }
+
+        File.Delete(filepath);
     }
 
     [Fact]
@@ -86,18 +75,14 @@ public class SceneTest
 
         File.WriteAllText(filepath, content);
 
-        try
+        using (InputStream str = new InputStream(filepath))
         {
-            InputStream str = new InputStream(filepath);
-
             Assert.Throws<SceneSyntaxException>(() => scene.ExpectString(str));
             Assert.Throws<SceneSyntaxException>(() => scene.ExpectString(str));
             Assert.Equal("pizza", scene.ExpectString(str));
         }
-        finally
-        {
-            File.Delete(filepath);
-        }
+
+        File.Delete(filepath);
     }
 
     [Fact]
@@ -107,18 +92,14 @@ public class SceneTest
 
         File.WriteAllText(filepath, content);
 
-        try
+        using (InputStream str = new InputStream(filepath))
         {
-            InputStream str = new InputStream(filepath);
-
             Assert.Equal("clock", scene.ExpectIdentifier(str));
             Assert.Throws<SceneSyntaxException>(() => scene.ExpectIdentifier(str));
             Assert.Throws<SceneSyntaxException>(() => scene.ExpectIdentifier(str));
         }
-        finally
-        {
-            File.Delete(filepath);
-        }
+
+        File.Delete(filepath);
     }
 
     [Fact]
@@ -128,16 +109,12 @@ public class SceneTest
 
         File.WriteAllText(filepath, vector);
 
-        try
+        using (InputStream str = new InputStream(filepath))
         {
-            InputStream str = new InputStream(filepath);
-
             Assert.True(Vector._AreVectorsClose(new Vector(18f, 23f, 0f), scene.ParseVector(str)));
         }
-        finally
-        {
-            File.Delete(filepath);
-        }
+
+        File.Delete(filepath);
     }
 
     [Fact]
@@ -147,17 +124,14 @@ public class SceneTest
 
         File.WriteAllText(filepath, color);
 
-        try
+        using (InputStream str = new InputStream(filepath))
         {
-            InputStream str = new InputStream(filepath);
-
             Assert.True(Color._AreColorsClose(new Color(0.5f, 0.21f, 0.75f), scene.ParseColor(str)));
         }
-        finally
-        {
-            File.Delete(filepath);
-        }
+
+        File.Delete(filepath);
     }
+
 
     [Fact]
     public void ParsePigmentTest()
@@ -167,10 +141,8 @@ public class SceneTest
 
         File.WriteAllText(filepath, pigment);
 
-        try
+        using (InputStream str = new InputStream(filepath))
         {
-            InputStream str = new InputStream(filepath);
-
             Pigment uniform = scene.ParsePigment(str);
 
             CheckeredPigment checkered = (CheckeredPigment)scene.ParsePigment(str);
@@ -184,23 +156,20 @@ public class SceneTest
             Assert.True(Color._AreColorsClose(new Color(0.1f, 0f, 0.9f), cColor2));
             Assert.Equal(4, checkered.NumSteps);
         }
-        finally
-        {
-            File.Delete(filepath);
-        }
+
+        File.Delete(filepath);
     }
 
     [Fact]
     public void ParseBRDFTest()
     {
-        const string brdf = "diffuse(uniform(<0.3, 0.5, 0.1>)) specular(checkered(<0.4, 0.6, 0.5>, <0.1, 0, 0.9>, 4))";
+        const string brdf =
+            "diffuse(uniform(<0.3, 0.5, 0.1>)) specular(checkered(<0.4, 0.6, 0.5>, <0.1, 0, 0.9>, 4))";
 
         File.WriteAllText(filepath, brdf);
 
-        try
+        using (InputStream str = new InputStream(filepath))
         {
-            InputStream str = new InputStream(filepath);
-
             BRDF diffuse = scene.ParseBRDF(str);
             BRDF specular = scene.ParseBRDF(str);
 
@@ -212,10 +181,8 @@ public class SceneTest
             Assert.True(Color._AreColorsClose(new Color(0.4f, 0.6f, 0.5f), cColor1));
             Assert.True(Color._AreColorsClose(new Color(0.1f, 0f, 0.9f), cColor2));
         }
-        finally
-        {
-            File.Delete(filepath);
-        }
+
+        File.Delete(filepath);
     }
 
     [Fact]
@@ -225,10 +192,8 @@ public class SceneTest
             "ground_material(diffuse(checkered(<0.3, 0.5, 0.1>, <0.1, 0.2, 0.5>, 4)), uniform(<0, 0, 0>))";
         File.WriteAllText(filepath, mat);
 
-        try
+        using (InputStream str = new InputStream(filepath))
         {
-            InputStream str = new InputStream(filepath);
-
             scene.ParseMaterial(str, out string name, out Material material);
 
             Color cColor1 = material.Pigment.GetColor(new Vector2D(0.1f, 0.1f));
@@ -240,10 +205,8 @@ public class SceneTest
             Assert.True(Color._AreColorsClose(new Color(0f, 0f, 0f), uColor));
             Assert.Equal("ground_material", name);
         }
-        finally
-        {
-            File.Delete(filepath);
-        }
+
+        File.Delete(filepath);
     }
 
     [Fact]
@@ -253,21 +216,18 @@ public class SceneTest
 
         File.WriteAllText(filepath, transform);
 
-        try
+        using (InputStream str = new InputStream(filepath))
         {
-            InputStream str = new InputStream(filepath);
-
             Transformation transformation = scene.ParseTransformation(str);
             Transformation t = new Transformation(Axis.Z, Functions.DegToRad(30)) *
                                new Transformation(new Vector(-4f, 0f, 1f));
 
             Assert.True(Transformation.AreTransformationsClose(t, transformation));
         }
-        finally
-        {
-            File.Delete(filepath);
-        }
+
+        File.Delete(filepath);
     }
+
 
     [Fact]
     public void ParseSphereTest()
@@ -277,10 +237,8 @@ public class SceneTest
 
         File.WriteAllText(filepath, sph);
 
-        try
+        using (InputStream str = new InputStream(filepath))
         {
-            InputStream str = new InputStream(filepath);
-
             scene.ParseMaterial(str, out string name, out Material material);
             scene.Materials[name] = material;
 
@@ -294,10 +252,8 @@ public class SceneTest
             Assert.True(Transformation.AreTransformationsClose(new Transformation(new Vector(0f, 0f, 1f)),
                 transformSphere));
         }
-        finally
-        {
-            File.Delete(filepath);
-        }
+
+        File.Delete(filepath);
     }
 
     [Fact]
@@ -309,10 +265,8 @@ public class SceneTest
 
         File.WriteAllText(filepath, pln);
 
-        try
+        using (InputStream str = new InputStream(filepath))
         {
-            InputStream str = new InputStream(filepath);
-
             scene.ParseMaterial(str, out string name, out Material material);
             scene.Materials[name] = material;
 
@@ -328,10 +282,8 @@ public class SceneTest
             Assert.True(Transformation.AreTransformationsClose(new Transformation(), transformPlane));
             Assert.Single(scene.Materials);
         }
-        finally
-        {
-            File.Delete(filepath);
-        }
+
+        File.Delete(filepath);
     }
 
     [Fact]
@@ -341,10 +293,8 @@ public class SceneTest
 
         File.WriteAllText(filepath, cam);
 
-        try
+        using (InputStream str = new InputStream(filepath))
         {
-            InputStream str = new InputStream(filepath);
-
             var camera = (PerspectiveCamera)scene.ParseCamera(str, scene);
 
             Assert.True(Transformation.AreTransformationsClose(
@@ -353,9 +303,7 @@ public class SceneTest
             Assert.True(Functions.AreClose(1.0f, camera.AspectRatio));
             Assert.True(Functions.AreClose(1.0f, camera.Distance));
         }
-        finally
-        {
-            File.Delete(filepath);
-        }
+
+        File.Delete(filepath);
     }
 }
