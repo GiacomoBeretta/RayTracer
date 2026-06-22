@@ -335,33 +335,31 @@ public class HDRImage
         }
     }
 
-    /// <summary>
-    /// Parses the endianness value from a PFM file string.
-    /// </summary>
-    /// <param name="stringEndianness">
-    /// The endianness value as string. Valid values are "1", "+1", "1.0", "+1.0" for Big Endian,
-    /// and "-1", "-1.0" for Little Endian.
-    /// </param>
-    /// <returns>
-    /// The parsed <see cref="Endianness"/> value corresponding to the input string.
-    /// </returns>
-    /// <exception cref="InvalidPfmFileFormatException">
-    /// Thrown when the input string is not a valid endianness value.
-    /// </exception>
+    /* /// <summary>
+     /// Parses the endianness value from a PFM file string.
+     /// </summary>
+     /// <param name="stringEndianness">
+     /// The endianness value as string. Valid values are "1", "+1", "1.0", "+1.0" for Big Endian,
+     /// and "-1", "-1.0" for Little Endian.
+     /// </param>
+     /// <returns>
+     /// The parsed <see cref="Endianness"/> value corresponding to the input string.
+     /// </returns>
+     /// <exception cref="InvalidPfmFileFormatException">
+     /// Thrown when the input string is not a valid endianness value.
+     /// </exception>*/
     public static Endianness _ParseEndianness(string stringEndianness)
     {
-        switch (stringEndianness)
+        if (Single.TryParse(stringEndianness, out float number))
         {
-            case "1":
-            case "+1":
-            case "1.0":
-            case "+1.0":
-                return Endianness.Big;
-            case "-1":
-            case "-1.0":
-                return Endianness.Little;
+            if (number > 0f) return Endianness.Big;
+
+            return Endianness.Little;
         }
-        throw new InvalidPfmFileFormatException("The endianness must be written as 1.0 or -1.0");
+        else
+        {
+           throw new InvalidPfmFileFormatException("The endianness must be a floating-point number");
+        }
     }
 
     /// <summary>
@@ -567,7 +565,7 @@ public class HDRImage
         {
             throw new ArgumentNullException(nameof(img));
         }
-        
+
         byte[] header = Encoding.ASCII.GetBytes($"PF\n{img.Width} {img.Height}\n1.0\n");
         filestream.Write(header, 0, header.Length);
 
@@ -603,7 +601,7 @@ public class HDRImage
     //Methods for Read and Write PFM files - End
 
     // Methods for conversion to an LDR Image (Tone mapping) - Begin
-    
+
     /// <summary>
     /// Computes the logarithmic average luminosity of the image.
     /// The luminosity of each pixel is evaluated according to the specified <see cref="LumFunction"/>
@@ -640,10 +638,9 @@ public class HDRImage
                 return MathF.Pow(10, sum / Pixels.Length);
             default:
                 throw new NotImplementedException("Average Luminosity: case not implemented.");
-
         }
     }
-    
+
     /// <summary>
     /// Scales all pixels so that their RGB values are normalized with respect
     /// to the image average luminosity.
@@ -682,7 +679,7 @@ public class HDRImage
             Pixels[i]._Clamp();
         }
     }
-    
+
     /// <summary>
     /// Applies gamma correction and converts all pixels
     /// to a 0–255 RGB representation.
@@ -696,7 +693,7 @@ public class HDRImage
             Pixels[i] = Pixels[i].To8BitRGB(gamma);
         }
     }
-    
+
     //Questa non è tecnicamente un HDR. Rivedere in futuro
     /// <summary>
     /// Returns Creates an LDR representation of the current HDR image.
@@ -724,7 +721,7 @@ public class HDRImage
     }
 
     // Methods for conversion to an LDR Image - End
-    
+
     /// <summary>
     /// Writes on the outputStream the corresponding LDR image.
     /// It applies the gamma correction of the display and of the empirical factor here named "factor".
@@ -798,7 +795,7 @@ public enum Endianness
     /// Most significant byte first.
     /// </summary>
     Big,
-    
+
     /// <summary>
     /// Least significant byte first.
     /// </summary>
