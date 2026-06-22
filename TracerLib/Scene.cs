@@ -31,6 +31,7 @@ public class Scene
         }
     }
 
+    
     public Keyword ExpectKeywords(InputStream inputFile, List<Keyword> keywords)
     {
         Token token = inputFile.ReadNextToken();
@@ -54,7 +55,8 @@ public class Scene
         Token token = inputFile.ReadNextToken();
 
         if (token is LiteralNumberToken literalNumberToken) return literalNumberToken.Value;
-        else if (token is IdentifierToken identifierToken)
+        
+        if (token is IdentifierToken identifierToken)
         {
             string variableName = identifierToken.Identifier;
             if (!Variables.ContainsKey(variableName))
