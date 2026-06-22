@@ -2,7 +2,7 @@ using System.Net;
 using TracerLib;
 
 namespace TracerTests;
-/*
+
 public class SceneTest
 {
     private Scene scene = new Scene();
@@ -11,7 +11,7 @@ public class SceneTest
     [Fact]
     public void ExpectSymbolTest()
     {
-        const string symbol = "(),[]<>*";
+        const string symbol = "()[]<>,*";
         
         File.WriteAllText(filepath, symbol);
         
@@ -258,7 +258,7 @@ public class SceneTest
             InputStream str = new InputStream(filepath);
 
             Transformation transformation = scene.ParseTransformation(str);
-            Transformation t = new Transformation('z', Functions.DegToRad(30)) * new Transformation(new Vector(-4f, 0f, 1f));
+            Transformation t = new Transformation(Axis.Z, Functions.DegToRad(30)) * new Transformation(new Vector(-4f, 0f, 1f));
             
             Assert.True(Transformation.AreTransformationsClose(t, transformation));
         }
@@ -345,7 +345,7 @@ public class SceneTest
             
             var camera = (PerspectiveCamera)scene.ParseCamera(str,  scene);
             
-            Assert.True(Transformation.AreTransformationsClose(new Transformation('z', Functions.DegToRad(30)) * new Transformation(new Vector(-4f, 0f, 1f)), camera.Transformation));
+            Assert.True(Transformation.AreTransformationsClose(new Transformation(Axis.Z, Functions.DegToRad(30)) * new Transformation(new Vector(-4f, 0f, 1f)), camera.Transformation));
             Assert.True(Functions.AreClose(1.0f, camera.AspectRatio));
             Assert.True(Functions.AreClose(1.0f, camera.Distance));
         }
@@ -354,4 +354,4 @@ public class SceneTest
             File.Delete(filepath);
         }
     }
-}*/
+}

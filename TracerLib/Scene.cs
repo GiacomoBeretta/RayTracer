@@ -4,6 +4,10 @@ namespace TracerLib;
 
 //Verificare se modificare {token} in {type(token)} nei messaggi d'errore cambia qualcosa
 //Considerare di cambiare ExpectSymbol(InputStream, string) in ExpecteSymbol(InputStream, char)
+
+/// <summary>
+/// A class that serves for interpret the txt file that contains the informations of the scene to render.
+/// </summary>
 public class Scene
 {
     public Dictionary<string, Material> Materials { get; set; } = new Dictionary<string, Material>();
@@ -17,7 +21,7 @@ public class Scene
         Token token = inputFile.ReadNextToken();
         if (token is not SymbolToken symbolToken || symbolToken.Symbol != symbol)
         {
-            throw new SceneSyntaxException(token.Location, $"got {token} instead of {symbol}");
+            throw new SceneSyntaxException(token.Location, $"expected {symbol} but got {token}");
         }
     }
 
