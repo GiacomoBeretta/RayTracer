@@ -1,5 +1,5 @@
 #v0.6.0
-Add InputStream and Scene class to interpret the text files with the scene description. (PR [#11]https://github.com/GiacomoBeretta/RayTracer/pull/11))
+Add InputStream and Scene class to interpret the text files with the scene description. (PR [#11](https://github.com/GiacomoBeretta/RayTracer/pull/11))
 
 #v0.5.1
 Fix float division bug. (PR [#10](https://github.com/GiacomoBeretta/RayTracer/pull/10), it fixes [#8](https://github.com/GiacomoBeretta/RayTracer/issues/8))
