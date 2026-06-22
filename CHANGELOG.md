@@ -1,5 +1,8 @@
-#v0.4.0
+#v0.5.0
 Add Pigment, BRDF and material classes, add PCG random generator. Add Flat-renderer algorithm (PR [#7](https://github.com/GiacomoBeretta/RayTracer/pull/7))
+
+#v0.4.0
+Add Shape base class, with the derived classes Sphere and Plane. Add World, HitRecord and Vector2D classes. Add first demo command. (PR [#5] (https://github.com/GiacomoBeretta/RayTracer/pull/5))
 
 #v0.3.0
 Fix bug in ImageTracer method FireRay (PR [#4](https://github.com/GiacomoBeretta/RayTracer/pull/4), it fixes [#3](https://github.com/GiacomoBeretta/RayTracer/issues/3))
