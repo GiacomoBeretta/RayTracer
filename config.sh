@@ -1,5 +1,6 @@
 # Global default 
 lumfunction="shirley"
+averageluminosity=0,5
 factor=1
 gamma=1
 
@@ -25,7 +26,8 @@ output=""
 
 # Default averageimage
 inputaverage=""
-outputaverage=""
+outputaveragepfm=""
+outputaveragepng=""
 
 # Cycle parameters
 pcgcycle=false
