@@ -10,11 +10,11 @@ namespace TracerLib;
 /// </summary>
 public class Scene
 {
-    public Dictionary<string, Material> Materials { get; set; } = new Dictionary<string, Material>();
+    public Dictionary<string, Material> Materials { get; set; } = new();
     public World World { get; set; } = new();
     public ICamera? Camera { get; set; } = null;
     public Dictionary<string, float> Variables { get; set; } = new();
-    //Overridden variables???
+    public HashSet<string> OverriddenVariables { get; set; } = [];
 
     /// <summary>
     /// Reads the next token and validates that it is a symbol token that contains the symbol expected.
@@ -59,8 +59,10 @@ public class Scene
         if (token is IdentifierToken identifierToken)
         {
             string variableName = identifierToken.Identifier;
+            
             if (!Variables.ContainsKey(variableName))
                 throw new SceneSyntaxException(token.Location, $"unknow variable {token}");
+            
             return Variables[variableName];
         }
 
@@ -316,7 +318,8 @@ public class Scene
     {
         var scene = new Scene
         {
-            Variables = variables
+            Variables = new Dictionary<string, float>(variables),
+            OverriddenVariables = new HashSet<string>(variables.Keys)
         };
 
         while (true)
@@ -335,11 +338,10 @@ public class Scene
                 float variableValue = ExpectNumber(inputFile);
                 ExpectSymbol(inputFile, ")");
 
-                if (scene.Variables.ContainsKey(variableName))
+                if (scene.Variables.ContainsKey(variableName) && !scene.OverriddenVariables.Contains(variableName))
                     throw new SceneSyntaxException(variableLocation,
-                        $"{variableName} cannot be redefined"); //Aggiungere controllo overridden variables 
-                //Aggiungere controllo overridden variables anche qui
-                scene.Variables[variableName] = variableValue;
+                        $"{variableName} cannot be redefined");
+                if (!scene.OverriddenVariables.Contains(variableName)) scene.Variables[variableName] = variableValue;
             }
             else if (token is KeywordToken { Keyword: Keyword.Sphere })
             {

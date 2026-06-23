@@ -41,4 +41,23 @@ public class FunctionsTest
         Assert.True(Functions.AreClose(Functions.DegToRad(deg), MathF.PI));
         Assert.False(Functions.AreClose(Functions.DegToRad(deg), 64f));
     }
+
+    [Fact]
+    public void VariableTableTest()
+    {
+        string[] variable1 = ["clock:150"];
+        string[] variable2 = ["color:3:2"];
+        string[] variable3 = ["hello:world"];
+
+        var result = Functions.VariableTable(variable1);
+        
+        Assert.Contains("clock", result.Keys);
+        Assert.Equal(150, result["clock"]);
+
+        Assert.Throws<ArgumentException>(() => Functions.VariableTable(variable2));
+        Assert.Throws<ArgumentException>(() => Functions.VariableTable(variable3));
+        
+
+
+    }
 }

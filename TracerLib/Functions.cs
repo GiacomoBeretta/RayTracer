@@ -59,7 +59,24 @@ public static class Functions
     {
         return deg * MathF.PI / 180f;
     }
-
+    
+    /// <summary>
+    /// Parses an array of variable definitions and converts them into a dictionary.
+    /// Each definition must follow the format "NAME:VALUE", where NAME is the
+    /// variable identifier and VALUE is a valid floating-point number.
+    /// </summary>
+    /// <param name="definitions">
+    /// Array of string definitions following the pattern "NAME:VALUE".
+    /// Each element represents a variable declaration.
+    /// </param>
+    /// <returns>
+    /// A dictionary where each key is the variable name and each value is the
+    /// corresponding floating-point value.
+    /// </returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when a definition does not follow the "NAME:VALUE" format or when
+    /// the provided value cannot be parsed as a floating-point number.
+    /// </exception>
     public static Dictionary<string, float> VariableTable(string[] definitions)
     {
         var variables = new Dictionary<string, float>();

@@ -150,7 +150,7 @@ public class HDRImage
     }
 
     public Color[] this[Range range] => Pixels[range];
-    
+
     /// <summary>
     /// Returns the index in a 1D array corresponding to the specified matrix column and row.
     /// </summary>
@@ -244,7 +244,7 @@ public class HDRImage
     }
 
     #endregion
-    
+
     //Constructors - End
 
     //meglio usare stringBuilder qua
@@ -344,29 +344,26 @@ public class HDRImage
     /// Parses the endianness value from a PFM file string.
     /// </summary>
     /// <param name="stringEndianness">
-    /// The endianness value as string. Valid values are "1", "+1", "1.0", "+1.0" for Big Endian,
-    /// and "-1", "-1.0" for Little Endian.
+    /// A string representing a floating-point scale factor.
+    /// Positive values indicate Big Endian byte order, while non-positive values
+    /// indicate Little Endian byte order.
     /// </param>
     /// <returns>
-    /// The parsed <see cref="Endianness"/> value corresponding to the input string.
+    /// The <see cref="Endianness"/> corresponding to the sign of the parsed value.
     /// </returns>
     /// <exception cref="InvalidPfmFileFormatException">
-    /// Thrown when the input string is not a valid endianness value.
+    /// Thrown when <paramref name="stringEndianness"/> cannot be parsed as a floating-point number.
     /// </exception>
     public static Endianness _ParseEndianness(string stringEndianness)
     {
-        switch (stringEndianness)
+        if (Single.TryParse(stringEndianness, out float number))
         {
-            case "1":
-            case "+1":
-            case "1.0":
-            case "+1.0":
-                return Endianness.Big;
-            case "-1":
-            case "-1.0":
-                return Endianness.Little;
+            if (number > 0f) return Endianness.Big;
+
+            if (number < 0f) return Endianness.Little;
         }
-        throw new InvalidPfmFileFormatException("The endianness must be written as 1.0 or -1.0");
+
+        throw new InvalidPfmFileFormatException("The endianness must be a floating-point non-zero number.");
     }
 
     /// <summary>
@@ -572,7 +569,7 @@ public class HDRImage
         {
             throw new ArgumentNullException(nameof(img));
         }
-        
+
         byte[] header = Encoding.ASCII.GetBytes($"PF\n{img.Width} {img.Height}\n1.0\n");
         filestream.Write(header, 0, header.Length);
 
@@ -606,14 +603,14 @@ public class HDRImage
     }
 
     #endregion
-    
+
     // Methods for Read and Write PFM files - End
 
     // Methods for conversion to an LDR Image (Tone mapping) - Begin
 
     #region Tone_mapping
 
-     /// <summary>
+    /// <summary>
     /// Computes the logarithmic average luminosity of the image.
     /// The luminosity of each pixel is evaluated according to the specified <see cref="LumFunction"/>
     /// (Shirley = Shirley and Morley method, Weighted = Weighted Average)
@@ -649,10 +646,9 @@ public class HDRImage
                 return MathF.Pow(10, sum / Pixels.Length);
             default:
                 throw new NotImplementedException("Average Luminosity: case not implemented.");
-
         }
     }
-    
+
     /// <summary>
     /// Scales all pixels so that their RGB values are normalized with respect
     /// to the image average luminosity.
@@ -691,7 +687,7 @@ public class HDRImage
             Pixels[i]._Clamp();
         }
     }
-    
+
     /// <summary>
     /// Applies gamma correction and converts all pixels
     /// to a 0–255 RGB representation.
@@ -705,7 +701,7 @@ public class HDRImage
             Pixels[i] = Pixels[i].To8BitRGB(gamma);
         }
     }
-    
+
     //Questa non è tecnicamente un HDR. Rivedere in futuro
     /// <summary>
     /// Returns Creates an LDR representation of the current HDR image.
@@ -733,9 +729,9 @@ public class HDRImage
     }
 
     #endregion
-    
+
     // Methods for conversion to an LDR Image - End
-    
+
     /// <summary>
     /// Writes on the outputStream the corresponding LDR image.
     /// It applies the gamma correction of the display and of the empirical factor here named "factor".
@@ -809,7 +805,7 @@ public enum Endianness
     /// Most significant byte first.
     /// </summary>
     Big,
-    
+
     /// <summary>
     /// Least significant byte first.
     /// </summary>
