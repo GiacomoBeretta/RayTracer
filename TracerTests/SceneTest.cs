@@ -41,9 +41,9 @@ public class SceneTest
 
         using (InputStream str = new InputStream(filepath))
         {
-            Assert.Throws<SceneSyntaxException>(() => scene.ExpectKeywords(str, keywords));
-            Assert.Equal(Keyword.Scaling, scene.ExpectKeywords(str, keywords));
-            Assert.Throws<SceneSyntaxException>(() => scene.ExpectKeywords(str, keywords));
+            Assert.Throws<SceneSyntaxException>(() => scene.ExpectKeyword(str, keywords));
+            Assert.Equal(Keyword.Scaling, scene.ExpectKeyword(str, keywords));
+            Assert.Throws<SceneSyntaxException>(() => scene.ExpectKeyword(str, keywords));
         }
 
         File.Delete(filepath);
