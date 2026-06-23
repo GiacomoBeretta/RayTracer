@@ -43,7 +43,8 @@ while [[ $# -gt 0 ]]; do
     --inputpfm) inputpfm="$2"; shift 2 ;;
     --output) output="$2"; shift 2 ;;
     --inputaverage) inputaverage="$2"; shift 2 ;;
-    --outputaverage) outputaverage="$2"; shift 2 ;;
+    --outputaveragepfm) outputaveragepfm="$2"; shift 2 ;;
+    --outputaveragepng) outputaveragepng="$2"; shift 2 ;;
     *) echo "Unknown parameter: $1"; exit 1 ;;
   esac
 done
@@ -87,17 +88,18 @@ if [[ "$subcommand" == "pfmtopng" ]]; then
 fi
 
 if [[ "$subcommand" == "averageimage" ]]; then
-	[ -n "$inputaverage" ]      && cmd+=( --inputaverage "$inputaverage" ) 
-	[ -n "$outputaverage" ]     && cmd+=( --outputaverage "$outputaverage" ) 
-	[ -n "$lumfunction" ]       && cmd+=( --luminosityfunction "$lumfunction" ) 
-	[ -n "$averageluminosity" ] && cmd+=( --averageluminosity "$averageluminosity" )
-	[ -n "$factor" ]            && cmd+=( --factor "$factor" ) 
-	[ -n "$gamma" ]             && cmd+=( --gamma "$gamma" ) 
+	[ -n "$inputaverage" ]         && cmd+=( --inputaverage "$inputaverage" ) 
+	[ -n "$outputaveragepfm" ]     && cmd+=( --outputaveragepfm "$outputaveragepfm" ) 
+	[ -n "$outputaveragepng" ]     && cmd+=( --outputaveragepng "$outputaveragepng" ) 
+	[ -n "$lumfunction" ]          && cmd+=( --luminosityfunction "$lumfunction" ) 
+	[ -n "$averageluminosity" ]    && cmd+=( --averageluminosity "$averageluminosity" )
+	[ -n "$factor" ]               && cmd+=( --factor "$factor" ) 
+	[ -n "$gamma" ]                && cmd+=( --gamma "$gamma" ) 
 fi
 
 # Build
 
-dotnet build || exit 1
+#dotnet build || exit 1
 
 # Random generator cycle
 
