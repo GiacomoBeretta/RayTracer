@@ -215,18 +215,16 @@ public class InputStream : IDisposable
     }
 
     // Parse_token methods - Begin
-
+    
     /// <summary>
     /// Parses a string literal token starting at the given source location.
-    /// Characters are read verbatim until the next quotation mark (").
-    /// Throws a <see cref="SceneSyntaxException"/> if the string is unterminated.
+    /// Characters are read verbatim until a closing quotation mark (") is encountered.
+    /// The closing quotation mark is read
+    /// and not included in the resulting string value.
     /// </summary>
-    /// <param name="tokenLocation">
-    /// The source location where the string token starts.
-    /// </param>
-    /// <returns>
-    /// A <see cref="StringToken"/> containing the parsed string value.
-    /// </returns>
+    /// <param name="tokenLocation">The source location where the string literal starts.</param>
+    /// <returns>A <see cref="StringToken"/> containing the parsed string value.</returns>
+    /// <exception cref="SceneSyntaxException">Thrown if the end of the input is reached before a closing quotation mark is found.</exception>
     public StringToken _ParseStringToken(SourceLocation tokenLocation)
     {
         StringBuilder sb = new StringBuilder();
