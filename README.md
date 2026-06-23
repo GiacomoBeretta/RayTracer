@@ -6,12 +6,12 @@ A C# application for generating photorealistic images using different rendering 
 
 - [Purpose](#purpose)
 - [Dependencies](#dependencies)
+- [How to install it](#how-to-install-it)
 - [Usage](#usage)
 - [Scripts](#scripts)
 - [Scene Description Language](#scene-description-language)
 - [Command Options](#command-options)
 - [Examples](#examples)
-- [How to install it](#how-to-install-it)
 - [Where to ask for help](#where-to-ask-for-help)
 - [Future developments](#future-developments)
 - [How to contribute](#how-to-contribute)
@@ -873,33 +873,6 @@ This technique significantly reduces jagged edges and improves image quality, es
 
 ![Anti-aliased image](Assets/scene_antialiasing.png)
 
-
-# Installation
-
-This program is tested and supported on:
-
-- **Ubuntu 24.04 LTS**
-- **.NET 10.0.109**
-
-The unit tests were successfully executed on the following environments using **.NET 10.0.109**:
-
-## Windows
-
-```text
-OS Name:        Microsoft Windows Server 2025 Datacenter
-OS Version:     10.0.26100 (Build 26100)
-BIOS Version:   Microsoft Corporation Hyper-V UEFI Release v4.1
-                2026-01-08
-```
-
-## macOS
-
-```text
-ProductName:    macOS
-ProductVersion: 15.7.7
-BuildVersion:   24G720
-```
-    
 ---
 
 # Where to ask for help
