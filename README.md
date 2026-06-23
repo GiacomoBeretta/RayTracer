@@ -650,6 +650,8 @@ float clock(45)
 
 The following options are available in multiple commands.
 
+> **TODO:** add the missing common options
+
 ---
 
 ## Render Command
@@ -756,6 +758,7 @@ If omitted, the probability is computed dynamically at each recursion step.
 The following common options are also available:
 
 - `--luminosityfunction`
+- `--averageluminosity`
 - `--factor`
 - `--gamma`
 
@@ -769,15 +772,20 @@ The following common options are also available:
 
 Name of the directory containing the PFM files to be averaged.
 
-#### `--outputaverage`
+#### `--outputaveragepfm`
 
-Name of the generated averaged image.
+Name of the generated averaged image as a pfm file.
+
+#### `--outputaveragepng`
+
+Name of the generated average image as a png file.
 
 The command generates both a PFM image and its corresponding PNG representation.
 
 The following common options are also available:
 
 - `--luminosityfunction`
+- `--averageluminosity`
 - `--factor`
 - `--gamma`
 
@@ -798,6 +806,7 @@ Name of the generated PNG image.
 The following common options are also available:
 
 - `--luminosityfunction`
+- `--averageluminosity`
 - `--factor`
 - `--gamma`
 
