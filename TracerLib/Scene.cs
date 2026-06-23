@@ -43,11 +43,14 @@ public class Scene
         Token token = inputFile.ReadNextToken();
 
         if (token is LiteralNumberToken literalNumberToken) return literalNumberToken.Value;
-        else if (token is IdentifierToken identifierToken)
+        
+        if (token is IdentifierToken identifierToken)
         {
             string variableName = identifierToken.Identifier;
+            
             if (!Variables.ContainsKey(variableName))
                 throw new SceneSyntaxException(token.Location, $"unknow variable {token}");
+            
             return Variables[variableName];
         }
 
