@@ -334,33 +334,31 @@ public class HDRImage
             throw new InvalidPfmFileFormatException("height must be greater than zero.");
         }
     }
-    
-     /// <summary>
-     /// Parses the endianness value from a PFM file string.
-     /// </summary>
-     /// <param name="stringEndianness">
-     /// A string representing a floating-point scale factor.
-     /// Positive values indicate Big Endian byte order, while non-positive values
-     /// indicate Little Endian byte order.
-     /// </param>
-     /// <returns>
-     /// The <see cref="Endianness"/> corresponding to the sign of the parsed value.
-     /// </returns>
-     /// <exception cref="InvalidPfmFileFormatException">
-     /// Thrown when <paramref name="stringEndianness"/> cannot be parsed as a floating-point number.
-     /// </exception>
+
+    /// <summary>
+    /// Parses the endianness value from a PFM file string.
+    /// </summary>
+    /// <param name="stringEndianness">
+    /// A string representing a floating-point scale factor.
+    /// Positive values indicate Big Endian byte order, while non-positive values
+    /// indicate Little Endian byte order.
+    /// </param>
+    /// <returns>
+    /// The <see cref="Endianness"/> corresponding to the sign of the parsed value.
+    /// </returns>
+    /// <exception cref="InvalidPfmFileFormatException">
+    /// Thrown when <paramref name="stringEndianness"/> cannot be parsed as a floating-point number.
+    /// </exception>
     public static Endianness _ParseEndianness(string stringEndianness)
     {
         if (Single.TryParse(stringEndianness, out float number))
         {
             if (number > 0f) return Endianness.Big;
 
-            return Endianness.Little;
+            if(number < 0f) return Endianness.Little;
         }
-        else
-        {
-           throw new InvalidPfmFileFormatException("The endianness must be a floating-point number");
-        }
+
+        throw new InvalidPfmFileFormatException("The endianness must be a floating-point non-zero number.");
     }
 
     /// <summary>

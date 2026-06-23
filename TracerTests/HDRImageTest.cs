@@ -215,16 +215,20 @@ public class HDRImageTest
         Assert.Throws<InvalidPfmFileFormatException>(() => HDRImage._ParseEndianness(endianness));
         endianness = "zws";
         Assert.Throws<InvalidPfmFileFormatException>(() => HDRImage._ParseEndianness(endianness));
-        endianness = "2.0";
+        endianness = "2. 0";
         Assert.Throws<InvalidPfmFileFormatException>(() => HDRImage._ParseEndianness(endianness));
         endianness = "0";
         Assert.Throws<InvalidPfmFileFormatException>(() => HDRImage._ParseEndianness(endianness));
-        endianness = "-2.0";
+        endianness = "- 2.0";
         Assert.Throws<InvalidPfmFileFormatException>(() => HDRImage._ParseEndianness(endianness));
 
         endianness = "1.0";
         Assert.Equal(Endianness.Big, HDRImage._ParseEndianness(endianness));
         endianness = "-1.0";
+        Assert.Equal(Endianness.Little, HDRImage._ParseEndianness(endianness));
+        endianness = "+102.0";
+        Assert.Equal(Endianness.Big, HDRImage._ParseEndianness(endianness));
+        endianness = "-920.40000";
         Assert.Equal(Endianness.Little, HDRImage._ParseEndianness(endianness));
     }
 
