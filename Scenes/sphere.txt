@@ -1,0 +1,50 @@
+# This scene is very similar to the same scene developed in the demo command
+# It will be used to shows how differently work all the render and how to successfully 
+# create an animation
+
+float clock(0)
+float aclock(0)
+
+# Materials declarations
+material diffmaterial( 
+    diffuse(uniform(<0.7, 0.3, 0.2>)), 
+    uniform(<0, 0, 0>) 
+)
+
+material imgmaterial( 
+	diffuse(image("earth.pfm")), 
+	uniform(<0, 0, 0>) 
+)
+
+material checkmaterial(
+    diffuse(checkered(<0.2, 0.7, 0.3>,
+                      <0.3, 0.2, 0.7>, 4)),
+    uniform(<0, 0, 0>)
+)
+
+# Spheres declarations
+sphere(diffmaterial, translation([0.5, 0.5, 0.5]) * scaling(0.1, 0.1, 0.1))
+
+sphere(diffmaterial, translation([-0.5, 0.5, 0.5]) * scaling(0.1, 0.1, 0.1))
+
+sphere(diffmaterial, translation([0.5, -0.5, 0.5]) * scaling(0.1, 0.1, 0.1))
+
+sphere(diffmaterial, translation([0.5, 0.5, -0.5]) * scaling(0.1, 0.1, 0.1))
+
+sphere(diffmaterial, translation([-0.5, -0.5, 0.5]) * scaling(0.1, 0.1, 0.1))
+
+sphere(diffmaterial, translation([0.5, -0.5, -0.5]) * scaling(0.1, 0.1, 0.1))
+
+sphere(diffmaterial, translation([-0.5, 0.5, -0.5]) * scaling(0.1, 0.1, 0.1))
+
+sphere(diffmaterial, translation([-0.5, -0.5, -0.5]) * scaling(0.1, 0.1, 0.1))
+
+sphere(imgmaterial, rotation_y(clock) * translation([0, 0, -0.5]) * scaling(0.1, 0.1, 0.1) * rotation_y(clock))
+
+sphere(checkmaterial, rotation_z(aclock) * translation([0, 0.5, 0]) * scaling(0.1, 0.1, 0.1) * rotation_z(clock))
+
+# Camera declaration
+camera(perspective, rotation_z(0) * translation([-1, 0, 0]), 1, 1)
+
+# Per generare due trasformazioni una antioraria ed una oraria passare il seguente script
+#  seq -w 0 359 | parallel -j 5 ' aclock=$((360-10#{})) ./raytracer.sh render --declarefloat clock:{} --declarefloat aclock:$aclock --outputpfm frame_{}.pfm --outputpng frame_{}.png '

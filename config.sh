@@ -8,26 +8,26 @@ gamma=1
 inputrender="scene.txt"
 width=500
 height=500
-algorithm="flat"
-outputpfm="output.pfm"
-outputpng="output.png"
+algorithm="pathtracer"
+outputpfm="scene_test.pfm"
+outputpng="scene_test.png"
 numrays=10
 maxdepth=2
-initstate=(45 12)
-initseq=(54 2)
+initstate=(45)
+initseq=(54)
 sampleside=1
 declarefloat=()
 roulettestart=3
 rouletteprob=""
 
 # Default pfmtopng
-inputpfm=""
-output=""
+inputpfm="dome.pfm"
+output="dome.png"
 
 # Default averageimage
-inputaverage=""
-outputaveragepfm=""
-outputaveragepng=""
+inputaverage="PfmImages"
+outputaveragepfm="average.pfm"
+outputaveragepng="average.png"
 
 # Cycle parameters
 pcgcycle=false
