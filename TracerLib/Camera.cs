@@ -38,7 +38,6 @@ public interface ICamera
 public struct OrthogonalCamera : ICamera
 {
     public float AspectRatio { get; set; }
-
     public Transformation Transformation { get; set; }
 
     /// <summary>

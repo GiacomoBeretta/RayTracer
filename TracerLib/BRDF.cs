@@ -5,21 +5,24 @@ namespace TracerLib;
 /// <summary>
 /// A class representing the Bidirectional Reflectance Distribution Function.
 /// That is the ratio between the radiance leaving a surface and the irradiance received. So it's a dimensionless number.
+/// Describes how light is reflected by the material.
 /// </summary>
 public abstract class BRDF
 {
+    /// <summary>
     /// The Pigment property represents the texture of the surface
+    /// </summary>
     public Pigment Pigment;
 
     // forse questo si può togliere?
     //public abstract Color Eval(Normal normal, Vector Vin, Vector Vout, Vector2D uv);
     
     /// <summary>
-    /// Constructs a BRDF with a uniform black color.
+    /// Base abstract class constructor that initialize a BRDF with a uniform black color.
     /// </summary>
     protected BRDF()
     {
-        Pigment = new UniformPigment(new Color(0f, 0f, 0f));
+        Pigment = new UniformPigment();
     }
 
     protected BRDF(Pigment pigment)

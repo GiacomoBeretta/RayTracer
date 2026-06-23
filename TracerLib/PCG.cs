@@ -2,6 +2,10 @@
 
 namespace TracerLib;
 
+/// <summary>
+/// A random generator described by Melissa O'Neill in this page:
+/// https://www.pcg-random.org/paper.html
+/// </summary>
 public class PCG
 {
     public ulong State { get; set; }
@@ -39,7 +43,7 @@ public class PCG
     }
 
     /// <summary>
-    /// Returns a random floating number between 0 and 1
+    /// Returns a random floating number between 0 and 1 following a uniform distribution.
     /// </summary>
     /// <returns></returns>
     public float RandomFloat()

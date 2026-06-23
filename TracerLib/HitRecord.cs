@@ -94,7 +94,6 @@ public struct HitRecord
     public static bool _AreHitRecordsClose(HitRecord hit1, HitRecord hit2, float epsilon = 1e-5f)
     {
         return Point._ArePointsClose(hit1.WorldPoint, hit2.WorldPoint, epsilon)
-               && (hit1.Shape)._IsCloseTo(hit2.Shape, epsilon)
                && Normal._AreNormalsClose(hit1.SurfaceNormal, hit2.SurfaceNormal, epsilon)
                && Vector2D._AreVectorsClose(hit1.SurfacePosition, hit2.SurfacePosition, epsilon)
                && Ray._AreRaysClose(hit1.IncomingRay, hit2.IncomingRay, epsilon)

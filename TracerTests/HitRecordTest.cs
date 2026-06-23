@@ -13,6 +13,7 @@ public class HitRecordTest
         Ray ray = new Ray(new Point(), new Vector(5, 2, 6));
         Sphere sphere = new Sphere();
         HitRecord record = new HitRecord(point, sphere, normal, surfacePoint, ray, 2);
+        
         Assert.Equal(point, record.WorldPoint);
         Assert.Equal(sphere, record.Shape);
         Assert.Equal(normal, record.SurfaceNormal);

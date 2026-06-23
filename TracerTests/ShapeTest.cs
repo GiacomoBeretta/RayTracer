@@ -1,7 +1,8 @@
+
 using System.Runtime.InteropServices.JavaScript;
 using TracerLib;
-
 namespace TracerTests;
+
 
 public class ShapeTest
 {
@@ -150,7 +151,7 @@ public class SphereTest
         Ray ray3 = new Ray(new Point(0, 0, 2), new Vector(0, 0, -1));
         hit = sphere.FindIntersection(ray3);
         Assert.Null(hit);
-
+        
         Ray ray4 = new Ray(new Point(-10, 0, 0), new Vector(0, 0, -1));
         hit = sphere.FindIntersection(ray4);
         Assert.Null(hit);
@@ -163,14 +164,13 @@ public class PlaneTest
     public void TestPlaneConstructor()
     {
         Plane plane = new Plane();
-
         Assert.True(Transformation.AreTransformationsClose(new Transformation(), plane.Transform));
     }
 
     [Fact]
     public void TestPlaneConstructorWithTransformation()
     {
-        Transformation transformation = new Transformation('x', MathF.PI / 2); 
+        Transformation transformation = new Transformation(Axis.X, MathF.PI / 2); 
         Plane plane = new Plane(transformation);
 
         Assert.True(Transformation.AreTransformationsClose(transformation, plane.Transform));

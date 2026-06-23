@@ -3,7 +3,11 @@
 namespace TracerLib;
 
 //Verificare se modificare {token} in {type(token)} nei messaggi d'errore cambia qualcosa
-//Considerare di cambiare ExpecteSymbol(InputStream, string) in ExpecteSymbol(InputStream, char)
+//Considerare di cambiare ExpectSymbol(InputStream, string) in ExpecteSymbol(InputStream, char)
+
+/// <summary>
+/// A class that serves for interpret the txt file that contains the informations of the scene to render.
+/// </summary>
 public class Scene
 {
     public Dictionary<string, Material> Materials { get; set; } = new();
@@ -12,141 +16,236 @@ public class Scene
     public Dictionary<string, float> Variables { get; set; } = new();
     public HashSet<string> OverriddenVariables { get; set; } = [];
 
-    public void ExpectSymbol(InputStream inputFile, string symbol)
+    /// <summary>
+    /// Reads the next token from the input stream and verifies that it matches the expected symbol.
+    /// </summary>
+    /// <param name="inputStream">The input stream providing tokens to read.</param>
+    /// <param name="symbol">The expected symbol value to match against the next token.</param>
+    /// <exception cref="SceneSyntaxException">Thrown when the next token is not a symbol token or its value does not match the expected symbol.</exception>
+    public void ExpectSymbol(InputStream inputStream, string symbol)
     {
-        Token token = inputFile.ReadNextToken();
+        Token token = inputStream.ReadNextToken();
         if (token is not SymbolToken symbolToken || symbolToken.Symbol != symbol)
         {
-            throw new SceneSyntaxException(token.Location, $"got {token} instead of {symbol}");
+            throw new SceneSyntaxException(token.Location, $"expected {symbol} but got {token}");
         }
     }
 
-    public Keyword ExpectKeywords(InputStream inputFile, List<Keyword> keywords)
+    /// <summary>
+    /// Reads the next token from the input stream and ensures it is a KeywordToken and that its value
+    /// is included in the provided <paramref name="keywords"/> list.
+    /// </summary>
+    /// <param name="inputStream">The input stream providing tokens to read.</param>
+    /// <param name="keywords">The list of valid keywords that are allowed at this position.</param>
+    /// <returns>The parsed <see cref="Keyword"/> value.</returns>
+    /// <exception cref="SceneSyntaxException">
+    ///  Thrown when the next token is not a keyword, or when the keyword is not contained in <paramref name="keywords"/>.
+    /// </exception>
+    public Keyword ExpectKeyword(InputStream inputStream, List<Keyword> keywords)
     {
-        Token token = inputFile.ReadNextToken();
+        Token token = inputStream.ReadNextToken();
 
         if (token is not KeywordToken keywordToken)
         {
             throw new SceneSyntaxException(token.Location, $"expected keyword instead of {token}");
         }
-        else if (!keywords.Contains(keywordToken.Keyword))
+
+        if (!keywords.Contains(keywordToken.Keyword))
         {
             throw new SceneSyntaxException(token.Location,
-                $"expect one of the following keywords: {string.Join(',', keywords)} instead of {token}");
+                $"expected one of the following keywords: {string.Join(", ", keywords)} instead of {token}");
         }
 
         return keywordToken.Keyword;
     }
 
-    public float ExpectNumber(InputStream inputFile)
+    /// <summary>
+    /// Reads the next token from the input stream and evaluates it as a numeric value.
+    /// The token can be either a numeric literal or a variable identifier.
+    /// </summary>
+    /// <param name="inputStream">The input stream providing tokens to read.</param>
+    /// <returns>The numeric value represented by the next token.</returns>
+    /// <exception cref="SceneSyntaxException">
+    /// Thrown when the token is not a number or a valid variable reference,
+    /// or when the referenced variable is not defined in <see cref="Variables"/>.
+    /// </exception>
+    public float ExpectNumber(InputStream inputStream)
     {
-        Token token = inputFile.ReadNextToken();
+        Token token = inputStream.ReadNextToken();
 
         if (token is LiteralNumberToken literalNumberToken) return literalNumberToken.Value;
-        
+
         if (token is IdentifierToken identifierToken)
         {
             string variableName = identifierToken.Identifier;
-            
+
             if (!Variables.ContainsKey(variableName))
                 throw new SceneSyntaxException(token.Location, $"unknow variable {token}");
-            
+
             return Variables[variableName];
         }
 
-        throw new SceneSyntaxException(token.Location, $"got {token} instead of a number");
+        throw new SceneSyntaxException(token.Location, $"expected a number instead of {token}");
     }
 
-    public string ExpectString(InputStream inputFile)
+    /// <summary>
+    /// Reads the next token from the input stream and ensures it is a StringToken.
+    /// </summary>
+    /// <param name="inputStream">The input stream providing tokens to read.</param>
+    /// <returns>The string value of the parsed token.</returns>
+    /// <exception cref="SceneSyntaxException">
+    /// Thrown if the next token is not a string literal.
+    /// </exception>
+    public string ExpectString(InputStream inputStream)
     {
-        Token token = inputFile.ReadNextToken();
+        Token token = inputStream.ReadNextToken();
 
         if (token is not StringToken stringToken)
-            throw new SceneSyntaxException(token.Location, $"got {token} instead of a string");
+            throw new SceneSyntaxException(token.Location, $"expected a literal string instead of {token}");
 
         return stringToken.String;
     }
-
-    public string ExpectIdentifier(InputStream inputFile)
+    
+    /// <summary>
+    /// Reads the next token from the input stream and ensures it is an IdentifierToken.
+    /// </summary>
+    /// <param name="inputStream">The input stream providing tokens to read.</param>
+    /// <returns>The identifier string from the next token.</returns>
+    /// <exception cref="SceneSyntaxException">
+    /// Thrown when the next token is not an identifier.
+    /// </exception>
+    public string ExpectIdentifier(InputStream inputStream)
     {
-        Token token = inputFile.ReadNextToken();
+        Token token = inputStream.ReadNextToken();
 
         if (token is not IdentifierToken identifierToken)
-            throw new SceneSyntaxException(token.Location, $"got {token} instead of an identifier");
+            throw new SceneSyntaxException(token.Location, $"expected an identifier instead of {token}");
 
         return identifierToken.Identifier;
     }
 
-    public Vector ParseVector(InputStream inputFile)
+    /// <summary>
+    /// Parses a three-dimensional vector from the input stream.
+    /// </summary>
+    /// <remarks>
+    /// Expected grammar:
+    /// vector ::= "[" number "," number "," number "]"
+    /// where each component is either a numeric literal or a valid variable reference.
+    /// </remarks>
+    /// <param name="inputStream">The input stream providing tokens to read.</param>
+    /// <returns>A <see cref="Vector"/> containing the parsed coordinates.</returns>
+    public Vector ParseVector(InputStream inputStream)
     {
-        ExpectSymbol(inputFile, "[");
-        float x = ExpectNumber(inputFile);
-        ExpectSymbol(inputFile, ",");
-        float y = ExpectNumber(inputFile);
-        ExpectSymbol(inputFile, ",");
-        float z = ExpectNumber(inputFile);
-        ExpectSymbol(inputFile, "]");
+        ExpectSymbol(inputStream, "[");
+        float x = ExpectNumber(inputStream);
+        ExpectSymbol(inputStream, ",");
+        float y = ExpectNumber(inputStream);
+        ExpectSymbol(inputStream, ",");
+        float z = ExpectNumber(inputStream);
+        ExpectSymbol(inputStream, "]");
 
         return new Vector(x, y, z);
     }
-
-    public Color ParseColor(InputStream inputFile)
+    
+    /// <summary>
+    /// Parses an RGB Color from the input stream.
+    /// </summary>
+    /// <remarks>
+    /// Expected grammar:
+    /// <code>
+    /// color ::= "&lt;" number "," number "," number "&gt;"
+    /// </code>
+    /// </remarks>
+    /// <param name="inputStream">The input stream providing tokens to read.</param>
+    /// <returns>A <see cref="Color"/> containing the parsed RGB values.</returns>
+    public Color ParseColor(InputStream inputStream)
     {
-        ExpectSymbol(inputFile, "<");
-        float r = ExpectNumber(inputFile);
-        ExpectSymbol(inputFile, ",");
-        float g = ExpectNumber(inputFile);
-        ExpectSymbol(inputFile, ",");
-        float b = ExpectNumber(inputFile);
-        ExpectSymbol(inputFile, ">");
+        ExpectSymbol(inputStream, "<");
+        float r = ExpectNumber(inputStream);
+        ExpectSymbol(inputStream, ",");
+        float g = ExpectNumber(inputStream);
+        ExpectSymbol(inputStream, ",");
+        float b = ExpectNumber(inputStream);
+        ExpectSymbol(inputStream, ">");
 
         return new Color(r, g, b);
     }
-
-    public Pigment ParsePigment(InputStream inputFile)
+    
+    /// <summary>
+    /// Parses a <see cref="Pigment"/> from the input stream.
+    /// Expected grammar:
+    /// <code>
+    /// pigment ::= uniform_pigment | checkered_pigment | image_pigment
+    /// uniform_pigment ::= "uniform" "(" color ")"
+    /// checkered_pigment ::= "checkered" "(" color "," color "," number ")"
+    /// image_pigment ::= "image" "(" LITERAL_STRING ")"
+    /// </code>
+    /// </summary>
+    /// <param name="inputStream">The input stream providing tokens to read.</param>
+    /// <returns>
+    /// A <see cref="Pigment"/> instance representing the parsed pigment.
+    /// </returns>
+    /// <exception cref="SceneSyntaxException">Thrown when the keyword is not among the expected.</exception>
+    public Pigment ParsePigment(InputStream inputStream)
     {
-        Keyword keyword = ExpectKeywords(inputFile, [Keyword.Uniform, Keyword.Checkered, Keyword.Image]);
+        Keyword keyword = ExpectKeyword(inputStream, [Keyword.Uniform, Keyword.Checkered, Keyword.Image]);
         Pigment result;
 
-        ExpectSymbol(inputFile, "(");
+        ExpectSymbol(inputStream, "(");
 
         switch (keyword)
         {
             case Keyword.Uniform:
-                Color color = ParseColor(inputFile);
+                Color color = ParseColor(inputStream);
                 result = new UniformPigment(color);
                 break;
             case Keyword.Checkered:
-                Color color1 = ParseColor(inputFile);
-                ExpectSymbol(inputFile, ",");
-                Color color2 = ParseColor(inputFile);
-                ExpectSymbol(inputFile, ",");
-                int steps = (int)ExpectNumber(inputFile);
+                Color color1 = ParseColor(inputStream);
+                ExpectSymbol(inputStream, ",");
+                Color color2 = ParseColor(inputStream);
+                ExpectSymbol(inputStream, ",");
+                int steps = (int)ExpectNumber(inputStream);
                 result = new CheckeredPigment(color1, color2, steps);
                 break;
             case Keyword.Image:
-                string fileName = ExpectString(inputFile);
+                string fileName = ExpectString(inputStream);
                 using (FileStream imageFile = File.OpenRead(fileName))
                 {
                     HDRImage image = HDRImage.ReadPFM_File(imageFile);
                     result = new ImagePigment(image);
                 }
-
                 break;
             default:
-                throw new SceneSyntaxException(inputFile.Location, "Keyword doesn't match any of the Pigments types");
+                throw new SceneSyntaxException(inputStream.Location, "Keyword doesn't match any of the Pigments types");
         }
 
-        ExpectSymbol(inputFile, ")");
+        ExpectSymbol(inputStream, ")");
         return result;
     }
-
-    public BRDF ParseBRDF(InputStream inputFile)
+    
+    /// <summary>
+    /// Parses a BRDF definition from the input stream.
+    /// Expected grammar:
+    /// <code>
+    /// brdf ::= diffuse_brdf | specular_brdf
+    ///
+    /// diffuse_brdf  ::= "diffuse" "(" pigment ")"
+    /// specular_brdf ::= "specular" "(" pigment ")"
+    /// </code>
+    /// </summary>
+    /// <param name="inputStream">The input stream providing tokens to read.</param>
+    /// <returns>
+    /// A <see cref="BRDF"/> instance representing the parsed reflectance model.
+    /// </returns>
+    /// <exception cref="SceneSyntaxException">
+    /// Thrown when the input does not match a valid BRDF definition or contains invalid tokens.
+    /// </exception>
+    public BRDF ParseBRDF(InputStream inputStream)
     {
-        Keyword BRDFkeyword = ExpectKeywords(inputFile, [Keyword.Diffuse, Keyword.Specular]);
-        ExpectSymbol(inputFile, "(");
-        Pigment pigment = ParsePigment(inputFile);
-        ExpectSymbol(inputFile, ")");
+        Keyword BRDFkeyword = ExpectKeyword(inputStream, [Keyword.Diffuse, Keyword.Specular]);
+        ExpectSymbol(inputStream, "(");
+        Pigment pigment = ParsePigment(inputStream);
+        ExpectSymbol(inputStream, ")");
         BRDF result;
 
         switch (BRDFkeyword)
@@ -158,32 +257,32 @@ public class Scene
                 result = new SpecularBRDF(pigment);
                 break;
             default:
-                throw new SceneSyntaxException(inputFile.Location, "Keyword doesn't match any of the BRDF types");
+                throw new SceneSyntaxException(inputStream.Location, "Keyword doesn't match any of the BRDF types");
         }
 
         return result;
     }
 
-    public void ParseMaterial(InputStream inputFile, out string name, out Material material)
+    public void ParseMaterial(InputStream inputStream, out string name, out Material material)
     {
-        name = ExpectIdentifier(inputFile);
+        name = ExpectIdentifier(inputStream);
 
-        ExpectSymbol(inputFile, "(");
-        BRDF brdf = ParseBRDF(inputFile);
-        ExpectSymbol(inputFile, ",");
-        Pigment emittedRadiance = ParsePigment(inputFile);
-        ExpectSymbol(inputFile, ")");
+        ExpectSymbol(inputStream, "(");
+        BRDF brdf = ParseBRDF(inputStream);
+        ExpectSymbol(inputStream, ",");
+        Pigment emittedRadiance = ParsePigment(inputStream);
+        ExpectSymbol(inputStream, ")");
 
         material = new Material(emittedRadiance, brdf);
     }
 
-    public Transformation ParseTransformation(InputStream inputFile)
+    public Transformation ParseTransformation(InputStream inputStream)
     {
         var result = new Transformation();
 
         while (true)
         {
-            Keyword transformKeyword = ExpectKeywords(inputFile,
+            Keyword transformKeyword = ExpectKeyword(inputStream,
             [
                 Keyword.Identity, Keyword.Translation, Keyword.RotationX, Keyword.RotationY, Keyword.RotationZ,
                 Keyword.Scaling
@@ -194,46 +293,47 @@ public class Scene
                 case Keyword.Identity:
                     break;
                 case Keyword.Translation:
-                    ExpectSymbol(inputFile, "(");
-                    result *= new Transformation(ParseVector(inputFile));
-                    ExpectSymbol(inputFile, ")");
+                    ExpectSymbol(inputStream, "(");
+                    result *= new Transformation(ParseVector(inputStream));
+                    ExpectSymbol(inputStream, ")");
                     break;
                 case Keyword.RotationX:
-                    ExpectSymbol(inputFile, "(");
-                    float degx = ExpectNumber(inputFile);
-                    result *= new Transformation('x', Functions.DegToRad(degx));
-                    ExpectSymbol(inputFile, ")");
+                    ExpectSymbol(inputStream, "(");
+                    float degx = ExpectNumber(inputStream);
+                    result *= new Transformation(Axis.X, Functions.DegToRad(degx));
+                    ExpectSymbol(inputStream, ")");
                     break;
                 case Keyword.RotationY:
-                    ExpectSymbol(inputFile, "(");
-                    float degy = ExpectNumber(inputFile);
-                    result *= new Transformation('y', Functions.DegToRad(degy));
-                    ExpectSymbol(inputFile, ")");
+                    ExpectSymbol(inputStream, "(");
+                    float degy = ExpectNumber(inputStream);
+                    result *= new Transformation(Axis.Y, Functions.DegToRad(degy));
+                    ExpectSymbol(inputStream, ")");
                     break;
                 case Keyword.RotationZ:
-                    ExpectSymbol(inputFile, "(");
-                    float degz = ExpectNumber(inputFile);
-                    result *= new Transformation('z', Functions.DegToRad(degz));
-                    ExpectSymbol(inputFile, ")");
+                    ExpectSymbol(inputStream, "(");
+                    float degz = ExpectNumber(inputStream);
+                    result *= new Transformation(Axis.Z, Functions.DegToRad(degz));
+                    ExpectSymbol(inputStream, ")");
                     break;
                 case Keyword.Scaling:
-                    ExpectSymbol(inputFile, "(");
-                    float x = ExpectNumber(inputFile);
-                    ExpectSymbol(inputFile, ",");
-                    float y = ExpectNumber(inputFile);
-                    ExpectSymbol(inputFile, ",");
-                    float z = ExpectNumber(inputFile);
+                    ExpectSymbol(inputStream, "(");
+                    float x = ExpectNumber(inputStream);
+                    ExpectSymbol(inputStream, ",");
+                    float y = ExpectNumber(inputStream);
+                    ExpectSymbol(inputStream, ",");
+                    float z = ExpectNumber(inputStream);
                     result *= new Transformation(x, y, z);
-                    ExpectSymbol(inputFile, ")");
+                    ExpectSymbol(inputStream, ")");
                     break;
                 default:
-                    throw new SceneSyntaxException(inputFile.Location, "Keyword doesn't match any of the Transformation types");
+                    throw new SceneSyntaxException(inputStream.Location,
+                        "Keyword doesn't match any of the Transformation types");
             }
 
-            Token nextToken = inputFile.ReadNextToken();
+            Token nextToken = inputStream.ReadNextToken();
             if (nextToken is not SymbolToken symbolToken || symbolToken.Symbol != "*")
             {
-                inputFile.UnreadToken(nextToken);
+                inputStream.UnreadToken(nextToken);
                 break;
             }
         }
@@ -241,49 +341,49 @@ public class Scene
         return result;
     }
 
-    public Sphere ParseSphere(InputStream inputFile, Scene scene)
+    public Sphere ParseSphere(InputStream inputStream, Scene scene)
     {
-        ExpectSymbol(inputFile, "(");
+        ExpectSymbol(inputStream, "(");
 
-        string material = ExpectIdentifier(inputFile);
-        
+        string material = ExpectIdentifier(inputStream);
+
         if (!Materials.ContainsKey(material))
-            throw new SceneSyntaxException(inputFile.Location, $"unknown material {material}");
+            throw new SceneSyntaxException(inputStream.Location, $"unknown material {material}");
 
-        ExpectSymbol(inputFile, ",");
-        Transformation transformation = scene.ParseTransformation(inputFile);
-        ExpectSymbol(inputFile, ")");
+        ExpectSymbol(inputStream, ",");
+        Transformation transformation = scene.ParseTransformation(inputStream);
+        ExpectSymbol(inputStream, ")");
 
         return new Sphere(transformation, Materials[material]);
     }
 
-    public Plane ParsePlane(InputStream inputFile, Scene scene)
+    public Plane ParsePlane(InputStream inputStream, Scene scene)
     {
-        ExpectSymbol(inputFile, "(");
-        
-        string material = ExpectIdentifier(inputFile);
-        
-        if (!Materials.ContainsKey(material))
-            throw new SceneSyntaxException(inputFile.Location, $"unknown material {material}");
+        ExpectSymbol(inputStream, "(");
 
-        ExpectSymbol(inputFile, ",");
-        Transformation transformation = scene.ParseTransformation(inputFile);
-        ExpectSymbol(inputFile, ")");
+        string material = ExpectIdentifier(inputStream);
+
+        if (!Materials.ContainsKey(material))
+            throw new SceneSyntaxException(inputStream.Location, $"unknown material {material}");
+
+        ExpectSymbol(inputStream, ",");
+        Transformation transformation = scene.ParseTransformation(inputStream);
+        ExpectSymbol(inputStream, ")");
 
         return new Plane(transformation, Materials[material]);
     }
 
-    public ICamera ParseCamera(InputStream inputFile, Scene scene)
+    public ICamera ParseCamera(InputStream inputStream, Scene scene)
     {
-        ExpectSymbol(inputFile, "(");
-        Keyword cameraKeyword = ExpectKeywords(inputFile, [Keyword.Perspective, Keyword.Orthogonal]);
-        ExpectSymbol(inputFile, ",");
-        Transformation transformation = scene.ParseTransformation(inputFile);
-        ExpectSymbol(inputFile, ",");
-        float aspectRatio = ExpectNumber(inputFile);
-        ExpectSymbol(inputFile, ",");
-        float distance = ExpectNumber(inputFile);
-        ExpectSymbol(inputFile, ")");
+        ExpectSymbol(inputStream, "(");
+        Keyword cameraKeyword = ExpectKeyword(inputStream, [Keyword.Perspective, Keyword.Orthogonal]);
+        ExpectSymbol(inputStream, ",");
+        Transformation transformation = scene.ParseTransformation(inputStream);
+        ExpectSymbol(inputStream, ",");
+        float aspectRatio = ExpectNumber(inputStream);
+        ExpectSymbol(inputStream, ",");
+        float distance = ExpectNumber(inputStream);
+        ExpectSymbol(inputStream, ")");
 
         ICamera result;
 
@@ -296,13 +396,13 @@ public class Scene
                 result = new OrthogonalCamera(transformation, aspectRatio);
                 break;
             default:
-                throw new SceneSyntaxException(inputFile.Location, "Keyword doesn't match any of the Cameras types");
+                throw new SceneSyntaxException(inputStream.Location, "Keyword doesn't match any of the Cameras types");
         }
 
         return result;
     }
 
-    public Scene ParseScene(InputStream inputFile, Dictionary<string, float> variables)
+    public Scene ParseScene(InputStream inputStream, Dictionary<string, float> variables)
     {
         var scene = new Scene
         {
@@ -312,19 +412,19 @@ public class Scene
 
         while (true)
         {
-            Token token = inputFile.ReadNextToken();
+            Token token = inputStream.ReadNextToken();
             if (token is StopToken) break;
             if (token is not KeywordToken)
                 throw new SceneSyntaxException(token.Location, $"expected keyword instead of {token}");
             if (token is KeywordToken { Keyword: Keyword.Float })
             {
-                string variableName = ExpectIdentifier(inputFile);
+                string variableName = ExpectIdentifier(inputStream);
 
-                SourceLocation variableLocation = inputFile.Location;
+                SourceLocation variableLocation = inputStream.Location;
 
-                ExpectSymbol(inputFile, "(");
-                float variableValue = ExpectNumber(inputFile);
-                ExpectSymbol(inputFile, ")");
+                ExpectSymbol(inputStream, "(");
+                float variableValue = ExpectNumber(inputStream);
+                ExpectSymbol(inputStream, ")");
 
                 if (scene.Variables.ContainsKey(variableName) && !scene.OverriddenVariables.Contains(variableName))
                     throw new SceneSyntaxException(variableLocation,
@@ -333,22 +433,22 @@ public class Scene
             }
             else if (token is KeywordToken { Keyword: Keyword.Sphere })
             {
-                var sphere = scene.ParseSphere(inputFile, scene);
+                var sphere = scene.ParseSphere(inputStream, scene);
                 scene.World.Add(sphere);
             }
             else if (token is KeywordToken { Keyword: Keyword.Plane })
             {
-                scene.World.Add(scene.ParsePlane(inputFile, scene));
+                scene.World.Add(scene.ParsePlane(inputStream, scene));
             }
             else if (token is KeywordToken { Keyword: Keyword.Camera })
             {
                 if (scene.Camera != null) throw new SceneSyntaxException(token.Location, "Cannot define more Cameras");
-                
-                scene.Camera = scene.ParseCamera(inputFile, scene);
+
+                scene.Camera = scene.ParseCamera(inputStream, scene);
             }
             else if (token is KeywordToken { Keyword: Keyword.Material })
             {
-                scene.ParseMaterial(inputFile, out string name, out Material material);
+                scene.ParseMaterial(inputStream, out string name, out Material material);
                 scene.Materials[name] = material;
             }
         }

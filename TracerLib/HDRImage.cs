@@ -151,14 +151,12 @@ public class HDRImage
 
     public Color[] this[Range range] => Pixels[range];
 
-    //forse è troppo mettere l'eccezione per offset?
     /// <summary>
-    /// Gives the index integer for the one dimensional vector,
-    /// given the column and row of the corresponding matrix
+    /// Returns the index in a 1D array corresponding to the specified matrix column and row.
     /// </summary>
-    /// <param name="column"></param>
-    /// <param name="row"></param>
-    /// <returns></returns>
+    /// <param name="column">The column index.</param>
+    /// <param name="row">The row index.</param>
+    /// <returns>The computed 1D array index.</returns>
     public int _PixelOffset(int column, int row)
     {
         _ValidateCoordinates(column, row);
@@ -178,6 +176,9 @@ public class HDRImage
     }
 
     //Constructors - Begin
+
+    #region Constructors
+
     public HDRImage(int width, int height)
     {
         _CheckWidthHeight(width, height);
@@ -242,6 +243,8 @@ public class HDRImage
         }
     }
 
+    #endregion
+
     //Constructors - End
 
     //meglio usare stringBuilder qua
@@ -295,6 +298,8 @@ public class HDRImage
     }
 
     //Methods for Read and Write PFM files - Begin
+
+    #region PFM_Files
 
     /// <summary>
     /// Parses an image size string and extracts width and height values.
@@ -355,7 +360,7 @@ public class HDRImage
         {
             if (number > 0f) return Endianness.Big;
 
-            if(number < 0f) return Endianness.Little;
+            if (number < 0f) return Endianness.Little;
         }
 
         throw new InvalidPfmFileFormatException("The endianness must be a floating-point non-zero number.");
@@ -597,9 +602,13 @@ public class HDRImage
         }
     }
 
-    //Methods for Read and Write PFM files - End
+    #endregion
+
+    // Methods for Read and Write PFM files - End
 
     // Methods for conversion to an LDR Image (Tone mapping) - Begin
+
+    #region Tone_mapping
 
     /// <summary>
     /// Computes the logarithmic average luminosity of the image.
@@ -718,6 +727,8 @@ public class HDRImage
         image._ImageTo8BitRGB(gamma);
         return image;
     }
+
+    #endregion
 
     // Methods for conversion to an LDR Image - End
 

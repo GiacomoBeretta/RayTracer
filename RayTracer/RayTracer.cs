@@ -1,11 +1,10 @@
 // This file is released under EUPL_v1.2 license. See LICENSE.md
 
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using SixLabors.ImageSharp.Processing;
 using TracerLib;
 using McMaster.Extensions.CommandLineUtils;
-using System.ComponentModel.DataAnnotations;
-using SixLabors.ImageSharp.Metadata.Profiles.Exif; // per rendere le opzioni o gli argomenti required
 
 [Command(Name = "RayTracer")]
 [Subcommand(typeof(DemoCommand), typeof(PfmToPngCommand), typeof(AverageImageCommand), typeof(RenderCommand))]
@@ -87,8 +86,8 @@ public class DemoCommand
         string currentPath = AppDomain.CurrentDomain.BaseDirectory;
         string pngFilePath =
             Path.Combine(currentPath,
-                "../../../../DemoImages/" +
-                OutputFileName); //"../../../../DemoImages/" dal path dell'eseguibile torna indietro (Controllare)
+                "../../../../PngImages/" +
+                OutputFileName); //"../../../../PngImages/" dal path dell'eseguibile torna indietro (Controllare)
         if (OutputFileName[^4..] != ".png") pngFilePath += ".png"; //OutputFilename[^4..] Legge gli ultimi 4 caratteri
 
         // Define materials
@@ -110,14 +109,14 @@ public class DemoCommand
 
         if (Projection == Projection.Perspective)
         {
-            camera = new PerspectiveCamera(transformation: new Transformation('z', phiRad) *
-                                                           new Transformation('y', thetaRad) *
+            camera = new PerspectiveCamera(transformation: new Transformation(Axis.Z, phiRad) *
+                                                           new Transformation(Axis.Y, thetaRad) *
                                                            new Transformation(new Vector(-1.0f, 0f, 0f)));
         }
         else if (Projection == Projection.Orthogonal)
         {
-            camera = new OrthogonalCamera(transformation: new Transformation('z', phiRad) *
-                                                          new Transformation('y', thetaRad) *
+            camera = new OrthogonalCamera(transformation: new Transformation(Axis.Z, phiRad) *
+                                                          new Transformation(Axis.Y, thetaRad) *
                                                           new Transformation(new Vector(-1.0f, 0f, 0f)));
         }
         else
@@ -186,7 +185,7 @@ public class DemoCommand
         tracer.FireAllRays(ray => render.RenderFunction(ray));
 
         image.WritePNG(pngFilePath, LuminosityFunction, Factor, Gamma, averageLuminosity: 0.5f);
-        Console.WriteLine("The PNG file has been saved in DemoImages/" + OutputFileName);
+        Console.WriteLine("The PNG file has been saved in PngImages/" + OutputFileName);
     }
     /*
      * Demo with the two spheres and the checkered floor
@@ -234,20 +233,75 @@ public class DemoCommand
         {
             camera = new PerspectiveCamera(transformation: new Transformation('z', phiRad) *
                                                            new Transformation('y', thetaRad) *
-                                                           new Transformation(new Vector(-1.0f, 0f, 1.0f)));
+                                                           new Transformation(new Vector(-1.0f, 0f, 0.0f)));
         }
         else if (Projection == Projection.Orthogonal)
         {
             camera = new OrthogonalCamera(transformation: new Transformation('z', phiRad) *
                                                           new Transformation('y', thetaRad) *
-                                                          new Transformation(new Vector(-1.0f, 0f, 1.0f)));
+                                                          new Transformation(new Vector(-1.0f, 0f, 0.0f)));
         }
         else
         {
             throw new ArgumentException("Invalid camera mode, accepted orthogonal or perspective");
         }
+<<<<<<< HEAD
+        
+        var tracer = new ImageTracer(image, camera, samplePerSide: 4);
+
+        //PER LE FORME APPLICARE LA TRASLAZIONE PER ULTIMA (PRIMA NELLA CONCATENAZIONE)
+        var s1 = new Sphere(new Transformation(new Vector(0.5f, 0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f), material1);
+        var s2 = new Sphere(new Transformation(new Vector(-0.5f, 0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f), material1);
+        var s3 = new Sphere(new Transformation(new Vector(0.5f, -0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f), material1);
+        var s4 = new Sphere(new Transformation(new Vector(0.5f, 0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f), material1);
+        var s5 = new Sphere(new Transformation(new Vector(-0.5f, -0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f), material1);
+        var s6 = new Sphere(new Transformation(new Vector(0.5f, -0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f), material1);
+        var s7 = new Sphere(new Transformation(new Vector(-0.5f, 0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f), material1);
+        var s8 = new Sphere(new Transformation(new Vector(-0.5f, -0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f), material1);
+        var s9 = new Sphere(new Transformation(new Vector(0f, 0f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f), material2);
+        var s10 = new Sphere(new Transformation(new Vector(0f, 0.5f, 0f)) * new Transformation(0.1f, 0.1f, 0.1f), material3);
+
+        var shapes = new List<Shape>
+        {
+            s1,
+            s2,
+            s3,
+            s4,
+            s5,
+            s6,
+            s7,
+            s8,
+            s9,
+            s10,
+        };
+        
+        var world = new World(shapes);
+        
+        //Starting generating pathtracer scenario
+
+        var world2 = new World();
+
+        var skyMaterial = new Material(new UniformPigment(new Color(0.0f, 0.0f, 0.0f)),
+            new UniformPigment(new Color(1.0f, 0.9f, 0.5f)), new DiffuseBRDF());
+        
+        var groundMaterial =
+            new Material(new CheckeredPigment(new Color(0.3f, 0.5f, 0.1f), new Color(0.1f, 0.2f, 0.5f)), new DiffuseBRDF());
+        
+        var sphereMaterial = new Material(new UniformPigment(new Color(0.3f, 0.4f, 0.8f)), new DiffuseBRDF());
+        
+        var mirrorMaterial = new Material(new UniformPigment(new Color(0.6f, 0.2f, 0.3f)), new SpecularBRDF());
+        
+        world2.Add(new Sphere(new Transformation(new Vector(0f, 0f, 0.4f)) * new Transformation(200f,200f,200f), skyMaterial));
+        world2.Add(new Plane(new Transformation(), groundMaterial));
+        world2.Add(new Sphere(new Transformation(new Vector(0f, 0f, 1f)), sphereMaterial));
+        world2.Add(new Sphere(new Transformation(new Vector(1f, 2.5f, 0f)), mirrorMaterial));
+        
+        //Ending generating pathtracer scenario
+
+=======
 
         // Choose the render algorithm
+>>>>>>> pathtracing
         Render render;
         switch (Algorithm)
         {
@@ -320,9 +374,10 @@ public class PfmToPngCommand
 
 
         HDRImage image = HDRImage.ReadPFM_File(pfmFilePath);
-        Console.WriteLine($"File read in: {pfmFilePath}");
-
+        Console.WriteLine($"File read: {pfmFilePath}");
+        
         image.WritePNG(pngFilePath, Luminosityfunction, Factor, Gamma, AverageLuminosity);
+        
         Console.WriteLine($"File saved in: {pngFilePath}");
     }
 }
@@ -695,6 +750,23 @@ private void OnExecute()
 
        tracer.FireAllRays(ray => render.RenderFunction(ray));
 
-       image.WritePNG(pngFilePath, LuminosityFunction, Factor, Gamma, averageLuminosity: 0.5f);
-       Console.WriteLine("The PNG file has been saved in DemoImages/" + OutputFileName);
-   }*/
+<<<<<<< HEAD
+    //InputFileName = args[0];
+
+    if (!Single.TryParse(args[0], out AFactor))
+    {
+        throw new ArgumentException($"Invalid aFactor ('{args[1]}'). It must be a floating number.",
+            nameof(AFactor));
+    }
+
+    if (!Single.TryParse(args[1], out Gamma))
+    {
+        throw new ArgumentException($"Invalid gamma ('{args[2]}'). It must be a floating number.", nameof(Gamma));
+    }
+
+    OutputFileName = args[2];
+
+    //Console.WriteLine(
+       // $"I parametri passati sono: InputFileName={args[0]}, aFactor={args[1]}, gamma={args[2]}, OutputFileName={args[3]}");
+}*/
+ 

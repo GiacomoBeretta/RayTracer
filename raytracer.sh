@@ -53,6 +53,8 @@ done
 
 readonly exepath="./RayTracer/bin/Debug/net10.0/RayTracer"
 
+dotnet build
+
 cmd=( "$exepath" "$subcommand" )
 
 # Render
@@ -86,6 +88,8 @@ if [[ "$subcommand" == "pfmtopng" ]]; then
 	[ -n "$factor" ]            && cmd+=( --factor "$factor" ) 
 	[ -n "$gamma" ]             && cmd+=( --gamma "$gamma" ) 
 fi
+
+# Average Images
 
 if [[ "$subcommand" == "averageimage" ]]; then
 	[ -n "$inputaverage" ]         && cmd+=( --inputaverage "$inputaverage" ) 
@@ -147,6 +151,3 @@ else
 fi
 
 # seq -w 0 359 | parallel -j 5 ./raytracer.sh render --declarefloat clock:{} --outputpfm frame_{}.pfm --outputpng frame_{}.png
-
-
-

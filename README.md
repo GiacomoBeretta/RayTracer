@@ -70,7 +70,7 @@ The program provides several commands:
 
 Reads a scene description from a text file and generates the corresponding image.
 
-> **Note:** The scene files must be located inside the `Scene` directory.
+> **Note:** The scene file must be located inside the `Scene` directory at build time.
 
 ---
 
@@ -718,6 +718,23 @@ Sequence identifier used by the random number generator.
 
 Number of subdivisions per pixel side used for anti-aliasing.
 
+#### `--luminosityfunction`
+
+Luminosity function used in tone mapping.
+
+Available options:
+
+* `shirley`
+* `weighted`
+
+#### `--factor`
+
+Empirical factor used during tone mapping.
+
+#### `--gamma`
+
+Gamma correction factor applied during tone mapping.
+
 #### `--declarefloat` or `-d`
 
 Declares a floating-point variable using:
@@ -857,6 +874,17 @@ This technique significantly reduces jagged edges and improves image quality, es
 ![Anti-aliased image](assets/scene_antialiasing.png)
 
 
+# How to install it
+This Program works on Ubuntu 24.04 LTS and with .NET 10.0.109. The unit tests were run on these OSs with .NET 10.0.109 and they were all successful:
+Windows family: 
+    OS Name:                       Microsoft Windows Server 2025 Datacenter
+    OS Version:                    10.0.26100 N/A Build 26100
+    BIOS Version:                  Microsoft Corporation Hyper-V UEFI Release v4.1, 1/8/2026
+
+MacOS:
+    ProductName:		macOS
+    ProductVersion:		15.7.7
+    BuildVersion:		24G720
 ---
 
 # Where to ask for help

@@ -1,8 +1,5 @@
 // This file is release under EUPL_v1.2 license. See LICENSE.md
 
-//forse è meglio cambiare nome ai membri di HomMatrix e Transformation,
-//per ora hanno entrambi 
-
 using System.Globalization;
 
 namespace TracerLib;
@@ -10,12 +7,27 @@ namespace TracerLib;
 /// <summary>
 /// A Homogeneous Matrix is a 4x4 matrix with the last row = (0,0,0,1)
 /// It allows to represent scaling transformations, rotations and translations in 3D space.
+/// The matrix is indexed in row-major order.
 /// </summary>
 public struct HomMatrix
 {
+    /// <summary>
+    /// The 1D array of the coefficients of the matrix.
+    /// The array contains 16 elements stored in row-major order:
+    /// [ m00, m01, m02, m03,
+    ///   m10, m11, m12, m13,
+    ///   m20, m21, m22, m23,
+    ///   m30, m31, m32, m33 ].
+    /// </summary>
     public float[] M { get; private set; }
 
     //Constructors - Begin
+
+    #region Constructors
+
+    /// <summary>
+    /// Constructs a 4x4 identity matrix.
+    /// </summary>
     public HomMatrix()
     {
         M =
@@ -34,12 +46,14 @@ public struct HomMatrix
         {
             M[i] = m[i];
         }
+
+        _CheckHomogeneity();
     }
 
     /// <summary>
-    /// Constructs a translation matrix that translates with vector k.
+    /// Initializes a translation matrix using the specified translation vector.
     /// </summary>
-    /// <param name="k"></param>
+    /// <param name="k">The translation vector (x, y, z).</param>
     public HomMatrix(Vector k)
     {
         M =
@@ -49,10 +63,11 @@ public struct HomMatrix
             0, 0, 1, k.Z,
             0, 0, 0, 1
         ];
+        _CheckHomogeneity();
     }
 
     /// <summary>
-    /// Constructs a scaling matrix that scales along the x,y,z coordinates
+    /// Constructs a scaling matrix using the specified scaling factors x,y,z.
     /// </summary>
     /// <param name="scaleX"></param>
     /// <param name="scaleY"></param>
@@ -66,6 +81,8 @@ public struct HomMatrix
             0, 0, scaleZ, 0,
             0, 0, 0, 1
         ];
+
+        _CheckHomogeneity();
     }
 
     /*
@@ -78,10 +95,39 @@ public struct HomMatrix
     /*public Transformation(Vector axis, float angle)
     {
     }*/
+
+    #endregion
+
     //Constructors - End
 
     /// <summary>
+    /// Validates that the last row of the homogeneous matrix is (0,0,0,1).
+    /// </summary>
+    /// <exception cref="ArgumentException">Thrown when the last row is not equal to (0,0,0,1).</exception>
+    public void _CheckHomogeneity()
+    {
+        if (M[12] != 0 || M[13] != 0 || M[14] != 0 || M[15] != 1)
+        {
+            throw new ArgumentException("The matrix must have the last row (0,0,0,1) to be homogeneous.");
+        }
+    }
+
+    /// <summary>
+    /// Returns the index in a 1D array corresponding to the specified matrix column and row.
+    /// </summary>
+    /// <param name="col">The column index.</param>
+    /// <param name="row">The row index.</param>
+    /// <returns>The computed 1D array index.</returns>
+    public int _MatrixOffset(int row, int col)
+    {
+        _CheckCoordinates(row, col);
+        return row * 4 + col;
+    }
+
+    /// <summary>
     /// 1D index for the M matrix
+    /// (coefficients are stored in row-major order).
+    /// Valid range: 0–15.
     /// </summary>
     /// <param name="index"></param>
     public float this[Index index]
@@ -89,19 +135,21 @@ public struct HomMatrix
         get => M[index];
         private set => M[index] = value;
     }
-    
+
     public float this[int row, int col]
     {
         get => M[_MatrixOffset(row, col)];
         set => M[_MatrixOffset(row, col)] = value;
     }
-    
+
     /// <summary>
-    /// Checks that the row and col are non-negative and less than 16
+    /// Validates that the specified row and column indices are within the valid range [0, 15].
     /// </summary>
-    /// <param name="row"></param>
-    /// <param name="col"></param>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
+    /// <param name="row">The row index to validate.</param>
+    /// <param name="col">The column index to validate.</param>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown when either the row or column is outside the valid range [0, 15].
+    /// </exception>
     public void _CheckCoordinates(int row, int col)
     {
         if (col < 0 || col > 15)
@@ -117,12 +165,16 @@ public struct HomMatrix
         }
     }
 
-    public int _MatrixOffset(int row, int col)
-    {
-        _CheckCoordinates(row, col);
-        return row * 4 + col;
-    }
-
+    /// <summary>
+    /// Determines whether two homogeneous matrices are approximately equal within a given tolerance.
+    /// </summary>
+    /// <param name="a">The first matrix to compare.</param>
+    /// <param name="b">The second matrix to compare.</param>
+    /// <param name="epsilon">The tolerance used when comparing each coefficient of the matrices.</param>
+    /// <returns>
+    /// /// True if the absolute difference between corresponding coefficients of the two matrices
+    /// is less than or equal to the specified tolerance; otherwise, false.
+    /// </returns>
     public static bool AreMatricesClose(HomMatrix a, HomMatrix b, float epsilon = 1e-5f)
     {
         return Functions.AreArraysClose(a.M, b.M, epsilon);
@@ -136,6 +188,7 @@ public struct HomMatrix
             str += "(";
             for (int j = 0; j < 4; j++)
             {
+                // F2 for the fixed point format
                 str += this[i, j].ToString("F2", CultureInfo.InvariantCulture);
                 if (j < 3)
                 {
@@ -177,44 +230,116 @@ public struct HomMatrix
         return invMatrix;
     }*/
 
-    //si può forse ottimizzare dato che l'ultima riga è 0,0,0,1?
     /// <summary>
-    /// Returns the product of the 2 homogeneous matrices.
+    /// Returns the product of two homogeneous transformation matrices.
+    /// The computation is optimized by exploiting the fact that the last row
+    /// of a homogeneous matrix is always (0, 0, 0, 1).
     /// </summary>
-    /// <param name="m1"></param>
-    /// <param name="m2"></param>
+    /// <param name="m1">The first matrix to multiply.</param>
+    /// <param name="m2">The second matrix to multiply.</param>
     /// <returns></returns>
     public static HomMatrix operator *(HomMatrix m1, HomMatrix m2)
     {
-        HomMatrix m3 = new HomMatrix();
-        for (int i = 0; i < 4; i++)
+        float[] m3 =
+        [
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 0,
+            0, 0, 0, 1 //the last row is always (0,0,0,1)
+        ];
+
+        // the last row (row = 3) is already determined.
+        // so we loop only on the first three rows and three columns,
+        // and the remaining coefficients of the last column are computed afterwards.
+        for (int row = 0; row < 3; row++)
         {
-            for (int j = 0; j < 4; j++)
+            for (int col = 0; col < 3; col++)
             {
-                m3[i * 4 + j] = 0;
-                for (int k = 0; k < 4; k++)
+                // The last row of m2 is (0, 0, 0, 1),
+                // therefore the k = 3 term is always zero for these coefficients.
+                for (int k = 0; k < 3; k++)
                 {
-                    m3[i * 4 + j] += m1[i * 4 + k] * m2[j + k * 4];
+                    m3[row * 4 + col] += m1[row * 4 + k] * m2[k * 4 + col];
                 }
             }
         }
 
-        return m3;
+        // the first three coefficients of the last column of m3
+        for (int row = 0; row < 3; row++)
+        {
+            m3[row * 4 + 3] =
+                m1[row * 4] * m2[3] +
+                m1[row * 4 + 1] * m2[7] +
+                m1[row * 4 + 2] * m2[11] +
+                m1[row * 4 + 3]; // m2[15] = 1
+        }
+
+        return new HomMatrix(m3);
     }
+
+    // old product function without optimization
+    /* /// <summary>
+     /// Returns the product of the 2 homogeneous matrices.
+     /// </summary>
+     /// <param name="m1"></param>
+     /// <param name="m2"></param>
+     /// <returns></returns>
+     public static HomMatrix operator *(HomMatrix m1, HomMatrix m2)
+     {
+         float[] m3 =
+         [
+             0, 0, 0, 0,
+             0, 0, 0, 0,
+             0, 0, 0, 0,
+             0, 0, 0, 0
+         ];
+
+         //usual row-by-column multiplication between matrices.
+         for (int row = 0; row < 4; row++)
+         {
+             for (int col = 0; col < 4; col++)
+             {
+                 for (int k = 0; k < 4; k++)
+                 {
+                     m3[row * 4 + col] += m1[row * 4 + k] * m2[k * 4 + col];
+                 }
+             }
+         }
+
+         return new HomMatrix(m3);
+     }*/
 }
 
 /// <summary>
-/// A Transformation represents
-/// scaling transformations, rotations and translations.
-/// It has two properties, the 4x4 homogeneous matrix and its inverse.
+/// Represents scaling transformations, rotations and translations.
+/// It stores a 4×4 homogeneous transformation matrix and its inverse.
 /// </summary>
 public struct Transformation
 {
+    /// <summary>
+    /// The 4×4 homogeneous transformation matrix representing this transformation.
+    /// </summary>
+    /// <remarks>
+    /// This matrix is stored in row-major order.
+    /// </remarks>
     public HomMatrix M { get; private set; }
 
+    /// <summary>
+    /// The inverse homogeneous transformation matrix.
+    /// </summary>
+    /// <remarks>
+    /// This value is precomputed and always kept consistent with <see cref="M"/>.
+    /// </remarks>
     public HomMatrix InvM { get; private set; }
 
     //Constructors - Begin
+
+    #region Constructors
+
+    /// <summary>
+    /// Initializes an identity transformation.
+    /// Both the transformation matrix and its inverse are set to the 4×4 identity matrix.
+    /// </summary>
     public Transformation()
     {
         M = new HomMatrix();
@@ -250,9 +375,9 @@ public struct Transformation
     }
 
     /// <summary>
-    /// Constructs a translation of vector k
+    /// Constructs a homogeneous transformation representing a pure translation using the given vector.
     /// </summary>
-    /// <param name="k"></param>
+    /// <param name="k">Translation vector.</param>
     public Transformation(Vector k)
     {
         M = new HomMatrix(k);
@@ -261,11 +386,11 @@ public struct Transformation
     }
 
     /// <summary>
-    /// Constructs a scale transformation along the x,y,z coordinates
+    /// Initializes a homogeneous transformation representing a diagonal scaling matrix.
     /// </summary>
-    /// <param name="scaleX"></param>
-    /// <param name="scaleY"></param>
-    /// <param name="scaleZ"></param>
+    /// <param name="scaleX">Scaling factor along the x-axis.</param>
+    /// <param name="scaleY">Scaling factor along the y-axis.</param>
+    /// <param name="scaleZ">Scaling factor along the z-axis.</param>
     public Transformation(float scaleX, float scaleY, float scaleZ)
     {
         if (scaleX == 0 || scaleY == 0 || scaleZ == 0)
@@ -280,24 +405,20 @@ public struct Transformation
     }
 
     /// <summary>
-    /// Constructs a rotation around one of the x,y,z axis
-    /// The angle is in radian
+    /// Initializes a homogeneous transformation representing a rotation
+    /// around one of the principal coordinate axes (X, Y, or Z).
+    /// The rotation follows the right-hand rule and uses radians.
     /// </summary>
-    /// <param name="axis"></param>
-    /// <param name="angle"></param>
-    public Transformation(char axis, float angle)
+    /// <param name="axis">Rotation axis (X, Y, or Z).</param>
+    /// <param name="angle">Rotation angle in radians.</param>
+    public Transformation(Axis axis, float angle)
     {
-        if (axis != 'x' && axis != 'y' && axis != 'z')
-        {
-            throw new ArgumentOutOfRangeException(nameof(axis), axis, nameof(axis) + " must be one of x,y,z");
-        }
-
         float c = MathF.Cos(angle);
         float s = MathF.Sin(angle);
 
         switch (axis)
         {
-            case 'x':
+            case Axis.X:
 
                 M = new HomMatrix
                 ([
@@ -314,7 +435,7 @@ public struct Transformation
                     0, 0, 0, 1
                 ]);
                 break;
-            case 'y':
+            case Axis.Y:
                 M = new HomMatrix
                 ([
                     c, 0, s, 0,
@@ -330,7 +451,7 @@ public struct Transformation
                     0, 0, 0, 1
                 ]);
                 break;
-            case 'z':
+            case Axis.Z:
                 M = new HomMatrix
                 ([
                     c, -s, 0, 0,
@@ -346,6 +467,8 @@ public struct Transformation
                     0, 0, 0, 1
                 ]);
                 break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(axis), axis, "Unsupported axis value.");
         }
 
         _CheckConsistency();
@@ -361,44 +484,54 @@ public struct Transformation
     /*public Transformation(Vector axis, float angle)
     {
     }*/
+
+    #endregion
+
     //Constructors - End
 
     /// <summary>
-    /// 1D read only index for the matrix M
+    /// 1D index for the transformation atrix
+    /// (coefficients are stored in row-major order).
+    /// Valid range: 0–15.
     /// </summary>
     /// <param name="index"></param>
     public float this[Index index] => M[index];
 
     /// <summary>
-    /// 2D read only index for the matrix M
+    /// 2D read only index for the transformation matrix M
     /// </summary>
     /// <param name="row"></param>
     /// <param name="col"></param>
     public float this[int row, int col] => M[M._MatrixOffset(row, col)];
 
     /// <summary>
-    /// Returns if the product of the matrix M and its inverse InvM is (close) to the identity.
+    /// Verifies that <c>InvM</c> is the inverse of <c>M</c> by checking that
+    /// their product is approximately equal to the identity matrix.
     /// </summary>
-    /// <returns></returns>
-    public bool _IsConsistent()
-    {
-        HomMatrix identity = new HomMatrix();
-        return HomMatrix.AreMatricesClose(M * InvM, identity, 1e-4f);
-    }
-
-    /// <summary>
-    /// Checks if the product of the matrix M and its inverse InvM is (close) to the identity,
-    /// if not throws an exception.
-    /// </summary>
-    /// <exception cref="ArgumentException"></exception>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <c>M * InvM</c> is not sufficiently close to the identity matrix.
+    /// </exception>
     public void _CheckConsistency()
     {
-        if (!_IsConsistent())
+        HomMatrix identity = new HomMatrix();
+        if (!HomMatrix.AreMatricesClose(M * InvM, identity, 2e-4f))
         {
             throw new ArgumentException("if multiplied the matrix and its inverse do not return the identity matrix");
         }
     }
 
+    /// <summary>
+    /// Determines whether two transformations are approximately equal within
+    /// the specified tolerance by comparing both their transformation matrices
+    /// and inverse transformation matrices.
+    /// </summary>
+    /// <param name="t1">The first transformation to compare.</param>
+    /// <param name="t2">The second transformation to compare.</param>
+    /// <param name="epsilon">The maximum allowed difference between corresponding matrix elements.</param>
+    /// <returns>
+    /// True if both the transformation matrices and inverse matrices are
+    /// approximately equal; otherwise false.
+    /// </returns>
     public static bool AreTransformationsClose(in Transformation t1, in Transformation t2, float epsilon = 1e-5f)
     {
         return HomMatrix.AreMatricesClose(t1.M, t2.M, epsilon)
@@ -406,16 +539,19 @@ public struct Transformation
     }
 
     /// <summary>
-    /// Returns (only) the matrix M coefficients
+    /// Returns the M and InvM matrices coefficients.
     /// </summary>
     /// <returns></returns>
     public override string ToString()
     {
-        return M.ToString();
+        return "Transformation matrix:\n" +
+               M.ToString() +
+               "\nInverse Matrix:\n" +
+               InvM.ToString();
     }
 
     /// <summary>
-    /// Prints (only) the matrix M
+    /// Prints the matrix M and its inverse.
     /// </summary>
     public void Print()
     {
@@ -423,36 +559,39 @@ public struct Transformation
     }
 
     /// <summary>
-    /// Returns the inverse transformation, where the matrix corresponds to the inverse matrix and viceversa.
+    /// Returns the inverse of this transformation by swapping the transformation
+    /// matrix and its inverse.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>
+    /// A new transformation whose matrix is <c>InvM</c> and whose inverse matrix
+    /// is <c>M</c>.
+    /// </returns>
     public Transformation Inverse()
     {
         return new Transformation(InvM, M);
     }
 
     /// <summary>
-    /// Returns the composition of the two transformations,
-    /// the matrix of the transformation is obtained by multiplying the two matrices M,
-    /// the inverse is computed as (AB)^-1 = (B^-1)(A^-1).
+    /// Returns the composition of two transformations.
+    /// The resulting transformation has matrix <c>t1.M * t2.M</c> and inverse
+    /// matrix <c>t2.InvM * t1.InvM</c>, according to
+    /// (AB)<sup>-1</sup> = B<sup>-1</sup>A<sup>-1</sup>.
     /// </summary>
-    /// <param name="t1"></param>
-    /// <param name="t2"></param>
-    /// <returns></returns>
     public static Transformation operator *(in Transformation t1, in Transformation t2)
     {
         HomMatrix prod = t1.M * t2.M;
         HomMatrix invProd = t2.InvM * t1.InvM;
         return new Transformation(prod, invProd);
     }
-
+    
     /// <summary>
-    /// Returns the transformed vector obtained by multiplying the matrix by the vector (matrix–vector multiplication).
-    /// We use homogeneous coordinates, so the vectors have their 4th coordinate equal to 0.
+    /// Transforms a vector using the specified transformation matrix.
+    /// We use homogeneous coordinates, so the vectors are expected to have their 4th coordinate equal to 0.
     /// </summary>
-    /// <param name="t"></param>
-    /// <param name="v"></param>
-    /// <returns></returns>
+    /// <param name="t">The transformation to apply.</param>
+    /// <param name="v">The vector to transform.</param>
+    /// <returns>A new vector resulting from the matrix–vector multiplication.
+    /// </returns>
     public static Vector operator *(in Transformation t, Vector v)
     {
         Vector v2 = new Vector
@@ -463,40 +602,39 @@ public struct Transformation
         );
         return v2;
     }
+    
     /// <summary>
-    /// Returns the transformed point obtained by multiplying the matrix by the point (matrix–vector multiplication).
+    /// Applies the transformation to a point.
     /// We use homogeneous coordinates, so the points have their 4th coordinate equal to 1.
     /// </summary>
-    /// <param name="t"></param>
-    /// <param name="p1"></param>
+    /// <param name="t">The transformation to apply.</param>
+    /// <param name="p">The point to transform.</param>
     /// <returns></returns>
-    public static Point operator *(in Transformation t, Point p1)
+    public static Point operator *(in Transformation t, Point p)
     {
         Point p2 = new Point
         (
-            t[0] * p1.X + t[1] * p1.Y + t[2] * p1.Z + t[3],
-            t[4] * p1.X + t[5] * p1.Y + t[6] * p1.Z + t[7],
-            t[8] * p1.X + t[9] * p1.Y + t[10] * p1.Z + t[11]
+            t[0] * p.X + t[1] * p.Y + t[2] * p.Z + t[3],
+            t[4] * p.X + t[5] * p.Y + t[6] * p.Z + t[7],
+            t[8] * p.X + t[9] * p.Y + t[10] * p.Z + t[11]
         );
 
-        float w = t[12] * p1.X + t[13] * p1.Y + t[14] * p1.Z + t[15];
+        float w = t[12] * p.X + t[13] * p.Y + t[14] * p.Z + t[15];
         if (w == 1.0f)
         {
             return p2;
         }
-        else
-        {
-            return p2 * (1.0f / w);
-        }
-    }
 
+        return p2 * (1.0f / w);
+    }
+    
     /// <summary>
-    /// Returns the transformed normal,
-    /// obtained multiplying the transpose of the inverse matrix by the normal.
+    /// Transforms a normal vector using the inverse transpose of the
+    /// transformation matrix.
     /// </summary>
-    /// <param name="t"></param>
-    /// <param name="n1"></param>
-    /// <returns></returns>
+    /// <param name="t">The transformation to apply.</param>
+    /// <param name="n1">The normal to transform.</param>
+    /// <returns>The transformed normal.</returns>
     public static Normal operator *(in Transformation t, Normal n1)
     {
         Normal n2 = new Normal
@@ -507,4 +645,11 @@ public struct Transformation
         );
         return n2;
     }
+}
+
+public enum Axis
+{
+    X,
+    Y,
+    Z
 }
