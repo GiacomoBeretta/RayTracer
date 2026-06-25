@@ -10,6 +10,10 @@ namespace TracerLib;
 /// </summary>
 public class Scene
 {
+    // Properties - Begin
+
+    #region Properties
+
     /// <summary>
     /// Maps material identifiers to the corresponding material definitions.
     /// </summary>
@@ -40,6 +44,10 @@ public class Scene
     /// This set contains only variable names, not their values.
     /// </remarks>
     public HashSet<string> ExternalVariables { get; set; } = [];
+
+    #endregion
+
+    // Properties - End
 
     /// <summary>
     /// Reads the next token from the input stream and verifies that it matches the expected symbol.
@@ -546,54 +554,49 @@ public class Scene
         if (!ExternalVariables.Contains(variableName)) Variables[variableName] = variableValue;
     }
 
-    public Scene ParseScene(InputStream inputStream, Dictionary<string, float> externalVariables)
+    public void ParseScene(InputStream inputStream, Dictionary<string, float> externalVariables)
     {
-        Scene scene = new Scene
-        {
-            Variables = new Dictionary<string, float>(externalVariables),
-            ExternalVariables = new HashSet<string>(externalVariables.Keys)
-        };
+        Variables = new Dictionary<string, float>(externalVariables);
+        ExternalVariables = new HashSet<string>(externalVariables.Keys);
 
         while (true)
         {
             Token token = inputStream.ReadNextToken();
+
             if (token is StopToken) break;
-            if (token is not KeywordToken)
-                throw new SceneSyntaxException(token.Location, $"expected keyword instead of {token}");
-            if (token is KeywordToken { Keyword: Keyword.Float })
-            {
-                string variableName = ExpectIdentifier(inputStream);
 
-                SourceLocation variableLocation = inputStream.Location;
+            switch (token)
+            {
+                case KeywordToken { Keyword: Keyword.Float }:
+                    string variableName = ExpectIdentifier(inputStream);
 
-                ExpectSymbol(inputStream, "(");
-                float variableValue = ExpectNumber(inputStream);
-                ExpectSymbol(inputStream, ")");
-                
-                RegisterVariable(variableName, variableValue, variableLocation);
-            }
-            else if (token is KeywordToken { Keyword: Keyword.Sphere })
-            {
-                var sphere = scene.ParseSphere(inputStream);
-                scene.World.Add(sphere);
-            }
-            else if (token is KeywordToken { Keyword: Keyword.Plane })
-            {
-                scene.World.Add(scene.ParsePlane(inputStream));
-            }
-            else if (token is KeywordToken { Keyword: Keyword.Camera })
-            {
-                if (scene.Camera != null) throw new SceneSyntaxException(token.Location, "Cannot define more Cameras");
+                    SourceLocation variableLocation = inputStream.Location;
 
-                scene.Camera = scene.ParseCamera(inputStream);
-            }
-            else if (token is KeywordToken { Keyword: Keyword.Material })
-            {
-                scene.ParseMaterial(inputStream, out string name, out Material material);
-                scene.Materials[name] = material;
+                    ExpectSymbol(inputStream, "(");
+                    float variableValue = ExpectNumber(inputStream);
+                    ExpectSymbol(inputStream, ")");
+
+                    RegisterVariable(variableName, variableValue, variableLocation);
+                    break;
+                case KeywordToken { Keyword: Keyword.Sphere }:
+                    Sphere sphere = ParseSphere(inputStream);
+                    World.Add(sphere);
+                    break;
+                case KeywordToken { Keyword: Keyword.Plane }:
+                    Plane plane = ParsePlane(inputStream);
+                    World.Add(plane);
+                    break;
+                case KeywordToken { Keyword: Keyword.Camera }:
+                    if (Camera != null) throw new SceneSyntaxException(token.Location, "Cannot define more Cameras");
+                    Camera = ParseCamera(inputStream);
+                    break;
+                case KeywordToken { Keyword: Keyword.Material }:
+                    ParseMaterial(inputStream, out string name, out Material material);
+                    Materials[name] = material;
+                    break;
+                default:
+                    throw new SceneSyntaxException(token.Location, $"expected keyword instead of {token}");
             }
         }
-
-        return scene;
     }
 }
