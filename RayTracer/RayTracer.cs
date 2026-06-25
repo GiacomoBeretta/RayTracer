@@ -395,6 +395,10 @@ public class RenderCommand
     [Option("--height", Description = "The height of the image")]
     [Range(1, Int32.MaxValue)]
     public int Height { get; set; } = 500;
+    
+    [Option("--aspectratio", Description = "The aspect ratio of the image, i.e. a positive floating-point number.")]
+    [Range(1e-5f, float.MaxValue)]
+    public float AspectRatio { get; set; } = 1.0f;
 
     [Option("--algorithm", Description = "Render's algorithm; pathTracer passed by default")]
     public RenderFunc Algorithm { get; set; } = RenderFunc.PathTracer;
@@ -456,6 +460,7 @@ public class RenderCommand
         Console.WriteLine($"Input: {InputScene}");
         Console.WriteLine($"Width: {Width}");
         Console.WriteLine($"Height: {Height}");
+        Console.WriteLine($"AspectRatio: {AspectRatio}");
         Console.WriteLine($"Algorithm: {Algorithm}");
         Console.WriteLine($"OutputPfm: {OutputPfm}");
         Console.WriteLine($"OutputPng: {OutputPng}");
@@ -475,7 +480,7 @@ public class RenderCommand
 
         string scenePath = Path.Combine(currentPath, "../../../../Scenes/", InputScene);
 
-        if (OutputPng[^4..] != ".png") OutputPng += ".png"; //OutputFilename[^4..] Legge gli ultimi 4 caratteri
+        if (OutputPng[^4..] != ".png") OutputPng += ".png"; //OutputFilename[^4..] reads the last 4 characters
         string pngFilePath =
             Path.Combine(currentPath, "../../../../PngImages/",
                 OutputPng); //"../../../../DemoImages/" dal path dell'eseguibile torna indietro (Controllare)
