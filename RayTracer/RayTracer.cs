@@ -625,7 +625,7 @@ public class AverageImageCommand
         HDRImage.WritePFM_File(output, pfmFilePath);
         Console.WriteLine($"Pfm file created in: {pfmFilePath}");
 
-        output.WritePNG(OutputFilePathPfm, Luminosityfunction, Factor, Gamma, AverageLuminosity);
+        output.WritePNG(OutputFilePathPng, Luminosityfunction, Factor, Gamma, AverageLuminosity);
         Console.WriteLine($"Png file created in: {pngFilePath}");
     }
 }

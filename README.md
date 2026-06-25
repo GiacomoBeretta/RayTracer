@@ -5,10 +5,8 @@ A C# application for generating photorealistic images using different rendering 
 ## Table of Contents
 
 - [Purpose](#purpose)
-- [Dependencies](#dependencies)
 - [How to install it](#how-to-install-it)
 - [Usage](#usage)
-- [Workflow](#workflow)
 - [Scripts](#scripts)
 - [Scene Description Language](#scene-description-language)
 - [Command Options](#command-options)
@@ -28,32 +26,88 @@ This project is a ray tracing renderer written in C# that generates photorealist
 
 ---
 
-## Dependencies
+# How to install it
+
+## Prerequisites
+
+Before building the project, install the following software:
 
 - .NET 10 SDK
 - Bash
 - GNU Parallel (optional, required for animation generation)
-- FFmpeg (required by generate-animation.sh)
+- FFmpeg (required by `generate-animation.sh`)
 
 ---
 
-## How to install it
+## Clone the Repository
 
-This program works on Ubuntu 24.04 LTS.
+Clone the repository and move into the project directory:
 
+```bash
+git clone git@github.com:GiacomoBeretta/RayTracer
+cd RayTracer
+```
+
+---
+
+## Build the Project
+
+Build the solution using the .NET CLI:
+
+```bash
+dotnet build
+```
+
+---
+
+## Run the Renderer
+
+The renderer can be executed through the provided Bash scripts or directly using the generated executable.
+
+Example:
+
+```bash
+./raytracer.sh render
+```
+
+Generated images will be saved in the corresponding output directories.
+
+The main application can be launched either through the provided scripts or directly from the .NET project entry point using:
+
+```bash
+dotnet run -- <command>
+```
+
+---
+
+## Development Environment
+
+The project was primarily developed and tested using JetBrains Rider.
+
+---
+
+## Supported Platforms
+
+This program works on:
+
+### Ubuntu
+
+```text
+Ubuntu 24.04 LTS
+```
 The unit tests were run on the following operating systems with the latest version of dotnet 10.0.x and they were all successful:
 
-Windows family:
+### Windows
 
-```
+```text
 OS Name:                       Microsoft Windows Server 2025 Datacenter
 OS Version:                    10.0.26100 N/A Build 26100
 BIOS Version:                  Microsoft Corporation Hyper-V UEFI Release v4.1, 1/8/2026
 ```
 
-MacOS:
+### macOS
 
-```
+```text
 ProductName:                   macOS
 ProductVersion:                15.7.7
 BuildVersion:                  24G720
@@ -337,7 +391,9 @@ Example:
 <0.5, 0.3, 0.1>
 ```
 
-> **TODO:** document the valid range for `r`, `g`, and `b`.
+The color components `r`, `g`, and `b` are floating-point values.
+
+Values in the range `[0, 1]` represent the standard visible intensity range, although higher values are allowed.
 
 ---
 
@@ -649,7 +705,32 @@ float clock(45)
 
 ## Common Options
 
-The following options are available in multiple commands.
+The following options are available in all the commands.
+
+#### `--luminosityfunction`
+
+Luminosity function used during tone mapping to compute image brightness.
+
+Available options:
+
+- `shirley`
+- `weighted`
+
+#### `--averageluminosity`
+
+Average luminosity value used during tone mapping.
+
+When specified, the image luminosity is normalized using this value instead of computing it automatically from the image.
+
+#### `--factor`
+
+Empirical scaling factor applied during tone mapping.
+
+Higher values generally produce brighter images, while lower values produce darker images.
+
+#### `--gamma`
+
+Gamma correction factor applied after tone mapping.
 
 ---
 
@@ -757,6 +838,7 @@ If omitted, the probability is computed dynamically at each recursion step.
 The following common options are also available:
 
 - `--luminosityfunction`
+- `--averageluminosity`
 - `--factor`
 - `--gamma`
 
@@ -770,15 +852,20 @@ The following common options are also available:
 
 Name of the directory containing the PFM files to be averaged.
 
-#### `--outputaverage`
+#### `--outputaveragepfm`
 
-Name of the generated averaged image.
+Name of the generated averaged image as a pfm file.
+
+#### `--outputaveragepng`
+
+Name of the generated average image as a png file.
 
 The command generates both a PFM image and its corresponding PNG representation.
 
 The following common options are also available:
 
 - `--luminosityfunction`
+- `--averageluminosity`
 - `--factor`
 - `--gamma`
 
@@ -799,6 +886,7 @@ Name of the generated PNG image.
 The following common options are also available:
 
 - `--luminosityfunction`
+- `--averageluminosity`
 - `--factor`
 - `--gamma`
 
@@ -806,30 +894,98 @@ The following common options are also available:
 
 # Examples
 
-*Examples will be added here.*
+The following examples showcase the different rendering algorithms and image generation features supported by the renderer.
 
-# How to install it
-This Program works on Ubuntu 24.04 LTS and with .NET 10.0.109. The unit tests were run on these OSs with .NET 10.0.109 and they were all successful:
-Windows family: 
-    OS Name:                       Microsoft Windows Server 2025 Datacenter
-    OS Version:                    10.0.26100 N/A Build 26100
-    BIOS Version:                  Microsoft Corporation Hyper-V UEFI Release v4.1, 1/8/2026
+---
 
-MacOS:
-    ProductName:		macOS
-    ProductVersion:		15.7.7
-    BuildVersion:		24G720
+## On/Off Rendering
+
+The `onoff` algorithm performs a binary visibility test and colors a pixel only when a ray intersects an object.
+
+![Sphere rendered with the onoff algorithm](Assets/sphere_onoff.png)
+
+---
+
+## Flat Rendering
+
+The `flat` algorithm computes surface colors without global illumination effects.
+
+Compared to `onoff`, it provides a more informative visualization of object appearance 
+
+![Sphere rendered with the flat algorithm](Assets/sphere_flat.png)
+
+---
+
+## Camera Rotation Animation
+
+Animations can be generated by varying scene parameters through floating-point variables declared in the scene description language.
+
+The following example shows a camera rotating around the scene while the objects remain fixed.
+
+![Camera rotation animation](Assets/Rotating_camera.gif)
+
+---
+
+## Object Transformation Animation
+
+Animations are not limited to camera movement.
+
+Any transformation controlled by a floating-point variable can be animated. In this example, two spheres rotate while the camera remains stationary.
+
+![Sphere rotation animation](Assets/Rotating_sphere.gif)
+
+---
+
+## Path Tracing
+
+The `pathtracer` algorithm simulates light transport through recursive ray scattering, producing realistic illumination effects such as indirect lighting and reflections.
+
+![Path tracing example](Assets/scene_path.png)
+
+---
+
+## Variance Reduction Through Image Averaging
+
+Noise can be reduced by rendering the same scene multiple times using different random generator states and sequence identifiers and then averaging the resulting images.
+
+The `averageimage` command performs this operation automatically.
+
+![Averaged path traced image](Assets/scene_average.png)
+
+---
+
+## Anti-Aliasing
+
+The renderer supports anti-aliasing through pixel subdivision and multiple ray samples per pixel.
+
+This technique significantly reduces jagged edges and improves image quality, especially along object boundaries.
+
+![Anti-aliased image](Assets/scene_antialiasing.png)
+
 ---
 
 # Where to ask for help
+
+If you encounter bugs, unexpected behavior, or have questions about the project, please open an issue in the repository.
 
 ---
 
 # Future developments
 
+Possible future improvements include:
+
+- support for mesh-based objects;
+- point-light tracing algorithm;
+- possibility to parse arithmetic operations in scene files;
+- performance optimizations and parallel rendering.
+
 ---
 
 # How to contribute
+
+Contributions are welcome.
+
+Please open an issue before implementing major changes and ensure that all tests pass before submitting a pull request.
 
 ---
 
