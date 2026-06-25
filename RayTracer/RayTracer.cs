@@ -552,10 +552,6 @@ public class RenderCommand
         "Generate an image averaging the color of multiple images using different seed in pathtracing renderer")]
 public class AverageImageCommand
 {
-    [Option("--inputaverage", Description = "Input file folder")]
-    [Required]
-    public required string InputFileFolder { get; set; }
-
     [Option("--outputaveragepfm", Description = "Name of the output pfm file")]
     [Required]
     public required string OutputFilePathPfm { get; set; }
@@ -578,7 +574,6 @@ public class AverageImageCommand
 
     public void OnExecute()
     {
-        Console.WriteLine($"Input file folder: {InputFileFolder}");
         Console.WriteLine($"Name of the output pfm file path: {OutputFilePathPfm}");
         Console.WriteLine($"Name of the output png file path: {OutputFilePathPng}");
         Console.WriteLine($"Luminosityfunction: {Luminosityfunction}");
@@ -587,6 +582,7 @@ public class AverageImageCommand
         Console.WriteLine($"Gamma: {Gamma}");
 
         string currentPath = AppDomain.CurrentDomain.BaseDirectory;
+        string inputFileFolder = Path.Combine(currentPath, "../../../../PfmImages");
 
         if (OutputFilePathPng[^4..] != ".png") OutputFilePathPng += ".png"; //OutputFilename[^4..] Legge gli ultimi 4 caratteri
         string pngFilePath =
@@ -596,7 +592,7 @@ public class AverageImageCommand
         if (OutputFilePathPfm[^4..] != ".pfm") OutputFilePathPfm += ".pfm";
         string pfmFilePath = Path.Combine(currentPath, "../../../../PfmImages", OutputFilePathPfm);
 
-        var files = Directory.GetFiles(InputFileFolder, "*_state*_seq*.pfm"); //search for pattern in folder
+        var files = Directory.GetFiles(inputFileFolder, "*_state*_seq*.pfm"); //search for pattern in folder
 
         if (files.Length == 0)
         {

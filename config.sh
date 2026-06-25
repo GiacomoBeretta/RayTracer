@@ -8,7 +8,7 @@ gamma=1
 inputrender="scene.txt"
 width=500
 height=500
-algorithm="pathtracer"
+algorithm="flat"
 outputpfm="scene_test.pfm"
 outputpng="scene_test.png"
 numrays=10
@@ -25,7 +25,6 @@ inputpfm="dome.pfm"
 output="dome.png"
 
 # Default averageimage
-inputaverage="PfmImages"
 outputaveragepfm="average.pfm"
 outputaveragepng="average.png"
 
