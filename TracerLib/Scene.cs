@@ -6,14 +6,39 @@ namespace TracerLib;
 //Considerare di cambiare ExpectSymbol(InputStream, string) in ExpecteSymbol(InputStream, char)
 
 /// <summary>
-/// A class that serves for interpret the txt file that contains the informations of the scene to render.
+/// Represents a scene parsed from a scene description file.
 /// </summary>
 public class Scene
 {
+    /// <summary>
+    /// Maps material identifiers to the corresponding material definitions.
+    /// </summary>
     public Dictionary<string, Material> Materials { get; set; } = new();
+
+    /// <summary>
+    /// The set of all the objects of the scene.
+    /// </summary>
     public World World { get; set; } = new();
+
+    /// <summary>
+    /// The camera used to render the scene.
+    /// See <see cref="Camera"/> for more information.
+    /// </summary>
     public ICamera? Camera { get; set; } = null;
+
+    /// <summary>
+    /// Maps variable names to their values.
+    /// </summary>
     public Dictionary<string, float> Variables { get; set; } = new();
+
+    /// <summary>
+    /// Names of variables whose values can be overridden by externally provided values
+    /// (for example, through command-line arguments).
+    /// When an external value is provided, it takes precedence over the value specified
+    /// in the scene file.
+    /// Variables that may be overridden must still be declared in the scene file
+    /// to keep the scene description self-consistent.
+    /// </summary>
     public HashSet<string> OverriddenVariables { get; set; } = [];
 
     /// <summary>
@@ -105,7 +130,7 @@ public class Scene
 
         return stringToken.String;
     }
-    
+
     /// <summary>
     /// Reads the next token from the input stream and ensures it is an IdentifierToken.
     /// </summary>
@@ -129,7 +154,9 @@ public class Scene
     /// </summary>
     /// <remarks>
     /// Expected grammar:
+    /// <code>
     /// vector ::= "[" number "," number "," number "]"
+    /// </code>
     /// where each component is either a numeric literal or a valid variable reference.
     /// </remarks>
     /// <param name="inputStream">The input stream providing tokens to read.</param>
@@ -146,7 +173,7 @@ public class Scene
 
         return new Vector(x, y, z);
     }
-    
+
     /// <summary>
     /// Parses an RGB Color from the input stream.
     /// </summary>
@@ -170,9 +197,11 @@ public class Scene
 
         return new Color(r, g, b);
     }
-    
+
     /// <summary>
     /// Parses a <see cref="Pigment"/> from the input stream.
+    /// </summary>
+    /// <remarks>
     /// Expected grammar:
     /// <code>
     /// pigment ::= uniform_pigment | checkered_pigment | image_pigment
@@ -180,7 +209,7 @@ public class Scene
     /// checkered_pigment ::= "checkered" "(" color "," color "," number ")"
     /// image_pigment ::= "image" "(" LITERAL_STRING ")"
     /// </code>
-    /// </summary>
+    /// </remarks>
     /// <param name="inputStream">The input stream providing tokens to read.</param>
     /// <returns>
     /// A <see cref="Pigment"/> instance representing the parsed pigment.
@@ -214,6 +243,7 @@ public class Scene
                     HDRImage image = HDRImage.ReadPFM_File(imageFile);
                     result = new ImagePigment(image);
                 }
+
                 break;
             default:
                 throw new SceneSyntaxException(inputStream.Location, "Keyword doesn't match any of the Pigments types");
@@ -222,17 +252,18 @@ public class Scene
         ExpectSymbol(inputStream, ")");
         return result;
     }
-    
+
     /// <summary>
     /// Parses a BRDF definition from the input stream.
+    /// </summary>
+    /// <remarks>
     /// Expected grammar:
     /// <code>
     /// brdf ::= diffuse_brdf | specular_brdf
-    ///
     /// diffuse_brdf  ::= "diffuse" "(" pigment ")"
     /// specular_brdf ::= "specular" "(" pigment ")"
     /// </code>
-    /// </summary>
+    /// </remarks>
     /// <param name="inputStream">The input stream providing tokens to read.</param>
     /// <returns>
     /// A <see cref="BRDF"/> instance representing the parsed reflectance model.
@@ -263,6 +294,27 @@ public class Scene
         return result;
     }
 
+    //??? perché questi parametri out?
+
+    /// <summary>
+    /// Parses a material definition from the input stream.
+    /// </summary>
+    /// <remarks>
+    /// Expected grammar:
+    /// <code>
+    /// material ::= "material" IDENTIFIER "(" brdf "," pigment ")"
+    /// </code>
+    /// </remarks>
+    /// <param name="inputStream">The input stream providing tokens to read.</param>
+    /// <param name="name">
+    /// The identifier name associated with the parsed material.
+    /// </param>
+    /// <param name="material">
+    /// The resulting <see cref="Material"/> instance constructed from the parsed data.
+    /// </param>
+    /// <exception cref="SceneSyntaxException">
+    /// Thrown when the input does not match the expected material definition syntax.
+    /// </exception>
     public void ParseMaterial(InputStream inputStream, out string name, out Material material)
     {
         name = ExpectIdentifier(inputStream);
@@ -276,6 +328,30 @@ public class Scene
         material = new Material(emittedRadiance, brdf);
     }
 
+    /// <summary>
+    /// Parses a sequence of transformations from the input stream.
+    /// </summary>
+    /// <remarks>
+    /// Transformations are evaluated in order and combined using composition.
+    /// Expected grammar:
+    /// <code>
+    /// transformation ::= basic_transformation | basic_transformation "*" transformation
+    /// basic_transformation ::= "identity"
+    ///           | "translation" "(" vector ")"
+    ///           | "rotation_x" "(" number ")"
+    ///           | "rotation_y" "(" number ")"
+    ///           | "rotation_z" "(" number ")"
+    ///           | "scaling" "(" number "," number "," number ")"
+    /// </code>
+    /// where angles are expressed in degrees and converted internally to radians.
+    /// </remarks>
+    /// <param name="inputStream">The input stream providing tokens to read.</param>
+    /// <returns>
+    /// A <see cref="Transformation"/> representing the composed transformation chain.
+    /// </returns>
+    /// <exception cref="SceneSyntaxException">
+    /// Thrown when the input does not match the expected transformation grammar.
+    /// </exception>
     public Transformation ParseTransformation(InputStream inputStream)
     {
         var result = new Transformation();
@@ -331,17 +407,35 @@ public class Scene
             }
 
             Token nextToken = inputStream.ReadNextToken();
-            if (nextToken is not SymbolToken symbolToken || symbolToken.Symbol != "*")
+            if (nextToken is SymbolToken { Symbol: "*" })
             {
-                inputStream.UnreadToken(nextToken);
-                break;
+                continue;
             }
+
+            inputStream.UnreadToken(nextToken);
+            break;
         }
 
         return result;
     }
 
-    public Sphere ParseSphere(InputStream inputStream, Scene scene)
+    /// <summary>
+    /// Parses a sphere definition from the input stream.
+    /// </summary>
+    /// <remarks>
+    /// Expected grammar:
+    /// <code>
+    /// sphere_decl ::= "sphere" "(" IDENTIFIER "," transformation ")"
+    /// </code>
+    /// </remarks>
+    /// <param name="inputStream">The input stream providing tokens to read.</param>
+    /// <returns>
+    /// A <see cref="Sphere"/> initialized with the specified material and transformation.
+    /// </returns>
+    /// <exception cref="SceneSyntaxException">
+    /// Thrown when the input does not match the expected sphere grammar or when the referenced material is undefined.
+    /// </exception>
+    public Sphere ParseSphere(InputStream inputStream)
     {
         ExpectSymbol(inputStream, "(");
 
@@ -351,13 +445,29 @@ public class Scene
             throw new SceneSyntaxException(inputStream.Location, $"unknown material {material}");
 
         ExpectSymbol(inputStream, ",");
-        Transformation transformation = scene.ParseTransformation(inputStream);
+        Transformation transformation = ParseTransformation(inputStream);
         ExpectSymbol(inputStream, ")");
 
         return new Sphere(transformation, Materials[material]);
     }
 
-    public Plane ParsePlane(InputStream inputStream, Scene scene)
+    /// <summary>
+    /// Parses a plane definition from the input stream.
+    /// </summary>
+    /// <remarks>
+    /// Expected grammar:
+    /// <code>
+    /// plane_decl ::= "plane" "(" IDENTIFIER "," transformation ")"
+    /// </code>
+    /// </remarks>
+    /// <param name="inputStream">The input stream providing tokens to read.</param>
+    /// <returns>
+    /// A <see cref="Plane"/> initialized with the specified material and transformation.
+    /// </returns>
+    /// <exception cref="SceneSyntaxException">
+    /// Thrown when the input does not match the expected plane grammar or when the referenced material is undefined.
+    /// </exception>
+    public Plane ParsePlane(InputStream inputStream)
     {
         ExpectSymbol(inputStream, "(");
 
@@ -367,18 +477,34 @@ public class Scene
             throw new SceneSyntaxException(inputStream.Location, $"unknown material {material}");
 
         ExpectSymbol(inputStream, ",");
-        Transformation transformation = scene.ParseTransformation(inputStream);
+        Transformation transformation = ParseTransformation(inputStream);
         ExpectSymbol(inputStream, ")");
 
         return new Plane(transformation, Materials[material]);
     }
 
-    public ICamera ParseCamera(InputStream inputStream, Scene scene)
+    /// <summary>
+    /// Parses a camera definition from the input stream.
+    /// </summary>
+    /// <remarks>
+    /// Expected grammar:
+    /// camera_decl ::= "camera" "(" camera_type "," transformation "," number "," number ")"
+    /// camera_type ::= "perspective" | "orthogonal"
+    /// </remarks>
+    /// <param name="inputStream">The input stream providing tokens to read.</param>
+    /// <returns>
+    /// An <see cref="ICamera"/> instance of the appropriate type
+    /// (<see cref="PerspectiveCamera"/> or <see cref="OrthogonalCamera"/>).
+    /// </returns>
+    /// <exception cref="SceneSyntaxException">
+    /// Thrown if the input does not match the expected syntax or if the camera type is invalid.
+    /// </exception>
+    public ICamera ParseCamera(InputStream inputStream)
     {
         ExpectSymbol(inputStream, "(");
         Keyword cameraKeyword = ExpectKeyword(inputStream, [Keyword.Perspective, Keyword.Orthogonal]);
         ExpectSymbol(inputStream, ",");
-        Transformation transformation = scene.ParseTransformation(inputStream);
+        Transformation transformation = ParseTransformation(inputStream);
         ExpectSymbol(inputStream, ",");
         float aspectRatio = ExpectNumber(inputStream);
         ExpectSymbol(inputStream, ",");
@@ -402,12 +528,19 @@ public class Scene
         return result;
     }
 
-    public Scene ParseScene(InputStream inputStream, Dictionary<string, float> variables)
+    public Scene ParseScene(InputStream inputStream, Dictionary<string, float> externalVariables)
     {
-        var scene = new Scene
+        Scene scene = new Scene
         {
-            Variables = new Dictionary<string, float>(variables),
-            OverriddenVariables = new HashSet<string>(variables.Keys)
+            // Initialize the variable table with externally provided values
+            // (typically passed through command-line arguments).
+            //
+            // To remain self-consistent, the scene file must declare all variables it uses.
+            //
+            // External values take precedence over values defined in the scene file,
+            // so we keep track of the names of variables that may be overridden.
+            Variables = new Dictionary<string, float>(externalVariables),
+            OverriddenVariables = new HashSet<string>(externalVariables.Keys)
         };
 
         while (true)
@@ -426,6 +559,14 @@ public class Scene
                 float variableValue = ExpectNumber(inputStream);
                 ExpectSymbol(inputStream, ")");
 
+                // If the variable already exists and its value comes from an external source,
+                // we leave the external value unchanged.
+                //
+                // If the variable already exists but is not marked as externally overridden,
+                // then the scene file is attempting to define the same variable twice and
+                // an exception is thrown.
+                //
+                // Otherwise, this is a new variable definition and we add it to the table.
                 if (scene.Variables.ContainsKey(variableName) && !scene.OverriddenVariables.Contains(variableName))
                     throw new SceneSyntaxException(variableLocation,
                         $"{variableName} cannot be redefined");
@@ -433,18 +574,18 @@ public class Scene
             }
             else if (token is KeywordToken { Keyword: Keyword.Sphere })
             {
-                var sphere = scene.ParseSphere(inputStream, scene);
+                var sphere = scene.ParseSphere(inputStream);
                 scene.World.Add(sphere);
             }
             else if (token is KeywordToken { Keyword: Keyword.Plane })
             {
-                scene.World.Add(scene.ParsePlane(inputStream, scene));
+                scene.World.Add(scene.ParsePlane(inputStream));
             }
             else if (token is KeywordToken { Keyword: Keyword.Camera })
             {
                 if (scene.Camera != null) throw new SceneSyntaxException(token.Location, "Cannot define more Cameras");
 
-                scene.Camera = scene.ParseCamera(inputStream, scene);
+                scene.Camera = scene.ParseCamera(inputStream);
             }
             else if (token is KeywordToken { Keyword: Keyword.Material })
             {
