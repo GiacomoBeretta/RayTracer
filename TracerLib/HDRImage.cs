@@ -58,18 +58,6 @@ public class HDRImage
         set{}
      }*/
 
-    //avendo implementato checkCoordinates non so se è più utile areCoordinatesValid
-    /// <summary>
-    /// Checks for the validity of the coordinates
-    /// </summary>
-    /// <param name="column">Image's width</param>
-    /// <param name="row">Image's height</param>
-    /// <returns></returns>
-    public bool _AreCoordinatesValid(int column, int row)
-    {
-        return column >= 0 && column < Width && row >= 0 && row < Height;
-    }
-
     /// <summary>
     /// Validates that the specified coordinates are within the range
     /// [0, Width) and [0, Height).

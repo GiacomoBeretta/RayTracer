@@ -9,23 +9,6 @@ namespace TracerTests;
 public class HDRImageTest
 {
     [Fact]
-    public void TestAreCoordinatesValid()
-    {
-        HDRImage image1 = new HDRImage(4, 10);
-        Assert.True(image1._AreCoordinatesValid(0, 0));
-        Assert.True(image1._AreCoordinatesValid(3, 2));
-        Assert.True(image1._AreCoordinatesValid(3, 9));
-        Assert.False(image1._AreCoordinatesValid(4, 1));
-        Assert.False(image1._AreCoordinatesValid(0, 10));
-        Assert.False(image1._AreCoordinatesValid(-1, 2));
-        Assert.False(image1._AreCoordinatesValid(2, -1));
-
-        HDRImage image2 = new HDRImage(100, 100);
-        Assert.True(image2._AreCoordinatesValid(53, 68));
-        Assert.False(image2._AreCoordinatesValid(200, 39));
-    }
-
-    [Fact]
     public void TestCheckCoordinates()
     {
         HDRImage image1 = new HDRImage(6, 11);
