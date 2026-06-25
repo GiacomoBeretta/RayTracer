@@ -32,14 +32,14 @@ public class Scene
     public Dictionary<string, float> Variables { get; set; } = new();
 
     /// <summary>
-    /// Names of variables whose values can be overridden by externally provided values
-    /// (for example, through command-line arguments).
-    /// When an external value is provided, it takes precedence over the value specified
-    /// in the scene file.
-    /// Variables that may be overridden must still be declared in the scene file
-    /// to keep the scene description self-consistent.
+    /// Names of variables provided externally (e.g., via command-line arguments).
+    /// External variables take precedence over values defined in the scene file.
     /// </summary>
-    public HashSet<string> OverriddenVariables { get; set; } = [];
+    /// <remarks>
+    /// The scene file must still declare all variables it uses to remain self-consistent.
+    /// This set contains only variable names, not their values.
+    /// </remarks>
+    public HashSet<string> ExternalVariables { get; set; } = [];
 
     /// <summary>
     /// Reads the next token from the input stream and verifies that it matches the expected symbol.
@@ -542,25 +542,18 @@ public class Scene
     /// <exception cref="SceneSyntaxException">Thrown when attempting to define twice a variable in the scene file.</exception>
     public void RegisterVariable(string variableName, float variableValue, SourceLocation variableLocation)
     {
-        if (Variables.ContainsKey(variableName) && !OverriddenVariables.Contains(variableName))
+        if (Variables.ContainsKey(variableName) && !ExternalVariables.Contains(variableName))
             throw new SceneSyntaxException(variableLocation,
                 $"{variableName} cannot be redefined");
-        if (!OverriddenVariables.Contains(variableName)) Variables[variableName] = variableValue;
+        if (!ExternalVariables.Contains(variableName)) Variables[variableName] = variableValue;
     }
 
     public Scene ParseScene(InputStream inputStream, Dictionary<string, float> externalVariables)
     {
         Scene scene = new Scene
         {
-            // Initialize the variable table with externally provided values
-            // (typically passed through command-line arguments).
-            //
-            // To remain self-consistent, the scene file must declare all variables it uses.
-            //
-            // External values take precedence over values defined in the scene file,
-            // so we keep track of the names of variables that may be overridden.
             Variables = new Dictionary<string, float>(externalVariables),
-            OverriddenVariables = new HashSet<string>(externalVariables.Keys)
+            ExternalVariables = new HashSet<string>(externalVariables.Keys)
         };
 
         while (true)
@@ -587,10 +580,10 @@ public class Scene
                 // an exception is thrown.
                 //
                 // Otherwise, this is a new variable definition and we add it to the table.
-                if (Variables.ContainsKey(variableName) && !OverriddenVariables.Contains(variableName))
+                if (Variables.ContainsKey(variableName) && !ExternalVariables.Contains(variableName))
                     throw new SceneSyntaxException(variableLocation,
                         $"{variableName} cannot be redefined");
-                if (!OverriddenVariables.Contains(variableName)) Variables[variableName] = variableValue;
+                if (!ExternalVariables.Contains(variableName)) Variables[variableName] = variableValue;
             }
             else if (token is KeywordToken { Keyword: Keyword.Sphere })
             {
