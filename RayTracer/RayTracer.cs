@@ -337,13 +337,15 @@ public class DemoCommand
 [Command(Name = "pfmtopng", Description = "Converts a PFM image to PNG")]
 public class PfmToPngCommand
 {
+    #region Options
+    
     [Option("--inputpfm", Description = "The input file name")]
     [Required]
-    public required string Input { get; set; }
+    public required string InputFileName { get; set; }
 
-    [Option("--output", Description = "The output file path")]
+    [Option("--output", Description = "The output file name")]
     [Required]
-    public required string Output { get; set; }
+    public required string OutputFileName { get; set; }
 
     [Option("--luminosityfunction", Description = "Luminosity function, options are: shirley (default), weighted")]
     public LumFunction Luminosityfunction { get; set; } = LumFunction.Shirley;
@@ -359,10 +361,12 @@ public class PfmToPngCommand
     [Option("--gamma", Description = "The gamma factor characteristic of the screen")]
     public float Gamma { get; set; } = 1f;
 
+    #endregion
+    
     internal void OnExecute()
     {
-        Console.WriteLine($"input path: {Input}");
-        Console.WriteLine($"output path: {Output}");
+        Console.WriteLine($"input path: {InputFileName}");
+        Console.WriteLine($"output path: {OutputFileName}");
         Console.WriteLine($"luminosityFunction: {Luminosityfunction}");
         Console.WriteLine($"Averageluminosity: {AverageLuminosity}");
         Console.WriteLine($"factor: {Factor}");
@@ -370,13 +374,13 @@ public class PfmToPngCommand
 
         string currentPath = AppDomain.CurrentDomain.BaseDirectory;
 
-        if (Output[^4..] != ".png") Output += ".png"; //OutputFilename[^4..] Legge gli ultimi 4 caratteri
+        if (OutputFileName[^4..] != ".png") OutputFileName += ".png"; //OutputFilename[^4..] Legge gli ultimi 4 caratteri
         string pngFilePath =
             Path.Combine(currentPath, "../../../../PngImages/",
-                Output); //"../../../../DemoImages/" dal path dell'eseguibile torna indietro (Controllare)
+                OutputFileName); //"../../../../DemoImages/" dal path dell'eseguibile torna indietro (Controllare)
 
-        if (Input[^4..] != ".pfm") Input += ".pfm";
-        string pfmFilePath = Path.Combine(currentPath, "../../../../PfmImages", Input);
+        if (InputFileName[^4..] != ".pfm") InputFileName += ".pfm";
+        string pfmFilePath = Path.Combine(currentPath, "../../../../PfmImages", InputFileName);
 
 
         HDRImage image = HDRImage.ReadPFM_File(pfmFilePath);
@@ -386,6 +390,8 @@ public class PfmToPngCommand
 
         Console.WriteLine($"File saved in: {pngFilePath}");
     }
+    
+    
 }
 
 [Command(Name = "render", Description = "Read a scene file and creates the corresponding image")]
