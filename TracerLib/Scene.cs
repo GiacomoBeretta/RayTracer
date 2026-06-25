@@ -529,17 +529,15 @@ public class Scene
     }
 
     /// <summary>
-    /// If the variable already exists and its value comes from an external source, we leave the external value unchanged.
-    /// If the variable already exists but is not marked as externally overridden,
-    /// then the scene file is attempting to define the same variable twice and
-    /// an exception is thrown.
-    ///
-    /// Otherwise, this is a new variable definition and we add it to the table.
+    /// Registers a variable definition from the scene file.
+    /// External variables take precedence over scene-defined values.
     /// </summary>
-    /// <param name="variableName"></param>
-    /// <param name="variableValue"></param>
-    /// <param name="variableLocation"></param>
-    /// <exception cref="SceneSyntaxException">Thrown when attempting to define twice a variable in the scene file.</exception>
+    /// <param name="variableName">Name of the variable.</param>
+    /// <param name="variableValue">Value defined in the scene file.</param>
+    /// <param name="variableLocation">Location used for error reporting.</param>
+    /// <exception cref="SceneSyntaxException">
+    /// Thrown when a variable is defined more than once in the scene file.
+    /// </exception>
     public void RegisterVariable(string variableName, float variableValue, SourceLocation variableLocation)
     {
         if (Variables.ContainsKey(variableName) && !ExternalVariables.Contains(variableName))
@@ -571,19 +569,8 @@ public class Scene
                 ExpectSymbol(inputStream, "(");
                 float variableValue = ExpectNumber(inputStream);
                 ExpectSymbol(inputStream, ")");
-
-                // If the variable already exists and its value comes from an external source,
-                // we leave the external value unchanged.
-                //
-                // If the variable already exists but is not marked as externally overridden,
-                // then the scene file is attempting to define the same variable twice and
-                // an exception is thrown.
-                //
-                // Otherwise, this is a new variable definition and we add it to the table.
-                if (Variables.ContainsKey(variableName) && !ExternalVariables.Contains(variableName))
-                    throw new SceneSyntaxException(variableLocation,
-                        $"{variableName} cannot be redefined");
-                if (!ExternalVariables.Contains(variableName)) Variables[variableName] = variableValue;
+                
+                RegisterVariable(variableName, variableValue, variableLocation);
             }
             else if (token is KeywordToken { Keyword: Keyword.Sphere })
             {
