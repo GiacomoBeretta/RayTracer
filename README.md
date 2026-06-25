@@ -5,7 +5,6 @@ A C# application for generating photorealistic images using different rendering 
 ## Table of Contents
 
 - [Purpose](#purpose)
-- [Dependencies](#dependencies)
 - [How to install it](#how-to-install-it)
 - [Usage](#usage)
 - [Scripts](#scripts)
@@ -27,32 +26,88 @@ This project is a ray tracing renderer written in C# that generates photorealist
 
 ---
 
-## Dependencies
+# How to install it
+
+## Prerequisites
+
+Before building the project, install the following software:
 
 - .NET 10 SDK
 - Bash
 - GNU Parallel (optional, required for animation generation)
-- FFmpeg (required by generate-animation.sh)
+- FFmpeg (required by `generate-animation.sh`)
 
 ---
 
-## How to install it
+## Clone the Repository
 
-This program works on Ubuntu 24.04 LTS.
+Clone the repository and move into the project directory:
 
+```bash
+git clone git@github.com:GiacomoBeretta/RayTracer
+cd RayTracer
+```
+
+---
+
+## Build the Project
+
+Build the solution using the .NET CLI:
+
+```bash
+dotnet build
+```
+
+---
+
+## Run the Renderer
+
+The renderer can be executed through the provided Bash scripts or directly using the generated executable.
+
+Example:
+
+```bash
+./raytracer.sh render
+```
+
+Generated images will be saved in the corresponding output directories.
+
+The main application can be launched either through the provided scripts or directly from the .NET project entry point using:
+
+```bash
+dotnet run -- <command>
+```
+
+---
+
+## Development Environment
+
+The project was primarily developed and tested using JetBrains Rider.
+
+---
+
+## Supported Platforms
+
+This program works on:
+
+### Ubuntu
+
+```text
+Ubuntu 24.04 LTS
+```
 The unit tests were run on the following operating systems with the latest version of dotnet 10.0.x and they were all successful:
 
-Windows family:
+### Windows
 
-```
+```text
 OS Name:                       Microsoft Windows Server 2025 Datacenter
 OS Version:                    10.0.26100 N/A Build 26100
 BIOS Version:                  Microsoft Corporation Hyper-V UEFI Release v4.1, 1/8/2026
 ```
 
-MacOS:
+### macOS
 
-```
+```text
 ProductName:                   macOS
 ProductVersion:                15.7.7
 BuildVersion:                  24G720
