@@ -9,7 +9,7 @@ namespace TracerTests;
 public class HDRImageTest
 {
     [Fact]
-    public void TestCheckCoordinates()
+    public void TestValidateCoordinates()
     {
         HDRImage image1 = new HDRImage(6, 11);
         image1._ValidateCoordinates(0, 0);
