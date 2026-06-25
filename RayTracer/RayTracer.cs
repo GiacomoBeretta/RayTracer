@@ -21,324 +21,6 @@ public class RayTracer
     }
 }
 
-[Command(Name = "Demo", Description = "Generates a simple test image composed of 10 spheres:\n" +
-                                      "eight spheres are placed at the vertices of a cube, and two are positioned at the centers of two faces.\n" +
-                                      "Allows configuration of image resolution and camera orientation via azimuth and zenith angles.\n" +
-                                      "Supports two projection modes: perspective (default) and orthogonal.")]
-public class DemoCommand
-{
-    [Option("--width", Description = "The width of the image")]
-    [Range(1, Int32.MaxValue)]
-    public int Width { get; init; } = 500;
-
-    [Option("--height", Description = "The height of the image")]
-    [Range(1, Int32.MaxValue)]
-    public int Height { get; init; } = 500;
-
-    [Option("--output", Description = "The name of the png file")]
-    public string OutputFileName { get; init; } = "referenceShirley.png";
-
-    [Option("--algorithm", Description = "Render's algorithm. OnOffRenderer passed by default." +
-                                         "Options are: OnOff, Flat, PathTracer")]
-    public RenderFunc Algorithm { get; init; } = RenderFunc.OnOff;
-
-    [Option("--theta", Description = "Observer's azimuthal angle in degrees")]
-    [Range(0.0f, 180.0f)]
-    public float Theta { get; init; } = 0.0f;
-
-    [Option("--phi", Description = "Observer's zenithal angle in degrees")]
-    [Range(0.0f, 360.0f)]
-    public float Phi { get; init; } = 0.0f;
-
-    [Option("--projection", Description = "projection used to render the image." +
-                                          "Options are: Orthogonal, Perspective")]
-    public Projection Projection { get; } = Projection.Perspective;
-
-    [Option("--luminosityFunction", Description = "Luminosity function, options are: shirley (default), weighted")]
-    public LumFunction LuminosityFunction { get; init; } = LumFunction.Shirley;
-
-    //aggiungere range
-    [Option("--factor", Description = "The empirical factor to render images")]
-    public float Factor { get; init; } = 1.0f;
-
-    //aggiungere range
-    [Option("--gamma", Description = "The gamma factor characteristic of the screen")]
-    public float Gamma { get; init; } = 1.0f;
-
-    // demo with the scene.txt file
-    private void OnExecute()
-    {
-        
-
-        // Adjust parameters
-        float thetaRad = Functions.DegToRad(Theta);
-        float phiRad = Functions.DegToRad(Phi);
-        string currentPath = AppDomain.CurrentDomain.BaseDirectory;
-        string pngFilePath =
-            Path.Combine(currentPath,
-                "../../../../PngImages/" +
-                OutputFileName); //"../../../../PngImages/" dal path dell'eseguibile torna indietro (Controllare)
-        if (OutputFileName[^4..] != ".png") pngFilePath += ".png"; //OutputFilename[^4..] Legge gli ultimi 4 caratteri
-
-        // Define materials
-        HDRImage sphereTexture = new HDRImage(2, 2)
-        {
-            [0, 0] = new Color(0.1f, 0.2f, 0.3f),
-            [0, 1] = new Color(0.2f, 0.1f, 0.3f),
-            [1, 0] = new Color(0.3f, 0.2f, 0.1f),
-            [1, 1] = new Color(0.3f, 0.1f, 0.2f)
-        };
-        Material material1 = new Material(new UniformPigment(new Color(0.7f, 0.3f, 0.2f)), new DiffuseBRDF());
-        Material material2 =
-            new Material(new CheckeredPigment(new Color(0.2f, 0.7f, 0.3f), new Color(0.3f, 0.2f, 0.7f), numsteps: 4),
-                new DiffuseBRDF());
-        Material material3 = new Material(new ImagePigment(sphereTexture), new DiffuseBRDF());
-
-        // PER LA CAMERA APPLICARE LA TRASLAZIONE PER PRIMA (ULTIMA NELLA CONCATENAZIONE)
-        ICamera camera;
-
-        if (Projection == Projection.Perspective)
-        {
-            camera = new PerspectiveCamera(transformation: new Transformation(Axis.Z, phiRad) *
-                                                           new Transformation(Axis.Y, thetaRad) *
-                                                           new Transformation(new Vector(-1.0f, 0f, 0f)));
-        }
-        else if (Projection == Projection.Orthogonal)
-        {
-            camera = new OrthogonalCamera(transformation: new Transformation(Axis.Z, phiRad) *
-                                                          new Transformation(Axis.Y, thetaRad) *
-                                                          new Transformation(new Vector(-1.0f, 0f, 0f)));
-        }
-        else
-        {
-            throw new ArgumentException("Invalid camera mode, accepted orthogonal or perspective");
-        }
-
-        HDRImage image = new HDRImage(Width, Height);
-        ImageTracer tracer = new ImageTracer(image, camera, pixelSideSubdivisions: 1);
-
-        //PER LE FORME APPLICARE LA TRASLAZIONE PER ULTIMA (PRIMA NELLA CONCATENAZIONE)
-        Sphere s1 = new Sphere(new Transformation(new Vector(0.5f, 0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f),
-            material1);
-        Sphere s2 = new Sphere(new Transformation(new Vector(-0.5f, 0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f),
-            material1);
-        Sphere s3 = new Sphere(new Transformation(new Vector(0.5f, -0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f),
-            material1);
-        Sphere s4 = new Sphere(new Transformation(new Vector(0.5f, 0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f),
-            material1);
-        Sphere s5 = new Sphere(
-            new Transformation(new Vector(-0.5f, -0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f),
-            material1);
-        Sphere s6 = new Sphere(
-            new Transformation(new Vector(0.5f, -0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f),
-            material1);
-        Sphere s7 = new Sphere(
-            new Transformation(new Vector(-0.5f, 0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f),
-            material1);
-        Sphere s8 = new Sphere(
-            new Transformation(new Vector(-0.5f, -0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f),
-            material1);
-        Sphere s9 = new Sphere(new Transformation(new Vector(0f, 0f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f),
-            material2);
-        Sphere s10 = new Sphere(new Transformation(new Vector(0f, 0.5f, 0f)) * new Transformation(0.1f, 0.1f, 0.1f),
-            material3);
-
-        List<Shape> shapes = new List<Shape>
-        {
-            s1,
-            s2,
-            s3,
-            s4,
-            s5,
-            s6,
-            s7,
-            s8,
-            s9,
-            s10,
-        };
-
-        World world = new World(shapes);
-
-        Renderer render;
-
-        switch (Algorithm)
-        {
-            case RenderFunc.OnOff:
-                render = new OnOffRenderer(world);
-                break;
-            case RenderFunc.Flat:
-                render = new FlatRenderer(world);
-                break;
-            //case RenderFunc.PathTracer:
-            //render = new PathTracer(world);
-            //break;
-            default:
-                throw new ArgumentException("Invalid renderer mode, accepted onoff, flat or pathtracer");
-        }
-
-        tracer.FireAllRays(ray => render.RenderFunction(ray));
-
-        image.WritePNG(pngFilePath, LuminosityFunction, Factor, Gamma, averageLuminosity: 0.5f);
-        Console.WriteLine("The PNG file has been saved in PngImages/" + OutputFileName);
-    }
-    /*
-     * Demo with the two spheres and the checkered floor
-    private void OnExecute()
-    {
-        // Print the parameters passed on the command line
-        Console.WriteLine($"width: {Width}");
-        Console.WriteLine($"height: {Height}");
-        Console.WriteLine($"outputFileName: {OutputFileName}");
-        Console.WriteLine($"Render's algorithm: {Algorithm}");
-        Console.WriteLine($"theta: {Theta}");
-        Console.WriteLine($"phi: {Phi}");
-        Console.WriteLine($"projection: {Projection}");
-        Console.WriteLine();
-        Console.WriteLine("Tone Mapping parameters:");
-        Console.WriteLine($"luminosity function: {LuminosityFunction}");
-        Console.WriteLine($"factor: {Factor}");
-        Console.WriteLine($"gamma: {Gamma}");
-
-        // Adjust parameters
-        float thetaRad = Functions.DegToRad(Theta);
-        float phiRad = Functions.DegToRad(Phi);
-        string currentPath = AppDomain.CurrentDomain.BaseDirectory;
-        string pngFilePath = Path.Combine(currentPath, "../../../../DemoImages/" + OutputFileName);
-        if (OutputFileName[^4..] != ".png") pngFilePath += ".png";
-
-        // Define materials
-        var skyMaterial = new Material(new UniformPigment(new Color(1.0f, 0.9f, 0.5f)),
-            new DiffuseBRDF(new UniformPigment(new Color(0.0f, 0.0f, 0.0f))));
-        var groundMaterial =
-            new Material(new CheckeredPigment(new Color(0.3f, 0.5f, 0.1f), new Color(0.1f, 0.2f, 0.5f)), new DiffuseBRDF());
-        var sphereMaterial = new Material(new UniformPigment(new Color(0.3f, 0.4f, 0.8f)), new DiffuseBRDF());
-        var mirrorMaterial = new Material(new UniformPigment(new Color(0.6f, 0.2f, 0.3f)), new SpecularBRDF());
-
-        // Define the shapes of the scene
-        var world = new World();
-        world.Add(new Sphere(new Transformation(new Vector(0f, 0f, 0.4f)) * new Transformation(200f,200f,200f), skyMaterial));
-        world.Add(new Plane(new Transformation(), groundMaterial));
-        world.Add(new Sphere(new Transformation(new Vector(0f, 0f, 1f)), sphereMaterial));
-        world.Add(new Sphere(new Transformation(new Vector(1f, 2.5f, 0f)), mirrorMaterial));
-
-        // Choose and position the camera
-        ICamera camera;
-        if(Projection == Projection.Perspective)
-        {
-            camera = new PerspectiveCamera(transformation: new Transformation('z', phiRad) *
-                                                           new Transformation('y', thetaRad) *
-                                                           new Transformation(new Vector(-1.0f, 0f, 0.0f)));
-        }
-        else if (Projection == Projection.Orthogonal)
-        {
-            camera = new OrthogonalCamera(transformation: new Transformation('z', phiRad) *
-                                                          new Transformation('y', thetaRad) *
-                                                          new Transformation(new Vector(-1.0f, 0f, 0.0f)));
-        }
-        else
-        {
-            throw new ArgumentException("Invalid camera mode, accepted orthogonal or perspective");
-        }
-<<<<<<< HEAD
-
-        var tracer = new ImageTracer(image, camera, samplePerSide: 4);
-
-        //PER LE FORME APPLICARE LA TRASLAZIONE PER ULTIMA (PRIMA NELLA CONCATENAZIONE)
-        var s1 = new Sphere(new Transformation(new Vector(0.5f, 0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f), material1);
-        var s2 = new Sphere(new Transformation(new Vector(-0.5f, 0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f), material1);
-        var s3 = new Sphere(new Transformation(new Vector(0.5f, -0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f), material1);
-        var s4 = new Sphere(new Transformation(new Vector(0.5f, 0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f), material1);
-        var s5 = new Sphere(new Transformation(new Vector(-0.5f, -0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f), material1);
-        var s6 = new Sphere(new Transformation(new Vector(0.5f, -0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f), material1);
-        var s7 = new Sphere(new Transformation(new Vector(-0.5f, 0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f), material1);
-        var s8 = new Sphere(new Transformation(new Vector(-0.5f, -0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f), material1);
-        var s9 = new Sphere(new Transformation(new Vector(0f, 0f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f), material2);
-        var s10 = new Sphere(new Transformation(new Vector(0f, 0.5f, 0f)) * new Transformation(0.1f, 0.1f, 0.1f), material3);
-
-        var shapes = new List<Shape>
-        {
-            s1,
-            s2,
-            s3,
-            s4,
-            s5,
-            s6,
-            s7,
-            s8,
-            s9,
-            s10,
-        };
-
-        var world = new World(shapes);
-
-        //Starting generating pathtracer scenario
-
-        var world2 = new World();
-
-        var skyMaterial = new Material(new UniformPigment(new Color(0.0f, 0.0f, 0.0f)),
-            new UniformPigment(new Color(1.0f, 0.9f, 0.5f)), new DiffuseBRDF());
-
-        var groundMaterial =
-            new Material(new CheckeredPigment(new Color(0.3f, 0.5f, 0.1f), new Color(0.1f, 0.2f, 0.5f)), new DiffuseBRDF());
-
-        var sphereMaterial = new Material(new UniformPigment(new Color(0.3f, 0.4f, 0.8f)), new DiffuseBRDF());
-
-        var mirrorMaterial = new Material(new UniformPigment(new Color(0.6f, 0.2f, 0.3f)), new SpecularBRDF());
-
-        world2.Add(new Sphere(new Transformation(new Vector(0f, 0f, 0.4f)) * new Transformation(200f,200f,200f), skyMaterial));
-        world2.Add(new Plane(new Transformation(), groundMaterial));
-        world2.Add(new Sphere(new Transformation(new Vector(0f, 0f, 1f)), sphereMaterial));
-        world2.Add(new Sphere(new Transformation(new Vector(1f, 2.5f, 0f)), mirrorMaterial));
-
-        //Ending generating pathtracer scenario
-
-=======
-
-        // Choose the render algorithm
->>>>>>> pathtracing
-        Render render;
-        switch (Algorithm)
-        {
-            case RenderFunc.OnOff:
-                render = new OnOff(world);
-                break;
-            case RenderFunc.Flat:
-                render = new Flat(world);
-                break;
-            case RenderFunc.PathTracer:
-                render = new PathTracer(world);
-                break;
-            default:
-                throw new ArgumentException("Invalid renderer mode, accepted onoff, flat or pathtracer");
-        }
-
-        // Create the PFM image
-        var image = new HDRImage(Width, Height);
-        var tracer = new ImageTracer(image, camera, samplePerSide: 4);
-        tracer.FireAllRays(ray => render.RenderFunction(ray));
-
-        // Write the PNG file
-        image.WritePNG(pngFilePath, LuminosityFunction, Factor, Gamma, averageLuminosity: 0.5f);
-        Console.WriteLine("The PNG file has been saved in DemoImages/" + OutputFileName);
-    }*/
-
-    public void PrintParameters()
-    {
-        Console.WriteLine($"width: {Width}");
-        Console.WriteLine($"height: {Height}");
-        Console.WriteLine($"outputFileName: {OutputFileName}");
-        Console.WriteLine($"Render's algorithm: {Algorithm}");
-        Console.WriteLine($"theta: {Theta}");
-        Console.WriteLine($"phi: {Phi}");
-        Console.WriteLine($"projection: {Projection}");
-        Console.WriteLine();
-        Console.WriteLine("Tone Mapping parameters:");
-        Console.WriteLine($"luminosity function: {LuminosityFunction}");
-        Console.WriteLine($"factor: {Factor}");
-        Console.WriteLine($"gamma: {Gamma}");
-    }
-}
-
 [Command(Name = "render", Description = "Read a scene file and creates the corresponding image")]
 public class RenderCommand
 {
@@ -352,7 +34,7 @@ public class RenderCommand
 
     [Option("--outputpng", Description = "Name of the png file output")]
     public string OutputPngName { get; set; } = "output.png";
-    
+
     [Option("--width", Description = "The width of the image")]
     [Range(1, Int32.MaxValue)]
     public int Width { get; set; } = 500;
@@ -364,7 +46,7 @@ public class RenderCommand
     [Option("--sampleside", Description = "Number of samples per pixel's side (used for antialiasing)")]
     [Range(1, Int32.MaxValue)]
     public int SampleSide { get; set; } = 1;
-    
+
     [Option("--algorithm", Description = "Render's algorithm; pathTracer passed by default")]
     public RenderFunc Algorithm { get; set; } = RenderFunc.PathTracer;
 
@@ -384,7 +66,7 @@ public class RenderCommand
     [Option("--initseq", Description = "Identifier of the sequence produced by the random number generator")]
     [Range(0, ulong.MaxValue)]
     public ulong InitSeq { get; set; } = 54;
-    
+
     [Option("--roulettestart",
         Description = "Number of ray reflections after which the Russian roulette algorithm is applied")]
     [Range(0, Int32.MaxValue)]
@@ -417,7 +99,7 @@ public class RenderCommand
     public void OnExecute()
     {
         PrintParameters();
-        SetIOFilesPaths(out string scenePath, out string pngFilePath, out string pfmFilePath);
+        SetIOFilesPaths(out string scenePath, out string pfmFilePath, out string pngFilePath);
         Scene scene = ReadSceneFile(scenePath);
         HDRImage image = new HDRImage(Width, Height);
         Renderer renderer = BuildRenderer(scene);
@@ -477,18 +159,18 @@ public class RenderCommand
     /// names if they are missing.
     /// </summary>
     /// <param name="scenePath">Full path to the input scene file.</param>
-    /// <param name="pngFilePath">Full path to the output PNG file.</param>
     /// <param name="pfmFilePath">Full path to the output PFM file.</param>
-    public void SetIOFilesPaths(out string scenePath, out string pngFilePath, out string pfmFilePath)
+    /// <param name="pngFilePath">Full path to the output PNG file.</param>
+    public void SetIOFilesPaths(out string scenePath, out string pfmFilePath, out string pngFilePath)
     {
         string currentPath = AppDomain.CurrentDomain.BaseDirectory;
 
-        if (!OutputPngName.EndsWith(".png")) OutputPngName += ".png";
-        if (!OutputPfmName.EndsWith(".pfm")) OutputPfmName += ".pfm";
+        string pfmName = OutputPfmName.EndsWith(".pfm") ? OutputPfmName : OutputPfmName + ".pfm";
+        string pngName = OutputPngName.EndsWith(".png") ? OutputPngName : OutputPngName + ".png";
 
         scenePath = Path.Combine(currentPath, "../../../../Scenes/", InputSceneName);
-        pngFilePath = Path.Combine(currentPath, "../../../../PngImages/", OutputPngName);
-        pfmFilePath = Path.Combine(currentPath, "../../../../PfmImages/", OutputPfmName);
+        pfmFilePath = Path.Combine(currentPath, "../../../../PfmImages/", pfmName);
+        pngFilePath = Path.Combine(currentPath, "../../../../PngImages/", pngName);
     }
 
     /// <summary>
