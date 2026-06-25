@@ -490,7 +490,7 @@ public class RenderCommand
 
         try
         {
-            scene.ParseScene(input, variables);
+            scene.ReadScene(input, variables);
         }
         catch (Exception e)
         {

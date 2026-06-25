@@ -553,8 +553,23 @@ public class Scene
                 $"{variableName} cannot be redefined");
         if (!ExternalVariables.Contains(variableName)) Variables[variableName] = variableValue;
     }
-
-    public void ParseScene(InputStream inputStream, Dictionary<string, float> externalVariables)
+    
+    /// <summary>
+    /// Populates this <see cref="Scene"/> by parsing a scene description from the input stream,
+    /// taking into account external variables that override values defined in the scene file.
+    /// </summary>
+    /// <param name="inputStream">
+    /// The input stream providing the scene description.
+    /// </param>
+    /// <param name="externalVariables">
+    /// Variables provided externally whose values take precedence over
+    /// those defined in the scene file.
+    /// </param>
+    /// <exception cref="SceneSyntaxException">
+    /// Thrown when the scene description violates the syntax rules,
+    /// attempts to redefine a variable, or defines more than one camera.
+    /// </exception>
+    public void ReadScene(InputStream inputStream, Dictionary<string, float> externalVariables)
     {
         Variables = new Dictionary<string, float>(externalVariables);
         ExternalVariables = new HashSet<string>(externalVariables.Keys);
