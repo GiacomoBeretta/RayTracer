@@ -209,7 +209,9 @@ public class Scene
                 break;
             case Keyword.Image:
                 string fileName = ExpectString(inputStream);
-                using (FileStream imageFile = File.OpenRead(fileName))
+                string currentPath = AppDomain.CurrentDomain.BaseDirectory;
+                string texturePath = Path.Combine(currentPath, "../../../../PfmImages", fileName);
+                using (FileStream imageFile = File.OpenRead(texturePath))
                 {
                     HDRImage image = HDRImage.ReadPFM_File(imageFile);
                     result = new ImagePigment(image);

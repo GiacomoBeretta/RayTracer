@@ -42,7 +42,6 @@ while [[ $# -gt 0 ]]; do
     --declarefloat) declarefloat+=( "$2" ); shift 2 ;;
     --inputpfm) inputpfm="$2"; shift 2 ;;
     --output) output="$2"; shift 2 ;;
-    --inputaverage) inputaverage="$2"; shift 2 ;;
     --outputaveragepfm) outputaveragepfm="$2"; shift 2 ;;
     --outputaveragepng) outputaveragepng="$2"; shift 2 ;;
     *) echo "Unknown parameter: $1"; exit 1 ;;
@@ -52,8 +51,6 @@ done
 # Base command
 
 readonly exepath="./RayTracer/bin/Debug/net10.0/RayTracer"
-
-dotnet build
 
 cmd=( "$exepath" "$subcommand" )
 
@@ -89,10 +86,7 @@ if [[ "$subcommand" == "pfmtopng" ]]; then
 	[ -n "$gamma" ]             && cmd+=( --gamma "$gamma" ) 
 fi
 
-# Average Images
-
 if [[ "$subcommand" == "averageimage" ]]; then
-	[ -n "$inputaverage" ]         && cmd+=( --inputaverage "$inputaverage" ) 
 	[ -n "$outputaveragepfm" ]     && cmd+=( --outputaveragepfm "$outputaveragepfm" ) 
 	[ -n "$outputaveragepng" ]     && cmd+=( --outputaveragepng "$outputaveragepng" ) 
 	[ -n "$lumfunction" ]          && cmd+=( --luminosityfunction "$lumfunction" ) 
@@ -103,7 +97,7 @@ fi
 
 # Build
 
-#dotnet build || exit 1
+dotnet build || exit 1
 
 # Random generator cycle
 
@@ -151,3 +145,6 @@ else
 fi
 
 # seq -w 0 359 | parallel -j 5 ./raytracer.sh render --declarefloat clock:{} --outputpfm frame_{}.pfm --outputpng frame_{}.png
+
+
+

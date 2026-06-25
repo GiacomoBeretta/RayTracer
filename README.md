@@ -125,7 +125,7 @@ The program provides several commands:
 
 Reads a scene description from a text file and generates the corresponding image.
 
-> **Note:** The scene file must be located inside the `Scene` directory at build time.
+> **Note:** The scene file must be located inside the `Scene` directory at build time while the corrisponding pfm and png images will be saved in the `PfmImages` and `PngImages` directories correspondly
 
 ---
 
@@ -145,11 +145,15 @@ ${outputpfm%.pfm}_state${state}_seq${seq}.pfm
 
 The command automatically filters the files contained in the input directory and processes only the files matching this pattern.
 
+> **Note:** The pfm files must be located inside the `PfmImages` directory at build time while the corrisponding pfm and png averaged images will be saved in the `PfmImages` and `PngImages` directories correspondly
+
 ---
 
 ### pfmtopng
 
 Converts images from the PFM (Portable Float Map) image format to PNG format.
+
+> **Note:** The pfm files must be located inside the `PfmImages` directory at build time while the corrisponding png images will be saved in the `PngImages` directoriy
 
 ---
 
