@@ -486,11 +486,11 @@ public class RenderCommand
 
         var scene = new Scene();
         var input = new InputStream(scenePath);
-        var variables = Functions.VariableTable(Definitions);
+        var variables = Functions.ParseVariableTable(Definitions);
 
         try
         {
-            scene = scene.ParseScene(input, variables);
+            scene.ParseScene(input, variables);
         }
         catch (Exception e)
         {
