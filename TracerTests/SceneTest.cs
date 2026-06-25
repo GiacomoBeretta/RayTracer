@@ -131,8 +131,7 @@ public class SceneTest
 
         File.Delete(filepath);
     }
-
-
+    
     [Fact]
     public void ParsePigmentTest()
     {
@@ -227,8 +226,7 @@ public class SceneTest
 
         File.Delete(filepath);
     }
-
-
+    
     [Fact]
     public void ParseSphereTest()
     {
@@ -242,7 +240,7 @@ public class SceneTest
             scene.ParseMaterial(str, out string name, out Material material);
             scene.Materials[name] = material;
 
-            Sphere sphere = scene.ParseSphere(str, scene);
+            Sphere sphere = scene.ParseSphere(str);
             Color colorSphere = sphere.Material.Pigment.GetColor(new Vector2D(0.5f, 0.5f));
             Color radianceSphere = sphere.Material.EmittedRadiance.GetColor(new Vector2D(0.5f, 0.5f));
             Transformation transformSphere = sphere.Transform;
@@ -270,7 +268,7 @@ public class SceneTest
             scene.ParseMaterial(str, out string name, out Material material);
             scene.Materials[name] = material;
 
-            Plane plane = scene.ParsePlane(str, scene);
+            Plane plane = scene.ParsePlane(str);
             Color colorPlane1 = plane.Material.Pigment.GetColor(new Vector2D(0.1f, 0.1f));
             Color colorPlane2 = plane.Material.Pigment.GetColor(new Vector2D(0.1f, 0.9f));
             Color radiancePlane = plane.Material.EmittedRadiance.GetColor(new Vector2D(0.5f, 0.5f));
@@ -295,7 +293,7 @@ public class SceneTest
 
         using (InputStream str = new InputStream(filepath))
         {
-            var camera = (PerspectiveCamera)scene.ParseCamera(str, scene);
+            var camera = (PerspectiveCamera)scene.ParseCamera(str);
 
             Assert.True(Transformation.AreTransformationsClose(
                 new Transformation(Axis.Z, Functions.DegToRad(30)) * new Transformation(new Vector(-4f, 0f, 1f)),
