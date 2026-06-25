@@ -336,7 +336,9 @@ Example:
 <0.5, 0.3, 0.1>
 ```
 
-> **TODO:** document the valid range for `r`, `g`, and `b`.
+The color components `r`, `g`, and `b` are floating-point values.
+
+Values in the range `[0, 1]` represent the standard visible intensity range, although higher values are allowed.
 
 ---
 
@@ -648,9 +650,32 @@ float clock(45)
 
 ## Common Options
 
-The following options are available in multiple commands.
+The following options are available in all the commands.
 
-> **TODO:** add the missing common options
+#### `--luminosityfunction`
+
+Luminosity function used during tone mapping to compute image brightness.
+
+Available options:
+
+- `shirley`
+- `weighted`
+
+#### `--averageluminosity`
+
+Average luminosity value used during tone mapping.
+
+When specified, the image luminosity is normalized using this value instead of computing it automatically from the image.
+
+#### `--factor`
+
+Empirical scaling factor applied during tone mapping.
+
+Higher values generally produce brighter images, while lower values produce darker images.
+
+#### `--gamma`
+
+Gamma correction factor applied after tone mapping.
 
 ---
 
@@ -886,13 +911,26 @@ This technique significantly reduces jagged edges and improves image quality, es
 
 # Where to ask for help
 
+If you encounter bugs, unexpected behavior, or have questions about the project, please open an issue in the repository.
+
 ---
 
 # Future developments
 
+Possible future improvements include:
+
+- support for mesh-based objects;
+- point-light tracing algorithm;
+- possibility to parse arithmetic operations in scene files;
+- performance optimizations and parallel rendering.
+
 ---
 
 # How to contribute
+
+Contributions are welcome.
+
+Please open an issue before implementing major changes and ensure that all tests pass before submitting a pull request.
 
 ---
 
