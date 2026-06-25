@@ -8,7 +8,7 @@ using TracerLib;
 using McMaster.Extensions.CommandLineUtils;
 
 [Command(Name = "RayTracer")]
-[Subcommand(typeof(DemoCommand), typeof(PfmToPngCommand), typeof(AverageImageCommand), typeof(RenderCommand))]
+[Subcommand( typeof(RenderCommand), typeof(AverageImageCommand), typeof(PfmToPngCommand))]
 public class RayTracer
 {
     public static int Main(string[] args)
@@ -103,8 +103,8 @@ public class RenderCommand
         Scene scene = ReadSceneFile(scenePath);
         HDRImage image = new HDRImage(Width, Height);
         Renderer renderer = BuildRenderer(scene);
-        EnsureCameraExists(scene);
-        ImageTracer tracer = new ImageTracer(image, scene.Camera, pixelSideSubdivisions: SampleSide);
+        ICamera camera = GetOrCreateCamera();
+        ImageTracer tracer = new ImageTracer(image, camera, pixelSideSubdivisions: SampleSide);
 
         tracer.FireAllRays(ray => renderer.RenderFunction(ray));
 
@@ -227,19 +227,19 @@ public class RenderCommand
     }
 
     /// <summary>
-    /// Validates the presence of a camera in the scene.
-    /// If no camera is defined, a default perspective camera is assigned.
+    /// Returns the scene camera, creating a default PerspectiveCamera if none exists.
     /// </summary>
-    /// <param name="scene">
-    /// The scene to validate and potentially modify.
-    /// </param>
-    public void EnsureCameraExists(Scene scene)
+    /// <param name="scene">The scene to retrieve or initialize the camera from.</param>
+    /// <returns>An existing camera if present, otherwise a newly created PerspectiveCamera.</returns>
+    public ICamera GetOrCreateCamera(Scene scene)
     {
         if (scene.Camera == null)
         {
             Console.WriteLine("Not initialized camera. Follows default initialization [perspective]");
             scene.Camera = new PerspectiveCamera();
         }
+
+        return scene.Camera;
     }
 }
 
