@@ -361,7 +361,7 @@ public class HDRImage
     /// <returns>The line content, or null if the end of the stream is reached before reading any data.</returns>
     public static string? _ReadLine(BinaryReader br)
     {
-        var bytes = new List<byte>();
+        List<Byte> bytes = new List<byte>();
 
         while (true)
         {
@@ -503,7 +503,7 @@ public class HDRImage
     /// </exception>
     public static HDRImage ReadPFM_File(Stream stream)
     {
-        using var br = new BinaryReader(stream);
+        using BinaryReader br = new BinaryReader(stream);
 
         HDRImage.ReadPFM_Header(br, out HDRImage image, out Endianness endianness);
 
@@ -515,7 +515,7 @@ public class HDRImage
                 //Console.WriteLine($"Column = {j}, Row = {i}");
                 //Console.WriteLine($"Offset = {result._PixelOffset(j,i)}");
                 //Console.WriteLine($"Offset 2 = {i * result.Width + j}");
-                var color = new Color
+                Color color = new Color
                 {
                     R = _ReadFloat(br, endianness),
                     G = _ReadFloat(br, endianness),

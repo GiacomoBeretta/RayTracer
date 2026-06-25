@@ -91,18 +91,18 @@ public class DemoCommand
         if (OutputFileName[^4..] != ".png") pngFilePath += ".png"; //OutputFilename[^4..] Legge gli ultimi 4 caratteri
 
         // Define materials
-        var sphereTexture = new HDRImage(2, 2)
+        HDRImage sphereTexture = new HDRImage(2, 2)
         {
             [0, 0] = new Color(0.1f, 0.2f, 0.3f),
             [0, 1] = new Color(0.2f, 0.1f, 0.3f),
             [1, 0] = new Color(0.3f, 0.2f, 0.1f),
             [1, 1] = new Color(0.3f, 0.1f, 0.2f)
         };
-        var material1 = new Material(new UniformPigment(new Color(0.7f, 0.3f, 0.2f)), new DiffuseBRDF());
-        var material2 =
+        Material material1 = new Material(new UniformPigment(new Color(0.7f, 0.3f, 0.2f)), new DiffuseBRDF());
+        Material material2 =
             new Material(new CheckeredPigment(new Color(0.2f, 0.7f, 0.3f), new Color(0.3f, 0.2f, 0.7f), numsteps: 4),
                 new DiffuseBRDF());
-        var material3 = new Material(new ImagePigment(sphereTexture), new DiffuseBRDF());
+        Material material3 = new Material(new ImagePigment(sphereTexture), new DiffuseBRDF());
 
         // PER LA CAMERA APPLICARE LA TRASLAZIONE PER PRIMA (ULTIMA NELLA CONCATENAZIONE)
         ICamera camera;
@@ -124,32 +124,32 @@ public class DemoCommand
             throw new ArgumentException("Invalid camera mode, accepted orthogonal or perspective");
         }
 
-        var image = new HDRImage(Width, Height);
-        var tracer = new ImageTracer(image, camera, pixelSideSubdivisions: 1);
+        HDRImage image = new HDRImage(Width, Height);
+        ImageTracer tracer = new ImageTracer(image, camera, pixelSideSubdivisions: 1);
 
         //PER LE FORME APPLICARE LA TRASLAZIONE PER ULTIMA (PRIMA NELLA CONCATENAZIONE)
-        var s1 = new Sphere(new Transformation(new Vector(0.5f, 0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f),
+        Sphere s1 = new Sphere(new Transformation(new Vector(0.5f, 0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f),
             material1);
-        var s2 = new Sphere(new Transformation(new Vector(-0.5f, 0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f),
+        Sphere s2 = new Sphere(new Transformation(new Vector(-0.5f, 0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f),
             material1);
-        var s3 = new Sphere(new Transformation(new Vector(0.5f, -0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f),
+        Sphere s3 = new Sphere(new Transformation(new Vector(0.5f, -0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f),
             material1);
-        var s4 = new Sphere(new Transformation(new Vector(0.5f, 0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f),
+        Sphere s4 = new Sphere(new Transformation(new Vector(0.5f, 0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f),
             material1);
-        var s5 = new Sphere(new Transformation(new Vector(-0.5f, -0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f),
+        Sphere s5 = new Sphere(new Transformation(new Vector(-0.5f, -0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f),
             material1);
-        var s6 = new Sphere(new Transformation(new Vector(0.5f, -0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f),
+        Sphere s6 = new Sphere(new Transformation(new Vector(0.5f, -0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f),
             material1);
-        var s7 = new Sphere(new Transformation(new Vector(-0.5f, 0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f),
+        Sphere s7 = new Sphere(new Transformation(new Vector(-0.5f, 0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f),
             material1);
-        var s8 = new Sphere(new Transformation(new Vector(-0.5f, -0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f),
+        Sphere s8 = new Sphere(new Transformation(new Vector(-0.5f, -0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f),
             material1);
-        var s9 = new Sphere(new Transformation(new Vector(0f, 0f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f),
+        Sphere s9 = new Sphere(new Transformation(new Vector(0f, 0f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f),
             material2);
-        var s10 = new Sphere(new Transformation(new Vector(0f, 0.5f, 0f)) * new Transformation(0.1f, 0.1f, 0.1f),
+        Sphere s10 = new Sphere(new Transformation(new Vector(0f, 0.5f, 0f)) * new Transformation(0.1f, 0.1f, 0.1f),
             material3);
 
-        var shapes = new List<Shape>
+        List<Shape> shapes = new List<Shape>
         {
             s1,
             s2,
@@ -163,7 +163,7 @@ public class DemoCommand
             s10,
         };
 
-        var world = new World(shapes);
+        World world = new World(shapes);
 
         Renderer render;
 
@@ -465,20 +465,20 @@ public class RenderCommand
 
         SetIOFilesPaths(out string scenePath, out string pngFilePath, out string pfmFilePath);
 
-        var scene = new Scene();
-        var input = new InputStream(scenePath);
-        var variables = Functions.ParseVariableTable(Definitions);
+        Scene scene = new Scene();
+        InputStream inputStream = new InputStream(scenePath);
+        Dictionary<string,float> variables = Functions.ParseVariableTable(Definitions);
 
         try
         {
-            scene.ReadScene(input, variables);
+            scene.ReadScene(inputStream, variables);
         }
         catch (Exception e)
         {
             Console.WriteLine(e.Message); //Verificare che stampi anche la posizione dell'errore
         }
 
-        var image = new HDRImage(Width, Height);
+        HDRImage image = new HDRImage(Width, Height);
 
         Renderer renderer;
         switch (Algorithm)
@@ -503,7 +503,7 @@ public class RenderCommand
             scene.Camera = new PerspectiveCamera();
         }
 
-        var tracer = new ImageTracer(image, scene.Camera, pixelSideSubdivisions: SampleSide);
+        ImageTracer tracer = new ImageTracer(image, scene.Camera, pixelSideSubdivisions: SampleSide);
         tracer.FireAllRays(ray => renderer.RenderFunction(ray));
 
         HDRImage.WritePFM_File(image, pfmFilePath);
@@ -612,7 +612,7 @@ public class AverageImageCommand
         if (OutputFilePathPfm[^4..] != ".pfm") OutputFilePathPfm += ".pfm";
         string pfmFilePath = Path.Combine(currentPath, "../../../../PfmImages", OutputFilePathPfm);
 
-        var files = Directory.GetFiles(inputFileFolder, "*_state*_seq*.pfm"); //search for pattern in folder
+        string[] files = Directory.GetFiles(inputFileFolder, "*_state*_seq*.pfm"); //search for pattern in folder
 
         if (files.Length == 0)
         {
@@ -622,27 +622,27 @@ public class AverageImageCommand
 
         //Using first file as accumulator
 
-        var acc = HDRImage.ReadPFM_File(files[0]);
+        HDRImage acc = HDRImage.ReadPFM_File(files[0]);
 
-        var width = acc.Width;
-        var height = acc.Height;
-        var length = width * height;
+        int width = acc.Width;
+        int height = acc.Height;
+        int length = width * height;
 
         Color[] average = new Color[length];
 
         HDRImage[] images = new HDRImage[files.Length];
 
-        for (var i = 0; i < files.Length; i++) images[i] = HDRImage.ReadPFM_File(files[i]);
+        for (int i = 0; i < files.Length; i++) images[i] = HDRImage.ReadPFM_File(files[i]);
 
-        foreach (var image in images)
+        foreach (HDRImage image in images)
         {
             if (image.Width != acc.Width || image.Height != acc.Height)
                 throw new ArgumentException("Images must have equal width and height");
         }
 
-        for (var i = 0; i < length; i++)
+        for (int i = 0; i < length; i++)
         {
-            foreach (var image in images)
+            foreach (HDRImage image in images)
             {
                 average[i] += image[i];
             }
@@ -650,7 +650,7 @@ public class AverageImageCommand
             average[i] *= (1.0f / files.Length);
         }
 
-        var output = new HDRImage(acc.Width, acc.Height, average);
+        HDRImage output = new HDRImage(acc.Width, acc.Height, average);
 
         HDRImage.WritePFM_File(output, pfmFilePath);
         Console.WriteLine($"Pfm file created in: {pfmFilePath}");

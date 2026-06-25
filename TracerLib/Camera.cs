@@ -75,7 +75,7 @@ public struct OrthogonalCamera : ICamera
         // u e v vanno da 0 a 1
         // e così lo schermo ha proporzioni 2x2*AspectRatio
         // il punto per cui passa il raggio va da -AspectRatio a +AspectRatio per y e da -1 a 1 per z 
-        // var origin = new Point(-1f, (1f - 2f * u) * this.AspectRatio, 2f * v - 1f);
+        // Point origin = new Point(-1f, (1f - 2f * u) * this.AspectRatio, 2f * v - 1f);
 
         // formula per quando u e v partono dall'angolo in alto a sinistra
         // u e v vanno da 0 a 1

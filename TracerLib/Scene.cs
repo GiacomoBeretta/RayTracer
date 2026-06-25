@@ -364,7 +364,7 @@ public class Scene
     /// </exception>
     public Transformation ParseTransformation(InputStream inputStream)
     {
-        var result = new Transformation();
+        Transformation result = new Transformation();
 
         while (true)
         {
