@@ -77,7 +77,7 @@ public static class Functions
     /// Thrown when a definition does not follow the "NAME:VALUE" format or when
     /// the provided value cannot be parsed as a floating-point number.
     /// </exception>
-    public static Dictionary<string, float> VariableTable(string[] definitions)
+    public static Dictionary<string, float> ParseVariableTable(string[] definitions)
     {
         var variables = new Dictionary<string, float>();
 

@@ -49,13 +49,13 @@ public class FunctionsTest
         string[] variable2 = ["color:3:2"];
         string[] variable3 = ["hello:world"];
 
-        var result = Functions.VariableTable(variable1);
+        var result = Functions.ParseVariableTable(variable1);
         
         Assert.Contains("clock", result.Keys);
         Assert.Equal(150, result["clock"]);
 
-        Assert.Throws<ArgumentException>(() => Functions.VariableTable(variable2));
-        Assert.Throws<ArgumentException>(() => Functions.VariableTable(variable3));
+        Assert.Throws<ArgumentException>(() => Functions.ParseVariableTable(variable2));
+        Assert.Throws<ArgumentException>(() => Functions.ParseVariableTable(variable3));
         
 
 
