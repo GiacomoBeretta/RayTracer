@@ -246,7 +246,7 @@ public class DemoCommand
             throw new ArgumentException("Invalid camera mode, accepted orthogonal or perspective");
         }
 <<<<<<< HEAD
-        
+
         var tracer = new ImageTracer(image, camera, samplePerSide: 4);
 
         //PER LE FORME APPLICARE LA TRASLAZIONE PER ULTIMA (PRIMA NELLA CONCATENAZIONE)
@@ -274,28 +274,28 @@ public class DemoCommand
             s9,
             s10,
         };
-        
+
         var world = new World(shapes);
-        
+
         //Starting generating pathtracer scenario
 
         var world2 = new World();
 
         var skyMaterial = new Material(new UniformPigment(new Color(0.0f, 0.0f, 0.0f)),
             new UniformPigment(new Color(1.0f, 0.9f, 0.5f)), new DiffuseBRDF());
-        
+
         var groundMaterial =
             new Material(new CheckeredPigment(new Color(0.3f, 0.5f, 0.1f), new Color(0.1f, 0.2f, 0.5f)), new DiffuseBRDF());
-        
+
         var sphereMaterial = new Material(new UniformPigment(new Color(0.3f, 0.4f, 0.8f)), new DiffuseBRDF());
-        
+
         var mirrorMaterial = new Material(new UniformPigment(new Color(0.6f, 0.2f, 0.3f)), new SpecularBRDF());
-        
+
         world2.Add(new Sphere(new Transformation(new Vector(0f, 0f, 0.4f)) * new Transformation(200f,200f,200f), skyMaterial));
         world2.Add(new Plane(new Transformation(), groundMaterial));
         world2.Add(new Sphere(new Transformation(new Vector(0f, 0f, 1f)), sphereMaterial));
         world2.Add(new Sphere(new Transformation(new Vector(1f, 2.5f, 0f)), mirrorMaterial));
-        
+
         //Ending generating pathtracer scenario
 
 =======
@@ -343,8 +343,10 @@ public class PfmToPngCommand
 
     [Option("--luminosityfunction", Description = "Luminosity function, options are: shirley (default), weighted")]
     public LumFunction Luminosityfunction { get; set; } = LumFunction.Shirley;
-    
-    [Option("--averageluminosity", Description = "Fixed luminosity for the tone mapping. If the value is null is computed with the luminosity function")]
+
+    [Option("--averageluminosity",
+        Description =
+            "Fixed luminosity for the tone mapping. If the value is null is computed with the luminosity function")]
     public float? AverageLuminosity { get; set; } = null;
 
     [Option("--factor", Description = "The empirical factor to render images")]
@@ -375,9 +377,9 @@ public class PfmToPngCommand
 
         HDRImage image = HDRImage.ReadPFM_File(pfmFilePath);
         Console.WriteLine($"File read: {pfmFilePath}");
-        
+
         image.WritePNG(pngFilePath, Luminosityfunction, Factor, Gamma, AverageLuminosity);
-        
+
         Console.WriteLine($"File saved in: {pngFilePath}");
     }
 }
@@ -395,7 +397,7 @@ public class RenderCommand
     [Option("--height", Description = "The height of the image")]
     [Range(1, Int32.MaxValue)]
     public int Height { get; set; } = 500;
-    
+
     [Option("--aspectratio", Description = "The aspect ratio of the image, i.e. a positive floating-point number.")]
     [Range(1e-5f, float.MaxValue)]
     public float AspectRatio { get; set; } = 1.0f;
@@ -432,8 +434,10 @@ public class RenderCommand
 
     [Option("--luminosityfunction", Description = "Luminosity function, options are: shirley (default), weighted")]
     public LumFunction Luminosityfunction { get; set; } = LumFunction.Shirley;
-    
-    [Option("--averageluminosity", Description = "Fixed luminosity for the tone mapping. If the value is null is computed with the luminosity function")]
+
+    [Option("--averageluminosity",
+        Description =
+            "Fixed luminosity for the tone mapping. If the value is null is computed with the luminosity function")]
     public float? AverageLuminosity { get; set; } = null;
 
     [Option("--factor", Description = "The empirical factor to render images")]
@@ -451,25 +455,15 @@ public class RenderCommand
                                             "(when null, the probability is computed dynamically at each recursive call of RenderFunction)")]
     [Range(0, 1)]
     public float? RussianRouletteFixedProb { get; set; } = null;
-    
+
     [Option("--declarefloat|-d", Description = "Declare a variable. The syntax is --declarefloat=NAME:VALUE")]
     public string[] Definitions { get; set; } = [];
 
     public void OnExecute()
     {
         PrintParameters();
-        string currentPath = AppDomain.CurrentDomain.BaseDirectory;
 
-        string scenePath = Path.Combine(currentPath, "../../../../Scenes/", InputSceneName);
-
-        if (OutputPngName[^4..] != ".png") OutputPngName += ".png"; //OutputFilename[^4..] reads the last 4 characters
-        string pngFilePath =
-            Path.Combine(currentPath, "../../../../PngImages/",
-                OutputPngName); //"../../../../DemoImages/" dal path dell'eseguibile torna indietro (Controllare)
-
-        if (OutputPfmName[^4..] != ".pfm") OutputPfmName += ".pfm";
-        string pfmFilePath = Path.Combine(currentPath, "../../../../PfmImages", OutputPfmName);
-
+        SetIOFilesPaths(out string scenePath, out string pngFilePath, out string pfmFilePath);
 
         var scene = new Scene();
         var input = new InputStream(scenePath);
@@ -519,6 +513,9 @@ public class RenderCommand
         Console.WriteLine($"Png file created in: {pngFilePath}");
     }
 
+    /// <summary>
+    /// Prints all the parameters passed through the command line.
+    /// </summary>
     public void PrintParameters()
     {
         Console.WriteLine($"Input: {InputSceneName}");
@@ -545,6 +542,26 @@ public class RenderCommand
             Console.WriteLine($"{Definitions[i]}");
         }
     }
+
+    /// <summary>
+    /// Builds the paths of the input scene file and the output PFM and PNG files,
+    /// <c>.pfm</c> and <c>.png</c> extensions are appended to the output file
+    /// names if they are missing.
+    /// </summary>
+    /// <param name="scenePath">Full path to the input scene file.</param>
+    /// <param name="pngFilePath">Full path to the output PNG file.</param>
+    /// <param name="pfmFilePath">Full path to the output PFM file.</param>
+    public void SetIOFilesPaths(out string scenePath, out string pngFilePath, out string pfmFilePath)
+    {
+        string currentPath = AppDomain.CurrentDomain.BaseDirectory;
+
+        if (!OutputPngName.EndsWith(".png")) OutputPngName += ".png";
+        if (!OutputPfmName.EndsWith(".pfm")) OutputPfmName += ".pfm";
+
+        scenePath = Path.Combine(currentPath, "../../../../Scenes/", InputSceneName);
+        pngFilePath = Path.Combine(currentPath, "../../../../PngImages/", OutputPngName);
+        pfmFilePath = Path.Combine(currentPath, "../../../../PfmImages/", OutputPfmName);
+    }
 }
 
 [Command(Name = "averageimage",
@@ -555,7 +572,7 @@ public class AverageImageCommand
     [Option("--outputaveragepfm", Description = "Name of the output pfm file")]
     [Required]
     public required string OutputFilePathPfm { get; set; }
-    
+
     [Option("--outputaveragepng", Description = "Name of the output png file")]
     [Required]
     public required string OutputFilePathPng { get; set; }
@@ -563,9 +580,11 @@ public class AverageImageCommand
     [Option("--luminosityfunction", Description = "Luminosity function, options are: shirley (default), weighted")]
     public LumFunction Luminosityfunction { get; set; } = LumFunction.Shirley;
 
-    [Option("--averageluminosity", Description = "Fixed luminosity for the tone mapping. If the value is null is computed with the luminosity function")]
+    [Option("--averageluminosity",
+        Description =
+            "Fixed luminosity for the tone mapping. If the value is null is computed with the luminosity function")]
     public float? AverageLuminosity { get; set; } = null;
-    
+
     [Option("--factor", Description = "The empirical factor to render images")]
     public float Factor { get; set; } = 1f;
 
@@ -584,7 +603,8 @@ public class AverageImageCommand
         string currentPath = AppDomain.CurrentDomain.BaseDirectory;
         string inputFileFolder = Path.Combine(currentPath, "../../../../PfmImages");
 
-        if (OutputFilePathPng[^4..] != ".png") OutputFilePathPng += ".png"; //OutputFilename[^4..] Legge gli ultimi 4 caratteri
+        if (OutputFilePathPng[^4..] != ".png")
+            OutputFilePathPng += ".png"; //OutputFilename[^4..] Legge gli ultimi 4 caratteri
         string pngFilePath =
             Path.Combine(currentPath, "../../../../PngImages/",
                 OutputFilePathPng); //"../../../../DemoImages/" dal path dell'eseguibile torna indietro (Controllare)
@@ -779,4 +799,3 @@ private void OnExecute()
     //Console.WriteLine(
        // $"I parametri passati sono: InputFileName={args[0]}, aFactor={args[1]}, gamma={args[2]}, OutputFileName={args[3]}");
 }*/
- 
