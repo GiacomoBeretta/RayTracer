@@ -385,8 +385,8 @@ public class PfmToPngCommand
 [Command(Name = "render", Description = "Read a scene file and creates the corresponding image")]
 public class RenderCommand
 {
-    [Option("--inputrender", Description = "The input scene file path")]
-    public string InputScene { get; set; } = "scene.txt";
+    [Option("--inputrender", Description = "The input scene file name")]
+    public string InputSceneName { get; set; } = "scene.txt";
 
     [Option("--width", Description = "The width of the image")]
     [Range(1, Int32.MaxValue)]
@@ -404,10 +404,10 @@ public class RenderCommand
     public RenderFunc Algorithm { get; set; } = RenderFunc.PathTracer;
 
     [Option("--outputpfm", Description = "Name of the pfm file output")]
-    public string OutputPfm { get; set; } = "output.pfm";
+    public string OutputPfmName { get; set; } = "output.pfm";
 
     [Option("--outputpng", Description = "Name of the png file output")]
-    public string OutputPng { get; set; } = "output.png";
+    public string OutputPngName { get; set; } = "output.png";
 
     [Option("--numrays",
         Description =
@@ -442,9 +442,6 @@ public class RenderCommand
     [Option("--gamma", Description = "The gamma factor characteristic of the screen")]
     public float Gamma { get; set; } = 1f;
 
-    [Option("--declarefloat|-d", Description = "Declare a variable. The syntax is --declarefloat=NAME:VALUE")]
-    public string[] Definitions { get; set; } = [];
-
     [Option("--roulettestart",
         Description = "Number of ray reflections after which the Russian roulette algorithm is applied")]
     [Range(0, Int32.MaxValue)]
@@ -454,39 +451,24 @@ public class RenderCommand
                                             "(when null, the probability is computed dynamically at each recursive call of RenderFunction)")]
     [Range(0, 1)]
     public float? RussianRouletteFixedProb { get; set; } = null;
+    
+    [Option("--declarefloat|-d", Description = "Declare a variable. The syntax is --declarefloat=NAME:VALUE")]
+    public string[] Definitions { get; set; } = [];
 
     public void OnExecute()
     {
-        Console.WriteLine($"Input: {InputScene}");
-        Console.WriteLine($"Width: {Width}");
-        Console.WriteLine($"Height: {Height}");
-        Console.WriteLine($"AspectRatio: {AspectRatio}");
-        Console.WriteLine($"Algorithm: {Algorithm}");
-        Console.WriteLine($"OutputPfm: {OutputPfm}");
-        Console.WriteLine($"OutputPng: {OutputPng}");
-        Console.WriteLine($"NumRay: {NumRays}");
-        Console.WriteLine($"MaxDepth: {MaxDepth}");
-        Console.WriteLine($"InitState: {InitState}");
-        Console.WriteLine($"InitSeq: {InitSeq}");
-        Console.WriteLine($"SampleSide: {SampleSide}");
-        Console.WriteLine($"Luminosityfunction: {Luminosityfunction}");
-        Console.WriteLine($"Averageluminosity: {AverageLuminosity}");
-        Console.WriteLine($"Factor: {Factor}");
-        Console.WriteLine($"Gamma: {Gamma}");
-        Console.WriteLine($"RouletteStart: {RussianRouletteStartDepth}");
-        Console.WriteLine($"RouletteFixedProb: {RussianRouletteFixedProb}");
-
+        PrintParameters();
         string currentPath = AppDomain.CurrentDomain.BaseDirectory;
 
-        string scenePath = Path.Combine(currentPath, "../../../../Scenes/", InputScene);
+        string scenePath = Path.Combine(currentPath, "../../../../Scenes/", InputSceneName);
 
-        if (OutputPng[^4..] != ".png") OutputPng += ".png"; //OutputFilename[^4..] reads the last 4 characters
+        if (OutputPngName[^4..] != ".png") OutputPngName += ".png"; //OutputFilename[^4..] reads the last 4 characters
         string pngFilePath =
             Path.Combine(currentPath, "../../../../PngImages/",
-                OutputPng); //"../../../../DemoImages/" dal path dell'eseguibile torna indietro (Controllare)
+                OutputPngName); //"../../../../DemoImages/" dal path dell'eseguibile torna indietro (Controllare)
 
-        if (OutputPfm[^4..] != ".pfm") OutputPfm += ".pfm";
-        string pfmFilePath = Path.Combine(currentPath, "../../../../PfmImages", OutputPfm);
+        if (OutputPfmName[^4..] != ".pfm") OutputPfmName += ".pfm";
+        string pfmFilePath = Path.Combine(currentPath, "../../../../PfmImages", OutputPfmName);
 
 
         var scene = new Scene();
@@ -535,6 +517,33 @@ public class RenderCommand
 
         image.WritePNG(pngFilePath, Luminosityfunction, Factor, Gamma, AverageLuminosity);
         Console.WriteLine($"Png file created in: {pngFilePath}");
+    }
+
+    public void PrintParameters()
+    {
+        Console.WriteLine($"Input: {InputSceneName}");
+        Console.WriteLine($"Width: {Width}");
+        Console.WriteLine($"Height: {Height}");
+        Console.WriteLine($"AspectRatio: {AspectRatio}");
+        Console.WriteLine($"Algorithm: {Algorithm}");
+        Console.WriteLine($"OutputPfm: {OutputPfmName}");
+        Console.WriteLine($"OutputPng: {OutputPngName}");
+        Console.WriteLine($"NumRay: {NumRays}");
+        Console.WriteLine($"MaxDepth: {MaxDepth}");
+        Console.WriteLine($"InitState: {InitState}");
+        Console.WriteLine($"InitSeq: {InitSeq}");
+        Console.WriteLine($"SampleSide: {SampleSide}");
+        Console.WriteLine($"Luminosityfunction: {Luminosityfunction}");
+        Console.WriteLine($"Averageluminosity: {AverageLuminosity}");
+        Console.WriteLine($"Factor: {Factor}");
+        Console.WriteLine($"Gamma: {Gamma}");
+        Console.WriteLine($"RouletteStart: {RussianRouletteStartDepth}");
+        Console.WriteLine($"RouletteFixedProb: {RussianRouletteFixedProb}");
+        Console.Write("Variables defined: ");
+        for (int i = 0; i < Definitions.Length; i++)
+        {
+            Console.WriteLine($"{Definitions[i]}");
+        }
     }
 }
 
