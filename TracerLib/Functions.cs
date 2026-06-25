@@ -79,7 +79,7 @@ public static class Functions
     /// </exception>
     public static Dictionary<string, float> ParseVariableTable(string[] definitions)
     {
-        var variables = new Dictionary<string, float>();
+        Dictionary<string, float> variables = new Dictionary<string, float>();
 
         foreach (string declaration in definitions)
         {
