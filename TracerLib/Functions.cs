@@ -83,16 +83,16 @@ public static class Functions
 
         foreach (string declaration in definitions)
         {
-            var parts = declaration.Split(':');
+            string[] parts = declaration.Split(':');
 
             if (parts.Length != 2)
             {
                 throw new ArgumentException($"The definition {declaration} doesn't follow the pattern NAME:VALUE");
             }
 
-            var name = parts[0];
+            string name = parts[0];
 
-            if (!float.TryParse(parts[1], out var result))
+            if (!float.TryParse(parts[1], out float result))
             {
                 throw new ArgumentException($"Invalid floating point value {parts[1]}");
             }
