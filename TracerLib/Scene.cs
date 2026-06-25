@@ -528,6 +528,26 @@ public class Scene
         return result;
     }
 
+    /// <summary>
+    /// If the variable already exists and its value comes from an external source, we leave the external value unchanged.
+    /// If the variable already exists but is not marked as externally overridden,
+    /// then the scene file is attempting to define the same variable twice and
+    /// an exception is thrown.
+    ///
+    /// Otherwise, this is a new variable definition and we add it to the table.
+    /// </summary>
+    /// <param name="variableName"></param>
+    /// <param name="variableValue"></param>
+    /// <param name="variableLocation"></param>
+    /// <exception cref="SceneSyntaxException">Thrown when attempting to define twice a variable in the scene file.</exception>
+    public void RegisterVariable(string variableName, float variableValue, SourceLocation variableLocation)
+    {
+        if (Variables.ContainsKey(variableName) && !OverriddenVariables.Contains(variableName))
+            throw new SceneSyntaxException(variableLocation,
+                $"{variableName} cannot be redefined");
+        if (!OverriddenVariables.Contains(variableName)) Variables[variableName] = variableValue;
+    }
+
     public Scene ParseScene(InputStream inputStream, Dictionary<string, float> externalVariables)
     {
         Scene scene = new Scene
@@ -567,10 +587,10 @@ public class Scene
                 // an exception is thrown.
                 //
                 // Otherwise, this is a new variable definition and we add it to the table.
-                if (scene.Variables.ContainsKey(variableName) && !scene.OverriddenVariables.Contains(variableName))
+                if (Variables.ContainsKey(variableName) && !OverriddenVariables.Contains(variableName))
                     throw new SceneSyntaxException(variableLocation,
                         $"{variableName} cannot be redefined");
-                if (!scene.OverriddenVariables.Contains(variableName)) scene.Variables[variableName] = variableValue;
+                if (!OverriddenVariables.Contains(variableName)) Variables[variableName] = variableValue;
             }
             else if (token is KeywordToken { Keyword: Keyword.Sphere })
             {
