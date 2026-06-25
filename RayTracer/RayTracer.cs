@@ -2,6 +2,7 @@
 
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using SixLabors.ImageSharp.Processing;
 using TracerLib;
 using McMaster.Extensions.CommandLineUtils;
@@ -136,13 +137,17 @@ public class DemoCommand
             material1);
         Sphere s4 = new Sphere(new Transformation(new Vector(0.5f, 0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f),
             material1);
-        Sphere s5 = new Sphere(new Transformation(new Vector(-0.5f, -0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f),
+        Sphere s5 = new Sphere(
+            new Transformation(new Vector(-0.5f, -0.5f, 0.5f)) * new Transformation(0.1f, 0.1f, 0.1f),
             material1);
-        Sphere s6 = new Sphere(new Transformation(new Vector(0.5f, -0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f),
+        Sphere s6 = new Sphere(
+            new Transformation(new Vector(0.5f, -0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f),
             material1);
-        Sphere s7 = new Sphere(new Transformation(new Vector(-0.5f, 0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f),
+        Sphere s7 = new Sphere(
+            new Transformation(new Vector(-0.5f, 0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f),
             material1);
-        Sphere s8 = new Sphere(new Transformation(new Vector(-0.5f, -0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f),
+        Sphere s8 = new Sphere(
+            new Transformation(new Vector(-0.5f, -0.5f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f),
             material1);
         Sphere s9 = new Sphere(new Transformation(new Vector(0f, 0f, -0.5f)) * new Transformation(0.1f, 0.1f, 0.1f),
             material2);
@@ -329,7 +334,6 @@ public class DemoCommand
     }*/
 }
 
-
 [Command(Name = "pfmtopng", Description = "Converts a PFM image to PNG")]
 public class PfmToPngCommand
 {
@@ -387,6 +391,8 @@ public class PfmToPngCommand
 [Command(Name = "render", Description = "Read a scene file and creates the corresponding image")]
 public class RenderCommand
 {
+    #region Options
+
     [Option("--inputrender", Description = "The input scene file name")]
     public string InputSceneName { get; set; } = "scene.txt";
 
@@ -459,51 +465,18 @@ public class RenderCommand
     [Option("--declarefloat|-d", Description = "Declare a variable. The syntax is --declarefloat=NAME:VALUE")]
     public string[] Definitions { get; set; } = [];
 
+    #endregion
+
     public void OnExecute()
     {
         PrintParameters();
-
         SetIOFilesPaths(out string scenePath, out string pngFilePath, out string pfmFilePath);
-
-        Scene scene = new Scene();
-        InputStream inputStream = new InputStream(scenePath);
-        Dictionary<string,float> variables = Functions.ParseVariableTable(Definitions);
-
-        try
-        {
-            scene.ReadScene(inputStream, variables);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e.Message); //Verificare che stampi anche la posizione dell'errore
-        }
-
+        Scene scene = ReadSceneFile(scenePath);
         HDRImage image = new HDRImage(Width, Height);
-
-        Renderer renderer;
-        switch (Algorithm)
-        {
-            case RenderFunc.OnOff:
-                renderer = new OnOffRenderer(scene.World);
-                break;
-            case RenderFunc.Flat:
-                renderer = new FlatRenderer(scene.World);
-                break;
-            case RenderFunc.PathTracer:
-                renderer = new PathTracingRenderer(scene.World, new PCG(InitState, InitSeq), backgroundColor: null,
-                    NumRays, MaxDepth, RussianRouletteStartDepth, RussianRouletteFixedProb);
-                break;
-            default:
-                throw new ArgumentException("Invalid renderer mode, accepted onoff, flat or pathtracer");
-        }
-
-        if (scene.Camera == null)
-        {
-            Console.WriteLine("Not initialized camera. Follows default initialization [perspective]");
-            scene.Camera = new PerspectiveCamera();
-        }
-
+        Renderer renderer = BuildRenderer(scene);
+        EnsureCameraExists(scene);
         ImageTracer tracer = new ImageTracer(image, scene.Camera, pixelSideSubdivisions: SampleSide);
+        
         tracer.FireAllRays(ray => renderer.RenderFunction(ray));
 
         HDRImage.WritePFM_File(image, pfmFilePath);
@@ -541,6 +514,7 @@ public class RenderCommand
         {
             Console.WriteLine($"{Definitions[i]}");
         }
+        Console.WriteLine();
     }
 
     /// <summary>
@@ -561,6 +535,75 @@ public class RenderCommand
         scenePath = Path.Combine(currentPath, "../../../../Scenes/", InputSceneName);
         pngFilePath = Path.Combine(currentPath, "../../../../PngImages/", OutputPngName);
         pfmFilePath = Path.Combine(currentPath, "../../../../PfmImages/", OutputPfmName);
+    }
+
+    /// <summary>
+    /// Loads and parses a scene file from the specified path.
+    /// Command-line defined variables take precedence over file-defined variables
+    /// during parsing.
+    /// </summary>
+    /// <param name="scenePath">Path to the scene file.</param>
+    /// <returns>The parsed <see cref="Scene"/>.</returns>
+    public Scene ReadSceneFile(string scenePath)
+    {
+        Scene scene = new Scene();
+        InputStream inputStream = new InputStream(scenePath);
+        Dictionary<string, float> CLvariables = Functions.ParseVariableTable(Definitions);
+
+        scene.ReadScene(inputStream, CLvariables);
+
+        return scene;
+    }
+
+    /// <summary>
+    /// Creates and returns a renderer instance based on the rendering algorithm
+    /// specified via command line options.
+    /// </summary>
+    /// <param name="scene">
+    /// The scene used to initialize the renderer.
+    /// </param>
+    /// <returns>
+    /// A <see cref="Renderer"/> instance configured according to the selected algorithm.
+    /// </returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown when the selected rendering algorithm is not supported.
+    /// </exception>
+    public Renderer BuildRenderer(Scene scene)
+    {
+        Renderer renderer;
+        switch (Algorithm)
+        {
+            case RenderFunc.OnOff:
+                renderer = new OnOffRenderer(scene.World);
+                break;
+            case RenderFunc.Flat:
+                renderer = new FlatRenderer(scene.World);
+                break;
+            case RenderFunc.PathTracer:
+                renderer = new PathTracingRenderer(scene.World, new PCG(InitState, InitSeq), backgroundColor: null,
+                    NumRays, MaxDepth, RussianRouletteStartDepth, RussianRouletteFixedProb);
+                break;
+            default:
+                throw new ArgumentException("Invalid algorithm, accepted onoff, flat or pathtracer");
+        }
+        
+        return renderer;
+    }
+
+    /// <summary>
+    /// Validates the presence of a camera in the scene.
+    /// If no camera is defined, a default perspective camera is assigned.
+    /// </summary>
+    /// <param name="scene">
+    /// The scene to validate and potentially modify.
+    /// </param>
+    public void EnsureCameraExists(Scene scene)
+    {
+        if (scene.Camera == null)
+        {
+            Console.WriteLine("Not initialized camera. Follows default initialization [perspective]");
+            scene.Camera = new PerspectiveCamera();
+        }
     }
 }
 
