@@ -1,4 +1,4 @@
-# This scene is very similar to the same scene developed in the demo command
+# This scene is very similar to the same scene developed in the old demo command
 # It will be used to shows how differently work all the render and how to successfully 
 # create an animation
 

@@ -1,9 +1,6 @@
 // This file is released under EUPL_v1.2 license. See LICENSE.md
 
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Globalization;
-using SixLabors.ImageSharp.Processing;
 using TracerLib;
 using McMaster.Extensions.CommandLineUtils;
 
@@ -26,7 +23,7 @@ public class RenderCommand
 {
     #region Options
 
-    [Option("--inputrender", Description = "The input scene file name")]
+    [Option("--inputscene", Description = "The input scene file name")]
     public string InputSceneName { get; set; } = "scene.txt";
 
     [Option("--outputpfm", Description = "Name of the pfm file output")]
