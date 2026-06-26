@@ -5,7 +5,7 @@ using TracerLib;
 using McMaster.Extensions.CommandLineUtils;
 
 [Command(Name = "RayTracer")]
-[Subcommand( typeof(RenderCommand), typeof(AverageImageCommand), typeof(PfmToPngCommand))]
+[Subcommand(typeof(RenderCommand), typeof(AverageImageCommand), typeof(PfmToPngCommand))]
 public class RayTracer
 {
     public static int Main(string[] args)
@@ -245,13 +245,15 @@ public class RenderCommand
         "Generate an image averaging the color of multiple images using different seed in pathtracing renderer")]
 public class AverageImageCommand
 {
+    #region Options
+
     [Option("--outputaveragepfm", Description = "Name of the output pfm file")]
     [Required]
-    public required string OutputFilePathPfm { get; set; }
+    public required string OutputPfmFileName { get; set; }
 
     [Option("--outputaveragepng", Description = "Name of the output png file")]
     [Required]
-    public required string OutputFilePathPng { get; set; }
+    public required string OutputPngFileNamePng { get; set; }
 
     [Option("--luminosityfunction", Description = "Luminosity function, options are: shirley (default), weighted")]
     public LumFunction Luminosityfunction { get; set; } = LumFunction.Shirley;
@@ -267,26 +269,12 @@ public class AverageImageCommand
     [Option("--gamma", Description = "The gamma factor characteristic of the screen")]
     public float Gamma { get; set; } = 1f;
 
+    #endregion
+
     public void OnExecute()
     {
-        Console.WriteLine($"Name of the output pfm file path: {OutputFilePathPfm}");
-        Console.WriteLine($"Name of the output png file path: {OutputFilePathPng}");
-        Console.WriteLine($"Luminosityfunction: {Luminosityfunction}");
-        Console.WriteLine($"Averageluminosity: {AverageLuminosity}");
-        Console.WriteLine($"Factor: {Factor}");
-        Console.WriteLine($"Gamma: {Gamma}");
+        PrintParameters();
 
-        string currentPath = AppDomain.CurrentDomain.BaseDirectory;
-        string inputFileFolder = Path.Combine(currentPath, "../../../../PfmImages");
-
-        if (OutputFilePathPng[^4..] != ".png")
-            OutputFilePathPng += ".png"; //OutputFilename[^4..] Legge gli ultimi 4 caratteri
-        string pngFilePath =
-            Path.Combine(currentPath, "../../../../PngImages/",
-                OutputFilePathPng); //"../../../../DemoImages/" dal path dell'eseguibile torna indietro (Controllare)
-
-        if (OutputFilePathPfm[^4..] != ".pfm") OutputFilePathPfm += ".pfm";
-        string pfmFilePath = Path.Combine(currentPath, "../../../../PfmImages", OutputFilePathPfm);
 
         string[] files = Directory.GetFiles(inputFileFolder, "*_state*_seq*.pfm"); //search for pattern in folder
 
@@ -331,8 +319,37 @@ public class AverageImageCommand
         HDRImage.WritePFM_File(output, pfmFilePath);
         Console.WriteLine($"Pfm file created in: {pfmFilePath}");
 
-        output.WritePNG(OutputFilePathPng, Luminosityfunction, Factor, Gamma, AverageLuminosity);
+        output.WritePNG(OutputPngFileNamePng, Luminosityfunction, Factor, Gamma, AverageLuminosity);
         Console.WriteLine($"Png file created in: {pngFilePath}");
+    }
+
+    /// <summary>
+    /// Prints all the parameters passed through the command line.
+    /// </summary>
+    public void PrintParameters()
+    {
+        Console.WriteLine($"Name of the output pfm file path: {OutputPfmFileName}");
+        Console.WriteLine($"Name of the output png file path: {OutputPngFileNamePng}");
+        Console.WriteLine();
+        Console.WriteLine("Tone Mapping parameters");
+        Console.WriteLine($"Luminosityfunction: {Luminosityfunction}");
+        Console.WriteLine($"Averageluminosity: {AverageLuminosity}");
+        Console.WriteLine($"Factor: {Factor}");
+        Console.WriteLine($"Gamma: {Gamma}");
+    }
+
+
+    public void SetIOFilesPaths(out string inputFileFolder, out string pfmFilePath, out string pngFilePath)
+    {
+        string currentPath = AppDomain.CurrentDomain.BaseDirectory;
+        inputFileFolder = Path.Combine(currentPath, "../../../../PfmImages");
+
+        string 
+        if (!OutputPngFileNamePng.EndsWith(".png")) OutputPngFileNamePng += ".png";
+        if (!OutputPfmFileName.EndsWith(".pfm")) OutputPfmFileName += ".pfm";
+
+        pfmFilePath = Path.Combine(currentPath, "../../../../PfmImages", OutputPfmFileName);
+        pngFilePath = Path.Combine(currentPath, "../../../../PngImages/", OutputPngFileNamePng);
     }
 }
 
