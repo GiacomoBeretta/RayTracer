@@ -137,25 +137,25 @@ public class RenderCommand
     {
         Console.WriteLine("File names:");
         Console.WriteLine($"Input: {InputSceneName}");
-        Console.WriteLine($"OutputPfm: {OutputPfmName}");
-        Console.WriteLine($"OutputPng: {OutputPngName}");
+        Console.WriteLine($"Output PFM name: {OutputPfmName}");
+        Console.WriteLine($"Output PNG name: {OutputPngName}");
         Console.WriteLine();
         Console.WriteLine($"Width: {Width}");
         Console.WriteLine($"Height: {Height}");
-        Console.WriteLine($"SampleSide: {SampleSide}");
+        Console.WriteLine($"Sample per Side: {SampleSide}");
         Console.WriteLine($"Algorithm: {Algorithm}");
         Console.WriteLine();
         Console.WriteLine("extra parameters for path tracing:");
         Console.WriteLine($"NumRay: {NumRays}");
-        Console.WriteLine($"MaxDepth: {MaxDepth}");
+        Console.WriteLine($"Max Depth: {MaxDepth}");
         Console.WriteLine($"InitState: {InitState}");
         Console.WriteLine($"InitSeq: {InitSeq}");
-        Console.WriteLine($"RouletteStart: {RussianRouletteStartDepth}");
-        Console.WriteLine($"RouletteFixedProb: {RussianRouletteFixedProb}");
+        Console.WriteLine($"Roulette Start Depth: {RussianRouletteStartDepth}");
+        Console.WriteLine($"Roulette Fixed Probability: {RussianRouletteFixedProb}");
         Console.WriteLine();
         Console.WriteLine("Tone Mapping parameters:");
-        Console.WriteLine($"Luminosityfunction: {Luminosityfunction}");
-        Console.WriteLine($"Averageluminosity: {AverageLuminosity}");
+        Console.WriteLine($"Luminosity Function: {Luminosityfunction}");
+        Console.WriteLine($"Average Luminosity: {AverageLuminosity}");
         Console.WriteLine($"Factor: {Factor}");
         Console.WriteLine($"Gamma: {Gamma}");
         Console.WriteLine();
@@ -320,8 +320,8 @@ public class AverageImagesCommand
         Console.WriteLine($"Name of the output png file path: {OutputPngFileName}");
         Console.WriteLine();
         Console.WriteLine("Tone Mapping parameters");
-        Console.WriteLine($"Luminosityfunction: {Luminosityfunction}");
-        Console.WriteLine($"Averageluminosity: {AverageLuminosity}");
+        Console.WriteLine($"Luminosity Function: {Luminosityfunction}");
+        Console.WriteLine($"Average Luminosity: {AverageLuminosity}");
         Console.WriteLine($"Factor: {Factor}");
         Console.WriteLine($"Gamma: {Gamma}");
     }
@@ -463,10 +463,10 @@ public class PfmToPngCommand
 
     internal void OnExecute()
     {
-        Console.WriteLine($"input path: {InputFileName}");
-        Console.WriteLine($"output path: {OutputFileName}");
-        Console.WriteLine($"luminosityFunction: {Luminosityfunction}");
-        Console.WriteLine($"Averageluminosity: {AverageLuminosity}");
+        Console.WriteLine($"input PFM file name: {InputFileName}");
+        Console.WriteLine($"output PNG file name: {OutputFileName}");
+        Console.WriteLine($"Luminosity Function: {Luminosityfunction}");
+        Console.WriteLine($"Average Luminosity: {AverageLuminosity}");
         Console.WriteLine($"factor: {Factor}");
         Console.WriteLine($"gamma: {Gamma}");
 
