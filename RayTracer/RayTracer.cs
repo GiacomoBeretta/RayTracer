@@ -4,6 +4,8 @@ using System.ComponentModel.DataAnnotations;
 using TracerLib;
 using McMaster.Extensions.CommandLineUtils;
 
+namespace RayTracer;
+
 [Command(Name = "RayTracer")]
 [Subcommand(typeof(RenderCommand), typeof(AverageImagesCommand), typeof(PfmToPngCommand))]
 public class RayTracer
@@ -25,62 +27,63 @@ public class RenderCommand
 
     [Option("--inputscene", Description = "Name of the input scene file.")]
     [Required]
-    public string InputSceneName { get; set; }
+    public string InputSceneName { get; init; } = null!;
 
     [Option("--outputpfm", Description = "Name of the pfm output file.")]
     [Required]
-    public string OutputPfmName { get; set; }
+    public string OutputPfmName { get; init; } = null!;
 
     [Option("--outputpng", Description = "Name of the png output file.")]
     [Required]
-    public string OutputPngName { get; set; }
+    public string OutputPngName { get; init; } = null!;
 
     [Option("--width", Description = "The width of the image (default: 500)")]
     [Range(1, Int32.MaxValue)]
-    public int Width { get; set; } = 500;
+    public int Width { get; init; } = 500;
 
     [Option("--height", Description = "The height of the image (default: 500)")]
     [Range(1, Int32.MaxValue)]
-    public int Height { get; set; } = 500;
+    public int Height { get; init; } = 500;
 
     [Option("--sampleside", Description = "Number of samples per pixel's side used for antialiasing (default: 1)")]
     [Range(1, Int32.MaxValue)]
-    public int SampleSide { get; set; } = 1;
+    public int SampleSide { get; init; } = 1;
 
-    [Option("--algorithm", Description = "Render's algorithm. Options are: onoff, flat or pathtracer. (default: pathtracer)")]
-    public RenderFunc Algorithm { get; set; } = RenderFunc.PathTracer;
+    [Option("--algorithm",
+        Description = "Render's algorithm. Options are: onoff, flat or pathtracer. (default: pathtracer)")]
+    public RenderFunc Algorithm { get; init; } = RenderFunc.PathTracer;
 
     [Option("--numrays",
         Description =
             "Number of rays departing from each surface " +
             "(this command only works for the path tracing algorithm, default: 10)")]
-    public int NumRays { get; set; } = 10;
+    public int NumRays { get; init; } = 10;
 
     [Option("--maxdepth",
         Description = "Maximum allowed ray depth " +
                       "(this command only works for the path tracing algorithm, default: 2)")]
-    public int MaxDepth { get; set; } = 2;
+    public int MaxDepth { get; init; } = 2;
 
     [Option("--initstate",
         Description =
             "Initial seed for the random number generator " +
             "(this command only works for the path tracing algorithm, default: 45)")]
     [Range(0, ulong.MaxValue)]
-    public ulong InitState { get; set; } = 45;
+    public ulong InitState { get; init; } = 45;
 
     [Option("--initseq",
         Description =
             "Identifier of the sequence produced by the random number generator " +
             "(this command only works for the path tracing algorithm, default: 54)")]
     [Range(0, ulong.MaxValue)]
-    public ulong InitSeq { get; set; } = 54;
+    public ulong InitSeq { get; init; } = 54;
 
     [Option("--roulettestart",
         Description =
             "Number of ray reflections after which the Russian roulette algorithm is applied " +
             "(this command only works for the path tracing algorithm, default: 3)")]
     [Range(0, Int32.MaxValue)]
-    public int RussianRouletteStartDepth { get; set; } = 3;
+    public int RussianRouletteStartDepth { get; init; } = 3;
 
     [Option("--rouletteprob",
         Description =
@@ -88,26 +91,27 @@ public class RenderCommand
             "When null, the probability is computed dynamically at each recursive call of RenderFunction" +
             "(this command only works for the path tracing algorithm, default: null")]
     [Range(0, 1)]
-    public float? RussianRouletteFixedProb { get; set; } = null;
+    public float? RussianRouletteFixedProb { get; init; } = null;
 
-    [Option("--luminosityfunction", Description = "Luminosity function, options are: shirley, weighted (default: shirley)")]
-    public LumFunction Luminosityfunction { get; set; } = LumFunction.Shirley;
+    [Option("--luminosityfunction",
+        Description = "Luminosity function, options are: shirley, weighted (default: shirley)")]
+    public LumFunction Luminosityfunction { get; init; } = LumFunction.Shirley;
 
     [Option("--averageluminosity",
         Description =
             "Fixed luminosity for the tone mapping." +
             "If the value is null is computed with the luminosity function (default: null)")]
-    public float? AverageLuminosity { get; set; } = null;
+    public float? AverageLuminosity { get; init; } = null;
 
     [Option("--factor", Description = "The empirical factor to render images (default: 1)")]
-    public float Factor { get; set; } = 1f;
+    public float Factor { get; init; } = 1f;
 
     [Option("--gamma", Description = "The gamma factor characteristic of the screen (default: 1)")]
-    public float Gamma { get; set; } = 1f;
+    public float Gamma { get; init; } = 1f;
 
     [Option("--declarefloat|-d", Description = "Declare a variable. " +
                                                "The syntax is '--declarefloat=NAME:VALUE' or '-d=NAME:VALUE'")]
-    public string[] Definitions { get; set; } = [];
+    public string[] Definitions { get; init; } = [];
 
     #endregion
 
@@ -160,11 +164,10 @@ public class RenderCommand
         Console.WriteLine($"Gamma: {Gamma}");
         Console.WriteLine();
         Console.Write("Definitions: ");
-        for (int i = 0; i < Definitions.Length; i++)
+        foreach (string def in Definitions)
         {
-            Console.WriteLine($"{Definitions[i]}");
+            Console.WriteLine($"{def}");
         }
-
         Console.WriteLine();
     }
 
@@ -264,29 +267,30 @@ public class RenderCommand
 public class AverageImagesCommand
 {
     #region Options
-    
+
     [Option("--outputpfm", Description = "Name of the averaged output PFM file.")]
     [Required]
-    public string OutputPfmFileName { get; set; }
+    public string OutputPfmFileName { get; init; } = null!;
 
     [Option("--outputpng", Description = "Name of the averaged output PNG file.")]
     [Required]
-    public string OutputPngFileName { get; set; }
-    
-    [Option("--luminosityfunction", Description = "Luminosity function, options are: shirley, weighted (default: shirley).")]
-    public LumFunction Luminosityfunction { get; set; } = LumFunction.Shirley;
+    public string OutputPngFileName { get; init; } = null!;
+
+    [Option("--luminosityfunction",
+        Description = "Luminosity function, options are: shirley, weighted (default: shirley).")]
+    public LumFunction Luminosityfunction { get; init; } = LumFunction.Shirley;
 
     [Option("--averageluminosity",
         Description =
             "Fixed luminosity for the tone mapping. " +
             "If the value is null is computed with the luminosity function (default: null).")]
-    public float? AverageLuminosity { get; set; } = null;
+    public float? AverageLuminosity { get; init; } = null;
 
     [Option("--factor", Description = "The empirical factor to render images (default: 1).")]
-    public float Factor { get; set; } = 1f;
+    public float Factor { get; init; } = 1f;
 
     [Option("--gamma", Description = "The gamma factor characteristic of the screen (default: 1).")]
-    public float Gamma { get; set; } = 1f;
+    public float Gamma { get; init; } = 1f;
 
     #endregion
 
@@ -375,7 +379,8 @@ public class AverageImagesCommand
         }
         else
         {
-            Console.WriteLine($"Searching for PFM images from the {inputFileFolder} folder, with the pattern {pattern}.");
+            Console.WriteLine(
+                $"Searching for PFM images from the {inputFileFolder} folder, with the pattern {pattern}.");
             files = Directory.GetFiles(inputFileFolder, pattern);
         }
 
@@ -384,16 +389,16 @@ public class AverageImagesCommand
             Console.WriteLine("The folder is empty");
             return null;
         }
-        
+
         HDRImage[] images = new HDRImage[files.Length];
         for (int i = 0; i < files.Length; i++) images[i] = HDRImage.ReadPFM_File(files[i]);
 
-        int Width = images[0].Width;
-        int Height = images[0].Height;
+        int width = images[0].Width;
+        int height = images[0].Height;
 
         foreach (HDRImage image in images)
         {
-            if (image.Width != Width || image.Height != Height)
+            if (image.Width != width || image.Height != height)
                 throw new ArgumentException("Images must have equal width and height");
         }
 
@@ -412,6 +417,7 @@ public class AverageImagesCommand
     /// <remarks>
     /// The method performs a per-pixel arithmetic mean across all images.
     /// All images are assumed to have identical width, height, and pixel layout.
+    /// </remarks>
     public HDRImage AverageImages(HDRImage[] images)
     {
         //Using first file as accumulator
@@ -438,26 +444,27 @@ public class PfmToPngCommand
 
     [Option("--inputpfm", Description = "The input PFM file name.")]
     [Required]
-    public string InputFileName { get; set; }
+    public string InputFileName { get; init; } = null!;
 
     [Option("--outputpng", Description = "The output PNG file name.")]
     [Required]
-    public string OutputFileName { get; set; }
+    public string OutputFileName { get; init; }= null!;
 
-    [Option("--luminosityfunction", Description = "Luminosity function, options are: shirley, weighted (default: shirley).")]
-    public LumFunction Luminosityfunction { get; set; } = LumFunction.Shirley;
+    [Option("--luminosityfunction",
+        Description = "Luminosity function, options are: shirley, weighted (default: shirley).")]
+    public LumFunction Luminosityfunction { get; init; } = LumFunction.Shirley;
 
     [Option("--averageluminosity",
         Description =
             "Fixed luminosity for the tone mapping. " +
             "If the value is null is computed with the luminosity function (default: null).")]
-    public float? AverageLuminosity { get; set; } = null;
+    public float? AverageLuminosity { get; init; } = null;
 
     [Option("--factor", Description = "The empirical factor to render images (default: 1).")]
-    public float Factor { get; set; } = 1f;
+    public float Factor { get; init; } = 1f;
 
     [Option("--gamma", Description = "The gamma factor characteristic of the screen (default: 1).")]
-    public float Gamma { get; set; } = 1f;
+    public float Gamma { get; init; } = 1f;
 
     #endregion
 
@@ -470,12 +477,11 @@ public class PfmToPngCommand
         Console.WriteLine($"factor: {Factor}");
         Console.WriteLine($"gamma: {Gamma}");
 
-        if (!OutputFileName.EndsWith(".png")) OutputFileName += ".png";
-        if (!InputFileName.EndsWith(".pfm")) InputFileName += ".pfm";
+        string pngfilename = OutputFileName.EndsWith(".png") ? OutputFileName : OutputFileName + ".png";
 
         string currentPath = AppDomain.CurrentDomain.BaseDirectory;
         string pfmFilePath = Path.Combine(currentPath, "../../../../PfmImages", InputFileName);
-        string pngFilePath = Path.Combine(currentPath, "../../../../PngImages/", OutputFileName);
+        string pngFilePath = Path.Combine(currentPath, "../../../../PngImages/", pngfilename);
 
         HDRImage image = HDRImage.ReadPFM_File(pfmFilePath);
         Console.WriteLine($"File read: {pfmFilePath}");
