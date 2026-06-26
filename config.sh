@@ -6,8 +6,8 @@ gamma=1
 
 # Default render
 inputscene="scene.txt"
-outputpfm="scene_test.pfm"
-outputpng="scene_test.png"
+outputrenderpfm="scene_test.pfm"
+outputrenderpng="scene_test.png"
 width=500
 height=500
 sampleside=1
@@ -25,8 +25,8 @@ inputpfm="dome.pfm"
 outputpng="dome.png"
 
 # Default averageimages
-outputpfm="average.pfm"
-outputpng="average.png"
+averagepfm="average.pfm"
+averagepng="average.png"
 
 # Cycle parameters
 pcgcycle=false
