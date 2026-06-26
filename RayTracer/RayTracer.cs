@@ -5,7 +5,7 @@ using TracerLib;
 using McMaster.Extensions.CommandLineUtils;
 
 [Command(Name = "RayTracer")]
-[Subcommand(typeof(RenderCommand), typeof(AverageImageCommand), typeof(PfmToPngCommand))]
+[Subcommand(typeof(RenderCommand), typeof(AverageImagesCommand), typeof(PfmToPngCommand))]
 public class RayTracer
 {
     public static int Main(string[] args)
@@ -240,10 +240,10 @@ public class RenderCommand
     }
 }
 
-[Command(Name = "averageimage",
+[Command(Name = "averageimages",
     Description =
         "Generate an image averaging the color of multiple images using different seed in pathtracing renderer")]
-public class AverageImageCommand
+public class AverageImagesCommand
 {
     #region Options
 
