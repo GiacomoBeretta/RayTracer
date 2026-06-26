@@ -44,7 +44,7 @@ public class RenderCommand
     [Range(1, Int32.MaxValue)]
     public int SampleSide { get; set; } = 1;
 
-    [Option("--algorithm", Description = "Render's algorithm (default: pathtracer)")]
+    [Option("--algorithm", Description = "Render's algorithm. Options are: onoff, flat or pathtracer. (default: pathtracer)")]
     public RenderFunc Algorithm { get; set; } = RenderFunc.PathTracer;
 
     [Option("--numrays",
@@ -86,7 +86,7 @@ public class RenderCommand
     [Range(0, 1)]
     public float? RussianRouletteFixedProb { get; set; } = null;
 
-    [Option("--luminosityfunction", Description = "Luminosity function, options are: shirley (default), weighted")]
+    [Option("--luminosityfunction", Description = "Luminosity function, options are: shirley, weighted (default: shirley)")]
     public LumFunction Luminosityfunction { get; set; } = LumFunction.Shirley;
 
     [Option("--averageluminosity",
