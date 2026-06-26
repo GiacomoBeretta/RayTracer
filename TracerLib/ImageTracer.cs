@@ -74,7 +74,7 @@ public class ImageTracer
         {
             for (int row = 0; row < _image.Height; row++)
             {
-                var cumcolor = new Color(0.0f,0.0f,0.0f);
+                Color cumcolor = new Color(0.0f,0.0f,0.0f);
 
                 // Anti-Aliasing algorithm:
                 // we subdivide the pixel in a PixelSideSubdivisions x PixelSideSubdivisions grid

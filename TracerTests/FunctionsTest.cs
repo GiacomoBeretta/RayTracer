@@ -56,8 +56,5 @@ public class FunctionsTest
 
         Assert.Throws<ArgumentException>(() => Functions.ParseVariableTable(variable2));
         Assert.Throws<ArgumentException>(() => Functions.ParseVariableTable(variable3));
-        
-
-
     }
 }

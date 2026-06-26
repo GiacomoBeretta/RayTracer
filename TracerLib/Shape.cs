@@ -296,7 +296,7 @@ public class Plane : Shape
     /// otherwise (0,0,-1).</returns>
     public Normal _PlaneNormal(Vector incidentVec)
     {
-        var normal = new Normal(0, 0, 1);
+        Normal normal = new Normal(0, 0, 1);
         return incidentVec.Z < 0 ? normal : -normal;
     }
     

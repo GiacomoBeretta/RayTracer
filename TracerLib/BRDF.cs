@@ -30,6 +30,11 @@ public abstract class BRDF
         Pigment = pigment;
     }
 
+    public virtual Color Eval(Normal normal, Vector Vin, Vector Vout, Vector2D uv)
+    {
+        return Pigment.GetColor(uv);
+    }
+    
     // public abstract Ray ScatterRay(PCG pcg, Ray incidentRay, Point interactionPoint, Normal normal);
     /// <summary>
     /// Returns a <c>Ray</c> generated according to the type of <see cref="BRDF"/>.
@@ -84,11 +89,10 @@ public class DiffuseBRDF : BRDF
         _reflectance = reflectance;
     }
 
-    // da togliere?
-    /* public override Color Eval(Normal normal, Vector Vin, Vector Vout, Vector2D uv)
-     {
-         return pigment.GetColor(uv) * reflectance * (1.0f / MathF.PI);
-     }*/
+    public override Color Eval(Normal normal, Vector Vin, Vector Vout, Vector2D uv)
+    {
+        return Pigment.GetColor(uv) * _reflectance * (1.0f / MathF.PI);
+    }
 
     /// <summary>
     /// Returns a <c>Ray</c> randomly generated over the hemisphere oriented by the surface <c>normal</c>
@@ -149,8 +153,7 @@ public class SpecularBRDF : BRDF
     public SpecularBRDF(Pigment pigment) : base(pigment)
     {
     }
-
-    //da modificare
+    
     /// <summary>
     /// Returns a <c>Ray</c> generated accordingly to the reflection's law and originating at the <c>interactionPoint</c>.
     /// The new ray will have the provided <c>depth</c>.
@@ -163,7 +166,8 @@ public class SpecularBRDF : BRDF
     /// <returns> A new <c>Ray</c> originating from the interaction point and traveling in the sampled direction.</returns>
     public override Ray ScatterRay(PCG pcg, Vector incidentVector, Point interactionPoint, Normal normal, int depth)
     {
-        //Tomasi non ho capito perché normalizza il vettore incidente
+        // Maybe it could be advantegeous normalize the incident vector before firing the new ray
+        //
         //Vector rayDir = new Vector(incindentVector.X, incindentVector.Y, incindentVector.Z);
         //rayDir.Normalize();
         Vector normalVec = normal.ToVector();

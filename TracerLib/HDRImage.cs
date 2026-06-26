@@ -58,18 +58,6 @@ public class HDRImage
         set{}
      }*/
 
-    //avendo implementato checkCoordinates non so se è più utile areCoordinatesValid
-    /// <summary>
-    /// Checks for the validity of the coordinates
-    /// </summary>
-    /// <param name="column">Image's width</param>
-    /// <param name="row">Image's height</param>
-    /// <returns></returns>
-    public bool _AreCoordinatesValid(int column, int row)
-    {
-        return column >= 0 && column < Width && row >= 0 && row < Height;
-    }
-
     /// <summary>
     /// Validates that the specified coordinates are within the range
     /// [0, Width) and [0, Height).
@@ -373,7 +361,7 @@ public class HDRImage
     /// <returns>The line content, or null if the end of the stream is reached before reading any data.</returns>
     public static string? _ReadLine(BinaryReader br)
     {
-        var bytes = new List<byte>();
+        List<Byte> bytes = new List<byte>();
 
         while (true)
         {
@@ -515,7 +503,7 @@ public class HDRImage
     /// </exception>
     public static HDRImage ReadPFM_File(Stream stream)
     {
-        using var br = new BinaryReader(stream);
+        using BinaryReader br = new BinaryReader(stream);
 
         HDRImage.ReadPFM_Header(br, out HDRImage image, out Endianness endianness);
 
@@ -527,7 +515,7 @@ public class HDRImage
                 //Console.WriteLine($"Column = {j}, Row = {i}");
                 //Console.WriteLine($"Offset = {result._PixelOffset(j,i)}");
                 //Console.WriteLine($"Offset 2 = {i * result.Width + j}");
-                var color = new Color
+                Color color = new Color
                 {
                     R = _ReadFloat(br, endianness),
                     G = _ReadFloat(br, endianness),

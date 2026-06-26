@@ -2,8 +2,19 @@ using TracerLib;
 
 namespace TracerTests;
 
-public class DiffuseBRDF_Test
+public class BRDF_Test
 {
+    [Fact]
+    public void ConstructorTest()
+    {
+        DiffuseBRDF diffuseBrdf = new DiffuseBRDF();
+        Color black = new Color(0, 0, 0);
+       
+        Assert.Equal(typeof(UniformPigment), (diffuseBrdf.Pigment).GetType());
+        Color pigmentColor = ((UniformPigment)diffuseBrdf.Pigment).Color;
+        Assert.True(Color._AreColorsClose(black, pigmentColor));
+    }
+    
     [Fact]
     public void DiffuseScatterRay()
     {
