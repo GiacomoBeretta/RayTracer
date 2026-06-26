@@ -23,54 +23,66 @@ public class RenderCommand
 {
     #region Options
 
-    [Option("--inputscene", Description = "The input scene file name")]
+    [Option("--inputscene", Description = "Name of the input scene file (default: scene.txt")]
     public string InputSceneName { get; set; } = "scene.txt";
 
-    [Option("--outputpfm", Description = "Name of the pfm file output")]
+    [Option("--outputpfm", Description = "Name of the pfm output file (default: output.pfm)")]
     public string OutputPfmName { get; set; } = "output.pfm";
 
-    [Option("--outputpng", Description = "Name of the png file output")]
+    [Option("--outputpng", Description = "Name of the png output file (default: output.png)")]
     public string OutputPngName { get; set; } = "output.png";
 
-    [Option("--width", Description = "The width of the image")]
+    [Option("--width", Description = "The width of the image (default: 500)")]
     [Range(1, Int32.MaxValue)]
     public int Width { get; set; } = 500;
 
-    [Option("--height", Description = "The height of the image")]
+    [Option("--height", Description = "The height of the image (default: 500)")]
     [Range(1, Int32.MaxValue)]
     public int Height { get; set; } = 500;
 
-    [Option("--sampleside", Description = "Number of samples per pixel's side (used for antialiasing)")]
+    [Option("--sampleside", Description = "Number of samples per pixel's side used for antialiasing (default: 1)")]
     [Range(1, Int32.MaxValue)]
     public int SampleSide { get; set; } = 1;
 
-    [Option("--algorithm", Description = "Render's algorithm; pathTracer passed by default")]
+    [Option("--algorithm", Description = "Render's algorithm (default: pathtracer)")]
     public RenderFunc Algorithm { get; set; } = RenderFunc.PathTracer;
 
     [Option("--numrays",
         Description =
-            "Number of rays departing from each surface (this command only works for the Pathtracing algorithm)")]
+            "Number of rays departing from each surface " +
+            "(this command only works for the path tracing algorithm, default: 10)")]
     public int NumRays { get; set; } = 10;
 
     [Option("--maxdepth",
-        Description = "Maximum allowed ray depth (this command only works for the Pathtracing algorithm)")]
+        Description = "Maximum allowed ray depth " +
+                      "(this command only works for the path tracing algorithm, default: 2)")]
     public int MaxDepth { get; set; } = 2;
 
-    [Option("--initstate", Description = "Initial seed for the random number generator")]
+    [Option("--initstate",
+        Description =
+            "Initial seed for the random number generator " +
+            "(this command only works for the path tracing algorithm, default: 45)")]
     [Range(0, ulong.MaxValue)]
     public ulong InitState { get; set; } = 45;
 
-    [Option("--initseq", Description = "Identifier of the sequence produced by the random number generator")]
+    [Option("--initseq",
+        Description =
+            "Identifier of the sequence produced by the random number generator " +
+            "(this command only works for the path tracing algorithm, default: 54)")]
     [Range(0, ulong.MaxValue)]
     public ulong InitSeq { get; set; } = 54;
 
     [Option("--roulettestart",
-        Description = "Number of ray reflections after which the Russian roulette algorithm is applied")]
+        Description =
+            "Number of ray reflections after which the Russian roulette algorithm is applied " +
+            "(this command only works for the path tracing algorithm, default: 3)")]
     [Range(0, Int32.MaxValue)]
     public int RussianRouletteStartDepth { get; set; } = 3;
 
-    [Option("--rouletteprob", Description = "Optional fixed probability for the Russian roulette algorithm " +
-                                            "(when null, the probability is computed dynamically at each recursive call of RenderFunction)")]
+    [Option("--rouletteprob",
+        Description =
+            "Optional fixed probability for the Russian roulette algorithm. " +
+            "When null, the probability is computed dynamically at each recursive call of RenderFunction (default: null")]
     [Range(0, 1)]
     public float? RussianRouletteFixedProb { get; set; } = null;
 
@@ -79,13 +91,14 @@ public class RenderCommand
 
     [Option("--averageluminosity",
         Description =
-            "Fixed luminosity for the tone mapping. If the value is null is computed with the luminosity function")]
+            "Fixed luminosity for the tone mapping." +
+            "If the value is null is computed with the luminosity function (default: null)")]
     public float? AverageLuminosity { get; set; } = null;
 
-    [Option("--factor", Description = "The empirical factor to render images")]
+    [Option("--factor", Description = "The empirical factor to render images (default: 1)")]
     public float Factor { get; set; } = 1f;
 
-    [Option("--gamma", Description = "The gamma factor characteristic of the screen")]
+    [Option("--gamma", Description = "The gamma factor characteristic of the screen (default: 1)")]
     public float Gamma { get; set; } = 1f;
 
     [Option("--declarefloat|-d", Description = "Declare a variable. The syntax is --declarefloat=NAME:VALUE")]
@@ -419,7 +432,7 @@ public class PfmToPngCommand
     [Required]
     public required string InputFileName { get; set; }
 
-    [Option("--output", Description = "The output file name")]
+    [Option("--outputpng", Description = "The output file name")]
     [Required]
     public required string OutputFileName { get; set; }
 
