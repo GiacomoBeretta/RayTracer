@@ -13,9 +13,6 @@ public abstract class BRDF
     /// The Pigment property represents the texture of the surface
     /// </summary>
     public Pigment Pigment;
-
-    // forse questo si può togliere?
-    //public abstract Color Eval(Normal normal, Vector Vin, Vector Vout, Vector2D uv);
     
     /// <summary>
     /// Base abstract class constructor that initialize a BRDF with a uniform black color.
@@ -35,7 +32,6 @@ public abstract class BRDF
         return Pigment.GetColor(uv);
     }
     
-    // public abstract Ray ScatterRay(PCG pcg, Ray incidentRay, Point interactionPoint, Normal normal);
     /// <summary>
     /// Returns a <c>Ray</c> generated according to the type of <see cref="BRDF"/>.
     /// The new ray will have the provided <c>depth</c>.
@@ -134,10 +130,10 @@ public class DiffuseBRDF : BRDF
 /// </summary>
 public class SpecularBRDF : BRDF
 {
-    /* public override Color Eval(Normal normal, Vector Vin, Vector Vout, Vector2D uv)
+     public override Color Eval(Normal normal, Vector Vin, Vector Vout, Vector2D uv)
      {
          throw new NotImplementedException();
-     }*/
+     }
     
     /// <summary>
     /// Constructs a <c>SpecularBRDF</c> with a uniform black <c>Pigment</c>
