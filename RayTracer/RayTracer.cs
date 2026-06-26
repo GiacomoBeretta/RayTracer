@@ -288,7 +288,7 @@ public class AverageImagesCommand
     {
         PrintParameters();
         SetIOFilesPaths(out string inputFileFolder, out string pfmFilePath, out string pngFilePath);
-        HDRImage[] images = ReadPfmImages(inputFileFolder, "*_state*_seq*.pfm");
+        HDRImage[]? images = ReadPfmImages(inputFileFolder, "*_state*_seq*.pfm");
 
         if (images == null)
         {
@@ -359,7 +359,7 @@ public class AverageImagesCommand
     /// All images in the folder must have identical dimensions.
     /// The method prints a message to the console and returns null if no files are found.
     /// </remarks>
-    public HDRImage[]? ReadPfmImages(string inputFileFolder, string pattern = null)
+    public HDRImage[]? ReadPfmImages(string inputFileFolder, string? pattern = null)
     {
         string[] files;
         if (pattern == null)
