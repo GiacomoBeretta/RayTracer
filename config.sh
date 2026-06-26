@@ -1,6 +1,6 @@
 # Global default 
 luminosityfunction="shirley"
-averageluminosity=0,5
+averageluminosity=""
 factor=1
 gamma=1
 
