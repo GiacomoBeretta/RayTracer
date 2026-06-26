@@ -18,6 +18,18 @@ case "$subcommand" in
 		;;
 esac
 
+# Set default values for output file names
+case "$subcommand" in
+	render)
+		outputpfm="${outputrenderpfm}"
+		outputpng="${outputrenderpng}"
+		;;
+	averageimages)
+		outputpfm="${averagepfm}"
+		outputpng="${averagepng}"
+		;;
+esac
+
 # Override command line
 
 while [[ $# -gt 0 ]]; do
