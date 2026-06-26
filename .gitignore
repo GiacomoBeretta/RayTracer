@@ -3,11 +3,12 @@
 #/**/*.png
 /TracerTests/referenceWeighted.png
 /TracerTests/referenceShirley.png
-/Images/
-/DemoImages/
+
+/Animations/*
 /PfmImages/*
 /PngImages/*
 
+!Animations/.gitkeep
 !PfmImages/.gitkeep
 !PngImages/.gitkeep
 
