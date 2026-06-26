@@ -105,7 +105,8 @@ public class RenderCommand
     [Option("--gamma", Description = "The gamma factor characteristic of the screen (default: 1)")]
     public float Gamma { get; set; } = 1f;
 
-    [Option("--declarefloat|-d", Description = "Declare a variable. The syntax is --declarefloat=NAME:VALUE")]
+    [Option("--declarefloat|-d", Description = "Declare a variable. " +
+                                               "The syntax is '--declarefloat=NAME:VALUE' or '-d=NAME:VALUE'")]
     public string[] Definitions { get; set; } = [];
 
     #endregion
