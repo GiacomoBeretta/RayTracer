@@ -253,7 +253,7 @@ public class AverageImageCommand
 
     [Option("--outputaveragepng", Description = "Name of the output png file")]
     [Required]
-    public required string OutputPngFileNamePng { get; set; }
+    public required string OutputPngFileName { get; set; }
 
     [Option("--luminosityfunction", Description = "Luminosity function, options are: shirley (default), weighted")]
     public LumFunction Luminosityfunction { get; set; } = LumFunction.Shirley;
@@ -274,52 +274,21 @@ public class AverageImageCommand
     public void OnExecute()
     {
         PrintParameters();
+        SetIOFilesPaths(out string inputFileFolder, out string pfmFilePath, out string pngFilePath);
+        HDRImage[] images = ReadPfmImages(inputFileFolder, "*_state*_seq*.pfm");
 
-
-        string[] files = Directory.GetFiles(inputFileFolder, "*_state*_seq*.pfm"); //search for pattern in folder
-
-        if (files.Length == 0)
+        if (images == null)
         {
-            Console.WriteLine("The folder is empty");
+            Console.WriteLine("No images found");
             return;
         }
 
-        //Using first file as accumulator
-
-        HDRImage acc = HDRImage.ReadPFM_File(files[0]);
-
-        int width = acc.Width;
-        int height = acc.Height;
-        int length = width * height;
-
-        Color[] average = new Color[length];
-
-        HDRImage[] images = new HDRImage[files.Length];
-
-        for (int i = 0; i < files.Length; i++) images[i] = HDRImage.ReadPFM_File(files[i]);
-
-        foreach (HDRImage image in images)
-        {
-            if (image.Width != acc.Width || image.Height != acc.Height)
-                throw new ArgumentException("Images must have equal width and height");
-        }
-
-        for (int i = 0; i < length; i++)
-        {
-            foreach (HDRImage image in images)
-            {
-                average[i] += image[i];
-            }
-
-            average[i] *= (1.0f / files.Length);
-        }
-
-        HDRImage output = new HDRImage(acc.Width, acc.Height, average);
+        HDRImage output = AverageImages(images);
 
         HDRImage.WritePFM_File(output, pfmFilePath);
         Console.WriteLine($"Pfm file created in: {pfmFilePath}");
 
-        output.WritePNG(OutputPngFileNamePng, Luminosityfunction, Factor, Gamma, AverageLuminosity);
+        output.WritePNG(OutputPngFileName, Luminosityfunction, Factor, Gamma, AverageLuminosity);
         Console.WriteLine($"Png file created in: {pngFilePath}");
     }
 
@@ -329,7 +298,7 @@ public class AverageImageCommand
     public void PrintParameters()
     {
         Console.WriteLine($"Name of the output pfm file path: {OutputPfmFileName}");
-        Console.WriteLine($"Name of the output png file path: {OutputPngFileNamePng}");
+        Console.WriteLine($"Name of the output png file path: {OutputPngFileName}");
         Console.WriteLine();
         Console.WriteLine("Tone Mapping parameters");
         Console.WriteLine($"Luminosityfunction: {Luminosityfunction}");
@@ -338,18 +307,106 @@ public class AverageImageCommand
         Console.WriteLine($"Gamma: {Gamma}");
     }
 
-
+    /// <summary>
+    /// Builds the path of the folder of the pfm images to average
+    /// and the paths of the output pfm and png images.
+    /// <c>.pfm</c> and <c>.png</c> extensions are appended to the output file
+    /// names if they are missing.
+    /// </summary>
+    /// <param name="inputFileFolder">Full path to the input folder</param>
+    /// <param name="pfmFilePath">Full path to the output PFM file.</param>
+    /// <param name="pngFilePath">Full path to the output PNG file.</param>
     public void SetIOFilesPaths(out string inputFileFolder, out string pfmFilePath, out string pngFilePath)
     {
         string currentPath = AppDomain.CurrentDomain.BaseDirectory;
         inputFileFolder = Path.Combine(currentPath, "../../../../PfmImages");
 
-        string 
-        if (!OutputPngFileNamePng.EndsWith(".png")) OutputPngFileNamePng += ".png";
-        if (!OutputPfmFileName.EndsWith(".pfm")) OutputPfmFileName += ".pfm";
+        string pfmFileName = OutputPfmFileName.EndsWith(".pfm") ? OutputPfmFileName : OutputPfmFileName + ".pfm";
+        string pngFileName = OutputPngFileName.EndsWith(".png") ? OutputPngFileName : OutputPngFileName + ".png";
 
-        pfmFilePath = Path.Combine(currentPath, "../../../../PfmImages", OutputPfmFileName);
-        pngFilePath = Path.Combine(currentPath, "../../../../PngImages/", OutputPngFileNamePng);
+        pfmFilePath = Path.Combine(currentPath, "../../../../PfmImages", pfmFileName);
+        pngFilePath = Path.Combine(currentPath, "../../../../PngImages/", pngFileName);
+    }
+
+    /// <summary>
+    /// Loads all PFM images from a specified folder and returns them as an array of HDRImage objects.
+    /// </summary>
+    /// <param name="inputFileFolder">The directory containing the PFM files.</param>
+    /// <param name="pattern">
+    /// Optional search pattern used to filter files (e.g. "*.pfm").
+    /// If null, all files in the directory are loaded.
+    /// </param>
+    /// <returns>
+    /// An array of HDRImage objects loaded from the folder, or null if the folder contains no files.
+    /// </returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown if at least one loaded image has a different width or height compared to the first image.
+    /// </exception>
+    /// <remarks>
+    /// All images in the folder must have identical dimensions.
+    /// The method prints a message to the console and returns null if no files are found.
+    /// </remarks>
+    public HDRImage[]? ReadPfmImages(string inputFileFolder, string pattern = null)
+    {
+        string[] files;
+        if (pattern == null)
+        {
+            files = Directory.GetFiles(inputFileFolder);
+        }
+        else
+        {
+            files = Directory.GetFiles(inputFileFolder, pattern);
+        }
+
+        if (files.Length == 0)
+        {
+            Console.WriteLine("The folder is empty");
+            return null;
+        }
+
+        HDRImage[] images = new HDRImage[files.Length];
+        for (int i = 0; i < files.Length; i++) images[i] = HDRImage.ReadPFM_File(files[i]);
+
+        int Width = images[0].Width;
+        int Height = images[0].Height;
+
+        foreach (HDRImage image in images)
+        {
+            if (image.Width != Width || image.Height != Height)
+                throw new ArgumentException("Images must have equal width and height");
+        }
+
+        return images;
+    }
+
+    /// <summary>
+    /// Returns the averaged image from an array of HDR images.
+    /// </summary>
+    /// <param name="images">
+    /// Array of HDRImage objects to be averaged. All images must have the same dimensions.
+    /// </param>
+    /// <returns>
+    /// A new HDRImage containing the average pixel values computed across all input images.
+    /// </returns>
+    /// <remarks>
+    /// The method performs a per-pixel arithmetic mean across all images.
+    /// All images are assumed to have identical width, height, and pixel layout.
+    public HDRImage AverageImages(HDRImage[] images)
+    {
+        //Using first file as accumulator
+        HDRImage acc = images[0];
+
+        for (int i = 0; i < acc.Pixels.Length; i++)
+        {
+            for (int j = 1; j < images.Length; j++)
+            {
+                acc[i] += images[j][i];
+            }
+
+            acc[i] *= (1.0f / images.Length);
+        }
+
+        return acc;
     }
 }
 
