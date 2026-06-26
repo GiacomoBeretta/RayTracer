@@ -82,7 +82,8 @@ public class RenderCommand
     [Option("--rouletteprob",
         Description =
             "Optional fixed probability for the Russian roulette algorithm. " +
-            "When null, the probability is computed dynamically at each recursive call of RenderFunction (default: null")]
+            "When null, the probability is computed dynamically at each recursive call of RenderFunction" +
+            "(this command only works for the path tracing algorithm, default: null")]
     [Range(0, 1)]
     public float? RussianRouletteFixedProb { get; set; } = null;
 
@@ -260,26 +261,27 @@ public class AverageImagesCommand
 {
     #region Options
 
-    [Option("--outputaveragepfm", Description = "Name of the output pfm file")]
+    [Option("--outputpfm", Description = "Name of the averaged output PFM file")]
     [Required]
     public required string OutputPfmFileName { get; set; }
 
-    [Option("--outputaveragepng", Description = "Name of the output png file")]
+    [Option("--outputpng", Description = "Name of the averaged output PNG file")]
     [Required]
     public required string OutputPngFileName { get; set; }
-
-    [Option("--luminosityfunction", Description = "Luminosity function, options are: shirley (default), weighted")]
+    
+    [Option("--luminosityfunction", Description = "Luminosity function, options are: shirley, weighted (default: shirley)")]
     public LumFunction Luminosityfunction { get; set; } = LumFunction.Shirley;
 
     [Option("--averageluminosity",
         Description =
-            "Fixed luminosity for the tone mapping. If the value is null is computed with the luminosity function")]
+            "Fixed luminosity for the tone mapping. " +
+            "If the value is null is computed with the luminosity function (default: null)")]
     public float? AverageLuminosity { get; set; } = null;
 
-    [Option("--factor", Description = "The empirical factor to render images")]
+    [Option("--factor", Description = "The empirical factor to render images (default: 1)")]
     public float Factor { get; set; } = 1f;
 
-    [Option("--gamma", Description = "The gamma factor characteristic of the screen")]
+    [Option("--gamma", Description = "The gamma factor characteristic of the screen (default: 1)")]
     public float Gamma { get; set; } = 1f;
 
     #endregion
@@ -364,10 +366,12 @@ public class AverageImagesCommand
         string[] files;
         if (pattern == null)
         {
+            Console.WriteLine($"Reading PFM images from the {inputFileFolder} folder.");
             files = Directory.GetFiles(inputFileFolder);
         }
         else
         {
+            Console.WriteLine($"Reading PFM images from the {inputFileFolder} folder, with the pattern {pattern}.");
             files = Directory.GetFiles(inputFileFolder, pattern);
         }
 
@@ -376,7 +380,7 @@ public class AverageImagesCommand
             Console.WriteLine("The folder is empty");
             return null;
         }
-
+        
         HDRImage[] images = new HDRImage[files.Length];
         for (int i = 0; i < files.Length; i++) images[i] = HDRImage.ReadPFM_File(files[i]);
 
