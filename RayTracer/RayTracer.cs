@@ -23,14 +23,17 @@ public class RenderCommand
 {
     #region Options
 
-    [Option("--inputscene", Description = "Name of the input scene file (default: scene.txt")]
-    public string InputSceneName { get; set; } = "scene.txt";
+    [Option("--inputscene", Description = "Name of the input scene file.")]
+    [Required]
+    public string InputSceneName { get; set; }
 
-    [Option("--outputpfm", Description = "Name of the pfm output file (default: output.pfm)")]
-    public string OutputPfmName { get; set; } = "output.pfm";
+    [Option("--outputpfm", Description = "Name of the pfm output file.")]
+    [Required]
+    public string OutputPfmName { get; set; }
 
-    [Option("--outputpng", Description = "Name of the png output file (default: output.png)")]
-    public string OutputPngName { get; set; } = "output.png";
+    [Option("--outputpng", Description = "Name of the png output file.")]
+    [Required]
+    public string OutputPngName { get; set; }
 
     [Option("--width", Description = "The width of the image (default: 500)")]
     [Range(1, Int32.MaxValue)]
@@ -260,28 +263,28 @@ public class RenderCommand
 public class AverageImagesCommand
 {
     #region Options
-
-    [Option("--outputpfm", Description = "Name of the averaged output PFM file")]
-    [Required]
-    public required string OutputPfmFileName { get; set; }
-
-    [Option("--outputpng", Description = "Name of the averaged output PNG file")]
-    [Required]
-    public required string OutputPngFileName { get; set; }
     
-    [Option("--luminosityfunction", Description = "Luminosity function, options are: shirley, weighted (default: shirley)")]
+    [Option("--outputpfm", Description = "Name of the averaged output PFM file.")]
+    [Required]
+    public string OutputPfmFileName { get; set; }
+
+    [Option("--outputpng", Description = "Name of the averaged output PNG file.")]
+    [Required]
+    public string OutputPngFileName { get; set; }
+    
+    [Option("--luminosityfunction", Description = "Luminosity function, options are: shirley, weighted (default: shirley).")]
     public LumFunction Luminosityfunction { get; set; } = LumFunction.Shirley;
 
     [Option("--averageluminosity",
         Description =
             "Fixed luminosity for the tone mapping. " +
-            "If the value is null is computed with the luminosity function (default: null)")]
+            "If the value is null is computed with the luminosity function (default: null).")]
     public float? AverageLuminosity { get; set; } = null;
 
-    [Option("--factor", Description = "The empirical factor to render images (default: 1)")]
+    [Option("--factor", Description = "The empirical factor to render images (default: 1).")]
     public float Factor { get; set; } = 1f;
 
-    [Option("--gamma", Description = "The gamma factor characteristic of the screen (default: 1)")]
+    [Option("--gamma", Description = "The gamma factor characteristic of the screen (default: 1).")]
     public float Gamma { get; set; } = 1f;
 
     #endregion
@@ -366,12 +369,12 @@ public class AverageImagesCommand
         string[] files;
         if (pattern == null)
         {
-            Console.WriteLine($"Reading PFM images from the {inputFileFolder} folder.");
+            Console.WriteLine($"Searching for PFM images from the {inputFileFolder} folder.");
             files = Directory.GetFiles(inputFileFolder);
         }
         else
         {
-            Console.WriteLine($"Reading PFM images from the {inputFileFolder} folder, with the pattern {pattern}.");
+            Console.WriteLine($"Searching for PFM images from the {inputFileFolder} folder, with the pattern {pattern}.");
             files = Directory.GetFiles(inputFileFolder, pattern);
         }
 
@@ -427,31 +430,32 @@ public class AverageImagesCommand
     }
 }
 
-[Command(Name = "pfmtopng", Description = "Converts a PFM image to PNG")]
+[Command(Name = "pfmtopng", Description = "Converts a PFM image to PNG.")]
 public class PfmToPngCommand
 {
     #region Options
 
-    [Option("--inputpfm", Description = "The input file name")]
+    [Option("--inputpfm", Description = "The input PFM file name.")]
     [Required]
-    public required string InputFileName { get; set; }
+    public string InputFileName { get; set; }
 
-    [Option("--outputpng", Description = "The output file name")]
+    [Option("--outputpng", Description = "The output PNG file name.")]
     [Required]
-    public required string OutputFileName { get; set; }
+    public string OutputFileName { get; set; }
 
-    [Option("--luminosityfunction", Description = "Luminosity function, options are: shirley (default), weighted")]
+    [Option("--luminosityfunction", Description = "Luminosity function, options are: shirley, weighted (default: shirley).")]
     public LumFunction Luminosityfunction { get; set; } = LumFunction.Shirley;
 
     [Option("--averageluminosity",
         Description =
-            "Fixed luminosity for the tone mapping. If the value is null is computed with the luminosity function")]
+            "Fixed luminosity for the tone mapping. " +
+            "If the value is null is computed with the luminosity function (default: null).")]
     public float? AverageLuminosity { get; set; } = null;
 
-    [Option("--factor", Description = "The empirical factor to render images")]
+    [Option("--factor", Description = "The empirical factor to render images (default: 1).")]
     public float Factor { get; set; } = 1f;
 
-    [Option("--gamma", Description = "The gamma factor characteristic of the screen")]
+    [Option("--gamma", Description = "The gamma factor characteristic of the screen (default: 1).")]
     public float Gamma { get; set; } = 1f;
 
     #endregion
