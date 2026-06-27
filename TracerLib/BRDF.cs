@@ -27,7 +27,7 @@ public abstract class BRDF
         Pigment = pigment;
     }
 
-    public virtual Color Eval(Normal normal, Vector Vin, Vector Vout, Vector2D uv)
+    public virtual Color Eval(Normal normal, Vector vin, Vector vout, Vector2D uv)
     {
         return Pigment.GetColor(uv);
     }
@@ -85,7 +85,7 @@ public class DiffuseBRDF : BRDF
         _reflectance = reflectance;
     }
 
-    public override Color Eval(Normal normal, Vector Vin, Vector Vout, Vector2D uv)
+    public override Color Eval(Normal normal, Vector vin, Vector vout, Vector2D uv)
     {
         return Pigment.GetColor(uv) * _reflectance * (1.0f / MathF.PI);
     }
@@ -130,7 +130,7 @@ public class DiffuseBRDF : BRDF
 /// </summary>
 public class SpecularBRDF : BRDF
 {
-     public override Color Eval(Normal normal, Vector Vin, Vector Vout, Vector2D uv)
+     public override Color Eval(Normal normal, Vector vin, Vector vout, Vector2D uv)
      {
          throw new NotImplementedException();
      }
@@ -162,9 +162,9 @@ public class SpecularBRDF : BRDF
     /// <returns> A new <c>Ray</c> originating from the interaction point and traveling in the sampled direction.</returns>
     public override Ray ScatterRay(PCG pcg, Vector incidentVector, Point interactionPoint, Normal normal, int depth)
     {
-        // Maybe it could be advantegeous normalize the incident vector before firing the new ray
+        // Maybe it could be advantageous normalize the incident vector before firing the new ray
         //
-        //Vector rayDir = new Vector(incindentVector.X, incindentVector.Y, incindentVector.Z);
+        //Vector rayDir = new Vector(incidentVector.X, incidentVector.Y, incidentVector.Z);
         //rayDir.Normalize();
         Vector normalVec = normal.ToVector();
 
