@@ -360,7 +360,7 @@ public struct Transformation
          _CheckConsistency();
      }*/
 
-    public Transformation(in HomMatrix m, in HomMatrix invM)
+    public Transformation(HomMatrix m, HomMatrix invM)
     {
         M = m;
         InvM = invM;
@@ -532,7 +532,7 @@ public struct Transformation
     /// True if both the transformation matrices and inverse matrices are
     /// approximately equal; otherwise false.
     /// </returns>
-    public static bool AreTransformationsClose(in Transformation t1, in Transformation t2, float epsilon = 1e-5f)
+    public static bool AreTransformationsClose(Transformation t1, Transformation t2, float epsilon = 1e-5f)
     {
         return HomMatrix.AreMatricesClose(t1.M, t2.M, epsilon)
                && HomMatrix.AreMatricesClose(t1.InvM, t2.InvM, epsilon);
@@ -577,7 +577,7 @@ public struct Transformation
     /// matrix <c>t2.InvM * t1.InvM</c>, according to
     /// (AB)<sup>-1</sup> = B<sup>-1</sup>A<sup>-1</sup>.
     /// </summary>
-    public static Transformation operator *(in Transformation t1, in Transformation t2)
+    public static Transformation operator *(Transformation t1, Transformation t2)
     {
         HomMatrix prod = t1.M * t2.M;
         HomMatrix invProd = t2.InvM * t1.InvM;
@@ -592,7 +592,7 @@ public struct Transformation
     /// <param name="v">The vector to transform.</param>
     /// <returns>A new vector resulting from the matrix–vector multiplication.
     /// </returns>
-    public static Vector operator *(in Transformation t, Vector v)
+    public static Vector operator *(Transformation t, Vector v)
     {
         Vector v2 = new Vector
         (
@@ -610,7 +610,7 @@ public struct Transformation
     /// <param name="t">The transformation to apply.</param>
     /// <param name="p">The point to transform.</param>
     /// <returns></returns>
-    public static Point operator *(in Transformation t, Point p)
+    public static Point operator *(Transformation t, Point p)
     {
         Point p2 = new Point
         (
@@ -635,7 +635,7 @@ public struct Transformation
     /// <param name="t">The transformation to apply.</param>
     /// <param name="n1">The normal to transform.</param>
     /// <returns>The transformed normal.</returns>
-    public static Normal operator *(in Transformation t, Normal n1)
+    public static Normal operator *(Transformation t, Normal n1)
     {
         Normal n2 = new Normal
         (

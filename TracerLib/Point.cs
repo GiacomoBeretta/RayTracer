@@ -58,7 +58,7 @@ public struct Point
     /// <param name="p">The original point.</param>
     /// <param name="v">The vector to add.</param>
     /// <returns>A new <see cref="Point"/> obtained by applying the vector translation to the input point.</returns>
-    public static Point operator +(in Point p, in Vector v)
+    public static Point operator +(Point p, Vector v)
     {
         return new Point(p.X + v.X, p.Y + v.Y, p.Z + v.Z);
     }
@@ -71,13 +71,13 @@ public struct Point
     /// <returns>
     /// A new <see cref="Point"/> resulting from translating the input point by the opposite of the vector.
     /// </returns>
-    public static Point operator -(in Point p, in Vector v)
+    public static Point operator -(Point p, Vector v)
     {
         return new Point(p.X - v.X, p.Y - v.Y, p.Z - v.Z);
     }
 
     //this operation shouldn't be allowed
-    /*public static Point operator +(in Vector a, in Point b)
+    /*public static Point operator +(Vector a, Point b)
     {
         return new Point(a.X + b.X, a.Y + b.Y, a.Z + b.Z);
     }*/
@@ -99,7 +99,7 @@ public struct Point
     /// <param name="a">The end point of the returned vector.</param>
     /// <param name="b">The origin of the returned vector.</param>
     /// <returns>A vector that points from <paramref name="b"/> to <paramref name="a"/>.</returns>
-    public static Vector operator -(in Point a, in Point b)
+    public static Vector operator -(Point a, Point b)
     {
         return new Vector(a.X - b.X, a.Y - b.Y, a.Z - b.Z);
     }
