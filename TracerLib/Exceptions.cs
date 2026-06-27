@@ -24,7 +24,7 @@ public class SceneSyntaxException : Exception
     /// <summary>
     /// The location of the error (file name, column and row). See <see cref="SourceLocation"/>.
     /// </summary>
-    SourceLocation Location;
+    public SourceLocation Location { get; }
 
     public SceneSyntaxException(SourceLocation location, string message) : base($"Grammar Error at ${location}: {message}")
     {
