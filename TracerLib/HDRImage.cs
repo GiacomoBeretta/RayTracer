@@ -205,17 +205,26 @@ public class HDRImage
 
     public HDRImage(string fileName)
     {
-        using (Stream filestream = File.OpenRead(fileName))
-        {
-            HDRImage img = ReadPFM_File(filestream);
+        /*   using Stream filestream = File.OpenRead(fileName);
+   HDRImage img = ReadPFM_File(filestream);
 
-            Width = img.Width;
-            Height = img.Height;
-            Pixels = new Color[Width * Height];
-            for (int i = 0; i < Pixels.Length; i++)
-            {
-                Pixels[i] = img.Pixels[i];
-            }
+   Width = img.Width;
+   Height = img.Height;
+   Pixels = new Color[Width * Height];
+   for (int i = 0; i < Pixels.Length; i++)
+   {
+       Pixels[i] = img.Pixels[i];
+   }*/
+
+        using Stream filestream = File.OpenRead(fileName);
+        HDRImage img = ReadPFM_File(filestream);
+
+        Width = img.Width;
+        Height = img.Height;
+        Pixels = new Color[Width * Height];
+        for (int i = 0; i < Pixels.Length; i++)
+        {
+            Pixels[i] = img.Pixels[i];
         }
     }
 
@@ -537,10 +546,8 @@ public class HDRImage
     /// <returns>An <see cref="HDRImage"/> containing the decoded floating-point RGB image.</returns>
     public static HDRImage ReadPFM_File(string filePath)
     {
-        using (Stream filestream = File.OpenRead(filePath))
-        {
-            return ReadPFM_File(filestream);
-        }
+        using Stream filestream = File.OpenRead(filePath);
+        return ReadPFM_File(filestream);
     }
 
     /// <summary>
@@ -584,10 +591,8 @@ public class HDRImage
     /// <param name="filePath">The path of the output file where the PFM data will be written.</param>
     public static void WritePFM_File(HDRImage img, string filePath)
     {
-        using (Stream filestream = File.OpenWrite(filePath))
-        {
-            WritePFM(img, filestream);
-        }
+        using Stream filestream = File.OpenWrite(filePath);
+        WritePFM(img, filestream);
     }
 
     #endregion
@@ -756,9 +761,9 @@ public class HDRImage
     }
 
     /// <summary>
-    /// Creates a PNG file of the corresponding LDR image
-    /// It accounts for the gamma correction of the display and of the empirical factor here named "factor"
-    /// The luminosityFunction parameter allow to choose between some possible ways to compute the luminosity of a pixel
+    /// Creates a PNG file of the corresponding LDR image.
+    /// It accounts for the gamma correction of the display and of the empirical factor here named "factor".
+    /// The luminosityFunction parameter allow to choose between some possible ways to compute the luminosity of a pixel.
     /// </summary>
     /// <param name="outputFilePath"></param>
     /// <param name="luminosityFunction"></param>
@@ -771,10 +776,8 @@ public class HDRImage
         float delta = 1e-10f)
     {
         //using (Stream fileStream = File.OpenWrite(outputFilename))
-        using (Stream fileStream = new FileStream(outputFilePath, FileMode.Create))
-        {
-            WritePNG(fileStream, luminosityFunction, factor, gamma, averageLuminosity, delta);
-        }
+        using Stream fileStream = new FileStream(outputFilePath, FileMode.Create);
+        WritePNG(fileStream, luminosityFunction, factor, gamma, averageLuminosity, delta);
     }
 }
 
