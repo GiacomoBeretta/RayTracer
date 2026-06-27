@@ -8,7 +8,7 @@ namespace TracerLib;
 /// </summary>
 public struct SourceLocation
 {
-    private string filePath;
+    public string filePath;
     public int line;
     public int column;
 
