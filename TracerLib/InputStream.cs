@@ -1,6 +1,5 @@
 // This file is release under EUPL_v1.2 license. See LICENSE.md
 
-using System.Diagnostics;
 using System.Globalization;
 using System.Text; //per il metodo cultureInfo
 
@@ -215,7 +214,7 @@ public class InputStream : IDisposable
     }
 
     // Parse_token methods - Begin
-    
+
     /// <summary>
     /// Parses a string literal token starting at the given source location.
     /// Characters are read verbatim until a closing quotation mark (") is encountered.
@@ -243,17 +242,17 @@ public class InputStream : IDisposable
 
     ///  <summary>
     /// Parses a floating-point numeric literal starting with the specified character.
-    ///  Supports optional leading sign (+/-), decimal notation, and scientific
-    ///  notation using an exponent (e.g. 1.23e-4).
-    ///  </summary>
-    ///  <param name="tokenLocation">The source location where the numeric token begins,
-    ///      (used in the constructor of <see cref="LiteralNumberToken"/>, and to throw the exceptions.
-    ///  </param>
-    ///  <param name="firstChar">The first character of the numeric literal that has already been read.
-    ///      This may be a digit or a leading sign (+/-).</param>
-    ///  <returns>A <see cref="LiteralNumberToken"/> containing the parsed floating-point value.</returns>
-    ///  <exception cref="SceneSyntaxException">Thrown when the numeric literal is malformed or reaches the end of the
-    ///  input before a valid number can be completed.</exception>
+    /// Supports optional leading sign (+/-), decimal notation, and scientific
+    /// notation using an exponent (e.g. 1.23e-4).
+    /// </summary>
+    /// <param name="tokenLocation">The source location where the numeric token begins,
+    /// used in the constructor of <see cref="LiteralNumberToken"/>, and to throw the exceptions.
+    /// </param>
+    /// <param name="firstChar">The first character of the numeric literal that has already been read.
+    /// This may be a digit or a leading sign (+/-).</param>
+    /// <returns>A <see cref="LiteralNumberToken"/> containing the parsed floating-point value.</returns>
+    /// <exception cref="SceneSyntaxException">Thrown when the numeric literal is malformed or reaches the end of the
+    /// input before a valid number can be completed.</exception>
     public LiteralNumberToken _ParseFloatToken(SourceLocation tokenLocation, char firstChar)
     {
         string floatString = firstChar.ToString();
@@ -429,7 +428,7 @@ public class InputStream : IDisposable
     }
 
     // Parse_Token methods - End 
-    
+
     /// <summary>
     /// Reads the next token from the input stream, skipping whitespace,
     /// newlines, and comments.
@@ -465,7 +464,7 @@ public class InputStream : IDisposable
         {
             return new StopToken(tokenLocation);
         }
-        
+
         switch (ch.Value)
         {
             case '(':
@@ -494,7 +493,7 @@ public class InputStream : IDisposable
 
         throw new SceneSyntaxException(tokenLocation, $"invalid character '{ch}'");
     }
-    
+
     /// <summary>
     /// Saves a token to be returned by the next call to <see cref="ReadNextToken"/>.
     /// Only one unread token can be saved at a time.
@@ -506,8 +505,10 @@ public class InputStream : IDisposable
     {
         if (SavedToken != null)
         {
-            throw new SceneSyntaxException(token.Location, $"Tried to unread the token {token}, but there was already a saved token {SavedToken}.");
+            throw new SceneSyntaxException(token.Location,
+                $"Tried to unread the token {token}, but there was already a saved token {SavedToken}.");
         }
+
         SavedToken = token;
     }
 }

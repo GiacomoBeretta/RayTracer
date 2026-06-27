@@ -42,7 +42,7 @@ public struct Ray
 
     /// <summary>
     /// Constructs an invalid/default ray whose origin is at (0, 0, 0),
-    /// whose direction is the zero vector, a intersection range of [1e-5, +∞),
+    /// whose direction is the zero vector, an intersection range of [1e-5, +∞),
     /// and a recursion depth, i.e. the number of reflections, of 0.
     /// </summary>
     public Ray()

@@ -26,7 +26,7 @@ public class PCG
     }
 
     /// <summary>
-    /// Returns a random unsigned integer (32 bit) number between 0 and uint.max
+    /// Returns a random unsigned integer (32 bit) number between 0 and <code>uint.max</code>.
     /// </summary>
     /// <returns></returns>
     public uint Random()
