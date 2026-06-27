@@ -237,7 +237,7 @@ This naming scheme is also used by the `averageimage` command to identify the im
 
 This script converts a sequence of PNG images into an MP4 video.
 
-The script is designed to process images whose filenames follow the pattern:
+The script is designed to process images in the `PfmImages` directory whose filenames follow the pattern:
 
 ```text
 frame_%03d.png
@@ -315,7 +315,7 @@ An example scene is shown below:
 float clock(150)
 
 material sky_material(
-    diffuse(uniform(<0.5, 0.3, 0.1>)),
+    diffuse(image("dome.pfm")),
     uniform(<0.7, 0.5, 1>)
 )
 
