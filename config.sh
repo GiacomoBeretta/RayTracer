@@ -1,13 +1,15 @@
+# Parameters used if not specified during the execution of raytracer.sh
+
 # Global default 
 luminosityfunction="shirley"
 averageluminosity=""
 factor=1
 gamma=1
+outputpfm="scene_test.pfm" #not used by pfmtopng
+outputpng="scene_test.png"
 
 # Default render
 inputscene="scene.txt"
-outputrenderpfm="scene_test.pfm"
-outputrenderpng="scene_test.png"
 width=500
 height=500
 sampleside=1
@@ -22,11 +24,6 @@ declarefloat=()
 
 # Default pfmtopng
 inputpfm="dome.pfm"
-outputpng="dome.png"
-
-# Default averageimages
-averagepfm="average.pfm"
-averagepng="average.png"
 
 # Cycle parameters
 pcgcycle=false
