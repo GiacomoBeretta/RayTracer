@@ -3,7 +3,6 @@
 namespace TracerLib;
 
 //Verificare se modificare {token} in {type(token)} nei messaggi d'errore cambia qualcosa
-//Considerare di cambiare ExpectSymbol(InputStream, string) in ExpecteSymbol(InputStream, char)
 
 /// <summary>
 /// Represents a scene parsed from a scene description file.
@@ -303,8 +302,6 @@ public class Scene
 
         return result;
     }
-
-    //??? perché questi parametri out?
 
     /// <summary>
     /// Parses a material definition from the input stream.
