@@ -804,23 +804,6 @@ Sequence identifier used by the random number generator.
 
 Number of subdivisions per pixel side used for anti-aliasing.
 
-#### `--luminosityfunction`
-
-Luminosity function used in tone mapping.
-
-Available options:
-
-* `shirley`
-* `weighted`
-
-#### `--factor`
-
-Empirical factor used during tone mapping.
-
-#### `--gamma`
-
-Gamma correction factor applied during tone mapping.
-
 #### `--declarefloat` or `-d`
 
 Declares a floating-point variable using:
