@@ -50,8 +50,8 @@ public class RenderCommand
     public int SampleSide { get; init; } = 1;
 
     [Option("--algorithm",
-        Description = "Render's algorithm. Options are: onoff, flat or pathtracer. (default: pathtracer)")]
-    public RenderFunc Algorithm { get; init; } = RenderFunc.PathTracer;
+        Description = "Render's algorithm. Options are: onoff, flat or pathtracing. (default: pathtracing)")]
+    public RenderFunc Algorithm { get; init; } = RenderFunc.PathTracing;
 
     [Option("--numrays",
         Description =
@@ -149,14 +149,19 @@ public class RenderCommand
         Console.WriteLine($"Sample per Side: {SampleSide}");
         Console.WriteLine($"Algorithm: {Algorithm}");
         Console.WriteLine();
-        Console.WriteLine("extra parameters for path tracing:");
-        Console.WriteLine($"NumRay: {NumRays}");
-        Console.WriteLine($"Max Depth: {MaxDepth}");
-        Console.WriteLine($"InitState: {InitState}");
-        Console.WriteLine($"InitSeq: {InitSeq}");
-        Console.WriteLine($"Roulette Start Depth: {RussianRouletteStartDepth}");
-        Console.WriteLine($"Roulette Fixed Probability: {RussianRouletteFixedProb}");
-        Console.WriteLine();
+
+        if (Algorithm == RenderFunc.PathTracing)
+        {
+            Console.WriteLine("extra parameters for path tracing:");
+            Console.WriteLine($"NumRay: {NumRays}");
+            Console.WriteLine($"Max Depth: {MaxDepth}");
+            Console.WriteLine($"InitState: {InitState}");
+            Console.WriteLine($"InitSeq: {InitSeq}");
+            Console.WriteLine($"Roulette Start Depth: {RussianRouletteStartDepth}");
+            Console.WriteLine($"Roulette Fixed Probability: {RussianRouletteFixedProb}");
+            Console.WriteLine();
+        }
+        
         Console.WriteLine("Tone Mapping parameters:");
         Console.WriteLine($"Luminosity Function: {Luminosityfunction}");
         Console.WriteLine($"Average Luminosity: {AverageLuminosity}");
@@ -233,12 +238,12 @@ public class RenderCommand
             case RenderFunc.Flat:
                 renderer = new FlatRenderer(scene.World);
                 break;
-            case RenderFunc.PathTracer:
+            case RenderFunc.PathTracing:
                 renderer = new PathTracingRenderer(scene.World, new PCG(InitState, InitSeq), backgroundColor: null,
                     NumRays, MaxDepth, RussianRouletteStartDepth, RussianRouletteFixedProb);
                 break;
             default:
-                throw new ArgumentException("Invalid algorithm, accepted onoff, flat or pathtracer");
+                throw new ArgumentException("Invalid algorithm, accepted onoff, flat or pathtracing");
         }
 
         return renderer;
@@ -502,5 +507,5 @@ public enum RenderFunc
 {
     OnOff,
     Flat,
-    PathTracer
+    PathTracing
 }
