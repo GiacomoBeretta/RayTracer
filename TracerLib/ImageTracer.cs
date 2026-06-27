@@ -11,32 +11,34 @@ public class ImageTracer
     /// The image storing the result of the rendering process.
     /// </summary>
     private HDRImage _image;
-    
+
     /// <summary>
     /// The camera defining the projection model, the observer position, and the aspect ratio.
     /// </summary>
     private ICamera _camera;
-    
+
     /// <summary>
     /// The random generator used for Monte Carlo integration. 
     /// </summary>
     private PCG _pcg;
-    
+
     /// <summary>
     /// Number of subdivisions per pixel axis.
     /// The total number of rays per pixel is the square of this value.
     /// </summary>
     public int PixelSideSubdivisions { get; set; }
-    
+
     public ImageTracer(HDRImage image, ICamera camera, PCG? pcg = null, int pixelSideSubdivisions = 1)
     {
         _image = image;
         _camera = camera;
         _pcg = pcg ?? new PCG();
-        if(pixelSideSubdivisions < 1) throw new ArgumentOutOfRangeException(nameof(pixelSideSubdivisions), pixelSideSubdivisions, "The number of pixel side subdivisions must be greater than 1.");
+        if (pixelSideSubdivisions < 1)
+            throw new ArgumentOutOfRangeException(nameof(pixelSideSubdivisions), pixelSideSubdivisions,
+                "The number of pixel side subdivisions must be greater than 1.");
         PixelSideSubdivisions = pixelSideSubdivisions;
     }
-    
+
     // (formule diverse da Tomasi)
     /// <summary>
     /// Returns a <see cref="Ray"/> passing through the pixel at (column, row).
@@ -53,11 +55,11 @@ public class ImageTracer
     public Ray FireRayAtPixel(int column, int row, float uPixel = 0.5f, float vPixel = 0.5f)
     {
         // the (u,v) coordinates start from the top-left corner of the unit square [0,1]x[0,1].
-        float u = (column + uPixel) / _image.Width; 
+        float u = (column + uPixel) / _image.Width;
         float v = (row + vPixel) / _image.Height;
         return _camera.FireRay(u, v);
     }
-    
+
     /// <summary>
     /// Computes the color of each pixel of the <see cref="HDRImage"/> using the provided RenderFunction
     /// of the <see cref="Renderer"/> class.
@@ -74,12 +76,13 @@ public class ImageTracer
         {
             for (int row = 0; row < _image.Height; row++)
             {
-                Color cumcolor = new Color(0.0f,0.0f,0.0f);
+                Color cumcolor = new Color(0.0f, 0.0f, 0.0f);
 
                 // Anti-Aliasing algorithm:
                 // we subdivide the pixel in a PixelSideSubdivisions x PixelSideSubdivisions grid
                 // then for each cell of this grid we fire a ray randomly.
-                if (PixelSideSubdivisions > 1) //CONTROLLARE SE 1 SUDDIVISIONE AGGIUNGE UN'ULTERIORE RAGGIO A QUELLO DELL'ALGORITMO NORMALE
+                if (PixelSideSubdivisions >
+                    1) //CONTROLLARE SE 1 SUDDIVISIONE AGGIUNGE UN'ULTERIORE RAGGIO A QUELLO DELL'ALGORITMO NORMALE
                 {
                     for (int pixRow = 0; pixRow < PixelSideSubdivisions; pixRow++)
                     {
@@ -91,8 +94,8 @@ public class ImageTracer
                             cumcolor += renderFunction(ray);
                         }
                     }
-                    
-                    _image[col, row] = cumcolor * (1.0f / (PixelSideSubdivisions*PixelSideSubdivisions));
+
+                    _image[col, row] = cumcolor * (1.0f / (PixelSideSubdivisions * PixelSideSubdivisions));
                 }
                 else
                 {

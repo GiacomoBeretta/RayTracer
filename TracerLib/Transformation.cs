@@ -583,7 +583,7 @@ public struct Transformation
         HomMatrix invProd = t2.InvM * t1.InvM;
         return new Transformation(prod, invProd);
     }
-    
+
     /// <summary>
     /// Transforms a vector using the specified transformation matrix.
     /// We use homogeneous coordinates, so the vectors are expected to have their 4th coordinate equal to 0.
@@ -602,7 +602,7 @@ public struct Transformation
         );
         return v2;
     }
-    
+
     /// <summary>
     /// Applies the transformation to a point.
     /// We use homogeneous coordinates, so the points have their 4th coordinate equal to 1.
@@ -627,7 +627,7 @@ public struct Transformation
 
         return p2 * (1.0f / w);
     }
-    
+
     /// <summary>
     /// Transforms a normal vector using the inverse transpose of the
     /// transformation matrix.

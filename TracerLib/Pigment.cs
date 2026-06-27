@@ -31,14 +31,14 @@ public class UniformPigment : Pigment
     /// </summary>
     public UniformPigment()
     {
-        this.Color = new Color(0,0,0);
+        this.Color = new Color(0, 0, 0);
     }
-    
+
     public UniformPigment(Color color)
     {
         Color = color;
     }
-    
+
     /// <summary>
     /// Returns the uniform color of this pigment regardless of the input UV coordinates.
     /// </summary>
@@ -64,7 +64,7 @@ public class ImagePigment : Pigment
     {
         Image = image;
     }
-    
+
     //TOGLIERE MATHFLOOR SUL BRANCH AVERAGEIMAGE
     /// <summary>
     /// Returns the color sampled from the image at the specified UV coordinates.
@@ -101,7 +101,7 @@ public class CheckeredPigment : Pigment
     /// The first color used by this <see cref="CheckeredPigment"/>.
     /// </summary>
     public Color Color1 { get; }
-    
+
     /// <summary>
     /// The second color used by this <see cref="CheckeredPigment"/>.
     /// </summary>
@@ -112,7 +112,7 @@ public class CheckeredPigment : Pigment
     /// For example, a value of 4 produces a 4x4 checker grid.
     /// </summary>
     public int NumSteps { get; }
-    
+
     /// <summary>
     /// Constructs a new instance of the <see cref="CheckeredPigment"/> class.
     /// </summary>
@@ -125,7 +125,7 @@ public class CheckeredPigment : Pigment
         Color2 = color2;
         NumSteps = numsteps;
     }
-    
+
     /// <summary>
     /// Returns one of the two colors of the checkered pattern based on the given uv coordinates.
     /// </summary>

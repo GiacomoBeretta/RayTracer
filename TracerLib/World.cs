@@ -11,7 +11,7 @@ public class World
     /// The collection of shapes contained in the world.
     /// </summary>
     public List<Shape> Shapes { get; private set; }
-    
+
     /// <summary>
     /// Initializes a new world containing the specified shapes.
     /// </summary>
@@ -22,7 +22,7 @@ public class World
     {
         Shapes = shapes ?? new List<Shape>();
     }
-    
+
     /// <summary>
     /// Add the shape specified to the list of shapes.
     /// </summary>
@@ -31,7 +31,7 @@ public class World
     {
         Shapes.Add(shape);
     }
-    
+
     /// <summary>
     /// Finds the closest intersection between the specified ray and the shapes in the scene.
     /// Returns null if the ray does not intersect any shape.
@@ -54,6 +54,7 @@ public class World
                 closest = intersection;
             }
         }
+
         return closest;
     }
 }

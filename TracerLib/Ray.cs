@@ -96,7 +96,7 @@ public struct Ray
     {
         Console.WriteLine(ToString());
     }
-    
+
     /// <summary>
     /// Returns the point given by the formula p = Origin + Direction * t
     /// where O is the origin of the ray and v is the direction of the ray.

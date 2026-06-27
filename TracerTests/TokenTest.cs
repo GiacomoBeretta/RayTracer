@@ -16,29 +16,29 @@ public class TokenTest
     [Fact]
     public void KeywordTokenTest()
     {
-       const string token = "orthogonal";
+        const string token = "orthogonal";
 
-       Keywords.Map.TryGetValue(token, out Keyword keyword);
+        Keywords.Map.TryGetValue(token, out Keyword keyword);
 
-       KeywordToken keywordToken = new KeywordToken(_location, keyword);
-       
-       _testOutputHelper.WriteLine(keywordToken.ToString());
-       
-       Assert.Equal(1, keywordToken.Location.column);
-       Assert.Equal(1, keywordToken.Location.line);
-       Assert.Equal(keyword, keywordToken.Keyword);
+        KeywordToken keywordToken = new KeywordToken(_location, keyword);
+
+        _testOutputHelper.WriteLine(keywordToken.ToString());
+
+        Assert.Equal(1, keywordToken.Location.column);
+        Assert.Equal(1, keywordToken.Location.line);
+        Assert.Equal(keyword, keywordToken.Keyword);
     }
-    
+
     [Fact]
     public void IdentifierTokenTest()
     {
         const string identifier = "clock";
         IdentifierToken identifierToken = new IdentifierToken(_location, identifier);
-        
+
         _testOutputHelper.WriteLine(identifierToken.ToString());
-        
-        Assert.Equal(1, identifierToken.Location.column); 
-        Assert.Equal(1, identifierToken.Location.line); 
+
+        Assert.Equal(1, identifierToken.Location.column);
+        Assert.Equal(1, identifierToken.Location.line);
         Assert.Equal("clock", identifierToken.Identifier);
     }
 
@@ -48,12 +48,12 @@ public class TokenTest
         const string s = "Hello, World!";
 
         StringToken stringToken = new StringToken(_location, s);
-        
+
         _testOutputHelper.WriteLine(stringToken.ToString());
-        
-         Assert.Equal(1, stringToken.Location.column);
-         Assert.Equal(1, stringToken.Location.line);
-         Assert.Equal("Hello, World!", stringToken.String);
+
+        Assert.Equal(1, stringToken.Location.column);
+        Assert.Equal(1, stringToken.Location.line);
+        Assert.Equal("Hello, World!", stringToken.String);
     }
 
     [Fact]
@@ -62,9 +62,9 @@ public class TokenTest
         const float f = 8.67f;
 
         LiteralNumberToken literalNumberToken = new LiteralNumberToken(_location, f);
-        
+
         _testOutputHelper.WriteLine(literalNumberToken.ToString());
-        
+
         Assert.Equal(1, literalNumberToken.Location.column);
         Assert.Equal(1, literalNumberToken.Location.line);
         Assert.Equal(8.67f, literalNumberToken.Value);
@@ -76,9 +76,9 @@ public class TokenTest
         const string op = "+";
 
         SymbolToken symbolToken = new SymbolToken(_location, op);
-        
+
         _testOutputHelper.WriteLine(symbolToken.ToString());
-        
+
         Assert.Equal(1, symbolToken.Location.column);
         Assert.Equal(1, symbolToken.Location.line);
         Assert.Equal("+", symbolToken.Symbol);

@@ -23,7 +23,7 @@ public struct SourceLocation
         this.line = 0;
         this.column = 0;
     }
-    
+
     public SourceLocation(string filePath, int line, int column)
     {
         this.filePath = filePath;
@@ -33,6 +33,6 @@ public struct SourceLocation
 
     public override string ToString()
     {
-        return "Source Location: "+ filePath + ", line " + line + ", column " + column;
+        return "Source Location: " + filePath + ", line " + line + ", column " + column;
     }
 }

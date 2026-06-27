@@ -160,7 +160,7 @@ public class PathTracingRenderer : Renderer
         MaxDepth = maxDepth;
         RussianRouletteFixedProbability = russianRouletteProbability;
     }
-    
+
     /// <summary>
     /// Evaluates the surface color at the ray intersection point using Monte Carlo integration
     /// and the Russian roulette algorithm.

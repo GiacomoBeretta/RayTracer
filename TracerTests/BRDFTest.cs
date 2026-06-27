@@ -9,12 +9,12 @@ public class BRDF_Test
     {
         DiffuseBRDF diffuseBrdf = new DiffuseBRDF();
         Color black = new Color(0, 0, 0);
-       
+
         Assert.Equal(typeof(UniformPigment), (diffuseBrdf.Pigment).GetType());
         Color pigmentColor = ((UniformPigment)diffuseBrdf.Pigment).Color;
         Assert.True(Color._AreColorsClose(black, pigmentColor));
     }
-    
+
     [Fact]
     public void DiffuseScatterRay()
     {
@@ -25,7 +25,7 @@ public class BRDF_Test
 
         Point intersect = new Point(0, 0, 0);
         Vector vin = new Vector(0, 0, -1);
-        Normal n = new Normal(0,0,1);
+        Normal n = new Normal(0, 0, 1);
 
         Vector e1 = new Vector(1, 0, 0);
         Vector e2 = new Vector(0, 1, 0);
@@ -48,7 +48,7 @@ public class BRDF_Test
                 float.PositiveInfinity,
                 3
             );
-            
+
             Assert.Equal(expected, ray_out);
         }
     }
@@ -57,25 +57,24 @@ public class BRDF_Test
     public void SpecularScatterRay()
     {
         PCG pcg = new PCG();
-        Vector vin = new Vector(0,0,-1);
+        Vector vin = new Vector(0, 0, -1);
         Point intersect = new Point(0, 0, 0);
-        Normal n = new Normal(0,0,1);
+        Normal n = new Normal(0, 0, 1);
         SpecularBRDF specularBrdf = new SpecularBRDF();
-        
+
         Ray ray = specularBrdf.ScatterRay(pcg, vin, intersect, n, 0);
-        Ray expected = new Ray(intersect, new Vector(0, 0, 1), tmin:1e-3f);
+        Ray expected = new Ray(intersect, new Vector(0, 0, 1), tmin: 1e-3f);
         Assert.Equal(expected, ray);
         vin = new Vector(-1, 1, 0);
-        n = new Normal(1,0,0);
+        n = new Normal(1, 0, 0);
         ray = specularBrdf.ScatterRay(pcg, vin, intersect, n, 0);
-        expected = new Ray(intersect, new Vector(1, 1, 0), tmin:1e-3f);
+        expected = new Ray(intersect, new Vector(1, 1, 0), tmin: 1e-3f);
         Assert.Equal(expected, ray);
 
         vin = new Vector(1, 1, -1);
-        n = new Normal(0,-1,0);
+        n = new Normal(0, -1, 0);
         ray = specularBrdf.ScatterRay(pcg, vin, intersect, n, 0);
-        expected = new Ray(intersect, new Vector(1, -1, -1), tmin:1e-3f);
+        expected = new Ray(intersect, new Vector(1, -1, -1), tmin: 1e-3f);
         Assert.Equal(expected, ray);
-
     }
 }

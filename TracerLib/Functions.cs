@@ -18,7 +18,7 @@ public static class Functions
     {
         return MathF.Abs(a - b) < epsilon;
     }
-    
+
     /// <summary>
     /// Determines whether two arrays of floats are approximately equal
     /// element by element within a given tolerance.
@@ -38,13 +38,15 @@ public static class Functions
         int length = a.Length;
         if (length != b.Length)
         {
-            throw new ArgumentOutOfRangeException(nameof(b), b, "the "+ nameof(b)+ " array has not the same length as the "+nameof(a)+ " array");
+            throw new ArgumentOutOfRangeException(nameof(b), b,
+                "the " + nameof(b) + " array has not the same length as the " + nameof(a) + " array");
         }
+
         bool areArrayClose = true;
         for (int i = 0; i < length; i++)
         {
             areArrayClose = areArrayClose
-                             && Functions.AreClose(a[i], b[i], epsilon);
+                            && Functions.AreClose(a[i], b[i], epsilon);
         }
 
         return areArrayClose;
@@ -59,7 +61,7 @@ public static class Functions
     {
         return deg * MathF.PI / 180f;
     }
-    
+
     /// <summary>
     /// Parses an array of variable definitions and converts them into a dictionary.
     /// Each definition must follow the format "NAME:VALUE", where NAME is the
@@ -101,5 +103,5 @@ public static class Functions
         }
 
         return variables;
-    } 
+    }
 }

@@ -161,7 +161,7 @@ public class RenderCommand
             Console.WriteLine($"Roulette Fixed Probability: {RussianRouletteFixedProb}");
             Console.WriteLine();
         }
-        
+
         Console.WriteLine("Tone Mapping parameters:");
         Console.WriteLine($"Luminosity Function: {Luminosityfunction}");
         Console.WriteLine($"Average Luminosity: {AverageLuminosity}");
@@ -173,6 +173,7 @@ public class RenderCommand
         {
             Console.WriteLine($"{def}");
         }
+
         Console.WriteLine();
     }
 
@@ -453,7 +454,7 @@ public class PfmToPngCommand
 
     [Option("--outputpng", Description = "The output PNG file name.")]
     [Required]
-    public string OutputFileName { get; init; }= null!;
+    public string OutputFileName { get; init; } = null!;
 
     [Option("--luminosityfunction",
         Description = "Luminosity function, options are: shirley, weighted (default: shirley).")]

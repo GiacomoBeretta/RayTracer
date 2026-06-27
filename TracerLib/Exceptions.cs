@@ -26,7 +26,8 @@ public class SceneSyntaxException : Exception
     /// </summary>
     public SourceLocation Location { get; }
 
-    public SceneSyntaxException(SourceLocation location, string message) : base($"Grammar Error at ${location}: {message}")
+    public SceneSyntaxException(SourceLocation location, string message) : base(
+        $"Grammar Error at ${location}: {message}")
     {
         Location = location;
     }

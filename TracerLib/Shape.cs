@@ -25,6 +25,7 @@ public abstract class Shape
     {
         Material = material;
     }
+
     /// <summary>
     /// Finds the closest intersection between the specified ray and *this* shape, otherwise returns a null value.
     /// </summary>
@@ -79,7 +80,7 @@ public class Sphere : Shape
     /// The transformation applied to the unit sphere.
     /// </summary>
     public Transformation Transform { get; }
-    
+
     /// <summary>
     /// Constructs a unit sphere centered at the origin.
     /// The material is initialized by the base class and defaults to a uniform black color.
@@ -179,7 +180,9 @@ public class Sphere : Shape
         // instead of transforming the sphere to represent all sorts of ellipsoids
         // we transform the ray with the inverse transformation
         Ray invRay = (Transform.Inverse()) * ray;
-        Vector origin = invRay.Origin.ToVector(); // This is the difference between the origin point of the vector and the point (0,0,0)
+        Vector
+            origin = invRay.Origin
+                .ToVector(); // This is the difference between the origin point of the vector and the point (0,0,0)
         Vector dir = invRay.Dir;
         float delta_4 = (origin * dir) * (origin * dir) - dir.SquaredNorm() * (origin.SquaredNorm() - 1); // = delta / 4
         // if delta_4 < 0 there are no intersection, if delta_4 == 0 there is no reflection
@@ -195,7 +198,7 @@ public class Sphere : Shape
                 Point intersectionPoint = invRay.At(t1); // intersection on the unit sphere
                 return new HitRecord
                 (
-                    Transform * intersectionPoint,  
+                    Transform * intersectionPoint,
                     this,
                     Transform * _SphereNormal(intersectionPoint, dir),
                     _SpherePointToUV(intersectionPoint),
@@ -253,7 +256,7 @@ public class Plane : Shape
     {
         Transform = transform;
     }
-    
+
     public Plane(Transformation transform, Material material) : base(material)
     {
         Transform = transform;
@@ -299,7 +302,7 @@ public class Plane : Shape
         Normal normal = new Normal(0, 0, 1);
         return incidentVec.Z < 0 ? normal : -normal;
     }
-    
+
     /// <summary>
     /// Returns periodic UV coordinates for a point on the XY plane.
     /// The texture pattern repeats every unit length along both axes.
@@ -313,9 +316,9 @@ public class Plane : Shape
         // e.g. X = 2.4, Y = -2.7 then
         // u = 2.4 - Floor(2.4) = 2.4 - 2 = 0.4
         // v = -2.7 - Floor(-2.7) = -2.7 - (-3) = -2.7 + 3 = 0.3
-        return new Vector2D( p.X - MathF.Floor(p.X),p.Y - MathF.Floor(p.Y));
+        return new Vector2D(p.X - MathF.Floor(p.X), p.Y - MathF.Floor(p.Y));
     }
-    
+
     public override HitRecord? FindIntersection(Ray ray)
     {
         // instead of transforming the plane to represent all the possible planes in 3D space,
@@ -328,7 +331,7 @@ public class Plane : Shape
         if (t > invRay.Tmin && t < invRay.Tmax)
         {
             Point intersectionPoint = invRay.At(t);
-            
+
             return new HitRecord(
                 Transform * intersectionPoint,
                 this,
@@ -336,8 +339,9 @@ public class Plane : Shape
                 _PlanePointToUV(intersectionPoint),
                 ray,
                 t
-                );
+            );
         }
+
         return null; //no intersection
     }
 }

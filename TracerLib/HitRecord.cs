@@ -37,7 +37,7 @@ public struct HitRecord
     /// T is the parameter such that WorldPoint = IncomingRay.Origin + T * IncomingRay.Dir
     /// </summary>
     public float T { get; }
-    
+
     /// <summary>
     /// Initializes a new instance of the <see cref="HitRecord"/> struct,
     /// representing a geometric intersection between a ray and a shape.

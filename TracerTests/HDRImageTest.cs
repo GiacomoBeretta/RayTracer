@@ -23,8 +23,8 @@ public class HDRImageTest
     [Fact]
     public void TestCheckWidthHeight()
     {
-        HDRImage._CheckWidthHeight(1,1);
-        HDRImage._CheckWidthHeight(190,201);
+        HDRImage._CheckWidthHeight(1, 1);
+        HDRImage._CheckWidthHeight(190, 201);
         Assert.Throws<ArgumentOutOfRangeException>(() => HDRImage._CheckWidthHeight(-5, 2));
         Assert.Throws<ArgumentOutOfRangeException>(() => HDRImage._CheckWidthHeight(0, 2));
         Assert.Throws<ArgumentOutOfRangeException>(() => HDRImage._CheckWidthHeight(1, -7));
@@ -34,8 +34,8 @@ public class HDRImageTest
     [Fact]
     public void TestCheckPixels()
     {
-        HDRImage._CheckPixels(1,1, new Color[1]);
-        HDRImage._CheckPixels(5,2, new Color[10]);
+        HDRImage._CheckPixels(1, 1, new Color[1]);
+        HDRImage._CheckPixels(5, 2, new Color[10]);
         Assert.Throws<ArgumentNullException>(() => HDRImage._CheckPixels(1, 2, null));
         Assert.Throws<ArgumentException>(() => HDRImage._CheckPixels(10, 91, new Color[911]));
     }
@@ -274,9 +274,9 @@ public class HDRImageTest
         Assert.True(Color._AreColorsClose(image[0], new Color(0.1513604f, 0.3446588f, 0.2079176f)));
         Assert.True(Color._AreColorsClose(image[1], new Color(2.4862983f, 3.5148109f, 5.0216226f)));
     }
-    
-     [Fact]
-    public void TestReadPFM_File()  //Rivedi
+
+    [Fact]
+    public void TestReadPFM_File() //Rivedi
     {
         byte[] LE_REFERENCE_BYTES =
         [
@@ -288,7 +288,7 @@ public class HDRImageTest
             0x00, 0x00, 0x20, 0x42, 0x00, 0x00, 0x48, 0x42, 0x00, 0x00, 0x70, 0x42,
             0x00, 0x00, 0x8c, 0x42, 0x00, 0x00, 0xa0, 0x42, 0x00, 0x00, 0xb4, 0x42
         ];
-        
+
         byte[] BE_REFERENCE_BYTES =
         [
             0x50, 0x46, 0x0a, 0x33, 0x20, 0x32, 0x0a, 0x31, 0x2e, 0x30, 0x0a, 0x42,
@@ -303,34 +303,34 @@ public class HDRImageTest
         using (Stream reference_bytes = new MemoryStream(LE_REFERENCE_BYTES))
         {
             HDRImage img = new HDRImage(reference_bytes);
-            
+
             Assert.Equal(2, img.Height);
-            Assert.Equal(3, img.Width); 
-            
-            Assert.True(Color._AreColorsClose(img[0,0],new Color(10f, 20f, 30f)));
-            Assert.True(Color._AreColorsClose(img[1,0],new Color(40f, 50f, 60f)));
-            Assert.True(Color._AreColorsClose(img[2,0],new Color(70f, 80f, 90f)));
-            Assert.True(Color._AreColorsClose(img[0,1],new Color(100f, 200f, 300f)));
-            Assert.True(Color._AreColorsClose(img[1,1],new Color(400f, 500f, 600f)));
-            Assert.True(Color._AreColorsClose(img[2,1],new Color(700f, 800f, 900f)));
+            Assert.Equal(3, img.Width);
+
+            Assert.True(Color._AreColorsClose(img[0, 0], new Color(10f, 20f, 30f)));
+            Assert.True(Color._AreColorsClose(img[1, 0], new Color(40f, 50f, 60f)));
+            Assert.True(Color._AreColorsClose(img[2, 0], new Color(70f, 80f, 90f)));
+            Assert.True(Color._AreColorsClose(img[0, 1], new Color(100f, 200f, 300f)));
+            Assert.True(Color._AreColorsClose(img[1, 1], new Color(400f, 500f, 600f)));
+            Assert.True(Color._AreColorsClose(img[2, 1], new Color(700f, 800f, 900f)));
         }
-        
+
         using (Stream reference_bytes = new MemoryStream(BE_REFERENCE_BYTES))
         {
             HDRImage img = new HDRImage(reference_bytes);
-                    
+
             Assert.Equal(2, img.Height);
-            Assert.Equal(3, img.Width); 
-                    
-            Assert.True(Color._AreColorsClose(img[0,0],new Color(10f, 20f, 30f)));
-            Assert.True(Color._AreColorsClose(img[1,0],new Color(40f, 50f, 60f)));
-            Assert.True(Color._AreColorsClose(img[2,0],new Color(70f, 80f, 90f)));
-            Assert.True(Color._AreColorsClose(img[0,1],new Color(100f, 200f, 300f)));
-            Assert.True(Color._AreColorsClose(img[1,1],new Color(400f, 500f, 600f)));
-            Assert.True(Color._AreColorsClose(img[2,1],new Color(700f, 800f, 900f)));
+            Assert.Equal(3, img.Width);
+
+            Assert.True(Color._AreColorsClose(img[0, 0], new Color(10f, 20f, 30f)));
+            Assert.True(Color._AreColorsClose(img[1, 0], new Color(40f, 50f, 60f)));
+            Assert.True(Color._AreColorsClose(img[2, 0], new Color(70f, 80f, 90f)));
+            Assert.True(Color._AreColorsClose(img[0, 1], new Color(100f, 200f, 300f)));
+            Assert.True(Color._AreColorsClose(img[1, 1], new Color(400f, 500f, 600f)));
+            Assert.True(Color._AreColorsClose(img[2, 1], new Color(700f, 800f, 900f)));
         }
     }
-    
+
     [Fact]
     public void TestClampImage()
     {

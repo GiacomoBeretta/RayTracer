@@ -17,7 +17,7 @@ public struct Color
     public float R { get; set; }
     public float G { get; set; }
     public float B { get; set; }
-    
+
     /// <summary>
     /// Basic <see cref="Color"/> constructor which accepts 3 positive parameters between 0 and 1 : R,G,B 
     /// </summary>
@@ -70,9 +70,10 @@ public struct Color
         {
             throw new ArgumentOutOfRangeException(nameof(alpha), alpha, nameof(alpha) + " must be non-negative");
         }
+
         return new Color(a.R * alpha, a.G * alpha, a.B * alpha);
     }
-    
+
     /// <summary>
     /// Product between a <see cref="Color"/> and a float scalar
     /// </summary>
@@ -132,7 +133,7 @@ public struct Color
     {
         return $"(R={R}, G={G}, B={B})";
     }
-    
+
     /// <summary>
     /// Prints the formatted string with RGB colors
     /// </summary>
@@ -192,7 +193,7 @@ public struct Color
         G = Color._Clamp(G);
         B = Color._Clamp(B);
     }
-    
+
     /// <summary>
     /// Applies gamma correction using a power-law function
     /// and maps the resulting color to the 0–255 range.
@@ -210,11 +211,11 @@ public struct Color
         {
             throw new ArgumentOutOfRangeException(nameof(gamma), gamma, nameof(gamma) + " must be greater than 0");
         }
+
         float r = (float)Math.Round(255 * MathF.Pow(R, 1.0f / gamma));
         float g = (float)Math.Round(255 * MathF.Pow(G, 1.0f / gamma));
         float b = (float)Math.Round(255 * MathF.Pow(B, 1.0f / gamma));
-        
+
         return new Color(r, g, b);
     }
-    
 }

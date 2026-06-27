@@ -17,7 +17,7 @@ public struct Material
     /// The radiance emitted by the surface material, varying over the surface.
     /// </summary>
     public Pigment EmittedRadiance;
-    
+
     /// <summary>
     /// The bidirectional reflectance distribution function that
     /// describes how light is reflected by the material.
@@ -32,7 +32,7 @@ public struct Material
         EmittedRadiance = new UniformPigment();
         Brdf = new DiffuseBRDF();
     }
-    
+
     /// <summary>
     /// Initializes a non-emissive material and a uniform black color, with the specified BRDF.
     /// </summary>

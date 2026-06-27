@@ -131,7 +131,7 @@ public class SceneTest
 
         File.Delete(filepath);
     }
-    
+
     [Fact]
     public void ParsePigmentTest()
     {
@@ -226,7 +226,7 @@ public class SceneTest
 
         File.Delete(filepath);
     }
-    
+
     [Fact]
     public void ParseSphereTest()
     {

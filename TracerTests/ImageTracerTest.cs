@@ -22,21 +22,21 @@ public class ImageTracerTest
     public void TestFireRay_uv_PixelSubmapping()
     {
         // pixel at top left corner, and top left corner of the pixel
-        Ray ray1 = tracer.FireRayAtPixel(0, 0, 0f, 0f); 
+        Ray ray1 = tracer.FireRayAtPixel(0, 0, 0f, 0f);
         Assert.True(Point._ArePointsClose(new Point(0f, 2f, 1f), ray1.At(1.0f)));
 
         // top right corner of the pixel
         ray1 = tracer.FireRayAtPixel(0, 0, 1f, 0f);
         Assert.True(Point._ArePointsClose(new Point(0f, 1f, 1f), ray1.At(1.0f)));
-        
+
         // bottom left corner of the pixel
         ray1 = tracer.FireRayAtPixel(0, 0, 0f, 1f);
         Assert.True(Point._ArePointsClose(new Point(0f, 2f, 0f), ray1.At(1.0f)));
-        
+
         // bottom right corner of the pixel
         ray1 = tracer.FireRayAtPixel(0, 0, 1f, 1f);
         Assert.True(Point._ArePointsClose(new Point(0f, 1f, 0f), ray1.At(1.0f)));
-        
+
         // We assign unusual values for uPixel and vPixel although these values are never reached 
         Ray ray2 = tracer.FireRayAtPixel(0, 0, 2.5f, 1.5f);
         Ray ray3 = tracer.FireRayAtPixel(2, 1, 0.5f, 0.5f);

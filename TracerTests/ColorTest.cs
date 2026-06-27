@@ -131,6 +131,6 @@ public class ColorTest
         Assert.Throws<ArgumentOutOfRangeException>(() => a.To8BitRGB(0));
         Assert.Throws<ArgumentOutOfRangeException>(() => a.To8BitRGB(-1));
     }
-    
+
     //Aggiungere test clamp
 }

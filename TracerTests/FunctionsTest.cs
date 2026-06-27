@@ -37,7 +37,7 @@ public class FunctionsTest
     public void TestDegToRad()
     {
         float deg = 180f;
-        
+
         Assert.True(Functions.AreClose(Functions.DegToRad(deg), MathF.PI));
         Assert.False(Functions.AreClose(Functions.DegToRad(deg), 64f));
     }
@@ -50,7 +50,7 @@ public class FunctionsTest
         string[] variable3 = ["hello:world"];
 
         var result = Functions.ParseVariableTable(variable1);
-        
+
         Assert.Contains("clock", result.Keys);
         Assert.Equal(150, result["clock"]);
 

@@ -80,7 +80,7 @@ public struct Normal
             throw new ArgumentOutOfRangeException($"Normal is not normalized within epsilon={epsilon}");
         }
     }
-    
+
     /// <summary>
     /// Negates the normal vector, reversing its direction.
     /// </summary>

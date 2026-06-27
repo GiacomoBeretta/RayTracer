@@ -552,7 +552,7 @@ public class Scene
                 $"{variableName} cannot be redefined");
         if (!ExternalVariables.Contains(variableName)) Variables[variableName] = variableValue;
     }
-    
+
     /// <summary>
     /// Populates this <see cref="Scene"/> by parsing a scene description from the input stream,
     /// taking into account external variables that override values defined in the scene file.

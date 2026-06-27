@@ -22,7 +22,7 @@ public class CameraTest
         Assert.True(Vector._AreVectorsClose(x_vector, ray3.Dir));
         Assert.True(Vector._AreVectorsClose(x_vector, ray4.Dir));
         Assert.True(Vector._AreVectorsClose(x_vector, ray5.Dir));
-        
+
         //Verify that the rays are parallel between each other by vanishing the cross product
         Assert.True(Functions.AreClose(0.0f, Vector.CrossProduct(ray1.Dir, ray2.Dir).SquaredNorm()));
         Assert.True(Functions.AreClose(0.0f, Vector.CrossProduct(ray1.Dir, ray3.Dir).SquaredNorm()));

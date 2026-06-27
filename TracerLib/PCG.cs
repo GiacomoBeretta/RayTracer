@@ -10,7 +10,7 @@ public class PCG
 {
     public ulong State { get; set; }
     public ulong Inc { get; set; }
-    
+
     /// <summary>
     /// Constructor
     /// </summary>
@@ -37,7 +37,7 @@ public class PCG
 
         uint xorshifted = (uint)(((oldstate >> 18) ^ oldstate) >> 27);
 
-        int rot = (int)(oldstate >> 59); 
+        int rot = (int)(oldstate >> 59);
 
         return (xorshifted >> rot) | (xorshifted << ((~rot + 1) & 31)); // Rivedere con 32 - rot al posto di ~rot +1
     }
