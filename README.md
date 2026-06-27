@@ -835,10 +835,6 @@ The following common options are also available:
 
 ### Available Options
 
-#### `--inputaverage`
-
-Name of the directory containing the PFM files to be averaged.
-
 #### `--outputaveragepfm`
 
 Name of the generated averaged image as a pfm file.
