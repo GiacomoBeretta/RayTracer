@@ -4,14 +4,17 @@
 /TracerTests/referenceWeighted.png
 /TracerTests/referenceShirley.png
 
+#ignore any files inside these folders
 /Animations/*
 /PfmImages/*
 /PngImages/*
 
+#except these dummy files so that the folders themselves are tracked
 !Animations/.gitkeep
 !PfmImages/.gitkeep
 !PngImages/.gitkeep
 
+#track also these PFM images because they are necessary for the demo.
 !PfmImages/dome.pfm
 !PfmImages/earth.pfm
 !PfmImages/memorial.pfm
