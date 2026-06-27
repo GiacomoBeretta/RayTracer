@@ -30,6 +30,12 @@ case "$subcommand" in
 		;;
 esac
 
+# Base command
+
+readonly exepath="./RayTracer/bin/Debug/net10.0/RayTracer"
+
+cmd=( "$exepath" "$subcommand" )
+
 # Override command line
 
 while [[ $# -gt 0 ]]; do
@@ -57,19 +63,19 @@ while [[ $# -gt 0 ]]; do
 #    --outputaveragepfm) outputaveragepfm="$2"; shift 2 ;;
 #    --outputaveragepng) outputaveragepng="$2"; shift 2 ;;
 	--pcgcycle) pcgcycle="$2"; shift 2 ;;
-    *) echo "Unknown parameter: $1"; exit 1 ;;
+    *) 
+		echo "Unknown parameter: $1"
+		echo "the available options are listed below, executing the help of the render command:"
+		cmd+=( --help)
+		echo "${cmd[@]}"
+		"${cmd[@]}"
+		exit 1 ;;
   esac
 done
 
 # Build
 
 dotnet build || exit 1
-
-# Base command
-
-readonly exepath="./RayTracer/bin/Debug/net10.0/RayTracer"
-
-cmd=( "$exepath" "$subcommand" )
 
 # Render
 # (the outputpfm and outputpng, initstate and initseq options are written later)
