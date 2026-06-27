@@ -115,7 +115,7 @@ public class HDRImage
     /// <exception cref="ArgumentException">
     /// Thrown when the length of <paramref name="colorVector"/> does not match width × height.
     /// </exception>
-    public static void _CheckPixels(int width, int height, in Color[] colorVector)
+    public static void _CheckPixels(int width, int height, Color[] colorVector)
     {
         ArgumentNullException.ThrowIfNull(colorVector);
         if (colorVector.Length != width * height)
@@ -176,7 +176,7 @@ public class HDRImage
     }
 
     public HDRImage(int width, int height,
-        in Color[] colorVector)
+        Color[] colorVector)
     {
         _CheckWidthHeight(width, height);
         _CheckPixels(width, height, colorVector);
