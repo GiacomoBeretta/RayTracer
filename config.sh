@@ -1,12 +1,12 @@
 # Parameters used if not specified during the execution of raytracer.sh
 
-# Global default 
+# Global default
+outputpfm="scene_test.pfm" #not used by pfmtopng
+outputpng="scene_test.png"
 luminosityfunction="shirley"
 averageluminosity=""
 factor=1
 gamma=1
-outputpfm="scene_test.pfm" #not used by pfmtopng
-outputpng="scene_test.png"
 
 # Default render
 inputscene="scene.txt"
