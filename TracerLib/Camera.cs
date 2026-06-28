@@ -3,7 +3,7 @@
 namespace TracerLib;
 
 /// <summary>
-/// Defines the common contract for a camera used to project a scene onto an image.
+/// Represents the base class for cameras used to project a scene onto an image.
 /// </summary>
 /// <remarks>
 /// The camera uses the following right-handed coordinate system:
@@ -12,12 +12,12 @@ namespace TracerLib;
 /// Z: vertical axis, positive upward
 /// 
 /// The image plane is centered at the origin of the coordinate system.
-/// It is parametrized using normalized coordinates (u, v) in [0, 1] × [0, 1],
+/// It is parametrized by normalized coordinates (u, v) in [0, 1]×[0, 1],
 /// with (0,0) in the top-left corner.
 /// (u,v) are mapped by the method <see cref="FireRay"/>
-/// onto the image plane [-Width/2, Width/2] x [-Height/2,Height/2]
+/// onto the image plane [-Width/2, Width/2]×[-Height/2,Height/2]
 /// </remarks>
-public interface ICamera
+public abstract class Camera
 {
     /// <summary>
     /// Width of the image plane.
@@ -37,7 +37,21 @@ public interface ICamera
     /// <summary>
     /// The transformation applied to the camera.
     /// </summary>
-    public Transformation Transformation { get; set; }
+    public Transformation Transformation { get; }
+
+    public Camera()
+    {
+        Width = 1.0f;
+        Height = 1.0f;
+        Transformation = new Transformation();
+    }
+
+    public Camera(Transformation transformation, float width = 1.0f, float height = 1.0f)
+    {
+        Width = width;
+        Height = height;
+        Transformation = transformation;
+    }
 
     /// <summary>
     /// Returns a <see cref="Ray"/> that passes through the specified normalized image coordinates (u, v).
@@ -50,12 +64,12 @@ public interface ICamera
     /// y ∈ [-Width/2, Width/2] (horizontal axis),
     /// z ∈ [-Height/2, Height/2] (vertical axis).
     /// 
-    /// See <see cref="ICamera"/> for details about the coordinate system.
+    /// See <see cref="Camera"/> for details about the coordinate system.
     /// </remarks>
     /// <param name="u">Horizontal normalized coordinate in the range [0, 1].</param>
     /// <param name="v">Vertical normalized coordinate in the range [0, 1].</param>
     /// <returns></returns>
-    public Ray FireRay(float u, float v);
+    public abstract Ray FireRay(float u, float v);
 }
 
 /// <summary>
@@ -63,24 +77,16 @@ public interface ICamera
 /// In this projection, all rays are parallel to each other and perpendicular to the image plane,
 /// meaning there is no perspective distortion.
 ///
-/// See <see cref="ICamera"/> for more information.
+/// See <see cref="Camera"/> for more information.
 /// </summary>
-public struct OrthogonalCamera : ICamera
+public class OrthogonalCamera : Camera
 {
-    public float Width { get; }
-    public float Height { get; }
-    public float AspectRatio { get; }
-    public Transformation Transformation { get; set; }
-
     /// <summary>
     /// Constructs an <see cref="OrthogonalCamera"/> with a 1×1 image plane and the
     /// identity <see cref="Transformation"/>.
     /// </summary>
-    public OrthogonalCamera()
+    public OrthogonalCamera() : base()
     {
-        Width = 1.0f;
-        Height = 1.0f;
-        Transformation = new Transformation();
     }
 
     /// <summary>
@@ -92,11 +98,9 @@ public struct OrthogonalCamera : ICamera
     /// </param>
     /// <param name="width">The width of the image plane (defaults to 1).</param>
     /// <param name="height">The height of the image plane (defaults to 1).</param>
-    public OrthogonalCamera(Transformation transformation, float width = 1.0f, float height = 1.0f)
+    public OrthogonalCamera(Transformation transformation, float width = 1.0f, float height = 1.0f) : base(
+        transformation, width, height)
     {
-        Width = width;
-        Height = height;
-        Transformation = transformation;
     }
 
     /// <summary>
@@ -111,12 +115,12 @@ public struct OrthogonalCamera : ICamera
     /// y ∈ [-Width/2, Width/2] (horizontal axis),
     /// z ∈ [-Height/2, Height/2] (vertical axis).
     /// 
-    /// See <see cref="ICamera"/> for details about the coordinate system.
+    /// See <see cref="Camera"/> for details about the coordinate system.
     /// </remarks>
     /// <param name="u">Horizontal normalized coordinate in the range [0, 1].</param>
     /// <param name="v">Vertical normalized coordinate in the range [0, 1].</param>
     /// <returns></returns>
-    public Ray FireRay(float u, float v)
+    public override Ray FireRay(float u, float v)
     {
         // Map normalized coordinates [0,1] to centered image plane coordinates [-0.5, 0.5].
         // We don't compute (u - 0.5, v - 0.5) because
@@ -137,31 +141,22 @@ public struct OrthogonalCamera : ICamera
 /// creating a vanishing point effect where parallel lines converge in the distance.
 /// Objects appear smaller as their distance from the camera increases, simulating human vision.
 ///
-/// See <see cref="ICamera"/> for more information.
+/// See <see cref="Camera"/> for more information.
 /// </summary>
-public struct PerspectiveCamera : ICamera
+public class PerspectiveCamera : Camera
 {
-    public float Width { get; }
-    public float Height { get; }
-    public float AspectRatio { get; set; }
-
     /// <summary>
     /// The distance of the observer from the screen.
     /// </summary>
-    public float Distance { get; set; }
-
-    public Transformation Transformation { get; set; }
+    public float Distance { get; }
 
     /// <summary>
     /// Constructs a <see cref="PerspectiveCamera"/> with a 1×1 image plane,
     /// the identity <see cref="Transformation"/>, and a unit <see cref="Distance"/> to the image plane.
     /// </summary>
-    public PerspectiveCamera()
+    public PerspectiveCamera() : base()
     {
         Distance = 1.0f;
-        Width = 1.0f;
-        Height = 1.0f;
-        Transformation = new Transformation();
     }
 
     /// <summary>
@@ -173,12 +168,9 @@ public struct PerspectiveCamera : ICamera
     /// <param name="height">The height of the image plane (defaults to 1).</param>
     /// <param name="distance">Distance to the image plane (defaults to 1).</param>
     public PerspectiveCamera(Transformation transformation, float width = 1.0f, float height = 1.0f,
-        float distance = 1.0f)
+        float distance = 1.0f) : base(transformation, width, height)
     {
-        Width = width;
-        Height = height;
         Distance = distance;
-        Transformation = transformation;
     }
 
     /// <summary>
@@ -194,12 +186,12 @@ public struct PerspectiveCamera : ICamera
     /// y ∈ [-Width/2, Width/2] (horizontal axis),
     /// z ∈ [-Height/2, Height/2] (vertical axis).
     /// 
-    /// See <see cref="ICamera"/> for details about the coordinate system.
+    /// See <see cref="Camera"/> for details about the coordinate system.
     /// </remarks>
     /// <param name="u">Horizontal normalized coordinate in the range [0, 1].</param>
     /// <param name="v">Vertical normalized coordinate in the range [0, 1].</param>
     /// <returns>A ray originating from the camera and passing through the corresponding point on the image plane.</returns>
-    public Ray FireRay(float u, float v)
+    public override Ray FireRay(float u, float v)
     {
         // position of the observer
         Point origin = new Point(-Distance, 0.0f, 0.0f);
