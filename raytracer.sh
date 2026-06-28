@@ -75,7 +75,7 @@ done
 
 # Build
 
-dotnet build || exit 1
+# dotnet build || exit 1
 
 # Render
 # (the outputpfm and outputpng, initstate and initseq options are written later)
