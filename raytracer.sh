@@ -19,16 +19,16 @@ case "$subcommand" in
 esac
 
 # Set default values for output file names
-case "$subcommand" in
-	render)
-		outputpfm="${outputrenderpfm}"
-		outputpng="${outputrenderpng}"
-		;;
-	averageimages)
-		outputpfm="${averagepfm}"
-		outputpng="${averagepng}"
-		;;
-esac
+#case "$subcommand" in
+#	render)
+#		outputpfm="${outputrenderpfm}"
+#		outputpng="${outputrenderpng}"
+#		;;
+#	averageimages)
+#		outputpfm="${averagepfm}"
+#		outputpng="${averagepng}"
+#		;;
+#esac
 
 # Base command
 
@@ -100,17 +100,6 @@ if [[ "$subcommand" == "render" ]]; then
     	done
 fi
 
-# Pfm to Png
-
-if [[ "$subcommand" == "pfmtopng" ]]; then
-	[ -n "$inputpfm" ]        		&& cmd+=( --inputpfm "$inputpfm" ) 
-	[ -n "$outputpng" ]       		&& cmd+=( --outputpng "$outputpng" ) 
-	[ -n "$luminosityfunction" ]	&& cmd+=( --luminosityfunction "$luminosityfunction" ) 
-	[ -n "$averageluminosity" ]		&& cmd+=( --averageluminosity "$averageluminosity" )
-	[ -n "$factor" ]         		&& cmd+=( --factor "$factor" ) 
-	[ -n "$gamma" ]          		&& cmd+=( --gamma "$gamma" ) 
-fi
-
 # Average images
 
 if [[ "$subcommand" == "averageimages" ]]; then
@@ -120,6 +109,17 @@ if [[ "$subcommand" == "averageimages" ]]; then
 	[ -n "$averageluminosity" ]    && cmd+=( --averageluminosity "$averageluminosity" )
 	[ -n "$factor" ]               && cmd+=( --factor "$factor" ) 
 	[ -n "$gamma" ]                && cmd+=( --gamma "$gamma" ) 
+fi
+
+# Pfm to Png
+
+if [[ "$subcommand" == "pfmtopng" ]]; then
+	[ -n "$inputpfm" ]        		&& cmd+=( --inputpfm "$inputpfm" ) 
+	[ -n "$outputpng" ]       		&& cmd+=( --outputpng "$outputpng" ) 
+	[ -n "$luminosityfunction" ]	&& cmd+=( --luminosityfunction "$luminosityfunction" ) 
+	[ -n "$averageluminosity" ]		&& cmd+=( --averageluminosity "$averageluminosity" )
+	[ -n "$factor" ]         		&& cmd+=( --factor "$factor" ) 
+	[ -n "$gamma" ]          		&& cmd+=( --gamma "$gamma" ) 
 fi
 
 # Render: outputpfm, outputpng, initstate and initseq options
