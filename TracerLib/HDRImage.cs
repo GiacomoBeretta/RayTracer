@@ -47,7 +47,7 @@ public class HDRImage
     /// <summary>
     /// The ratio Width/Height of the pixel grid.
     /// </summary>
-    public float AspectRatio => Width / Height; 
+    public float AspectRatio => Width / (float)Height; 
     
     //con i controlli invece viene
     /*
