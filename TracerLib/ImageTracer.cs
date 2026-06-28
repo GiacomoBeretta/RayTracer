@@ -3,7 +3,7 @@
 namespace TracerLib;
 
 /// <summary>
-/// ImageTracer is a class that links the Camera classes to the pixel matrix
+/// ImageTracer is a class that bridges the image plane represented by a <see cref="Camera"/>, to the pixel matrix.
 /// </summary>
 public class ImageTracer
 {
@@ -15,7 +15,7 @@ public class ImageTracer
     /// <summary>
     /// The camera defining the projection model, the observer position, and the aspect ratio.
     /// </summary>
-    private ICamera _camera;
+    private Camera _camera;
 
     /// <summary>
     /// The random generator used for Monte Carlo integration. 
@@ -28,14 +28,21 @@ public class ImageTracer
     /// </summary>
     public int PixelSideSubdivisions { get; set; }
 
-    public ImageTracer(HDRImage image, ICamera camera, PCG? pcg = null, int pixelSideSubdivisions = 1)
+    public ImageTracer(HDRImage image, Camera camera, PCG? pcg = null, int pixelSideSubdivisions = 1)
     {
-        _image = image;
-        _camera = camera;
-        _pcg = pcg ?? new PCG();
+        if (image.AspectRatio != camera.AspectRatio)
+        {
+            throw new ArgumentOutOfRangeException(nameof(image.AspectRatio), image.AspectRatio,
+                "The pixel grid aspect ratio must be equal to the image plane aspect ratio, in order to have square pixels.");
+        }
+
         if (pixelSideSubdivisions < 1)
             throw new ArgumentOutOfRangeException(nameof(pixelSideSubdivisions), pixelSideSubdivisions,
                 "The number of pixel side subdivisions must be greater than 1.");
+
+        _image = image;
+        _camera = camera;
+        _pcg = pcg ?? new PCG();
         PixelSideSubdivisions = pixelSideSubdivisions;
     }
 
@@ -45,7 +52,7 @@ public class ImageTracer
     /// Since a pixel is not a dimensionless point,
     /// <paramref name="uPixel"/> and <paramref name="vPixel"/> are the coordinates inside the pixel at which the ray will be fired.
     /// A value of (uPixel, vPixel)=(0,0) corresponds to the top-left corner of the pixel.
-    /// See method FireRay of <see cref="ICamera"/> for more information.
+    /// See method FireRay of <see cref="Camera"/> for more information.
     /// </summary>
     /// <param name="column">Pixel column index in the image (0 to image.Width - 1).</param>
     /// <param name="row">Pixel row index in the image (0 to image.Height - 1).</param>
@@ -54,7 +61,7 @@ public class ImageTracer
     /// <returns></returns>
     public Ray FireRayAtPixel(int column, int row, float uPixel = 0.5f, float vPixel = 0.5f)
     {
-        // the (u,v) coordinates start from the top-left corner of the unit square [0,1]x[0,1].
+        // the (u,v) coordinates start from the top-left corner of the unit square [0,1]×[0,1].
         float u = (column + uPixel) / _image.Width;
         float v = (row + vPixel) / _image.Height;
         return _camera.FireRay(u, v);
