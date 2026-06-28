@@ -30,9 +30,7 @@ This project is a ray tracing renderer written in C# that generates photorealist
 
 ## Prerequisites
 
-Before building the project, install the following software:
-
-- .NET 10 SDK
+Before building the project, install the .NET SDK. The project has been tested with .NET SDK 10.0.301 (LTS), but may also work with other versions of the .NET SDK.
 
 ## Optional tools (for scripts and animation generation)
 The project itself does not require these tools, but they are needed to run helper scripts such as raytracer.sh and generate-animation.sh.
