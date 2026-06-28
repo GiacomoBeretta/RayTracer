@@ -33,8 +33,12 @@ This project is a ray tracing renderer written in C# that generates photorealist
 Before building the project, install the following software:
 
 - .NET 10 SDK
-- Bash
-- GNU Parallel (optional, required for animation generation)
+
+### Optional tools (for scripts and animation generation)
+The project itself does not require these tools, but they are needed to run helper scripts such as raytracer.sh and generate-animation.sh.
+On Linux/macOS (and Windows via WSL), you can install
+- Bash (required to run raytracer.sh and generate-animation.sh)
+- GNU Parallel (used animation generation)
 - FFmpeg (required by `generate-animation.sh`)
 
 ---
