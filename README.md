@@ -34,7 +34,7 @@ Before building the project, install the following software:
 
 - .NET 10 SDK
 
-### Optional tools (for scripts and animation generation)
+## Optional tools (for scripts and animation generation)
 The project itself does not require these tools, but they are needed to run helper scripts such as raytracer.sh and generate-animation.sh.
 On Linux/macOS (and Windows via WSL), you can install
 - Bash (required to run raytracer.sh and generate-animation.sh)
@@ -66,20 +66,27 @@ dotnet build
 
 ## Run the Renderer
 
-The renderer can be executed through the provided Bash scripts or directly using the generated executable.
+The program can be executed either using the provided Bash script raytracer.sh or directly using the generated .NET executable.
 
-Example:
+#### Using the script
+
+The recommended way to run the renderer is through the script:
+
+```bash
+./raytracer.sh <command> [Option]
+```
+
+You can also configure default values by editing config.sh, then simply run:
 
 ```bash
 ./raytracer.sh render
 ```
 
-Generated images will be saved in the corresponding output directories.
-
-The main application can be launched either through the provided scripts or directly from the .NET project entry point using:
+#### Using dotnet run
+From the RayTracer project directory, you can run:
 
 ```bash
-dotnet run -- <command>
+dotnet run -- <command> [Option]
 ```
 
 ---
@@ -129,17 +136,15 @@ The program provides several commands:
 
 Reads a scene description from a text file and generates the corresponding image.
 
-> **Note:** The scene file must be located inside the `Scene` directory at build time while the corrisponding pfm and png images will be saved in the `PfmImages` and `PngImages` directories correspondly
+> **Note:** The scene file must be available in the `Scene` directory when the program is executed. Output images (PFM and PNG) will be generated in the `PfmImages` and `PngImages` directories respectively.
 
 ---
 
 ### averageimage
 
-Generates a new image by averaging multiple PFM (Portable Float Map) images of the same scene rendered using different random generator states and sequence identifiers.
+Generates a new image by averaging multiple PFM (Portable Float Map) images of the same rendered scene.
 
-The averaging is performed pixel by pixel in order to reduce image variance and noise.
-
-This command is designed to work together with the `raytracer.sh` script.
+This command is intended to work together with the raytracer.sh script.
 
 When the script is configured to generate multiple renders using different random generator states and sequence identifiers, the generated PFM files are saved using the naming convention:
 
@@ -149,15 +154,15 @@ ${outputpfm%.pfm}_state${state}_seq${seq}.pfm
 
 The command automatically filters the files contained in the input directory and processes only the files matching this pattern.
 
-> **Note:** The pfm files must be located inside the `PfmImages` directory at build time while the corrisponding pfm and png averaged images will be saved in the `PfmImages` and `PngImages` directories correspondly
+> **Note:** The PFM files must be available in the `PfmImages` directory at runtime. The resulting averaged PFM and PNG images will be saved in the `PfmImages` and `PngImages` directories respectively.
 
 ---
 
 ### pfmtopng
 
-Converts images from the PFM (Portable Float Map) image format to PNG format.
+Converts images from the PFM format to PNG format.
 
-> **Note:** The pfm files must be located inside the `PfmImages` directory at build time while the corrisponding png images will be saved in the `PngImages` directoriy
+> **Note:** The pfm file must be located inside the `PfmImages` directory at runtime while the corrisponding png image will be saved in the `PngImages` directory.
 
 ---
 
@@ -177,7 +182,7 @@ This file contains the default values used by the different commands supported b
 
 By modifying the values in this file it is possible to generate different images without specifying all parameters from the command line.
 
-In particular, the following options can be specified as arrays:
+In particular, the following options can be specified as arrays (in bash arrays are written as `(3 5 44 23)`):
 
 - `initstate`
 - `initseq`
@@ -257,10 +262,7 @@ frame_002.png
 ```
 
 All matching images are combined into a single MP4 animation.
-
-The images can be generated automatically using the GNU Parallel library.
-
-A generic command has the following form:
+Frame generation can be parallelized using GNU Parallel. For example:
 
 ```bash
 seq -w START_VALUE END_VALUE | parallel -j NUM_CORES ./raytracer.sh render --declarefloat VARIABLE_NAME:{} --outputpfm frame_{}.pfm --outputpng frame_{}.png
@@ -344,6 +346,7 @@ plane(sky_material,
 camera(
     perspective,
     rotation_z(clock) * translation([-4, 0, 1]),
+    1.0,
     1.0,
     1.0
 )
@@ -569,9 +572,9 @@ plane(
 
 Materials must be declared before the geometric primitives that use them.
 
-The material identifier passed to a primitive must refer to an existing material.
-
 The parser must know the material before the primitive is defined.
+
+The material identifier passed to a primitive must refer to an existing material.
 
 A material definition cannot be directly embedded inside a primitive definition.
 
@@ -707,13 +710,75 @@ Example:
 float clock(45)
 ```
 
+## EBNF Grammar
+For the sake of completeness, here is the EBNF grammar:
+
+```text
+scene ::= declaration*
+
+declaration ::= float_decl | plane_decl | sphere_decl | material_decl | camera_decl
+
+float_decl ::= "float" IDENTIFIER "(" number ")"
+
+plane_decl ::= "plane" "(" IDENTIFIER "," transformation ")"
+
+sphere_decl ::= "sphere" "(" IDENTIFIER "," transformation ")"
+
+material_decl ::= "material" IDENTIFIER "(" brdf "," pigment ")"
+
+camera_decl ::= "camera" "(" camera_type "," transformation "," number "," number ")"
+
+camera_type ::= "perspective" | "orthogonal"
+
+brdf ::= diffuse_brdf | specular_brdf
+
+diffuse_brdf ::= "diffuse" "(" pigment ")"
+
+specular_brdf ::= "specular" "(" pigment ")"
+
+pigment ::= uniform_pigment | checkered_pigment | image_pigment
+
+uniform_pigment ::= "uniform" "(" color ")"
+
+checkered_pigment ::= "checkered" "(" color "," color "," number ")"
+
+image_pigment ::= "image" "(" LITERAL_STRING ")"
+
+color ::= "<" number "," number "," number ">"
+
+transformation ::= basic_transformation | basic_transformation "*" transformation
+
+basic_transformation ::= "identity"
+    | "translation" "(" vector ")"
+    | "rotation_x" "(" number ")"
+    | "rotation_y" "(" number ")"
+    | "rotation_z" "(" number ")"
+    | "scaling" "(" vector ")"
+
+number ::= LITERAL_NUMBER | IDENTIFIER
+
+vector ::= "[" number "," number "," number "]"
+```
+
 ---
 
 # Command Options
 
 ## Common Options
 
-The following options are available in all the commands.
+The following options are available in all the commands (except for outputpfm, that is not used by the command pfmtopng)
+
+#### `--outputpfm`
+
+Name of the generated PFM image.
+
+The file will be saved in the `PfmImages` directory.
+
+#### `--outputpng`
+
+Name of the generated PNG image.
+
+The file will be saved in the `PngImages` directory.
 
 #### `--luminosityfunction`
 
@@ -721,8 +786,8 @@ Luminosity function used during tone mapping to compute image brightness.
 
 Available options:
 
-- `shirley`
-- `weighted`
+- `shirley` that uses the formula $( \max(R,G,B) + \min(R,G,B) ) / 2$
+- `weighted` that uses a weighted average (see https://en.wikipedia.org/wiki/Rec._709)
 
 #### `--averageluminosity`
 
@@ -738,7 +803,7 @@ Higher values generally produce brighter images, while lower values produce dark
 
 #### `--gamma`
 
-Gamma correction factor applied after tone mapping.
+Gamma correction factor applied after tone mapping (display-dependent).
 
 ---
 
@@ -746,7 +811,7 @@ Gamma correction factor applied after tone mapping.
 
 ### Available Options
 
-#### `--inputrender`
+#### `--inputscene`
 
 Name of the scene file to be rendered.
 
@@ -760,33 +825,25 @@ Output image width in pixels.
 
 Output image height in pixels.
 
+#### `--sampleside`
+
+Number of subdivisions per pixel side used for anti-aliasing.
+
 #### `--algorithm`
 
 Rendering algorithm to use.
 
 Available options:
 
-- `onoff`
-- `flat`
-- `pathtracer`
-
-#### `--outputpfm`
-
-Name of the generated PFM image.
-
-The file will be saved in the `PfmImages` directory.
-
-#### `--outputpng`
-
-Name of the generated PNG image.
-
-The file will be saved in the `PngImages` directory.
+- `onoff`: colors a pixel only when a ray intersects an object.
+- `flat`: computes surface color without global illumination effects.
+- `pathtracing`: simulates light transport via recursive ray scattering.
 
 #### `--numrays`
 
 Number of rays scattered at each reflection.
 
-Used only when the selected algorithm is `pathtracer`.
+Used only when the selected algorithm is `pathtracing`.
 
 #### `--maxdepth`
 
@@ -794,31 +851,33 @@ Maximum recursion depth for each ray.
 
 It represents the maximum number of reflections a ray can undergo before returning the background color.
 
-Used only when the selected algorithm is `pathtracer`.
+Used only when the selected algorithm is `pathtracing`.
 
 #### `--initstate`
 
 Initial state for the random number generator.
 
+You can pass either a single value or an array like this
+
+`--initstate (23 41 29 102 1)`
+
+Used only when the selected algorithm is `pathtracing`.
+
 #### `--initseq`
 
 Sequence identifier used by the random number generator.
 
-#### `--sampleside`
+You can pass either a single value or an array like this
 
-Number of subdivisions per pixel side used for anti-aliasing.
+`--initseq (23 41 29 102 1)`
 
-#### `--declarefloat` or `-d`
-
-Declares a floating-point variable using:
-
-```bash
---declarefloat=NAME:VALUE
-```
+Used only when the selected algorithm is `pathtracing`.
 
 #### `--roulettestart`
 
 Number of reflections after which the Russian Roulette termination algorithm starts.
+
+Used only when the selected algorithm is `pathtracing`.
 
 #### `--rouletteprob`
 
@@ -826,7 +885,21 @@ Optional fixed probability used by the Russian Roulette algorithm.
 
 If omitted, the probability is computed dynamically at each recursion step.
 
-The following common options are also available:
+Used only when the selected algorithm is `pathtracing`.
+
+#### `--declarefloat` or `-d`
+
+Declares a floating-point variable using:
+
+```bash
+--declarefloat NAME:VALUE
+```
+
+You can pass either a single value or an array like this
+
+`--declarefloat (ax:23 ay:41 az:29 theta:102 phi:1)`
+
+The following common options are also available (see Common Options above):
 
 - `--luminosityfunction`
 - `--averageluminosity`
@@ -839,18 +912,11 @@ The following common options are also available:
 
 ### Available Options
 
-#### `--outputaveragepfm`
+This command does not introduce any additional options.
+It only supports the common options listed below:
 
-Name of the generated averaged image as a pfm file.
-
-#### `--outputaveragepng`
-
-Name of the generated average image as a png file.
-
-The command generates both a PFM image and its corresponding PNG representation.
-
-The following common options are also available:
-
+- `--outputpfm`
+- `--outputpng`
 - `--luminosityfunction`
 - `--averageluminosity`
 - `--factor`
@@ -866,12 +932,9 @@ The following common options are also available:
 
 Name of the PFM file to convert.
 
-#### `--output`
-
-Name of the generated PNG image.
-
 The following common options are also available:
 
+- `--outputpng`
 - `--luminosityfunction`
 - `--averageluminosity`
 - `--factor`
@@ -925,7 +988,7 @@ Any transformation controlled by a floating-point variable can be animated. In t
 
 ## Path Tracing
 
-The `pathtracer` algorithm simulates light transport through recursive ray scattering, producing realistic illumination effects such as indirect lighting and reflections.
+The `pathtracing` algorithm simulates light transport through recursive ray scattering, producing realistic illumination effects such as indirect lighting and reflections.
 
 ![Path tracing example](Assets/scene_path.png)
 
@@ -961,11 +1024,22 @@ If you encounter bugs, unexpected behavior, or have questions about the project,
 
 Possible future improvements include:
 
-- support for mesh-based objects;
-- point-light tracing algorithm;
+- HomMatrix efficiency improvement by expliciting the coefficients (now is a float array)
+- possibility to specify the paths in which to save the pfm and png images;
+- possibility to specify the image plane dimensions;
+- adding the possiblity to specify the pattern for the averageimages command;
 - possibility to parse arithmetic operations in scene files;
+- point-light tracing algorithm (Whitted algorithm);
+- adding triangle primitives;
+- support for mesh-based objects;
+- support for CSG (Constructive Solid Geometry) objects;
+- Adding AAB (Axis Aligned Boxes)
+- Adding AABB (Axis Aligned Bounding Box)
+- adding other output image formats;
+- adding a BSP (Binary Space Partitions) algorithm to improve efficiency;
+- Direct Illumination algorithm (with importance sampling)
+- Photon Mapping algorithm
 - performance optimizations and parallel rendering.
-
 ---
 
 # How to contribute
@@ -989,3 +1063,5 @@ See the file LICENSE.md
 ---
 
 # State of the project
+
+Version 1.0.0
