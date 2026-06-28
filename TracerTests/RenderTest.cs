@@ -20,7 +20,7 @@ public class RenderTest
 
         HDRImage image = new HDRImage(3, 3);
 
-        ICamera camera = new OrthogonalCamera();
+        Camera camera = new OrthogonalCamera();
 
         ImageTracer tracer = new ImageTracer(image, camera);
 
@@ -54,7 +54,7 @@ public class RenderTest
 
         HDRImage image = new HDRImage(3, 3);
 
-        ICamera camera = new OrthogonalCamera();
+        Camera camera = new OrthogonalCamera();
 
         ImageTracer tracer = new ImageTracer(image, camera);
 

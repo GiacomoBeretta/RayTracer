@@ -27,7 +27,7 @@ public class Scene
     /// The camera used to render the scene.
     /// See <see cref="Camera"/> for more information.
     /// </summary>
-    public ICamera? Camera { get; set; } = null;
+    public Camera? Camera { get; set; } = null;
 
     /// <summary>
     /// Maps variable names to their values.
@@ -503,15 +503,15 @@ public class Scene
     /// </remarks>
     /// <param name="inputStream">The input stream providing tokens to read.</param>
     /// <returns>
-    /// An <see cref="ICamera"/> instance of the appropriate type
+    /// An <see cref="TracerLib.Camera"/> instance of the appropriate type
     /// (<see cref="PerspectiveCamera"/> or <see cref="OrthogonalCamera"/>).
     /// </returns>
     /// <exception cref="SceneSyntaxException">
     /// Thrown if the input does not match the expected syntax or if the camera type is invalid.
     /// </exception>
-    public ICamera ParseCamera(InputStream inputStream)
+    public Camera ParseCamera(InputStream inputStream)
     {
-        ICamera result;
+        Camera result;
         
         ExpectSymbol(inputStream, "(");
         Keyword cameraKeyword = ExpectKeyword(inputStream, [Keyword.Perspective, Keyword.Orthogonal]);
