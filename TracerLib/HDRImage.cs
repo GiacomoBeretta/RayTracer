@@ -662,14 +662,15 @@ public class HDRImage
     {
         if (factor < 0)
         {
-            throw new ArgumentOutOfRangeException(nameof(factor),factor,"the factor must be non-negative");
+            throw new ArgumentOutOfRangeException(nameof(factor),factor,nameof(factor) + " must be non-negative");
         }
         //if averageLuminosity is null compute it with the _AverageLuminosity function
         averageLuminosity ??= _AverageLuminosity(luminosityFunction, delta);
 
         if (averageLuminosity <= 0)
         {
-            throw new ArgumentOutOfRangeException(nameof(averageLuminosity), averageLuminosity, "the average luminosity must be a positive number.")
+            throw new ArgumentOutOfRangeException(nameof(averageLuminosity), averageLuminosity,
+               nameof(averageLuminosity) + " must be greater than 0.");
         }
         for (int i = 0; i < Pixels.Length; i++)
         {
