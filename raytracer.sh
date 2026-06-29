@@ -18,18 +18,6 @@ case "$subcommand" in
 		;;
 esac
 
-# Set default values for output file names
-#case "$subcommand" in
-#	render)
-#		outputpfm="${outputrenderpfm}"
-#		outputpng="${outputrenderpng}"
-#		;;
-#	averageimages)
-#		outputpfm="${averagepfm}"
-#		outputpng="${averagepng}"
-#		;;
-#esac
-
 # Base command
 
 readonly exepath="./RayTracer/bin/Debug/net10.0/RayTracer"
@@ -59,9 +47,6 @@ while [[ $# -gt 0 ]]; do
     --gamma) gamma="$2"; shift 2 ;;
     --declarefloat) declarefloat+=( "$2" ); shift 2 ;;
     --inputpfm) inputpfm="$2"; shift 2 ;;
-#    --output) output="$2"; shift 2 ;;
-#    --outputaveragepfm) outputaveragepfm="$2"; shift 2 ;;
-#    --outputaveragepng) outputaveragepng="$2"; shift 2 ;;
 	--pcgcycle) pcgcycle="$2"; shift 2 ;;
     *) 
 		echo "Unknown parameter: $1"
@@ -158,16 +143,6 @@ if [[ "$subcommand" == "render" ]]; then
 		[ -n "$outputpng" ]      && cmd+=( --outputpng "$outputpng" )
 
 		time "${cmd[@]}"
-
-#		run_cmd=( "${cmd[@]}" )
-
-#		[ -n "${initstate[0]}" ] && run_cmd+=( --initstate "${initstate[0]}" )
-#		[ -n "${initseq[0]}" ]   && run_cmd+=( --initseq "${initseq[0]}" )
-		
-#		[ -n "$outputpfm" ]      && run_cmd+=( --outputpfm "$outputpfm" )
-#		[ -n "$outputpng" ]      && run_cmd+=( --outputpng "$outputpng" )
-
-#		time "${run_cmd[@]}"
 
 	fi
 
