@@ -209,7 +209,7 @@ public struct Color
     {
         if (gamma <= 0)
         {
-            throw new ArgumentOutOfRangeException(nameof(gamma), gamma, nameof(gamma) + " must be greater than 0");
+            throw new ArgumentOutOfRangeException(nameof(gamma), gamma, nameof(gamma) + " must be greater than 0.");
         }
 
         float r = (float)Math.Round(255 * MathF.Pow(R, 1.0f / gamma));
