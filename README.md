@@ -302,7 +302,7 @@ Scenes are described through a custom text-based language.
 
 The scene language allows the definition of:
 
-- floating-point variables;
+- [floating-point variables](#floating-point-variables);
 - vectors;
 - colors;
 - materials;
