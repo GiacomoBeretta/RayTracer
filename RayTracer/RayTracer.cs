@@ -137,7 +137,32 @@ public class RenderCommand
         image.WritePNG(pngFilePath, Luminosityfunction, Factor, Gamma, AverageLuminosity);
         Console.WriteLine($"Png file created in: {pngFilePath}");
     }
-    
+
+    public void ValidateParameters()
+    {
+        Functions.EnsureGreaterThanOrEqual<int>(Width, nameof(Width), 1);
+        Functions.EnsureGreaterThanOrEqual<int>(Height, nameof(Height), 1);
+        Functions.EnsureGreaterThanOrEqual<int>(SampleSide, nameof(SampleSide), 1);
+        Functions.EnsureGreaterThanOrEqual<int>(NumRays, nameof(NumRays), 1);
+        Functions.EnsureGreaterThanOrEqual<int>(MaxDepth, nameof(MaxDepth), 1);
+        Functions.EnsureGreaterThanOrEqual<ulong>(InitState, nameof(InitState), 0);
+        Functions.EnsureGreaterThanOrEqual<ulong>(InitSeq, nameof(InitSeq), 0);
+        Functions.EnsureGreaterThanOrEqual<int>(RussianRouletteStartDepth, nameof(RussianRouletteStartDepth), 0);
+       
+        if (RussianRouletteFixedProb.HasValue)
+        {
+            Functions.EnsureInRange<float>(RussianRouletteFixedProb.Value, nameof(RussianRouletteFixedProb), 0, 1);
+        }
+
+        if (AverageLuminosity.HasValue)
+        {
+            Functions.EnsureGreaterThan<float>(AverageLuminosity.Value, nameof(AverageLuminosity), 0);
+        }
+
+        Functions.EnsureGreaterThanOrEqual<float>(Factor, nameof(Factor), 0);
+        Functions.EnsureGreaterThan<float>(Gamma, nameof(Gamma), 0);
+    }
+
     /// <summary>
     /// Prints all the parameters passed through the command line.
     /// </summary>
