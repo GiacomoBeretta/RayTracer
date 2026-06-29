@@ -10,20 +10,19 @@ gamma=1
 
 # Default render 
 inputscene="scene.txt"
-width=500
-height=500
+width=100
+height=100
 sampleside=1
-algorithm="flat"
-numrays=10 #only for pathtracing
-maxdepth=2 #only for pathtracing
+algorithm="pathtracing"
+numrays=5 #only for pathtracing
+maxdepth=4 #only for pathtracing
 initstate=(45) #only for pathtracing
 initseq=(54) #only for pathtracing
 roulettestart=3 #only for pathtracing
-rouletteprob="" #only for pathtracing
+rouletteprob=0.5 #only for pathtracing
 declarefloat=()
 
 pcgcycle=false #only for pathtracing
 
 # Default pfmtopng
 inputpfm="dome.pfm"
-
