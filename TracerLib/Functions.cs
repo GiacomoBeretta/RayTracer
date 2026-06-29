@@ -57,6 +57,11 @@ public static class Functions
     /// </exception>
     public static void EnsureInRange<T>(T value, string paramName, T min, T max) where T : IComparable<T>
     {
+        if (min.CompareTo(max) > 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(min), min, $"{nameof(min)} must be less than {nameof(max)}");
+        }
+
         if (value.CompareTo(min) < 0 || value.CompareTo(max) > 0)
         {
             throw new ArgumentOutOfRangeException(paramName, value, $"{paramName} must be in [{min}, {max}]");
