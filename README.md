@@ -30,9 +30,7 @@ This project is a ray tracing renderer written in C# that generates photorealist
 
 ## Prerequisites
 
-Before building the project, install the following software:
-
-- .NET 10 SDK
+Before building the project, install the .NET SDK. The project has been tested with .NET SDK 10.0.301 (LTS), but may also work with other versions of the .NET SDK.
 
 ## Optional tools (for scripts and animation generation)
 The project itself does not require these tools, but they are needed to run helper scripts such as raytracer.sh and generate-animation.sh.
@@ -140,7 +138,7 @@ Reads a scene description from a text file and generates the corresponding image
 
 ---
 
-### averageimage
+### averageimages
 
 Generates a new image by averaging multiple PFM (Portable Float Map) images of the same rendered scene.
 
@@ -238,7 +236,7 @@ and:
 ${outputpng%.png}_state${state}_seq${seq}.png
 ```
 
-This naming scheme is also used by the `averageimage` command to identify the images that must be averaged.
+This naming scheme is also used by the `averageimages` command to identify the images that must be averaged.
 
 ---
 
@@ -857,21 +855,25 @@ Used only when the selected algorithm is `pathtracing`.
 
 Initial state for the random number generator.
 
+Used only when the selected algorithm is `pathtracing`.
+
 You can pass either a single value or an array like this
 
 `--initstate (23 41 29 102 1)`
 
-Used only when the selected algorithm is `pathtracing`.
+See the `--pcgcycle` option for more information.
 
 #### `--initseq`
 
 Sequence identifier used by the random number generator.
 
-You can pass either a single value or an array like this
+Used only when the selected algorithm is `pathtracing`.
+
+You can pass either a single value or an array like this:
 
 `--initseq (23 41 29 102 1)`
 
-Used only when the selected algorithm is `pathtracing`.
+See the `--pcgcycle` option for more information.
 
 #### `--roulettestart`
 
@@ -883,9 +885,9 @@ Used only when the selected algorithm is `pathtracing`.
 
 Optional fixed probability used by the Russian Roulette algorithm.
 
-If omitted, the probability is computed dynamically at each recursion step.
-
 Used only when the selected algorithm is `pathtracing`.
+
+If omitted, the probability is computed dynamically at each recursion step.
 
 #### `--declarefloat` or `-d`
 
@@ -898,6 +900,32 @@ Declares a floating-point variable using:
 You can pass either a single value or an array like this
 
 `--declarefloat (ax:23 ay:41 az:29 theta:102 phi:1)`
+
+#### `--pcgcycle`
+
+Boolean option available only when using the `raytracer.sh` script (it is not available when running the program with `dotnet run`).
+
+Used only when the selected algorithm is `pathtracing`.
+
+Possible values:
+- `false`: only the first elements of the `initstate` and `initseq` arrays is used during rendering.
+- `true`: the renderer is executed once for every combination of state and sequence identifier contained in the two arrays.
+
+Example:
+
+```bash
+initstate=(45 12)
+initseq=(54 2)
+```
+
+The renderer will be executed four times using the following combinations:
+
+```text
+state=45, seq=54
+state=45, seq=2
+state=12, seq=54
+state=12, seq=2
+```
 
 The following common options are also available (see Common Options above):
 
@@ -998,7 +1026,7 @@ The `pathtracing` algorithm simulates light transport through recursive ray scat
 
 Noise can be reduced by rendering the same scene multiple times using different random generator states and sequence identifiers and then averaging the resulting images.
 
-The `averageimage` command performs this operation automatically.
+The `averageimages` command performs this operation automatically.
 
 ![Averaged path traced image](Assets/scene_average.png)
 
