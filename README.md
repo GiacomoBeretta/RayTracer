@@ -855,21 +855,25 @@ Used only when the selected algorithm is `pathtracing`.
 
 Initial state for the random number generator.
 
+Used only when the selected algorithm is `pathtracing`.
+
 You can pass either a single value or an array like this
 
 `--initstate (23 41 29 102 1)`
 
-Used only when the selected algorithm is `pathtracing`.
+See the `--pcgcycle` option for more information.
 
 #### `--initseq`
 
 Sequence identifier used by the random number generator.
 
-You can pass either a single value or an array like this
+Used only when the selected algorithm is `pathtracing`.
+
+You can pass either a single value or an array like this:
 
 `--initseq (23 41 29 102 1)`
 
-Used only when the selected algorithm is `pathtracing`.
+See the `--pcgcycle` option for more information.
 
 #### `--roulettestart`
 
@@ -881,9 +885,9 @@ Used only when the selected algorithm is `pathtracing`.
 
 Optional fixed probability used by the Russian Roulette algorithm.
 
-If omitted, the probability is computed dynamically at each recursion step.
-
 Used only when the selected algorithm is `pathtracing`.
+
+If omitted, the probability is computed dynamically at each recursion step.
 
 #### `--declarefloat` or `-d`
 
@@ -896,6 +900,32 @@ Declares a floating-point variable using:
 You can pass either a single value or an array like this
 
 `--declarefloat (ax:23 ay:41 az:29 theta:102 phi:1)`
+
+#### `--pcgcycle`
+
+Boolean option available only when using the `raytracer.sh` script (it is not available when running the program with `dotnet run`).
+
+Used only when the selected algorithm is `pathtracing`.
+
+Possible values:
+- `false`: only the first elements of the `initstate` and `initseq` arrays is used during rendering.
+- `true`: the renderer is executed once for every combination of state and sequence identifier contained in the two arrays.
+
+Example:
+
+```bash
+initstate=(45 12)
+initseq=(54 2)
+```
+
+The renderer will be executed four times using the following combinations:
+
+```text
+state=45, seq=54
+state=45, seq=2
+state=12, seq=54
+state=12, seq=2
+```
 
 The following common options are also available (see Common Options above):
 
