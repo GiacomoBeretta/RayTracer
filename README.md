@@ -665,11 +665,10 @@ scaling(2,2,2)
 Cameras are defined as:
 
 ```text
-camera(
+camera
+(
     Keyword_camera,
-    transformation,
-    aspect_ratio,
-    distance
+    ...
 )
 ```
 
@@ -678,12 +677,32 @@ where `Keyword_camera` can be:
 - `orthogonal`
 - `perspective`
 
+---
+
+### Orthogonal Camera
+
+camera(orthogonal, Transformation, Width, Height)
+
 Example:
 
 ```text
 camera(
+    orthogonal,
+    identity,
+    1.0,
+    1.0
+)
+```
+### Perspective Camera
+
+camera(perspective, Transformation, Width, Height)
+
+```text
+camera
+(
     perspective,
     identity,
+    1.0,
     1.0,
     1.0
 )
