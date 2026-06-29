@@ -1052,22 +1052,23 @@ If you encounter bugs, unexpected behavior, or have questions about the project,
 
 Possible future improvements include:
 
-- HomMatrix efficiency improvement by expliciting the coefficients (now is a float array)
-- possibility to specify the paths in which to save the pfm and png images;
-- possibility to specify the image plane dimensions;
-- adding the possiblity to specify the pattern for the averageimages command;
-- possibility to parse arithmetic operations in scene files;
-- point-light tracing algorithm (Whitted algorithm);
+- adding validation checks to operations (e.g. ensuring that the scalar in a color-scalar multiplication is positive);
+- removing unnecessary validation checks that significantly impact performance;
+- improving `HomMatrix` efficiency by storing coefficients explicitly instead of using a float array;
+- allowing users to specify the output paths for PFM and PNG images;
+- allowing users to specify the image plane dimensions;
+- allowing users to specify the filename pattern for the `averageimages` command;
+- supporting arithmetic expressions in scene files;
+- implementing a point-light tracer (Whitted ray tracing);
 - adding triangle primitives;
-- support for mesh-based objects;
-- support for CSG (Constructive Solid Geometry) objects;
-- Adding AAB (Axis Aligned Boxes)
+- supporting mesh-based objects;
+- supporting CSG (Constructive Solid Geometry);
 - Adding AABB (Axis Aligned Bounding Box)
-- adding other output image formats;
+- supporting additional output image formats;
 - adding a BSP (Binary Space Partitions) algorithm to improve efficiency;
-- Direct Illumination algorithm (with importance sampling)
-- Photon Mapping algorithm
-- performance optimizations and parallel rendering.
+- implementing direct illumination with importance sampling;
+- implementing photon mapping;
+- further performance optimizations and parallel rendering.
 ---
 
 # How to contribute
