@@ -662,6 +662,11 @@ public class HDRImage
     {
         //if averageLuminosity is null compute it with the _AverageLuminosity function
         averageLuminosity ??= _AverageLuminosity(luminosityFunction, delta);
+
+        if (averageLuminosity <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(averageLuminosity), averageLuminosity, "the average luminosity must be a positive number.")
+        }
         for (int i = 0; i < Pixels.Length; i++)
         {
             //averageLuminosity is a nullable type so we must explicitly cast it from float? to float
