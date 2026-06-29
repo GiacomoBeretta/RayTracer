@@ -138,7 +138,7 @@ Reads a scene description from a text file and generates the corresponding image
 
 ---
 
-### averageimage
+### averageimages
 
 Generates a new image by averaging multiple PFM (Portable Float Map) images of the same rendered scene.
 
@@ -236,7 +236,7 @@ and:
 ${outputpng%.png}_state${state}_seq${seq}.png
 ```
 
-This naming scheme is also used by the `averageimage` command to identify the images that must be averaged.
+This naming scheme is also used by the `averageimages` command to identify the images that must be averaged.
 
 ---
 
@@ -1026,7 +1026,7 @@ The `pathtracing` algorithm simulates light transport through recursive ray scat
 
 Noise can be reduced by rendering the same scene multiple times using different random generator states and sequence identifiers and then averaging the resulting images.
 
-The `averageimage` command performs this operation automatically.
+The `averageimages` command performs this operation automatically.
 
 ![Averaged path traced image](Assets/scene_average.png)
 
