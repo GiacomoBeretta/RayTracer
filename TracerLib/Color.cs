@@ -180,9 +180,9 @@ public struct Color
     /// </summary>
     public void _Clamp()
     {
-        R = Color._Clamp(R);
-        G = Color._Clamp(G);
-        B = Color._Clamp(B);
+        R = _Clamp(R);
+        G = _Clamp(G);
+        B = _Clamp(B);
     }
 
     /// <summary>
