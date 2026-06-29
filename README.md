@@ -311,6 +311,8 @@ The scene language allows the definition of:
 - [transformations](#transformations);
 - [geometric primitives](#geometric-primitives);
 - [cameras](#cameras).
+- [comments](#comments)
+- [EBNF Grammar](#EBNF-Grammar)
 
 An example scene is shown below:
 
