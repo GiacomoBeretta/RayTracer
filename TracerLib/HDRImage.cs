@@ -36,7 +36,7 @@ public class HDRImage
     /// <summary>
     /// The ratio Width/Height of the pixel grid.
     /// </summary>
-    public float AspectRatio => Width / (float)Height; 
+    public float AspectRatio => Width / (float)Height;
 
     /// <summary>
     /// Validates that the specified coordinates are within the range
@@ -104,7 +104,7 @@ public class HDRImage
                 nameof(colorVector));
         }
     }
-    
+
     /// <summary>
     /// Returns the <c>Color</c> given by the i-th element of the 1D Pixel's array.
     /// </summary>
@@ -128,7 +128,7 @@ public class HDRImage
         _ValidateCoordinates(column, row);
         return row * Width + column;
     }
-    
+
     /// <summary>
     /// Gives the Color at the indexes (column, row) of the corresponding matrix
     /// </summary>
@@ -143,7 +143,7 @@ public class HDRImage
     //Constructors - Begin
 
     #region Constructors
-    
+
     /// <summary>
     /// Initializes an HDR image with a <paramref name="width"/>×<paramref name="height"/> pixel grid,
     /// where every pixel is initialized to black (0, 0, 0).
@@ -216,37 +216,39 @@ public class HDRImage
 
     //Constructors - End
 
-    //meglio usare stringBuilder qua
     /// <summary>
     /// Returns a human-readable string representation of the HDR image,
     /// including dimensions and the full pixel matrix.
     /// </summary>
     public override string ToString()
     {
-        string str = $"Height: {Height}, Width: {Width}\n" +
-                     "Pixel's matrix:\n" +
-                     "\tColumns ->\n" +
-                     "Rows";
+        StringBuilder sb = new StringBuilder(
+            $"Height: {Height}, Width: {Width}\n" +
+            "Pixel's matrix:\n" +
+            "\tColumns ->\n" +
+            "Rows"
+        );
+
         for (int j = 0; j < Width; j++)
         {
-            str += $"\t{j}";
+            sb.Append($"\t{j}");
         }
 
-        str += "\n";
+        sb.Append("\n");
 
         for (int i = 0; i < Height; i++)
         {
-            str += $"{i}";
+            sb.Append($"{i}");
             for (int j = 0; j < Width; j++)
             {
-                str += "\t";
-                str += Pixels[_PixelOffset(j, i)].ToString();
+                sb.Append("\t");
+                sb.Append(Pixels[_PixelOffset(j, i)].ToString());
             }
 
-            str += "\n";
+            sb.Append("\n");
         }
 
-        return str;
+        return sb.ToString();
     }
 
     /// <summary>
@@ -282,6 +284,7 @@ public class HDRImage
     public static void _ParseImgSize(string stringImgSize, out int width, out int height)
     {
         string[] stringSizeArray = stringImgSize.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        
         if (stringSizeArray.Length != 2)
         {
             throw new InvalidPfmFileFormatException(
@@ -465,12 +468,7 @@ public class HDRImage
 
         endianness = _ParseEndianness(endiannessLine);
 
-        /*Console.WriteLine($"POS BEFORE PIXELS: {br.BaseStream.Position}");
-        long expectedBytes = width * height * 3 * 4;
-        Console.WriteLine($"EXPECTED PIXEL BYTES: {expectedBytes}"); */
-
         image = new HDRImage(width, height);
-        //Console.WriteLine($"Width = {result.Width}, Height = {result.Height}");
     }
 
     /// <summary>
@@ -634,16 +632,18 @@ public class HDRImage
     {
         if (factor < 0)
         {
-            throw new ArgumentOutOfRangeException(nameof(factor),factor,nameof(factor) + " must be non-negative");
+            throw new ArgumentOutOfRangeException(nameof(factor), factor, nameof(factor) + " must be non-negative");
         }
+
         //if averageLuminosity is null compute it with the _AverageLuminosity function
         averageLuminosity ??= _AverageLuminosity(luminosityFunction, delta);
 
         if (averageLuminosity <= 0)
         {
             throw new ArgumentOutOfRangeException(nameof(averageLuminosity), averageLuminosity,
-               nameof(averageLuminosity) + " must be greater than 0.");
+                nameof(averageLuminosity) + " must be greater than 0.");
         }
+
         for (int i = 0; i < Pixels.Length; i++)
         {
             //averageLuminosity is a nullable type so we must explicitly cast it from float? to float
