@@ -660,6 +660,10 @@ public class HDRImage
     public void _Normalize(LumFunction luminosityFunction, float factor, float? averageLuminosity = null,
         float delta = 1e-10f)
     {
+        if (factor < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(factor),factor,"the factor must be non-negative");
+        }
         //if averageLuminosity is null compute it with the _AverageLuminosity function
         averageLuminosity ??= _AverageLuminosity(luminosityFunction, delta);
 
