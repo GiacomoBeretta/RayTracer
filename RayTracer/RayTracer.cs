@@ -57,11 +57,13 @@ public class RenderCommand
         Description =
             "Number of rays departing from each surface " +
             "(this command only works for the path tracing algorithm, default: 10)")]
+    [Range(1, Int32.MaxValue)]
     public int NumRays { get; init; } = 10;
 
     [Option("--maxdepth",
         Description = "Maximum allowed ray depth " +
                       "(this command only works for the path tracing algorithm, default: 2)")]
+    [Range(1, Int32.MaxValue)]
     public int MaxDepth { get; init; } = 2;
 
     [Option("--initstate",
@@ -90,7 +92,7 @@ public class RenderCommand
             "Optional fixed probability for the Russian roulette algorithm. " +
             "When null, the probability is computed dynamically at each recursive call of RenderFunction" +
             "(this command only works for the path tracing algorithm, default: null")]
-    [Range(0, 1)]
+    [Range(0.0, 1.0)]
     public float? RussianRouletteFixedProb { get; init; } = null;
 
     [Option("--luminosityfunction",
@@ -104,6 +106,7 @@ public class RenderCommand
     public float? AverageLuminosity { get; init; } = null;
 
     [Option("--factor", Description = "The empirical factor to render images (default: 1)")]
+    [Range(0, float.MaxValue)]
     public float Factor { get; init; } = 1f;
 
     [Option("--gamma", Description = "The gamma factor characteristic of the screen (default: 1)")]
