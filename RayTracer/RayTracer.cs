@@ -37,83 +37,84 @@ public class RenderCommand
     [Required]
     public string OutputPngName { get; init; } = null!;
 
-    [Option("--width", Description = "The width of the image (default: 500)")]
+    [Option("--width", Description = "The width of the image. Must be >= 1 (default: 500).")]
     [Range(1, Int32.MaxValue)]
     public int Width { get; init; } = 500;
 
-    [Option("--height", Description = "The height of the image (default: 500)")]
+    [Option("--height", Description = "The height of the image. Must be >= 1 (default: 500).")]
     [Range(1, Int32.MaxValue)]
     public int Height { get; init; } = 500;
 
-    [Option("--sampleside", Description = "Number of samples per pixel's side used for antialiasing (default: 1)")]
+    [Option("--sampleside", Description = "Number of samples per pixel's side used for antialiasing. " +
+                                          "Must be >= 1 (default: 1).")]
     [Range(1, Int32.MaxValue)]
     public int SampleSide { get; init; } = 1;
 
     [Option("--algorithm",
-        Description = "Render's algorithm. Options are: onoff, flat or pathtracing. (default: pathtracing)")]
+        Description = "Render's algorithm. Options are: onoff, flat or pathtracing. (default: pathtracing).")]
     public RenderFunc Algorithm { get; init; } = RenderFunc.PathTracing;
 
     [Option("--numrays",
         Description =
-            "Number of rays departing from each surface " +
-            "(this command only works for the path tracing algorithm, default: 10)")]
+            "Number of rays departing from each surface. Must be >= 1 " +
+            "(this command only works for the path tracing algorithm, default: 10).")]
     [Range(1, Int32.MaxValue)]
     public int NumRays { get; init; } = 10;
 
     [Option("--maxdepth",
-        Description = "Maximum allowed ray depth " +
-                      "(this command only works for the path tracing algorithm, default: 2)")]
+        Description = "Maximum allowed ray depth. Must be >= 1 " +
+                      "(this command only works for the path tracing algorithm, default: 2).")]
     [Range(1, Int32.MaxValue)]
     public int MaxDepth { get; init; } = 2;
 
     [Option("--initstate",
         Description =
-            "Initial seed for the random number generator " +
-            "(this command only works for the path tracing algorithm, default: 45)")]
+            "Initial seed for the random number generator. Must be >= 0 " +
+            "(this command only works for the path tracing algorithm, default: 45).")]
     [Range(0, ulong.MaxValue)]
     public ulong InitState { get; init; } = 45;
 
     [Option("--initseq",
         Description =
-            "Identifier of the sequence produced by the random number generator " +
-            "(this command only works for the path tracing algorithm, default: 54)")]
+            "Identifier of the sequence produced by the random number generator. Must be >= 0 " +
+            "(this command only works for the path tracing algorithm, default: 54).")]
     [Range(0, ulong.MaxValue)]
     public ulong InitSeq { get; init; } = 54;
 
     [Option("--roulettestart",
         Description =
-            "Number of ray reflections after which the Russian roulette algorithm is applied " +
-            "(this command only works for the path tracing algorithm, default: 3)")]
+            "Number of ray reflections after which the Russian roulette algorithm is applied. Must be >= 0 " +
+            "(this command only works for the path tracing algorithm, default: 3).")]
     [Range(0, Int32.MaxValue)]
     public int RussianRouletteStartDepth { get; init; } = 3;
 
     [Option("--rouletteprob",
         Description =
-            "Optional fixed probability for the Russian roulette algorithm. " +
-            "When null, the probability is computed dynamically at each recursive call of RenderFunction" +
-            "(this command only works for the path tracing algorithm, default: null")]
+            "Optional fixed probability for the Russian roulette algorithm. Accepted Range: [0,1] U {null}. " +
+            "When null, the probability is computed dynamically at each recursive call of RenderFunction " +
+            "(this command only works for the path tracing algorithm, default: null).")]
     [Range(0.0, 1.0)]
     public float? RussianRouletteFixedProb { get; init; } = null;
 
     [Option("--luminosityfunction",
-        Description = "Luminosity function, options are: shirley, weighted (default: shirley)")]
+        Description = "Luminosity function, options are: shirley, weighted (default: shirley).")]
     public LumFunction Luminosityfunction { get; init; } = LumFunction.Shirley;
 
     [Option("--averageluminosity",
         Description =
-            "Fixed luminosity for the tone mapping." +
-            "If the value is null is computed with the luminosity function (default: null)")]
+            "Fixed luminosity for the tone mapping. Must be > 0. " +
+            "If the value is null is computed with the luminosity function (default: null).")]
     public float? AverageLuminosity { get; init; } = null;
 
-    [Option("--factor", Description = "The empirical factor to render images (default: 1)")]
+    [Option("--factor", Description = "The empirical factor to render images. Must be >= 0 (default: 1).")]
     [Range(0, float.MaxValue)]
     public float Factor { get; init; } = 1f;
 
-    [Option("--gamma", Description = "The gamma factor characteristic of the screen (default: 1)")]
+    [Option("--gamma", Description = "The gamma factor characteristic of the screen. Must be > 0 (default: 1).")]
     public float Gamma { get; init; } = 1f;
 
     [Option("--declarefloat|-d", Description = "Declare a variable. " +
-                                               "The syntax is '--declarefloat=NAME:VALUE' or '-d=NAME:VALUE'")]
+                                               "The syntax is '--declarefloat=NAME:VALUE' or '-d=NAME:VALUE'.")]
     public string[] Definitions { get; init; } = [];
 
     #endregion
@@ -136,7 +137,7 @@ public class RenderCommand
         image.WritePNG(pngFilePath, Luminosityfunction, Factor, Gamma, AverageLuminosity);
         Console.WriteLine($"Png file created in: {pngFilePath}");
     }
-
+    
     /// <summary>
     /// Prints all the parameters passed through the command line.
     /// </summary>
