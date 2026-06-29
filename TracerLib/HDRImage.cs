@@ -491,9 +491,6 @@ public class HDRImage
         {
             for (int col = 0; col < image.Width; col++)
             {
-                //Console.WriteLine($"Column = {j}, Row = {i}");
-                //Console.WriteLine($"Offset = {result._PixelOffset(j,i)}");
-                //Console.WriteLine($"Offset 2 = {i * result.Width + j}");
                 Color color = new Color
                 {
                     R = _ReadFloat(br, endianness),
@@ -503,8 +500,6 @@ public class HDRImage
                 image[col, row] = color;
             }
         }
-
-        //if (result.Pixels != null) Console.WriteLine($"W={result.Width}, H={result.Height}, Pixels={result.Pixels.Length}");
 
         return image;
     }
@@ -616,7 +611,6 @@ public class HDRImage
     /// Scales all pixels so that their RGB values are normalized with respect
     /// to the image average luminosity.
     /// Each pixel is multiplied by factor / averageLuminosity.
-    /// The luminosityFunction tells which of function of the color class to use to compute the luminosity of the pixel, see <c>LumFunction</c>
     /// If <paramref name="averageLuminosity"/> is not provided, it is computed
     /// using <see cref="_AverageLuminosity"/> and the specified
     /// <paramref name="luminosityFunction"/>.
@@ -626,7 +620,7 @@ public class HDRImage
     /// <param name="factor"> An empirical value.</param>
     /// <param name="averageLuminosity">Optional precomputed average luminosity.</param>
     /// <param name="delta">Small positive value added to pixel luminosity to avoid
-    /// logarithm singularities in the computation of <see cref="_AverageLuminosity"/></param>
+    /// logarithm singularities in the computation of <see cref="_AverageLuminosity"/>.</param>
     public void _Normalize(LumFunction luminosityFunction, float factor, float? averageLuminosity = null,
         float delta = 1e-10f)
     {
@@ -634,8 +628,7 @@ public class HDRImage
         {
             throw new ArgumentOutOfRangeException(nameof(factor), factor, nameof(factor) + " must be non-negative");
         }
-
-        //if averageLuminosity is null compute it with the _AverageLuminosity function
+        
         averageLuminosity ??= _AverageLuminosity(luminosityFunction, delta);
 
         if (averageLuminosity <= 0)
@@ -646,7 +639,6 @@ public class HDRImage
 
         for (int i = 0; i < Pixels.Length; i++)
         {
-            //averageLuminosity is a nullable type so we must explicitly cast it from float? to float
             Pixels[i] = Pixels[i] * (factor / averageLuminosity.Value);
         }
     }
@@ -676,22 +668,22 @@ public class HDRImage
             Pixels[i] = Pixels[i].To8BitRGB(gamma);
         }
     }
-
-    //Questa non è tecnicamente un HDR. Rivedere in futuro
+    
     /// <summary>
-    /// Returns Creates an LDR representation of the current HDR image.
-    /// It accounts for the gamma correction of the display and of the empirical factor here named "factor"
-    /// The luminosityFunction parameter allow to choose between some possible ways to compute the luminosity of a pixel.
-    /// averageLuminosity is an optional parameter you can use if you've already computed it previously.
+    /// Returns an LDR representation of the current HDR image.
     /// </summary>
-    /// <param name="luminosityFunction">Function used to compute pixel luminosity.</param>
+    /// <param name="luminosityFunction">Function used to compute pixel luminosity.
+    /// If null, it will be computed internally.</param>
     /// <param name="factor">Empirical scaling factor used in normalization.</param>
     /// <param name="gamma">Gamma exponent used for power-law correction (must be > 0).
     /// It's characteristic of the display used.</param>
     /// <param name="averageLuminosity">Optional precomputed average luminosity.</param>
     /// <param name="delta">Small positive value added to pixel luminosity to avoid
-    /// logarithm singularities in the computation of <see cref="_AverageLuminosity"/></param>
-    /// <returns>The LDR image (0–255 range per channel).</returns>
+    /// logarithm singularities in the computation of <see cref="_AverageLuminosity"/>.</param>
+    /// <returns>HDRImage containing LDR data (typically in 0–255 range per channel).</returns>
+    /// <remarks>
+    /// Although the output is LDR, it is returned as an <see cref="HDRImage"/> to avoid introducing a redundant LDR-specific type.
+    /// </remarks>
     public HDRImage CreateLDR(LumFunction luminosityFunction, float factor, float gamma,
         float? averageLuminosity = null,
         float delta = 1e-10f)
@@ -709,9 +701,6 @@ public class HDRImage
 
     /// <summary>
     /// Writes on the outputStream the corresponding LDR image.
-    /// It applies the gamma correction of the display and of the empirical factor here named "factor".
-    /// The luminosityFunction parameter allow to choose between some possible ways to compute the luminosity of a pixel.
-    /// averageLuminosity is an optional parameter you can use if you've already computed it previously.
     /// </summary>
     /// <param name="outputStream">Destination stream where the PNG image will be written.</param>
     /// <param name="luminosityFunction">Function used to compute pixel luminosity for tone mapping.</param>
@@ -720,7 +709,7 @@ public class HDRImage
     /// It's characteristic of the display used.</param>
     /// <param name="averageLuminosity">Optional precomputed average luminosity.</param>
     /// <param name="delta">Small positive value added to pixel luminosity to avoid
-    /// logarithm singularities in the computation of <see cref="_AverageLuminosity"/></param>
+    /// logarithm singularities in the computation of <see cref="_AverageLuminosity"/>.</param>
     public void WritePNG(Stream outputStream, LumFunction luminosityFunction, float factor, float gamma,
         float? averageLuminosity = null,
         float delta = 1e-10f)
@@ -733,7 +722,7 @@ public class HDRImage
         {
             for (int j = 0; j < Height; j++)
             {
-                //the Rgb format requires 3 numbers of the type byte
+                //the Rgb24 format requires 3 numbers of the type byte
                 //so we must convert the RGB values to bytes
                 bitmap[i, j] = new Rgb24((byte)LDRimage[i, j].R, (byte)LDRimage[i, j].G, (byte)LDRimage[i, j].B);
             }
@@ -744,20 +733,19 @@ public class HDRImage
 
     /// <summary>
     /// Creates a PNG file of the corresponding LDR image.
-    /// It accounts for the gamma correction of the display and of the empirical factor here named "factor".
-    /// The luminosityFunction parameter allow to choose between some possible ways to compute the luminosity of a pixel.
     /// </summary>
-    /// <param name="outputFilePath"></param>
-    /// <param name="luminosityFunction"></param>
-    /// <param name="factor"></param>
-    /// <param name="gamma"></param>
-    /// <param name="averageLuminosity"></param>
-    /// <param name="delta"></param>
+    /// <param name="outputFilePath">Destination path where the PNG image will be saved.</param>
+    /// <param name="luminosityFunction">Function used to compute pixel luminosity for tone mapping.</param>
+    /// <param name="factor">Empirical scaling factor used in normalization.</param>
+    /// <param name="gamma">Gamma exponent used for power-law correction (must be > 0).
+    /// It's characteristic of the display used.</param>
+    /// <param name="averageLuminosity">Optional precomputed average luminosity.</param>
+    /// <param name="delta">Small positive value added to pixel luminosity to avoid
+    /// logarithm singularities in the computation of <see cref="_AverageLuminosity"/>.</param>
     public void WritePNG(string outputFilePath, LumFunction luminosityFunction, float factor, float gamma,
         float? averageLuminosity = null,
         float delta = 1e-10f)
     {
-        //using (Stream fileStream = File.OpenWrite(outputFilename))
         using Stream fileStream = new FileStream(outputFilePath, FileMode.Create);
         WritePNG(fileStream, luminosityFunction, factor, gamma, averageLuminosity, delta);
     }
