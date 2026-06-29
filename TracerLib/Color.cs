@@ -4,10 +4,6 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace TracerLib;
 
-//forse un controllo sul prodotto per scalare è troppo?
-//forse è meglio passare by value per efficienza certi argomenti, meglio chiedere a Tomasi
-//magari si può migliorare lo struct usando i primary constructor?
-
 /// <summary>
 /// The Color type is identified by 3 float positive values R,G,B.
 /// Some basic implemented operations: sum, product of a color by a scalar, product between 2 colors.
@@ -27,7 +23,7 @@ public struct Color
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     public Color(float r, float g, float b)
     {
-        if (r < 0)
+        /*if (r < 0)
         {
             throw new ArgumentOutOfRangeException(nameof(r), r, nameof(r) + " must be non-negative");
         }
@@ -40,7 +36,7 @@ public struct Color
         if (b < 0)
         {
             throw new ArgumentOutOfRangeException(nameof(b), b, nameof(b) + " must be non-negative");
-        }
+        }*/
 
         R = r;
         G = g;
@@ -66,10 +62,10 @@ public struct Color
     /// <returns></returns>
     public static Color operator *(Color a, float alpha)
     {
-        if (alpha < 0)
+        /*if (alpha < 0)
         {
             throw new ArgumentOutOfRangeException(nameof(alpha), alpha, nameof(alpha) + " must be non-negative");
-        }
+        }*/
 
         return new Color(a.R * alpha, a.G * alpha, a.B * alpha);
     }
@@ -86,7 +82,7 @@ public struct Color
     }
 
     /// <summary>
-    /// Hadamard's product: Product oper component between two <see cref="Color"/> (used in RenderFunction).
+    /// Hadamard's product: Product per component between two <see cref="Color"/> (used in RenderFunction).
     /// </summary>
     /// <param name="c1">First Color</param>
     /// <param name="c2">Second Color</param>
@@ -142,11 +138,6 @@ public struct Color
     {
         Console.WriteLine(ToString());
     }
-
-    // public bool _AreColorsValid(float R, float G, float B)
-    // {
-    //     return R >= 0 && G >= 0 && B >= 0;
-    // }
 
     /// <summary>
     /// Returns the luminosity of a pixel using the formula given by Shirley and Morley 
