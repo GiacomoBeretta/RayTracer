@@ -4,6 +4,30 @@ namespace TracerLib;
 
 public static class Functions
 {
+    public static void EnsureGreaterThan<T>(T value, string paramName, T threshold) where T : IComparable<T>
+    {
+        if (value.CompareTo(threshold) < 0)
+        {
+            throw new ArgumentOutOfRangeException(paramName, value, $"{paramName} must be greater than {threshold}");
+        }
+    }
+    
+    public static void EnsureGreaterThanOrEqual<T>(T value, string paramName, T threshold) where T : IComparable<T>
+    {
+        if (value.CompareTo(threshold) < 0)
+        {
+            throw new ArgumentOutOfRangeException(paramName, value, $"{paramName} must be greater than or equal to {threshold}");
+        }
+    }
+
+    public static void EnsureInRange<T>(T value, string paramName, T min, T max) where T : IComparable<T>
+    {
+        if (value.CompareTo(min) < 0 || value.CompareTo(max) > 0)
+        {
+            throw new ArgumentOutOfRangeException(paramName, value, $"{paramName} must be in [{min}, {max}]");
+        }
+    }
+    
     /// <summary>
     /// Determines whether two floating-point values are approximately equal
     /// within a given tolerance.
