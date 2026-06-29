@@ -381,8 +381,8 @@ public class HDRImageTest
         float delta = 0;
         HDRImage hdrImage = new HDRImage(3, 1, colorVector);
 
-        HDRImage ldrImage = hdrImage.CreateLDR(luminosityFunction, factor, gamma, delta);
-        hdrImage._Normalize(luminosityFunction, factor, delta);
+        HDRImage ldrImage = hdrImage.CreateLDR(luminosityFunction, factor, gamma, null, delta);
+        hdrImage._Normalize(luminosityFunction, factor, null, delta);
         hdrImage._ClampImage();
         hdrImage._ImageTo8BitRGB(gamma);
 

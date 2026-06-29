@@ -284,7 +284,7 @@ public class HDRImage
     public static void _ParseImgSize(string stringImgSize, out int width, out int height)
     {
         string[] stringSizeArray = stringImgSize.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        
+
         if (stringSizeArray.Length != 2)
         {
             throw new InvalidPfmFileFormatException(
