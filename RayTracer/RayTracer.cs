@@ -121,6 +121,7 @@ public class RenderCommand
 
     public void OnExecute()
     {
+        ValidateParameters();
         PrintParameters();
         SetIOFilesPaths(out string scenePath, out string pfmFilePath, out string pngFilePath);
         Scene scene = ReadSceneFile(scenePath);
@@ -138,6 +139,11 @@ public class RenderCommand
         Console.WriteLine($"Png file created in: {pngFilePath}");
     }
 
+    /// <summary>
+    /// Validates that all numeric parameters satisfy their expected constraints
+    /// Throws <see cref="ArgumentOutOfRangeException"/> if any parameter is invalid.
+    /// Enum parameters (Algorithm and luminosityFunction) are not validated here.
+    /// </summary>
     public void ValidateParameters()
     {
         Functions.EnsureGreaterThanOrEqual<int>(Width, nameof(Width), 1);
@@ -148,7 +154,7 @@ public class RenderCommand
         Functions.EnsureGreaterThanOrEqual<ulong>(InitState, nameof(InitState), 0);
         Functions.EnsureGreaterThanOrEqual<ulong>(InitSeq, nameof(InitSeq), 0);
         Functions.EnsureGreaterThanOrEqual<int>(RussianRouletteStartDepth, nameof(RussianRouletteStartDepth), 0);
-       
+
         if (RussianRouletteFixedProb.HasValue)
         {
             Functions.EnsureInRange<float>(RussianRouletteFixedProb.Value, nameof(RussianRouletteFixedProb), 0, 1);
@@ -331,6 +337,7 @@ public class AverageImagesCommand
 
     public void OnExecute()
     {
+        ValidateParameters();
         PrintParameters();
         SetIOFilesPaths(out string inputFileFolder, out string pfmFilePath, out string pngFilePath);
         HDRImage[]? images = ReadPfmImages(inputFileFolder, "*_state*_seq*.pfm");
@@ -348,6 +355,23 @@ public class AverageImagesCommand
 
         output.WritePNG(OutputPngFileName, Luminosityfunction, Factor, Gamma, AverageLuminosity);
         Console.WriteLine($"Png file created in: {pngFilePath}");
+    }
+
+    /// <summary>
+    /// Validates that all the numeric parameters satisfy their expected constraints.
+    /// Throws <see cref="ArgumentOutOfRangeException"/> if any parameter is invalid.
+    ///
+    /// The enum parameter LuminosityFunction is not validated here.
+    /// </summary>
+    public void ValidateParameters()
+    {
+        if (AverageLuminosity.HasValue)
+        {
+            Functions.EnsureGreaterThan<float>(AverageLuminosity.Value, nameof(AverageLuminosity), 0);
+        }
+
+        Functions.EnsureGreaterThanOrEqual<float>(Factor, nameof(Factor), 0);
+        Functions.EnsureGreaterThan<float>(Gamma, nameof(Gamma), 0);
     }
 
     /// <summary>
@@ -505,6 +529,8 @@ public class PfmToPngCommand
 
     internal void OnExecute()
     {
+        ValidateParameters();
+
         Console.WriteLine($"input PFM file name: {InputFileName}");
         Console.WriteLine($"output PNG file name: {OutputFileName}");
         Console.WriteLine($"Luminosity Function: {Luminosityfunction}");
@@ -524,6 +550,23 @@ public class PfmToPngCommand
         image.WritePNG(pngFilePath, Luminosityfunction, Factor, Gamma, AverageLuminosity);
 
         Console.WriteLine($"File saved in: {pngFilePath}");
+    }
+
+    /// <summary>
+    /// Validates that all the numeric parameters satisfy their expected constraints.
+    /// Throws <see cref="ArgumentOutOfRangeException"/> if any parameter is invalid.
+    ///
+    /// The enum parameter LuminosityFunction is not validated here.
+    /// </summary>
+    public void ValidateParameters()
+    {
+        if (AverageLuminosity.HasValue)
+        {
+            Functions.EnsureGreaterThan<float>(AverageLuminosity.Value, nameof(AverageLuminosity), 0);
+        }
+
+        Functions.EnsureGreaterThanOrEqual<float>(Factor, nameof(Factor), 0);
+        Functions.EnsureGreaterThan<float>(Gamma, nameof(Gamma), 0);
     }
 }
 
