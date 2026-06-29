@@ -23,7 +23,7 @@ public struct Color
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     public Color(float r, float g, float b)
     {
-        /*if (r < 0)
+        if (r < 0)
         {
             throw new ArgumentOutOfRangeException(nameof(r), r, nameof(r) + " must be non-negative");
         }
@@ -36,7 +36,7 @@ public struct Color
         if (b < 0)
         {
             throw new ArgumentOutOfRangeException(nameof(b), b, nameof(b) + " must be non-negative");
-        }*/
+        }
 
         R = r;
         G = g;
@@ -62,10 +62,10 @@ public struct Color
     /// <returns></returns>
     public static Color operator *(Color a, float alpha)
     {
-        /*if (alpha < 0)
+        if (alpha < 0)
         {
             throw new ArgumentOutOfRangeException(nameof(alpha), alpha, nameof(alpha) + " must be non-negative");
-        }*/
+        }
 
         return new Color(a.R * alpha, a.G * alpha, a.B * alpha);
     }
