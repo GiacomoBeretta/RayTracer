@@ -127,7 +127,7 @@ public class RenderCommand
         Scene scene = ReadSceneFile(scenePath);
         HDRImage image = new HDRImage(Width, Height);
         Renderer renderer = BuildRenderer(scene);
-        ICamera camera = GetOrCreateCamera(scene);
+        Camera camera = GetOrCreateCamera(scene);
         ImageTracer tracer = new ImageTracer(image, camera, pixelSideSubdivisions: SampleSide);
 
         tracer.FireAllRays(ray => renderer.RenderFunction(ray));
@@ -290,7 +290,7 @@ public class RenderCommand
     /// </summary>
     /// <param name="scene">The scene to retrieve or initialize the camera from.</param>
     /// <returns>An existing camera if present, otherwise a newly created PerspectiveCamera.</returns>
-    public ICamera GetOrCreateCamera(Scene scene)
+    public Camera GetOrCreateCamera(Scene scene)
     {
         if (scene.Camera == null)
         {

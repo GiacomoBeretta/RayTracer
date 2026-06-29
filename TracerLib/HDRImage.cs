@@ -44,6 +44,11 @@ public class HDRImage
     /// </summary>
     public Color[] Pixels { get; set; } //Controllare nullable (Color[])?
 
+    /// <summary>
+    /// The ratio Width/Height of the pixel grid.
+    /// </summary>
+    public float AspectRatio => Width / (float)Height; 
+    
     //con i controlli invece viene
     /*
      private int width;

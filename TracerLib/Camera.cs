@@ -3,94 +3,133 @@
 namespace TracerLib;
 
 /// <summary>
-/// Defines the common contract for a camera used to project a scene onto an image.
-/// The camera screen is parametrized as the unit square [0,1] × [0,1], with the origin in the top-left corner.
-/// The <see cref="AspectRatio"/> property can then be used to scale it to the desired proportions.
+/// Represents the base class for cameras used to project a scene onto an image.
 /// </summary>
-public interface ICamera
+/// <remarks>
+/// The camera uses the following right-handed coordinate system:
+/// X: forward (viewing direction)
+/// Y: horizontal axis, positive toward the left
+/// Z: vertical axis, positive upward
+/// 
+/// The image plane is centered at the origin of the coordinate system.
+/// It is parametrized by normalized coordinates (u, v) in [0, 1]×[0, 1],
+/// with (0,0) in the top-left corner.
+/// (u,v) are mapped by the method <see cref="FireRay"/>
+/// onto the image plane [-Width/2, Width/2]×[-Height/2,Height/2]
+/// </remarks>
+public abstract class Camera
 {
     /// <summary>
-    /// The ratio Width/Height of the image.
+    /// Width of the image plane.
     /// </summary>
-    public float AspectRatio { get; }
+    public float Width { get; }
+
+    /// <summary>
+    /// Height of the image plane.
+    /// </summary>
+    public float Height { get; }
+
+    /// <summary>
+    /// The ratio Width/Height of the image plane.
+    /// </summary>
+    public float AspectRatio => Width / Height;
 
     /// <summary>
     /// The transformation applied to the camera.
     /// </summary>
-    public Transformation Transformation { get; set; }
-    
+    public Transformation Transformation { get; }
+
+    public Camera()
+    {
+        Width = 1.0f;
+        Height = 1.0f;
+        Transformation = new Transformation();
+    }
+
+    public Camera(Transformation transformation, float width = 1.0f, float height = 1.0f)
+    {
+        Width = width;
+        Height = height;
+        Transformation = transformation;
+    }
+
     /// <summary>
-    /// Returns a <see cref="Ray"/> passing through the specified screen's coordinates (u,v).
-    /// The coordinate origin is the top-left corner of the screen.
-    /// u and v are in [0, 1], mapped to screen space: y ∈ [-R, R] (R = aspect ratio) and z ∈ [-1, 1].
+    /// Returns a <see cref="Ray"/> that passes through the specified normalized image coordinates (u, v).
     /// </summary>
-    /// <param name="u">Horizontal screen coordinate (within [0,1]).</param>
-    /// <param name="v">Vertical screen coordinate (within [0,1]).</param>
+    /// <remarks>
+    /// (u, v) parameterize the image plane in normalized coordinates in the range [0, 1] × [0, 1],
+    /// with (0, 0) mapped to the top-left corner.
+    ///
+    /// These coordinates are transformed into image plane space:
+    /// y ∈ [-Width/2, Width/2] (horizontal axis),
+    /// z ∈ [-Height/2, Height/2] (vertical axis).
+    /// 
+    /// See <see cref="Camera"/> for details about the coordinate system.
+    /// </remarks>
+    /// <param name="u">Horizontal normalized coordinate in the range [0, 1].</param>
+    /// <param name="v">Vertical normalized coordinate in the range [0, 1].</param>
     /// <returns></returns>
-    public Ray FireRay(float u, float v);
+    public abstract Ray FireRay(float u, float v);
 }
 
 /// <summary>
 /// Represents an orthogonal (orthographic) camera projection.
 /// In this projection, all rays are parallel to each other and perpendicular to the image plane,
 /// meaning there is no perspective distortion.
+///
+/// See <see cref="Camera"/> for more information.
 /// </summary>
-public struct OrthogonalCamera : ICamera
+public class OrthogonalCamera : Camera
 {
-    public float AspectRatio { get; set; }
-    public Transformation Transformation { get; set; }
-
     /// <summary>
-    /// Constructs an <see cref="OrthogonalCamera"/> with an aspect ratio of 1:1 and an identity <c>Transformation</c>
+    /// Constructs an <see cref="OrthogonalCamera"/> with a 1×1 image plane and the
+    /// identity <see cref="Transformation"/>.
     /// </summary>
-    public OrthogonalCamera()
+    public OrthogonalCamera() : base()
     {
-        AspectRatio = 1.0f;
-        Transformation = new Transformation();
     }
 
     /// <summary>
-    /// Constructs an orthogonal <c>Camera</c> with specified aspect ratio and transformation.
+    /// Initializes a new instance of the <see cref="OrthogonalCamera"/> class with the specified
+    /// transformation and image plane dimensions.
     /// </summary>
-    /// <param name="transformation">Possible <c>Transformation</c>: Identity, Translation, Scaling and Rotation around a specified axis.</param>
-    /// <param name="aspectRatio">Ratio between image's width and height.</param>
-    public OrthogonalCamera(Transformation transformation, float aspectRatio = 1.0f)
+    /// <param name="transformation">
+    /// The transformation that defines the camera's position and orientation.
+    /// </param>
+    /// <param name="width">The width of the image plane (defaults to 1).</param>
+    /// <param name="height">The height of the image plane (defaults to 1).</param>
+    public OrthogonalCamera(Transformation transformation, float width = 1.0f, float height = 1.0f) : base(
+        transformation, width, height)
     {
-        AspectRatio = aspectRatio;
-        Transformation = transformation;
     }
-    
-    // forse sarebbe meglio mettere due parametri ulteriori da riga di comando che allargano la dimensione dello schermo.
+
     /// <summary>
-    /// Returns a <see cref="Ray"/> orthogonal to the screen, passing through the specified screen's coordinates (u,v).
-    /// The coordinate origin is the top-left corner of the screen.
-    /// u and v are in [0, 1], mapped to screen space: y ∈ [-R, R] (R = aspect ratio) and z ∈ [-1, 1].
+    /// Returns a <see cref="Ray"/> that passes through the specified normalized image coordinates (u, v),
+    /// parallel to the camera's viewing direction (X axis).
     /// </summary>
-    /// <param name="u">Horizontal screen coordinate (within [0,1]).</param>
-    /// <param name="v">Vertical screen coordinate (within [0,1]).</param>
+    /// <remarks>
+    /// (u, v) parameterize the image plane in normalized coordinates in the range [0, 1] × [0, 1],
+    /// with (0, 0) mapped to the top-left corner.
+    ///
+    /// These coordinates are transformed into image plane space:
+    /// y ∈ [-Width/2, Width/2] (horizontal axis),
+    /// z ∈ [-Height/2, Height/2] (vertical axis).
+    /// 
+    /// See <see cref="Camera"/> for details about the coordinate system.
+    /// </remarks>
+    /// <param name="u">Horizontal normalized coordinate in the range [0, 1].</param>
+    /// <param name="v">Vertical normalized coordinate in the range [0, 1].</param>
     /// <returns></returns>
-    public Ray FireRay(float u, float v)
+    public override Ray FireRay(float u, float v)
     {
-        // formula per quando u,v partono dall'angolo in basso a sinistra
-        // u e v vanno da 0 a 1
-        // e così lo schermo ha proporzioni 2x2*AspectRatio
-        // il punto per cui passa il raggio va da -AspectRatio a +AspectRatio per y e da -1 a 1 per z 
-        // Point origin = new Point(-1f, (1f - 2f * u) * this.AspectRatio, 2f * v - 1f);
+        // Map normalized coordinates [0,1] to centered image plane coordinates [-0.5, 0.5].
+        // We don't compute (u - 0.5, v - 0.5) because
+        // u,v originate in the top-left corner and have the positive direction inverted with respect to y and z.
+        // We multiply by Width and Height to scale the normalized image plane to its real dimensions.
+        Point origin = new Point(-1, (-u + 0.5f) * Width, (-v + 0.5f) * Height);
 
-        // formula per quando u e v partono dall'angolo in alto a sinistra
-        // u e v vanno da 0 a 1
-        // e così lo schermo ha proporzioni 2x2*AspectRatio
-        // il punto per cui passa il raggio va da -AspectRatio a +AspectRatio per y e da -1 a 1 per z 
-         Point origin = new Point(-1, (-2*u + 1f) * AspectRatio, -2*v + 1f);
-
-        // formula per quando u e v partono dall'angolo in alto a sinistra
-        // u e v vanno da 0 a 1
-        // e così lo schermo ha proporzioni 1xAspectRatio 
-        // il punto per cui passa il raggio va da -0.5*AspectRatio a 0.5*AspectRatio per y e da -0.5 a 0.5 per z
-        // quindi forse così lo schermo è un po' più piccolo
-        //Point origin = new Point(-1, (-u + 0.5f) * AspectRatio, -v + 0.5f);
-
-        //direction orthogonal to the screen.
+        // In orthogonal projection, all rays are parallel to the camera's viewing direction (X axis),
+        // which is orthogonal to the image plane.
         Vector direction = new Vector(1, 0, 0);
         return Transformation * new Ray(origin, direction);
     }
@@ -101,76 +140,67 @@ public struct OrthogonalCamera : ICamera
 /// In this model, all rays originate from a single point (the observer position),
 /// creating a vanishing point effect where parallel lines converge in the distance.
 /// Objects appear smaller as their distance from the camera increases, simulating human vision.
+///
+/// See <see cref="Camera"/> for more information.
 /// </summary>
-public struct PerspectiveCamera : ICamera
+public class PerspectiveCamera : Camera
 {
     /// <summary>
     /// The distance of the observer from the screen.
     /// </summary>
-    public float Distance { get; set; }
-
-    public float AspectRatio { get; set; }
-    public Transformation Transformation { get; set; }
+    public float Distance { get; }
 
     /// <summary>
-    /// Initialize a perspective <c>Camera</c> with unity <see cref="Distance"/>,
-    /// an <see cref="AspectRatio"/> of 1:1 and an identity <see cref="Transformation"/>.
+    /// Constructs a <see cref="PerspectiveCamera"/> with a 1×1 image plane,
+    /// the identity <see cref="Transformation"/>, and a unit <see cref="Distance"/> to the image plane.
     /// </summary>
-    public PerspectiveCamera()
+    public PerspectiveCamera() : base()
     {
         Distance = 1.0f;
-        AspectRatio = 1.0f;
-        Transformation = new Transformation();
     }
 
     /// <summary>
-    /// Constructs a camera that uses a perspective projection,
-    /// with specified <see cref="Distance"/>, <see cref="AspectRatio"/> and <see cref="Transformation"/>.
+    /// Constructs a <see cref="PerspectiveCamera"/>, with the specified image plane dimensions, <see cref="Distance"/> to the image plane,
+    /// and <see cref="Transformation"/>.
     /// </summary>
-    /// <param name="transformation">Possible <c>Transformation</c>: Identity, Translation, Scaling and Rotation around a specified axis</param>
-    /// <param name="distance">Distance between the observer and the screen</param>
-    /// <param name="aspectRatio">Ratio Width/Height of the screen</param>
-    public PerspectiveCamera(Transformation transformation, float distance = 1.0f, float aspectRatio = 1.0f)
+    /// <param name="transformation">The transformation that defines the camera's position and orientation.</param>
+    /// <param name="width">The width of the image plane (defaults to 1).</param>
+    /// <param name="height">The height of the image plane (defaults to 1).</param>
+    /// <param name="distance">Distance to the image plane (defaults to 1).</param>
+    public PerspectiveCamera(Transformation transformation, float width = 1.0f, float height = 1.0f,
+        float distance = 1.0f) : base(transformation, width, height)
     {
         Distance = distance;
-        AspectRatio = aspectRatio;
-        Transformation = transformation;
     }
-    
-    // forse sarebbe meglio mettere due parametri ulteriori da riga di comando che allargano la dimensione dello schermo.
+
     /// <summary>
     /// Returns a <see cref="Ray"/> starting at (-d, 0, 0)
     /// (d = <see cref="Distance"/> from between the observer and the screen)
-    /// and passing through the specified screen's coordinates (u,v).
-    /// The coordinate origin is the top-left corner of the screen.
-    /// u and v are in [0, 1], mapped to screen space: y ∈ [-R, R] (R = aspect ratio) and z ∈ [-1, 1].
+    /// that passes through the specified normalized image coordinates (u, v),
     /// </summary>
-    /// <param name="u">Horizontal screen coordinate (within [0,1]).</param>
-    /// <param name="v">Vertical screen coordinate (within [0,1]).</param>
-    /// <returns></returns>
-    public Ray FireRay(float u, float v)
+    /// <remarks>
+    /// (u, v) parameterize the image plane in normalized coordinates in the range [0, 1] × [0, 1],
+    /// with (0, 0) mapped to the top-left corner.
+    ///
+    /// These coordinates are transformed into image plane space:
+    /// y ∈ [-Width/2, Width/2] (horizontal axis),
+    /// z ∈ [-Height/2, Height/2] (vertical axis).
+    /// 
+    /// See <see cref="Camera"/> for details about the coordinate system.
+    /// </remarks>
+    /// <param name="u">Horizontal normalized coordinate in the range [0, 1].</param>
+    /// <param name="v">Vertical normalized coordinate in the range [0, 1].</param>
+    /// <returns>A ray originating from the camera and passing through the corresponding point on the image plane.</returns>
+    public override Ray FireRay(float u, float v)
     {
         // position of the observer
         Point origin = new Point(-Distance, 0.0f, 0.0f);
 
-        // formula per quando u,v partono dall'angolo in basso a sinistra
-        // u e v vanno da 0 a 1
-        // e così lo schermo ha proporzioni 2x2*AspectRatio
-        // il punto per cui passa il raggio va da -AspectRatio a +AspectRatio per y e da -1 a 1 per z 
-        // Vector dir = new Vector(Distance, (1.0f - 2.0f * u) * AspectRatio, 2 * v - 1);
-
-        // formula per quando u e v partono dall'angolo in alto a sinistra
-        // u e v vanno da 0 a 1
-        // e così lo schermo ha proporzioni 2x2*AspectRatio
-        // il punto per cui passa il raggio va da -AspectRatio a +AspectRatio per y e da -1 a 1 per z
-        Vector dir = new Vector(Distance, (-2*u + 1f) * AspectRatio, -2*v + 1f);
-
-        // formula per quando u e v partono dall'angolo in alto a sinistra
-        // u e v vanno da 0 a 1
-        // e così lo schermo ha proporzioni 1xAspectRatio
-        // il punto per cui passa il raggio va da -0.5*AspectRatio a 0.5*AspectRatio per y e da -0.5 a 0.5 per z
-        // quindi forse così lo schermo è un po' più piccolo
-        // Vector dir = new Vector(Distance, (-u + 0.5f) * AspectRatio, -v + 0.5f);
+        // Map normalized coordinates [0,1] to centered image plane coordinates [-0.5, 0.5].
+        // We don't compute (u - 0.5, v - 0.5) because
+        // u,v originate in the top-left corner and have the positive direction inverted with respect to y and z.
+        // We multiply by Width and Height to scale the normalized image plane to its real dimensions.
+        Vector dir = new Vector(Distance, (-u + 0.5f) * Width, (-v + 0.5f) * Height);
 
         return Transformation * new Ray(origin, dir);
     }

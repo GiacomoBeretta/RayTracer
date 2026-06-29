@@ -27,7 +27,7 @@ public class Scene
     /// The camera used to render the scene.
     /// See <see cref="Camera"/> for more information.
     /// </summary>
-    public ICamera? Camera { get; set; } = null;
+    public Camera? Camera { get; set; } = null;
 
     /// <summary>
     /// Maps variable names to their values.
@@ -495,43 +495,48 @@ public class Scene
     /// </summary>
     /// <remarks>
     /// Expected grammar:
-    /// camera_decl ::= "camera" "(" camera_type "," transformation "," number "," number ")"
-    /// camera_type ::= "perspective" | "orthogonal"
+    /// camera_decl ::= "camera" "(" camera_type "," camera_params ")"
+    /// camera_type ::= "orthogonal" | "perspective"
+    /// camera_params ::= orthogonal_params | perspective_params
+    /// orthogonal_params ::= transformation "," number "," number
+    /// perspective_params ::= transformation "," number "," number "," number
     /// </remarks>
     /// <param name="inputStream">The input stream providing tokens to read.</param>
     /// <returns>
-    /// An <see cref="ICamera"/> instance of the appropriate type
+    /// An <see cref="TracerLib.Camera"/> instance of the appropriate type
     /// (<see cref="PerspectiveCamera"/> or <see cref="OrthogonalCamera"/>).
     /// </returns>
     /// <exception cref="SceneSyntaxException">
     /// Thrown if the input does not match the expected syntax or if the camera type is invalid.
     /// </exception>
-    public ICamera ParseCamera(InputStream inputStream)
+    public Camera ParseCamera(InputStream inputStream)
     {
+        Camera result;
+        
         ExpectSymbol(inputStream, "(");
         Keyword cameraKeyword = ExpectKeyword(inputStream, [Keyword.Perspective, Keyword.Orthogonal]);
         ExpectSymbol(inputStream, ",");
         Transformation transformation = ParseTransformation(inputStream);
         ExpectSymbol(inputStream, ",");
-        float aspectRatio = ExpectNumber(inputStream);
+        float width = ExpectNumber(inputStream);
         ExpectSymbol(inputStream, ",");
-        float distance = ExpectNumber(inputStream);
-        ExpectSymbol(inputStream, ")");
-
-        ICamera result;
-
+        float height = ExpectNumber(inputStream);
+        
         switch (cameraKeyword)
         {
             case Keyword.Perspective:
-                result = new PerspectiveCamera(transformation, distance, aspectRatio);
+                ExpectSymbol(inputStream, ",");
+                float distance = ExpectNumber(inputStream);
+                result = new PerspectiveCamera(transformation, width, height, distance);
                 break;
             case Keyword.Orthogonal:
-                result = new OrthogonalCamera(transformation, aspectRatio);
+                result = new OrthogonalCamera(transformation, width, height);
                 break;
             default:
                 throw new SceneSyntaxException(inputStream.Location, "Keyword doesn't match any of the Cameras types");
         }
-
+        ExpectSymbol(inputStream, ")");
+        
         return result;
     }
 
