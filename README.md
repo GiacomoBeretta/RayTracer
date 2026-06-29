@@ -303,14 +303,14 @@ Scenes are described through a custom text-based language.
 The scene language allows the definition of:
 
 - [floating-point variables](#floating-point-variables);
-- vectors;
-- colors;
-- materials;
-- pigments;
-- BRDFs;
-- transformations;
-- geometric primitives;
-- cameras.
+- [vectors](#vectors);
+- [colors](#vectors);
+- [materials](#materials);
+- [pigments](#pigments);
+- [BRDFs](#BRDFs);
+- [transformations](#transformations);
+- [geometric primitives](#geometric-primitives);
+- [cameras](#cameras).
 
 An example scene is shown below:
 
