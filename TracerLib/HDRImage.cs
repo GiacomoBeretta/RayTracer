@@ -1,8 +1,5 @@
 // This file is release under EUPL_v1.2 license. See LICENSE.md
 
-// Implementare dei controlli per i constructor e in altre funzioni se necessario, vediamo cosa dice Tomasi in proposito.
-// Forse si possono mettere i membri privati e rendere la classe dei test una friend?
-
 using System.Diagnostics.CodeAnalysis; // per sopprimere i messaggi di errore
 using
     System.Globalization; //per il metodo cultureInfo e quindi per risolvere il problema dell'1.0 che viene letto come 10
@@ -21,21 +18,13 @@ using System.Text; //for the Encoding.ASCII.GetBytes
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 public class HDRImage
 {
-    //Provare a mettere delle verifiche sulle funzioni get e set
-    //per verificare per esempio che RGB siano positivi e che get
-    //e set pixel verifichino che row e column siano positivi con
-    //la funzione validCoordinates. E vedere se il programma non
-    //rallenta troppo
-
-    //Variables HDR image
-
     /// <summary>
-    /// Width of the matrix of pixels.
+    /// Number of pixel columns.
     /// </summary>
     public int Width { get; private set; }
 
     /// <summary>
-    /// Height of the matrix of pixels.
+    /// Number of pixel rows.
     /// </summary>
     public int Height { get; private set; }
 
@@ -48,20 +37,6 @@ public class HDRImage
     /// The ratio Width/Height of the pixel grid.
     /// </summary>
     public float AspectRatio => Width / (float)Height; 
-    
-    //con i controlli invece viene
-    /*
-     private int width;
-     private height;
-     private Color[] pixels;
-
-     public int Width{
-        get{return width;}
-        if(value < 0){
-            throw new ArgumentException("the width must be >= 0")
-        }
-        set{}
-     }*/
 
     /// <summary>
     /// Validates that the specified coordinates are within the range
@@ -120,7 +95,7 @@ public class HDRImage
     /// <exception cref="ArgumentException">
     /// Thrown when the length of <paramref name="colorVector"/> does not match width × height.
     /// </exception>
-    public static void _CheckPixels(int width, int height, Color[] colorVector)
+    public static void _CheckArrayLength(int width, int height, Color[] colorVector)
     {
         ArgumentNullException.ThrowIfNull(colorVector);
         if (colorVector.Length != width * height)
@@ -129,9 +104,7 @@ public class HDRImage
                 nameof(colorVector));
         }
     }
-
-    //vedere se anche per questo indice si possono mettere dei controlli
-    //index and range for the pixels 1D vector with the type indexer
+    
     /// <summary>
     /// Returns the <c>Color</c> given by the i-th element of the 1D Pixel's array.
     /// </summary>
@@ -155,8 +128,7 @@ public class HDRImage
         _ValidateCoordinates(column, row);
         return row * Width + column;
     }
-
-    //vedere come mettere un controllo con l'eccezione
+    
     /// <summary>
     /// Gives the Color at the indexes (column, row) of the corresponding matrix
     /// </summary>
@@ -171,7 +143,13 @@ public class HDRImage
     //Constructors - Begin
 
     #region Constructors
-
+    
+    /// <summary>
+    /// Initializes an HDR image with a <paramref name="width"/>×<paramref name="height"/> pixel grid,
+    /// where every pixel is initialized to black (0, 0, 0).
+    /// </summary>
+    /// <param name="width">The number of pixel columns.</param>
+    /// <param name="height">The number of pixel rows.</param>
     public HDRImage(int width, int height)
     {
         _CheckWidthHeight(width, height);
@@ -184,7 +162,7 @@ public class HDRImage
         Color[] colorVector)
     {
         _CheckWidthHeight(width, height);
-        _CheckPixels(width, height, colorVector);
+        _CheckArrayLength(width, height, colorVector);
 
         Width = width;
         Height = height;
@@ -210,17 +188,6 @@ public class HDRImage
 
     public HDRImage(string fileName)
     {
-        /*   using Stream filestream = File.OpenRead(fileName);
-   HDRImage img = ReadPFM_File(filestream);
-
-   Width = img.Width;
-   Height = img.Height;
-   Pixels = new Color[Width * Height];
-   for (int i = 0; i < Pixels.Length; i++)
-   {
-       Pixels[i] = img.Pixels[i];
-   }*/
-
         using Stream filestream = File.OpenRead(fileName);
         HDRImage img = ReadPFM_File(filestream);
 

@@ -521,7 +521,7 @@ public class Scene
         float width = ExpectNumber(inputStream);
         ExpectSymbol(inputStream, ",");
         float height = ExpectNumber(inputStream);
-        
+            
         switch (cameraKeyword)
         {
             case Keyword.Perspective:

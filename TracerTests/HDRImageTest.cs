@@ -34,10 +34,10 @@ public class HDRImageTest
     [Fact]
     public void TestCheckPixels()
     {
-        HDRImage._CheckPixels(1, 1, new Color[1]);
-        HDRImage._CheckPixels(5, 2, new Color[10]);
-        Assert.Throws<ArgumentNullException>(() => HDRImage._CheckPixels(1, 2, null));
-        Assert.Throws<ArgumentException>(() => HDRImage._CheckPixels(10, 91, new Color[911]));
+        HDRImage._CheckArrayLength(1, 1, new Color[1]);
+        HDRImage._CheckArrayLength(5, 2, new Color[10]);
+        Assert.Throws<ArgumentNullException>(() => HDRImage._CheckArrayLength(1, 2, null));
+        Assert.Throws<ArgumentException>(() => HDRImage._CheckArrayLength(10, 91, new Color[911]));
     }
 
     [Fact]
