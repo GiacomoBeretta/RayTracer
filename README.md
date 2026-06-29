@@ -691,12 +691,6 @@ camera(
 
 ---
 
-### Note on Orthogonal Cameras
-
-Although an orthogonal camera does not use the `distance` parameter internally, the parameter must still be specified in order for the scene to be parsed correctly.
-
----
-
 ## Comments
 
 Comments can be inserted using the `#` character.
@@ -724,9 +718,15 @@ sphere_decl ::= "sphere" "(" IDENTIFIER "," transformation ")"
 
 material_decl ::= "material" IDENTIFIER "(" brdf "," pigment ")"
 
-camera_decl ::= "camera" "(" camera_type "," transformation "," number "," number ")"
+amera_decl ::= "camera" "(" camera_type "," camera_params ")"
 
-camera_type ::= "perspective" | "orthogonal"
+camera_type ::= "orthogonal" | "perspective"
+
+camera_params ::= orthogonal_params | perspective_params
+
+orthogonal_params ::= transformation "," number "," number
+
+perspective_params ::= transformation "," number "," number "," number
 
 brdf ::= diffuse_brdf | specular_brdf
 
