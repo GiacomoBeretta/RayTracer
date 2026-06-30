@@ -64,7 +64,7 @@ public class ColorTest
     }
 
     [Fact]
-    public void TestSameColor()
+    public void TestAreSameColor()
     {
         Color c1 = new Color(423.3f, 5, 18.8f);
         Color c2 = new Color(423.3f, 5, 18.8f);
@@ -75,7 +75,7 @@ public class ColorTest
     }
 
     [Fact]
-    public void TestCloseColor()
+    public void TestAreColorsClose()
     {
         Color c1 = new Color(423.37737f, 5, 18.81416f);
 
@@ -131,6 +131,4 @@ public class ColorTest
         Assert.Throws<ArgumentOutOfRangeException>(() => a.To8BitRGB(0));
         Assert.Throws<ArgumentOutOfRangeException>(() => a.To8BitRGB(-1));
     }
-
-    //Aggiungere test clamp
 }
