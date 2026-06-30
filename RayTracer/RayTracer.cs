@@ -203,12 +203,11 @@ public class RenderCommand
         Console.WriteLine($"Factor: {Factor}");
         Console.WriteLine($"Gamma: {Gamma}");
         Console.WriteLine();
-        Console.Write("Definitions: ");
+        Console.Write("Definitions:\n");
         foreach (string def in Definitions)
         {
             Console.WriteLine($"{def}");
         }
-
         Console.WriteLine();
     }
 
@@ -387,6 +386,7 @@ public class AverageImagesCommand
         Console.WriteLine($"Average Luminosity: {AverageLuminosity}");
         Console.WriteLine($"Factor: {Factor}");
         Console.WriteLine($"Gamma: {Gamma}");
+        Console.WriteLine();
     }
 
     /// <summary>
@@ -537,6 +537,7 @@ public class PfmToPngCommand
         Console.WriteLine($"Average Luminosity: {AverageLuminosity}");
         Console.WriteLine($"factor: {Factor}");
         Console.WriteLine($"gamma: {Gamma}");
+        Console.WriteLine();
 
         string pngfilename = OutputFileName.EndsWith(".png") ? OutputFileName : OutputFileName + ".png";
 
