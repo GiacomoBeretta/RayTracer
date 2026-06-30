@@ -64,8 +64,7 @@ public class ImagePigment : Pigment
     {
         Image = image;
     }
-
-    //TOGLIERE MATHFLOOR SUL BRANCH AVERAGEIMAGE
+    
     /// <summary>
     /// Returns the color sampled from the image at the specified UV coordinates.
     /// </summary>
@@ -145,7 +144,7 @@ public class CheckeredPigment : Pigment
         int iu = (int)(MathF.Floor(uv.U * NumSteps));
         int iv = (int)(MathF.Floor(uv.V * NumSteps));
 
-        return (iu + iv) % 2 == 0 ? Color1 : Color2; //magari è più veloce
+        return (iu + iv) % 2 == 0 ? Color1 : Color2; // maybe it's faster this
         //return ((iu % 2) == (iv % 2)) ? Color1 : Color2;
     }
 }

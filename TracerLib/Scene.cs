@@ -2,8 +2,6 @@
 
 namespace TracerLib;
 
-//Verificare se modificare {token} in {type(token)} nei messaggi d'errore cambia qualcosa
-
 /// <summary>
 /// Represents a scene parsed from a scene description file.
 /// </summary>
@@ -71,7 +69,7 @@ public class Scene
     /// <param name="keywords">The list of valid keywords that are allowed at this position.</param>
     /// <returns>The parsed <see cref="Keyword"/> value.</returns>
     /// <exception cref="SceneSyntaxException">
-    ///  Thrown when the next token is not a keyword, or when the keyword is not contained in <paramref name="keywords"/>.
+    /// Thrown when the next token is not a keyword, or when the keyword is not contained in <paramref name="keywords"/>.
     /// </exception>
     public Keyword ExpectKeyword(InputStream inputStream, List<Keyword> keywords)
     {

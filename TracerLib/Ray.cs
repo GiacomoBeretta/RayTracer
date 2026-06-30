@@ -3,7 +3,7 @@
 namespace TracerLib;
 
 /// <summary>
-/// A struct representing a light ray.
+/// Represents a light ray.
 /// 
 /// Intersections are parameterized by a scalar t such that
 /// P = <see cref="Origin"/> + t * <see cref="Dir"/>.

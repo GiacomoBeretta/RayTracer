@@ -76,12 +76,6 @@ public struct Point
         return new Point(p.X - v.X, p.Y - v.Y, p.Z - v.Z);
     }
 
-    //this operation shouldn't be allowed
-    /*public static Point operator +(Vector a, Point b)
-    {
-        return new Point(a.X + b.X, a.Y + b.Y, a.Z + b.Z);
-    }*/
-
     /// <summary>
     /// Returns a new point, inverting all the coordinates of the specified point.
     /// </summary>
