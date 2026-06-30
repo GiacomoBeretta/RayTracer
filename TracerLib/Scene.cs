@@ -247,7 +247,7 @@ public class Scene
                 string texturePath = Path.Combine(currentPath, "../../../../PfmImages", fileName);
                 using (FileStream imageFile = File.OpenRead(texturePath))
                 {
-                    HDRImage image = HDRImage.ReadPFM_File(imageFile);
+                    HDRImage image = HDRImage.ReadPFM(imageFile);
                     result = new ImagePigment(image);
                 }
 

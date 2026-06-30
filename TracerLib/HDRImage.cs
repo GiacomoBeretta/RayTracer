@@ -175,7 +175,7 @@ public class HDRImage
 
     public HDRImage(Stream stream)
     {
-        HDRImage img = ReadPFM_File(stream);
+        HDRImage img = ReadPFM(stream);
 
         Width = img.Width;
         Height = img.Height;
@@ -189,7 +189,7 @@ public class HDRImage
     public HDRImage(string fileName)
     {
         using Stream filestream = File.OpenRead(fileName);
-        HDRImage img = ReadPFM_File(filestream);
+        HDRImage img = ReadPFM(filestream);
 
         Width = img.Width;
         Height = img.Height;
@@ -480,11 +480,11 @@ public class HDRImage
     /// Thrown when the file does not conform to the expected PFM format (invalid header,
     /// missing metadata lines, or malformed image size/endianness information).
     /// </exception>
-    public static HDRImage ReadPFM_File(Stream stream)
+    public static HDRImage ReadPFM(Stream stream)
     {
         using BinaryReader br = new BinaryReader(stream);
 
-        HDRImage.ReadPFM_Header(br, out HDRImage image, out Endianness endianness);
+        ReadPFM_Header(br, out HDRImage image, out Endianness endianness);
 
         // the matrix of colors in PFM files is saved bottom to top and left to right
         for (int row = image.Height - 1; row >= 0; row--)
@@ -509,10 +509,10 @@ public class HDRImage
     /// </summary>
     /// <param name="filePath">The path of the PFM file.</param>
     /// <returns>An <see cref="HDRImage"/> containing the decoded floating-point RGB image.</returns>
-    public static HDRImage ReadPFM_File(string filePath)
+    public static HDRImage ReadPFM(string filePath)
     {
         using Stream filestream = File.OpenRead(filePath);
-        return ReadPFM_File(filestream);
+        return ReadPFM(filestream);
     }
 
     /// <summary>
@@ -554,7 +554,7 @@ public class HDRImage
     /// </remarks>
     /// <param name="img">The HDR image to write.</param>
     /// <param name="filePath">The path of the output file where the PFM data will be written.</param>
-    public static void WritePFM_File(HDRImage img, string filePath)
+    public static void WritePFM(HDRImage img, string filePath)
     {
         using Stream filestream = File.OpenWrite(filePath);
         WritePFM(img, filestream);

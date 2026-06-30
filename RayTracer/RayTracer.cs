@@ -132,7 +132,7 @@ public class RenderCommand
 
         tracer.FireAllRays(ray => renderer.RenderFunction(ray));
 
-        HDRImage.WritePFM_File(image, pfmFilePath);
+        HDRImage.WritePFM(image, pfmFilePath);
         Console.WriteLine($"Pfm file created in: {pfmFilePath}");
 
         image.WritePNG(pngFilePath, Luminosityfunction, Factor, Gamma, AverageLuminosity);
@@ -350,7 +350,7 @@ public class AverageImagesCommand
 
         HDRImage averageImage = AverageImages(images);
 
-        HDRImage.WritePFM_File(averageImage, pfmFilePath);
+        HDRImage.WritePFM(averageImage, pfmFilePath);
         Console.WriteLine($"Pfm file created in: {pfmFilePath}");
 
         averageImage.WritePNG(pngFilePath, Luminosityfunction, Factor, Gamma, AverageLuminosity);
@@ -450,7 +450,7 @@ public class AverageImagesCommand
         }
 
         HDRImage[] images = new HDRImage[files.Length];
-        for (int i = 0; i < files.Length; i++) images[i] = HDRImage.ReadPFM_File(files[i]);
+        for (int i = 0; i < files.Length; i++) images[i] = HDRImage.ReadPFM(files[i]);
 
         int width = images[0].Width;
         int height = images[0].Height;
@@ -544,7 +544,7 @@ public class PfmToPngCommand
         string pfmFilePath = Path.Combine(currentPath, "../../../../PfmImages", InputFileName);
         string pngFilePath = Path.Combine(currentPath, "../../../../PngImages/", pngfilename);
 
-        HDRImage image = HDRImage.ReadPFM_File(pfmFilePath);
+        HDRImage image = HDRImage.ReadPFM(pfmFilePath);
         Console.WriteLine($"File read: {pfmFilePath}");
 
         image.WritePNG(pngFilePath, Luminosityfunction, Factor, Gamma, AverageLuminosity);
