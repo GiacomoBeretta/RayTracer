@@ -844,11 +844,11 @@ The file must be located inside the `Scene` directory.
 
 #### `--width`
 
-Output image width in pixels.
+Number of pixel columns (The physical width of the image plane must be specified in the camera definition in the scene file).
 
 #### `--height`
 
-Output image height in pixels.
+Number of pixel rows (The physical width of the image plane must be specified in the camera definition in the scene file). 
 
 #### `--sampleside`
 
