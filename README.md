@@ -1083,7 +1083,6 @@ Possible future improvements include:
 - removing unnecessary validation checks that significantly impact performance;
 - improving `HomMatrix` efficiency by storing coefficients explicitly instead of using a float array;
 - allowing users to specify the output paths for PFM and PNG images;
-- allowing users to specify the image plane dimensions;
 - allowing users to specify the filename pattern for the `averageimages` command;
 - supporting arithmetic expressions in scene files;
 - implementing a point-light tracer (Whitted ray tracing);
