@@ -17,7 +17,7 @@ public static class Functions
     /// </exception>
     public static void EnsureGreaterThan<T>(T value, string paramName, T threshold) where T : IComparable<T>
     {
-        if (value.CompareTo(threshold) < 0)
+        if (value.CompareTo(threshold) <= 0)
         {
             throw new ArgumentOutOfRangeException(paramName, value, $"{paramName} must be greater than {threshold}");
         }
