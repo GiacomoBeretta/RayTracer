@@ -685,6 +685,8 @@ where `Keyword_camera` can be:
 
 camera(orthogonal, Transformation, Width, Height)
 
+The Width and Height are physical dimensions of the image plane.
+
 Example:
 
 ```text
@@ -697,7 +699,11 @@ camera(
 ```
 ### Perspective Camera
 
-camera(perspective, Transformation, Width, Height)
+camera(perspective, Transformation, Width, Height, Distance)
+
+The Width and Height are physical dimensions of the image plane, the Distance measures the distance between the observer and the image plane.
+
+Example:
 
 ```text
 camera
