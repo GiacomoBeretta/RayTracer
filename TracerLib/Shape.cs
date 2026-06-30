@@ -60,7 +60,7 @@ public abstract class Shape
     /// </param>
     public static void CreateONB(Normal normal, out Vector e1, out Vector e2, out Vector e3)
     {
-        // See Duff et al. 2017 article
+        // See Duff et al. 2017 article (https://jcgt.org/published/0006/01/01/)
         int sign = normal.Z > 0.0f ? 1 : -1;
         float a = -1.0f / (sign + normal.Z);
         float b = normal.X * normal.Y * a;
