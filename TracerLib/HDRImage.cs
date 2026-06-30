@@ -31,7 +31,7 @@ public class HDRImage
     /// <summary>
     /// The array of <see cref="Color"/>s that make up the HDR image.
     /// </summary>
-    public Color[] Pixels { get; set; } //Controllare nullable (Color[])?
+    public Color[] Pixels { get; set; }
 
     /// <summary>
     /// The ratio Width/Height of the pixel grid.
