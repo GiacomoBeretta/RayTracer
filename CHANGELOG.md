@@ -1,3 +1,6 @@
+#v0.4.0
+Add Pigment, BRDF and material classes, add PCG random generator. Add Flat-renderer algorithm (PR [#7](https://github.com/GiacomoBeretta/RayTracer/pull/7))
+
 #v0.3.0
 Fix bug in ImageTracer method FireRay (PR [#4](https://github.com/GiacomoBeretta/RayTracer/pull/4), it fixes [#3](https://github.com/GiacomoBeretta/RayTracer/issues/3))
 Add types and methods to fire rays (PR [#2](https://github.com/GiacomoBeretta/RayTracer/pull/2))
