@@ -32,7 +32,7 @@ public class HDRImageTest
     }
 
     [Fact]
-    public void TestCheckPixels()
+    public void TestCheckArrayLength()
     {
         HDRImage._CheckArrayLength(1, 1, new Color[1]);
         HDRImage._CheckArrayLength(5, 2, new Color[10]);
@@ -127,9 +127,7 @@ public class HDRImageTest
         colors = new Color[99];
         Assert.Throws<ArgumentException>(() => new HDRImage(10, 10, colors));
     }
-
-    //test constructor from stream and from filename
-
+    
     [Fact]
     public void TestToString()
     {
@@ -274,9 +272,45 @@ public class HDRImageTest
         Assert.True(Color._AreColorsClose(image[0], new Color(0.1513604f, 0.3446588f, 0.2079176f)));
         Assert.True(Color._AreColorsClose(image[1], new Color(2.4862983f, 3.5148109f, 5.0216226f)));
     }
-
+    
     [Fact]
-    public void TestReadPFM_File() //Rivedi
+    public void TestClampImage()
+    {
+        HDRImage img = new HDRImage(2, 1)
+        {
+            [0, 0] = new Color(0.5f, 1.0f, 1.5f),
+            [1, 0] = new Color(50.0f, 100.0f, 150.0f)
+        };
+
+        img._ClampImage();
+
+        foreach (Color pixel in img.Pixels)
+        {
+            Assert.True(pixel.R is >= 0 and <= 1);
+            Assert.True(pixel.G is >= 0 and <= 1);
+            Assert.True(pixel.B is >= 0 and <= 1);
+        }
+    }
+    
+    [Fact]
+    public void TestImageTo8BitRGB()
+    {
+        float gamma = 3.6f;
+
+        HDRImage image = new HDRImage(3, 1)
+        {
+            [0] = new Color(0.883f, 0.2102f, 0.3775f),
+            [1] = new Color(0.2381f, 0.9324f, 0.4467f),
+            [2] = new Color(0.1941f, 0.5728f, 0.9483f)
+        };
+        image._ImageTo8BitRGB(gamma);
+        Assert.Equal(new Color(246, 165, 195), image[0]);
+        Assert.Equal(new Color(171, 250, 204), image[1]);
+        Assert.Equal(new Color(162, 218, 251), image[2]);
+    }
+    
+    [Fact]
+    public void TestReadPFM()
     {
         byte[] LE_REFERENCE_BYTES =
         [
@@ -330,43 +364,7 @@ public class HDRImageTest
             Assert.True(Color._AreColorsClose(img[2, 1], new Color(700f, 800f, 900f)));
         }
     }
-
-    [Fact]
-    public void TestClampImage()
-    {
-        HDRImage img = new HDRImage(2, 1)
-        {
-            [0, 0] = new Color(0.5f, 1.0f, 1.5f),
-            [1, 0] = new Color(50.0f, 100.0f, 150.0f)
-        };
-
-        img._ClampImage();
-
-        foreach (Color pixel in img.Pixels)
-        {
-            Assert.True(pixel.R is >= 0 and <= 1);
-            Assert.True(pixel.G is >= 0 and <= 1);
-            Assert.True(pixel.B is >= 0 and <= 1);
-        }
-    }
-
-    [Fact]
-    public void TestImageTo8BitRGB()
-    {
-        float gamma = 3.6f;
-
-        HDRImage image = new HDRImage(3, 1)
-        {
-            [0] = new Color(0.883f, 0.2102f, 0.3775f),
-            [1] = new Color(0.2381f, 0.9324f, 0.4467f),
-            [2] = new Color(0.1941f, 0.5728f, 0.9483f)
-        };
-        image._ImageTo8BitRGB(gamma);
-        Assert.Equal(new Color(246, 165, 195), image[0]);
-        Assert.Equal(new Color(171, 250, 204), image[1]);
-        Assert.Equal(new Color(162, 218, 251), image[2]);
-    }
-
+    
     [Fact]
     public void TestCreateLDR()
     {
@@ -391,8 +389,8 @@ public class HDRImageTest
         Assert.Equal(hdrImage.Pixels, ldrImage.Pixels);
     }
 
-    [Fact]
+    /*[Fact]
     public void TestWritePNG()
     {
-    }
+    }*/
 }
