@@ -4,8 +4,6 @@
 /TracerTests/referenceWeighted.png
 /TracerTests/referenceShirley.png
 
-/config.sh
-
 #ignore any files inside these folders
 /Animations/*
 /PfmImages/*

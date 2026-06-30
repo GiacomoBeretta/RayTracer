@@ -36,7 +36,7 @@ public class HDRImageTest
     {
         HDRImage._CheckArrayLength(1, 1, new Color[1]);
         HDRImage._CheckArrayLength(5, 2, new Color[10]);
-        Assert.Throws<ArgumentNullException>(() => HDRImage._CheckArrayLength(1, 2, null));
+        Assert.Throws<ArgumentNullException>(() => HDRImage._CheckArrayLength(1, 2, null!));
         Assert.Throws<ArgumentException>(() => HDRImage._CheckArrayLength(10, 91, new Color[911]));
     }
 
@@ -48,16 +48,15 @@ public class HDRImageTest
         HDRImage image = new HDRImage(width, height);
 
         Color[] colors = new Color[width * height];
-        float red, green, blue;
-        int offset;
+        
         for (int i = 0; i < width; i++)
         {
             for (int j = 0; j < height; j++)
             {
-                offset = image._PixelOffset(i, j);
-                red = offset;
-                green = offset * 2;
-                blue = offset * 3;
+                int offset = image._PixelOffset(i, j);
+                float red = offset;
+                float green = offset * 2;
+                float blue = offset * 3;
                 colors[offset] = new Color(red, green, blue);
             }
         }
@@ -100,16 +99,16 @@ public class HDRImageTest
         HDRImage image = new HDRImage(width, height);
 
         Color[] colors = new Color[width * height];
-        float red, green, blue;
-        int offset = 0;
+        
         for (int i = 0; i < width; i++)
         {
             for (int j = 0; j < height; j++)
             {
-                offset = image._PixelOffset(i, j);
-                red = offset * 3;
-                green = offset;
-                blue = offset * 4;
+                
+                int offset = image._PixelOffset(i, j);
+                float red = offset * 3;
+                float green = offset;
+                float blue = offset * 4;
                 colors[offset] = new Color(red, green, blue);
             }
         }
@@ -121,8 +120,8 @@ public class HDRImageTest
     [Fact]
     public void TestConstructorWithColorVector()
     {
-        Color[]? colors = null;
-        Assert.Throws<ArgumentNullException>(() => new HDRImage(10, 10, colors));
+        Color[] colors = null;
+        Assert.Throws<ArgumentNullException>(() => new HDRImage(10, 10, colors!));
 
         colors = new Color[99];
         Assert.Throws<ArgumentException>(() => new HDRImage(10, 10, colors));
@@ -131,9 +130,14 @@ public class HDRImageTest
     [Fact]
     public void TestToString()
     {
-        HDRImage image = new HDRImage(2, 1);
-        image.Pixels[0] = new Color(3, 7, 10);
-        image.Pixels[1] = new Color(4, 21, 15);
+        HDRImage image = new HDRImage(2, 1)
+        {
+            Pixels =
+            {
+                [0] = new Color(3, 7, 10),
+                [1] = new Color(4, 21, 15)
+            }
+        };
         string str = "Height: 1, Width: 2\n" +
                      "Pixel's matrix:\n" +
                      "\tColumns ->\n" +
@@ -234,7 +238,7 @@ public class HDRImageTest
         image2[0] = new Color(1, 0, 2); //Luminosity = 1
         image2[1] = new Color(300000, 1550000, 1700000); //Luminosity = 1000000
         image2[2] = new Color(0, 0, 0); // Luminosity = 0
-        Assert.True(Functions.AreClose(10.00333f, image2._AverageLuminosity(0, delta: 1e-3f), 1e-5f));
+        Assert.True(Functions.AreClose(10.00333f, image2._AverageLuminosity(0, delta: 1e-3f)));
     }
 
     [Fact]
@@ -244,7 +248,7 @@ public class HDRImageTest
         image[0] = new Color(4.1f, 2.0f, 11); //Luminosity = 3.09626
         image[1] = new Color(33.6f, 83, 27.2f); //Luminosity = 68.4688
         image[2] = new Color(0.3f, 44.9f, 9.3f); // Luminosity = 32.84772
-        Assert.True(Functions.AreClose(19.0961195f, image._AverageLuminosity(LumFunction.Weighted, 0), 1e-5f));
+        Assert.True(Functions.AreClose(19.0961195f, image._AverageLuminosity(LumFunction.Weighted, 0)));
     }
 
     [Fact]
