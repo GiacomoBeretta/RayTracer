@@ -5,7 +5,7 @@ using System.Globalization;
 namespace TracerLib;
 
 /// <summary>
-/// A base abstract class t
+/// Represents the base class for all token types.
 /// </summary>
 public abstract class Token
 {
@@ -73,7 +73,9 @@ public static class Keywords
     };
 }
 
-// A token signaling the end of a file
+/// <summary>
+/// Represents a token that signals the end of a file.
+/// </summary>
 public sealed class StopToken : Token
 {
     public StopToken(SourceLocation location) : base(location)
@@ -86,7 +88,9 @@ public sealed class StopToken : Token
     }
 }
 
-//Cambiare in sealed anche tutte le altre classi che non verranno ereditate (orthogonal, sphere, etc)
+/// <summary>
+/// Represents a token that corresponds to a reserved keyword in the language.
+/// </summary>
 public sealed class KeywordToken : Token
 {
     public Keyword Keyword { get; }
@@ -102,6 +106,9 @@ public sealed class KeywordToken : Token
     }
 }
 
+/// <summary>
+/// Represents an identifier token.
+/// </summary>
 public sealed class IdentifierToken : Token
 {
     public string Identifier { get; }
@@ -117,6 +124,9 @@ public sealed class IdentifierToken : Token
     }
 }
 
+/// <summary>
+/// Represents a string literal token.
+/// </summary>
 public sealed class StringToken : Token
 {
     public string String { get; }
@@ -151,7 +161,7 @@ public sealed class LiteralNumberToken : Token
 }
 
 /// <summary>
-/// Represents a symbol token, such as '(', ')', '<', or '+'.
+/// Represents a symbol token, such as '(', ')', '&lt;', or '+'.
 /// </summary>
 public sealed class SymbolToken : Token
 {
