@@ -302,15 +302,17 @@ Scenes are described through a custom text-based language.
 
 The scene language allows the definition of:
 
-- floating-point variables;
-- vectors;
-- colors;
-- materials;
-- pigments;
-- BRDFs;
-- transformations;
-- geometric primitives;
-- cameras.
+- [floating-point variables](#floating-point-variables);
+- [vectors](#vectors);
+- [colors](#vectors);
+- [materials](#materials);
+- [pigments](#pigments);
+- [BRDFs](#BRDFs);
+- [transformations](#transformations);
+- [geometric primitives](#geometric-primitives);
+- [cameras](#cameras).
+- [comments](#comments)
+- [EBNF Grammar](#EBNF-Grammar)
 
 An example scene is shown below:
 
@@ -665,11 +667,10 @@ scaling(2,2,2)
 Cameras are defined as:
 
 ```text
-camera(
+camera
+(
     Keyword_camera,
-    transformation,
-    aspect_ratio,
-    distance
+    ...
 )
 ```
 
@@ -678,22 +679,36 @@ where `Keyword_camera` can be:
 - `orthogonal`
 - `perspective`
 
+---
+
+### Orthogonal Camera
+
+camera(orthogonal, Transformation, Width, Height)
+
 Example:
 
 ```text
 camera(
-    perspective,
+    orthogonal,
     identity,
     1.0,
     1.0
 )
 ```
+### Perspective Camera
 
----
+camera(perspective, Transformation, Width, Height)
 
-### Note on Orthogonal Cameras
-
-Although an orthogonal camera does not use the `distance` parameter internally, the parameter must still be specified in order for the scene to be parsed correctly.
+```text
+camera
+(
+    perspective,
+    identity,
+    1.0,
+    1.0,
+    1.0
+)
+```
 
 ---
 
@@ -724,9 +739,15 @@ sphere_decl ::= "sphere" "(" IDENTIFIER "," transformation ")"
 
 material_decl ::= "material" IDENTIFIER "(" brdf "," pigment ")"
 
-camera_decl ::= "camera" "(" camera_type "," transformation "," number "," number ")"
+amera_decl ::= "camera" "(" camera_type "," camera_params ")"
 
-camera_type ::= "perspective" | "orthogonal"
+camera_type ::= "orthogonal" | "perspective"
+
+camera_params ::= orthogonal_params | perspective_params
+
+orthogonal_params ::= transformation "," number "," number
+
+perspective_params ::= transformation "," number "," number "," number
 
 brdf ::= diffuse_brdf | specular_brdf
 
@@ -1052,22 +1073,23 @@ If you encounter bugs, unexpected behavior, or have questions about the project,
 
 Possible future improvements include:
 
-- HomMatrix efficiency improvement by expliciting the coefficients (now is a float array)
-- possibility to specify the paths in which to save the pfm and png images;
-- possibility to specify the image plane dimensions;
-- adding the possiblity to specify the pattern for the averageimages command;
-- possibility to parse arithmetic operations in scene files;
-- point-light tracing algorithm (Whitted algorithm);
+- adding validation checks to operations (e.g. ensuring that the scalar in a color-scalar multiplication is positive);
+- removing unnecessary validation checks that significantly impact performance;
+- improving `HomMatrix` efficiency by storing coefficients explicitly instead of using a float array;
+- allowing users to specify the output paths for PFM and PNG images;
+- allowing users to specify the image plane dimensions;
+- allowing users to specify the filename pattern for the `averageimages` command;
+- supporting arithmetic expressions in scene files;
+- implementing a point-light tracer (Whitted ray tracing);
 - adding triangle primitives;
-- support for mesh-based objects;
-- support for CSG (Constructive Solid Geometry) objects;
-- Adding AAB (Axis Aligned Boxes)
+- supporting mesh-based objects;
+- supporting CSG (Constructive Solid Geometry);
 - Adding AABB (Axis Aligned Bounding Box)
-- adding other output image formats;
+- supporting additional output image formats;
 - adding a BSP (Binary Space Partitions) algorithm to improve efficiency;
-- Direct Illumination algorithm (with importance sampling)
-- Photon Mapping algorithm
-- performance optimizations and parallel rendering.
+- implementing direct illumination with importance sampling;
+- implementing photon mapping;
+- further performance optimizations and parallel rendering.
 ---
 
 # How to contribute
