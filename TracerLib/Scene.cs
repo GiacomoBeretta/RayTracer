@@ -51,7 +51,9 @@ public class Scene
     /// </summary>
     /// <param name="inputStream">The input stream providing tokens to read.</param>
     /// <param name="symbol">The expected symbol value to match against the next token.</param>
-    /// <exception cref="SceneSyntaxException">Thrown when the next token is not a symbol token or its value does not match the expected symbol.</exception>
+    /// <exception cref="SceneSyntaxException">
+    /// Thrown when the next token is not a symbol token or its value does not match the expected symbol.
+    /// </exception>
     public void ExpectSymbol(InputStream inputStream, string symbol)
     {
         Token token = inputStream.ReadNextToken();

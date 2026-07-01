@@ -131,7 +131,7 @@ public struct Vector
     }
 
     /// <summary>
-    /// Returns a <see cref="Normal"/>, i.e. a normalized vector with same direction
+    /// Returns a <see cref="Normal"/>, i.e. a normalized vector with same direction.
     /// </summary>
     /// <returns></returns>
     public Normal ToNormal()

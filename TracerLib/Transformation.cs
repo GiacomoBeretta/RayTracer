@@ -5,7 +5,7 @@ using System.Globalization;
 namespace TracerLib;
 
 /// <summary>
-/// A Homogeneous Matrix is a 4x4 matrix with the last row = (0,0,0,1)
+/// A Homogeneous Matrix is a 4x4 matrix with the last row = (0,0,0,1).
 /// It allows to represent scaling transformations, rotations and translations in 3D space.
 /// The matrix is indexed in row-major order.
 /// </summary>
@@ -466,7 +466,7 @@ public struct Transformation
     public float this[Index index] => M[index];
 
     /// <summary>
-    /// 2D read only index for the transformation matrix M
+    /// 2D read only index for the transformation matrix M.
     /// </summary>
     /// <param name="row"></param>
     /// <param name="col"></param>

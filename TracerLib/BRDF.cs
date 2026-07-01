@@ -10,7 +10,7 @@ namespace TracerLib;
 public abstract class BRDF
 {
     /// <summary>
-    /// The Pigment property represents the texture of the surface
+    /// The Pigment property represents the texture of the surface.
     /// </summary>
     public Pigment Pigment;
 
@@ -136,16 +136,16 @@ public class SpecularBRDF : BRDF
     }
 
     /// <summary>
-    /// Constructs a <c>SpecularBRDF</c> with a uniform black <c>Pigment</c>
+    /// Constructs a <c>SpecularBRDF</c> with a uniform black <c>Pigment</c>.
     /// </summary>
     public SpecularBRDF() : base()
     {
     }
 
     /// <summary>
-    /// Constructs a <c>SpecularBRDF</c> with a specified <c>Pigment</c>
+    /// Constructs a <c>SpecularBRDF</c> with a specified <c>Pigment</c>.
     /// </summary>
-    /// <param name="pigment"> The pigment defining the surface color </param>
+    /// <param name="pigment">The pigment defining the surface color.</param>
     public SpecularBRDF(Pigment pigment) : base(pigment)
     {
     }

@@ -66,7 +66,8 @@ public class ImageTracer
     /// <summary>
     /// Returns a <see cref="Ray"/> passing through the pixel at (column, row).
     /// Since a pixel is not a dimensionless point,
-    /// <paramref name="uPixel"/> and <paramref name="vPixel"/> are the coordinates inside the pixel at which the ray will be fired.
+    /// <paramref name="uPixel"/> and <paramref name="vPixel"/> are the coordinates inside the pixel 
+    /// at which the ray will be fired.
     /// A value of (uPixel, vPixel)=(0,0) corresponds to the top-left corner of the pixel.
     /// See method FireRay of <see cref="Camera"/> for more information.
     /// </summary>

@@ -15,7 +15,7 @@ public struct Color
     public float B { get; set; }
 
     /// <summary>
-    /// Basic <see cref="Color"/> constructor which accepts 3 positive parameters between 0 and 1 : R,G,B 
+    /// Basic <see cref="Color"/> constructor which accepts 3 positive parameters R,G,B between 0 and 1.
     /// </summary>
     /// <param name="r"></param>
     /// <param name="g"></param>
@@ -44,7 +44,7 @@ public struct Color
     }
 
     /// <summary>
-    /// Sum per component between two <see cref="Color"/>
+    /// Sum per component between two <see cref="Color"/>.
     /// </summary>
     /// <param name="c1"></param>
     /// <param name="c2"></param>
@@ -55,10 +55,10 @@ public struct Color
     }
 
     /// <summary>
-    /// Product between a <see cref="Color"/> and a float scalar
+    /// Product between a <see cref="Color"/> and a float scalar.
     /// </summary>
-    /// <param name="a">Color</param>
-    /// <param name="alpha">Scalar</param>
+    /// <param name="a">Color.</param>
+    /// <param name="alpha">Scalar.</param>
     /// <returns></returns>
     public static Color operator *(Color a, float alpha)
     {
@@ -71,10 +71,10 @@ public struct Color
     }
 
     /// <summary>
-    /// Product between a <see cref="Color"/> and a float scalar
+    /// Product between a <see cref="Color"/> and a float scalar.
     /// </summary>
-    /// <param name="alpha">Scalar</param>
-    /// <param name="a">Color</param>
+    /// <param name="alpha">Scalar.</param>
+    /// <param name="a">Color.</param>
     /// <returns></returns>
     public static Color operator *(float alpha, Color a)
     {
@@ -84,8 +84,8 @@ public struct Color
     /// <summary>
     /// Hadamard's product: Product per component between two <see cref="Color"/> (used in RenderFunction).
     /// </summary>
-    /// <param name="c1">First Color</param>
-    /// <param name="c2">Second Color</param>
+    /// <param name="c1">First Color.</param>
+    /// <param name="c2">Second Color.</param>
     /// <returns></returns>
     public static Color operator *(Color c1, Color c2)
     {
@@ -95,8 +95,8 @@ public struct Color
     /// <summary>
     /// Returns whether the 2 Colors passed are exactly equal.
     /// </summary>
-    /// <param name="c1">First Color</param>
-    /// <param name="c2">Second Color</param>
+    /// <param name="c1">First Color.</param>
+    /// <param name="c2">Second Color.</param>
     /// <returns></returns>
     [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
     public static bool _AreSameColor(Color c1, Color c2)
@@ -110,9 +110,9 @@ public struct Color
     /// Returns whether the 2 Colors passed are equal
     /// within a difference given by the epsilon parameter to deal with floating numbers.
     /// </summary>
-    /// <param name="c1">First Color</param>
-    /// <param name="c2">Second Color</param>
-    /// <param name="epsilon">Epsilon parameter</param>
+    /// <param name="c1">First Color.</param>
+    /// <param name="c2">Second Color.</param>
+    /// <param name="epsilon">Epsilon parameter.</param>
     /// <returns></returns>
     public static bool _AreColorsClose(Color c1, Color c2, float epsilon = 1e-5f)
     {
@@ -131,7 +131,7 @@ public struct Color
     }
 
     /// <summary>
-    /// Prints the formatted string with RGB colors
+    /// Prints the formatted string with RGB colors.
     /// </summary>
     /// <returns></returns>
     public void Print()
@@ -140,7 +140,7 @@ public struct Color
     }
 
     /// <summary>
-    /// Returns the luminosity of a pixel using the formula given by Shirley and Morley 
+    /// Returns the luminosity of a pixel using the formula given by Shirley and Morley.
     /// </summary>
     /// <returns></returns>
     public float LuminosityShirleyMorley()
@@ -149,11 +149,11 @@ public struct Color
     }
 
     /// <summary>
-    /// Returns the luminosity of a pixel using the ITU-R BT.709 standard
-    /// see https://en.wikipedia.org/wiki/Rec._709
+    /// Returns the luminosity of a pixel using the ITU-R BT.709 standard.
+    /// See https://en.wikipedia.org/wiki/Rec._709
     /// </summary>
     /// <returns></returns>
-    public float LuminosityWeightedAverage() //VERIFICARE I PESI
+    public float LuminosityWeightedAverage()
     {
         const float wR = 0.2126f;
         const float wG = 0.7152f;

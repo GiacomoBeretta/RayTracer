@@ -3,7 +3,7 @@
 namespace TracerLib;
 
 /// <summary>
-/// A 2D Vector to represent a point of a <see cref="Shape"/> surface
+/// A 2D Vector to represent a point of a <see cref="Shape"/> surface.
 /// </summary>
 public struct Vector2D
 {

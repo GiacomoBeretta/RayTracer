@@ -130,7 +130,7 @@ public class HDRImage
     }
 
     /// <summary>
-    /// Gives the Color at the indexes (column, row) of the corresponding matrix
+    /// Gives the Color at the indexes (column, row) of the corresponding matrix.
     /// </summary>
     /// <param name="column"></param>
     /// <param name="row"></param>
@@ -260,7 +260,7 @@ public class HDRImage
     }
 
     /// <summary>
-    /// Returns a clone of this HDRImage
+    /// Returns a clone of this HDRImage.
     /// </summary>
     /// <returns></returns>
     public HDRImage Clone()
@@ -341,7 +341,7 @@ public class HDRImage
     /// <summary>
     /// Reads a single ASCII line from a binary stream in PFM format.
     /// </summary>
-    /// /// <param name="br">The binary reader used to read the stream.</param>
+    /// <param name="br">The binary reader used to read the stream.</param>
     /// <returns>The line content, or null if the end of the stream is reached before reading any data.</returns>
     public static string? _ReadLine(BinaryReader br)
     {
@@ -571,7 +571,7 @@ public class HDRImage
     /// <summary>
     /// Computes the logarithmic average luminosity of the image.
     /// The luminosity of each pixel is evaluated according to the specified <see cref="LumFunction"/>
-    /// (Shirley = Shirley and Morley method, Weighted = Weighted Average)
+    /// (Shirley = Shirley and Morley method, Weighted = Weighted Average).
     /// </summary>
     /// <param name="luminosityFunction">The pixel luminosity algorithm to use.</param>
     /// <param name="delta">Small positive value added to pixel luminosity to avoid
@@ -615,7 +615,8 @@ public class HDRImage
     /// using <see cref="_AverageLuminosity"/> and the specified
     /// <paramref name="luminosityFunction"/>.
     /// </summary>
-    /// <param name="luminosityFunction">Function used to compute pixel luminosity when the average luminosity
+    /// <param name="luminosityFunction">
+    /// Function used to compute pixel luminosity when the average luminosity
     /// needs to be calculated.</param>
     /// <param name="factor"> An empirical value.</param>
     /// <param name="averageLuminosity">Optional precomputed average luminosity.</param>

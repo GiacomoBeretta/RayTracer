@@ -3,7 +3,7 @@
 namespace TracerLib;
 
 /// <summary>
-/// A class that represents a Normalized 3D Vector
+/// A class that represents a Normalized 3D Vector.
 /// </summary>
 public struct Normal
 {
