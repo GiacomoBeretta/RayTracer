@@ -1,3 +1,6 @@
+#v1.0.0
+Fix sphere bug. (PR[#16](https://github.com/GiacomoBeretta/RayTracer/pull/16), it fixes [#13](https://github.com/GiacomoBeretta/RayTracer/issues/13))
+
 #v0.7.0
 Add imageplane dimensions. (PR[#15](https://github.com/GiacomoBeretta/RayTracer/pull/15))
 
