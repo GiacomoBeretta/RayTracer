@@ -122,6 +122,15 @@ public class ColorTest
     }
 
     [Fact]
+    public void TestFloatClamp()
+    {
+        float f = 2.8f;
+        float c = 0.736842105263f;
+        
+        Assert.True(Functions.AreClose(c, Color._Clamp(f)));
+    }
+
+    [Fact]
     public void TestTo8BitRGB()
     {
         float gamma = 2;

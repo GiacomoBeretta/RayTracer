@@ -168,7 +168,7 @@ public struct Color
     /// </summary>
     /// <param name="x"></param>
     /// <returns></returns>
-    private static float _Clamp(float x)
+    public static float _Clamp(float x)
     {
         return x / (x + 1);
     }

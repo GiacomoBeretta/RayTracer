@@ -1,6 +1,7 @@
 #nullable disable
 
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
 using TracerLib;
 
 namespace TracerTests;
@@ -217,13 +218,87 @@ public class HDRImageTest
         Assert.Equal(Endianness.Little, HDRImage._ParseEndianness(endianness));
     }
 
-    //test read float
+    [Fact]
+    public void TestReadLine() {
 
-    //test write float
+        byte[] data = "Hello\n"u8.ToArray();
+        byte[] data2 = "World\r\n"u8.ToArray();
+        
+        using var ms = new MemoryStream(data);
+        using var br = new BinaryReader(ms);
+        
+        using var ms2 = new MemoryStream(data2);
+        using var br2 = new BinaryReader(ms2);
 
-    //test read pfm file (2)
+        using var ms3 = new MemoryStream();
+        using var br3 = new BinaryReader(ms3);
 
-    //test write_pfm_file (2)
+        string line = HDRImage._ReadLine(br);
+        string line2 = HDRImage._ReadLine(br2);
+        
+        Assert.Equal("Hello", line); //Test readline
+        Assert.Equal("World", line2); //Test \r ignore
+        Assert.Null(HDRImage._ReadLine(br3)); //Test EOF
+    }
+
+    [Fact]
+    public void TestReadFloat()
+    {
+        float expect = 3.5f;
+        float expect2 = 2.8f;
+
+        byte[] bytes = BitConverter.GetBytes(expect);
+        byte[] bytes2 = BitConverter.GetBytes(expect2);
+
+        if (BitConverter.IsLittleEndian)
+        {
+            Array.Reverse(bytes);
+        }
+
+        using var ms = new MemoryStream(bytes);
+        using var br = new BinaryReader(ms);
+        
+        using var ms2 = new MemoryStream(bytes2);
+        using var br2 = new BinaryReader(ms2);
+
+        using var ms3 = new MemoryStream(new byte[] { 1, 2, 3 });
+        using var br3 = new BinaryReader(ms3);
+
+        float actual = HDRImage._ReadFloat(br, Endianness.Big);
+        float actual2 = HDRImage._ReadFloat(br2, Endianness.Little);
+        
+        Assert.Equal(expect, actual); //Test big endian
+        Assert.Equal(expect2, actual2); //Test little endian
+        Assert.Throws<InvalidPfmFileFormatException>(() =>
+            {
+                HDRImage._ReadFloat(br3, Endianness.Big); //Test sream too short
+            }
+        );
+    }
+
+    [Fact]
+    public void TestWriteFloat()
+    {
+        float value = 1.5f;
+
+        using var ms = new MemoryStream();
+        
+        HDRImage._WriteFloat(ms, value);
+
+        byte[] written = ms.ToArray();
+
+        byte[] expected = BitConverter.GetBytes(value);
+        
+        if(BitConverter.IsLittleEndian) Array.Reverse(expected);
+        
+        Assert.Equal(expected, written);
+    }
+
+    [Fact]
+    public void TestReadPFMHeader()
+    {
+        
+    }
 
     [Fact]
     public void TestAverageLuminosityShirleyMorley()
