@@ -71,7 +71,7 @@ public class InputStream : IDisposable
     /// Handles line breaks, tab expansion, and standard character advancement.
     /// </summary>
     /// <param name="c">
-    /// Consumed character used to update the current position
+    /// Consumed character used to update the current position.
     /// </param>
     public void UpdateLocation(char c)
     {
@@ -223,7 +223,9 @@ public class InputStream : IDisposable
     /// </summary>
     /// <param name="tokenLocation">The source location where the string literal starts.</param>
     /// <returns>A <see cref="StringToken"/> containing the parsed string value.</returns>
-    /// <exception cref="SceneSyntaxException">Thrown if the end of the input is reached before a closing quotation mark is found.</exception>
+    /// <exception cref="SceneSyntaxException">
+    /// Thrown if the end of the input is reached before a closing quotation mark is found.
+    /// </exception>
     public StringToken _ParseStringToken(SourceLocation tokenLocation)
     {
         StringBuilder sb = new StringBuilder();

@@ -31,7 +31,7 @@ public class HDRImage
     /// <summary>
     /// The array of <see cref="Color"/>s that make up the HDR image.
     /// </summary>
-    public Color[] Pixels { get; set; } //Controllare nullable (Color[])?
+    public Color[] Pixels { get; set; }
 
     /// <summary>
     /// The ratio Width/Height of the pixel grid.
@@ -106,7 +106,7 @@ public class HDRImage
     }
 
     /// <summary>
-    /// Returns the <c>Color</c> given by the i-th element of the 1D Pixel's array.
+    /// Returns the <see cref="Color"/> given by the i-th element of the 1D Pixel's array.
     /// </summary>
     /// <param name="index"></param>
     public Color this[Index index]
@@ -130,7 +130,7 @@ public class HDRImage
     }
 
     /// <summary>
-    /// Gives the Color at the indexes (column, row) of the corresponding matrix
+    /// Gives the Color at the indexes (column, row) of the corresponding matrix.
     /// </summary>
     /// <param name="column"></param>
     /// <param name="row"></param>
@@ -175,7 +175,7 @@ public class HDRImage
 
     public HDRImage(Stream stream)
     {
-        HDRImage img = ReadPFM_File(stream);
+        HDRImage img = ReadPFM(stream);
 
         Width = img.Width;
         Height = img.Height;
@@ -189,7 +189,7 @@ public class HDRImage
     public HDRImage(string fileName)
     {
         using Stream filestream = File.OpenRead(fileName);
-        HDRImage img = ReadPFM_File(filestream);
+        HDRImage img = ReadPFM(filestream);
 
         Width = img.Width;
         Height = img.Height;
@@ -260,7 +260,7 @@ public class HDRImage
     }
 
     /// <summary>
-    /// Returns a clone of this HDRImage
+    /// Returns a clone of this HDRImage.
     /// </summary>
     /// <returns></returns>
     public HDRImage Clone()
@@ -341,7 +341,7 @@ public class HDRImage
     /// <summary>
     /// Reads a single ASCII line from a binary stream in PFM format.
     /// </summary>
-    /// /// <param name="br">The binary reader used to read the stream.</param>
+    /// <param name="br">The binary reader used to read the stream.</param>
     /// <returns>The line content, or null if the end of the stream is reached before reading any data.</returns>
     public static string? _ReadLine(BinaryReader br)
     {
@@ -480,11 +480,11 @@ public class HDRImage
     /// Thrown when the file does not conform to the expected PFM format (invalid header,
     /// missing metadata lines, or malformed image size/endianness information).
     /// </exception>
-    public static HDRImage ReadPFM_File(Stream stream)
+    public static HDRImage ReadPFM(Stream stream)
     {
         using BinaryReader br = new BinaryReader(stream);
 
-        HDRImage.ReadPFM_Header(br, out HDRImage image, out Endianness endianness);
+        ReadPFM_Header(br, out HDRImage image, out Endianness endianness);
 
         // the matrix of colors in PFM files is saved bottom to top and left to right
         for (int row = image.Height - 1; row >= 0; row--)
@@ -509,10 +509,10 @@ public class HDRImage
     /// </summary>
     /// <param name="filePath">The path of the PFM file.</param>
     /// <returns>An <see cref="HDRImage"/> containing the decoded floating-point RGB image.</returns>
-    public static HDRImage ReadPFM_File(string filePath)
+    public static HDRImage ReadPFM(string filePath)
     {
         using Stream filestream = File.OpenRead(filePath);
-        return ReadPFM_File(filestream);
+        return ReadPFM(filestream);
     }
 
     /// <summary>
@@ -554,7 +554,7 @@ public class HDRImage
     /// </remarks>
     /// <param name="img">The HDR image to write.</param>
     /// <param name="filePath">The path of the output file where the PFM data will be written.</param>
-    public static void WritePFM_File(HDRImage img, string filePath)
+    public static void WritePFM(HDRImage img, string filePath)
     {
         using Stream filestream = File.OpenWrite(filePath);
         WritePFM(img, filestream);
@@ -571,7 +571,7 @@ public class HDRImage
     /// <summary>
     /// Computes the logarithmic average luminosity of the image.
     /// The luminosity of each pixel is evaluated according to the specified <see cref="LumFunction"/>
-    /// (Shirley = Shirley and Morley method, Weighted = Weighted Average)
+    /// (Shirley = Shirley and Morley method, Weighted = Weighted Average).
     /// </summary>
     /// <param name="luminosityFunction">The pixel luminosity algorithm to use.</param>
     /// <param name="delta">Small positive value added to pixel luminosity to avoid
@@ -615,7 +615,8 @@ public class HDRImage
     /// using <see cref="_AverageLuminosity"/> and the specified
     /// <paramref name="luminosityFunction"/>.
     /// </summary>
-    /// <param name="luminosityFunction">Function used to compute pixel luminosity when the average luminosity
+    /// <param name="luminosityFunction">
+    /// Function used to compute pixel luminosity when the average luminosity
     /// needs to be calculated.</param>
     /// <param name="factor"> An empirical value.</param>
     /// <param name="averageLuminosity">Optional precomputed average luminosity.</param>

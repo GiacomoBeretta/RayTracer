@@ -15,7 +15,7 @@ namespace TracerLib;
 /// It is parametrized by normalized coordinates (u, v) in [0, 1]×[0, 1],
 /// with (0,0) in the top-left corner.
 /// (u,v) are mapped by the method <see cref="FireRay"/>
-/// onto the image plane [-Width/2, Width/2]×[-Height/2,Height/2]
+/// onto the image plane [-Width/2, Width/2]×[-Height/2,Height/2].
 /// </remarks>
 public abstract class Camera
 {
@@ -160,8 +160,8 @@ public class PerspectiveCamera : Camera
     }
 
     /// <summary>
-    /// Constructs a <see cref="PerspectiveCamera"/>, with the specified image plane dimensions, <see cref="Distance"/> to the image plane,
-    /// and <see cref="Transformation"/>.
+    /// Constructs a <see cref="PerspectiveCamera"/>, with the specified image plane dimensions, 
+    /// <see cref="Distance"/> to the image plane, and <see cref="Transformation"/>.
     /// </summary>
     /// <param name="transformation">The transformation that defines the camera's position and orientation.</param>
     /// <param name="width">The width of the image plane (defaults to 1).</param>
@@ -176,7 +176,7 @@ public class PerspectiveCamera : Camera
     /// <summary>
     /// Returns a <see cref="Ray"/> starting at (-d, 0, 0)
     /// (d = <see cref="Distance"/> from between the observer and the screen)
-    /// that passes through the specified normalized image coordinates (u, v),
+    /// that passes through the specified normalized image coordinates (u, v).
     /// </summary>
     /// <remarks>
     /// (u, v) parameterize the image plane in normalized coordinates in the range [0, 1] × [0, 1],

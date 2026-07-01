@@ -12,7 +12,7 @@ public class PCG
     public ulong Inc { get; set; }
 
     /// <summary>
-    /// Constructor
+    /// Constructor.
     /// </summary>
     /// <param name="initState"></param>
     /// <param name="initSeq"></param>

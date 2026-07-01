@@ -117,7 +117,9 @@ public class CheckeredPigment : Pigment
     /// </summary>
     /// <param name="color1">The first color of the checkerboard pattern.</param>
     /// <param name="color2">The second color of the checkerboard pattern.</param>
-    /// <param name="numsteps">Number of subdivisions along each UV axis used to generate the checker pattern. Defaults to 10.</param>
+    /// <param name="numsteps">
+    /// Number of subdivisions along each UV axis used to generate the checker pattern. Defaults to 10.
+    /// </param>
     public CheckeredPigment(Color color1, Color color2, int numsteps = 10)
     {
         Color1 = color1;
