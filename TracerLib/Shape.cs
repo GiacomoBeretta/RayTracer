@@ -185,8 +185,7 @@ public class Sphere : Shape
             origin = invRay.Origin
                 .ToVector(); // This is the difference between the origin point of the vector and the point (0,0,0)
         Vector dir = invRay.Dir;
-        //float delta_3 = dir.SquaredNorm() - (Vector.CrossProduct(dir, origin)).SquaredNorm();
-        float delta_4 = (origin * dir) * (origin * dir) - dir.SquaredNorm() * (origin.SquaredNorm() - 1); // = delta / 4
+        float delta_4 = dir.SquaredNorm() - (Vector.CrossProduct(dir, origin)).SquaredNorm(); // = delta / 4
         // if delta_4 < 0 there are no intersection, if delta_4 == 0 there is no reflection
         // then we take only one of the two solutions depending on whether they represent
         // intersections on the line that are behind the origin of the ray.
