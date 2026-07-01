@@ -106,7 +106,7 @@ public class HDRImage
     }
 
     /// <summary>
-    /// Returns the <c>Color</c> given by the i-th element of the 1D Pixel's array.
+    /// Returns the <see cref="Color"/> given by the i-th element of the 1D Pixel's array.
     /// </summary>
     /// <param name="index"></param>
     public Color this[Index index]
