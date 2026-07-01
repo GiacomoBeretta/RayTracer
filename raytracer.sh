@@ -22,7 +22,7 @@ esac
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --inputrender) inputrender="$2"; shift 2 ;;
+    --inputscene) inputscene="$2"; shift 2 ;;
     --width) width="$2"; shift 2 ;;
     --height) height="$2"; shift 2 ;;
     --algorithm) algorithm="$2"; shift 2 ;;
@@ -57,7 +57,7 @@ cmd=( "$exepath" "$subcommand" )
 # Render
 
 if [[ "$subcommand" == "render" ]]; then
-	[ -n "$inputrender" ]       && cmd+=( --inputrender "$inputrender" )
+	[ -n "$inpuscene" ]         && cmd+=( --inputscene "$inputscene" )
 	[ -n "$width" ]             && cmd+=( --width "$width" )
 	[ -n "$height" ]            && cmd+=( --height "$height" )
 	[ -n "$algorithm" ]         && cmd+=( --algorithm "$algorithm" )

@@ -6,9 +6,9 @@ gamma=1
 
 # Default render
 inputrender="scene.txt"
-width=500
-height=500
-algorithm="flat"
+width=250
+height=250
+algorithm="pathtracer"
 outputpfm="scene_test.pfm"
 outputpng="scene_test.png"
 numrays=10
@@ -18,7 +18,7 @@ initseq=(54)
 sampleside=1
 declarefloat=()
 roulettestart=3
-rouletteprob=""
+rouletteprob=0,5
 
 # Default pfmtopng
 inputpfm="dome.pfm"
