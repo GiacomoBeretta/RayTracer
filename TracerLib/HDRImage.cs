@@ -1,8 +1,5 @@
 // This file is release under EUPL_v1.2 license. See LICENSE.md
 
-// Implementare dei controlli per i constructor e in altre funzioni se necessario, vediamo cosa dice Tomasi in proposito.
-// Forse si possono mettere i membri privati e rendere la classe dei test una friend?
-
 using System.Diagnostics.CodeAnalysis; // per sopprimere i messaggi di errore
 using
     System.Globalization; //per il metodo cultureInfo e quindi per risolvere il problema dell'1.0 che viene letto come 10
@@ -21,42 +18,25 @@ using System.Text; //for the Encoding.ASCII.GetBytes
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 public class HDRImage
 {
-    //Provare a mettere delle verifiche sulle funzioni get e set
-    //per verificare per esempio che RGB siano positivi e che get
-    //e set pixel verifichino che row e column siano positivi con
-    //la funzione validCoordinates. E vedere se il programma non
-    //rallenta troppo
-
-    //Variables HDR image
-
     /// <summary>
-    /// Width of the matrix of pixels.
+    /// Number of pixel columns.
     /// </summary>
     public int Width { get; private set; }
 
     /// <summary>
-    /// Height of the matrix of pixels.
+    /// Number of pixel rows.
     /// </summary>
     public int Height { get; private set; }
 
     /// <summary>
     /// The array of <see cref="Color"/>s that make up the HDR image.
     /// </summary>
-    public Color[] Pixels { get; set; } //Controllare nullable (Color[])?
+    public Color[] Pixels { get; set; }
 
-    //con i controlli invece viene
-    /*
-     private int width;
-     private height;
-     private Color[] pixels;
-
-     public int Width{
-        get{return width;}
-        if(value < 0){
-            throw new ArgumentException("the width must be >= 0")
-        }
-        set{}
-     }*/
+    /// <summary>
+    /// The ratio Width/Height of the pixel grid.
+    /// </summary>
+    public float AspectRatio => Width / (float)Height;
 
     /// <summary>
     /// Validates that the specified coordinates are within the range
@@ -115,7 +95,7 @@ public class HDRImage
     /// <exception cref="ArgumentException">
     /// Thrown when the length of <paramref name="colorVector"/> does not match width × height.
     /// </exception>
-    public static void _CheckPixels(int width, int height, in Color[] colorVector)
+    public static void _CheckArrayLength(int width, int height, Color[] colorVector)
     {
         ArgumentNullException.ThrowIfNull(colorVector);
         if (colorVector.Length != width * height)
@@ -125,10 +105,8 @@ public class HDRImage
         }
     }
 
-    //vedere se anche per questo indice si possono mettere dei controlli
-    //index and range for the pixels 1D vector with the type indexer
     /// <summary>
-    /// Returns the <c>Color</c> given by the i-th element of the 1D Pixel's array.
+    /// Returns the <see cref="Color"/> given by the i-th element of the 1D Pixel's array.
     /// </summary>
     /// <param name="index"></param>
     public Color this[Index index]
@@ -151,9 +129,8 @@ public class HDRImage
         return row * Width + column;
     }
 
-    //vedere come mettere un controllo con l'eccezione
     /// <summary>
-    /// Gives the Color at the indexes (column, row) of the corresponding matrix
+    /// Gives the Color at the indexes (column, row) of the corresponding matrix.
     /// </summary>
     /// <param name="column"></param>
     /// <param name="row"></param>
@@ -167,6 +144,12 @@ public class HDRImage
 
     #region Constructors
 
+    /// <summary>
+    /// Initializes an HDR image with a <paramref name="width"/>×<paramref name="height"/> pixel grid,
+    /// where every pixel is initialized to black (0, 0, 0).
+    /// </summary>
+    /// <param name="width">The number of pixel columns.</param>
+    /// <param name="height">The number of pixel rows.</param>
     public HDRImage(int width, int height)
     {
         _CheckWidthHeight(width, height);
@@ -176,10 +159,10 @@ public class HDRImage
     }
 
     public HDRImage(int width, int height,
-        in Color[] colorVector)
+        Color[] colorVector)
     {
         _CheckWidthHeight(width, height);
-        _CheckPixels(width, height, colorVector);
+        _CheckArrayLength(width, height, colorVector);
 
         Width = width;
         Height = height;
@@ -192,7 +175,7 @@ public class HDRImage
 
     public HDRImage(Stream stream)
     {
-        HDRImage img = ReadPFM_File(stream);
+        HDRImage img = ReadPFM(stream);
 
         Width = img.Width;
         Height = img.Height;
@@ -205,17 +188,15 @@ public class HDRImage
 
     public HDRImage(string fileName)
     {
-        using (Stream filestream = File.OpenRead(fileName))
-        {
-            HDRImage img = ReadPFM_File(filestream);
+        using Stream filestream = File.OpenRead(fileName);
+        HDRImage img = ReadPFM(filestream);
 
-            Width = img.Width;
-            Height = img.Height;
-            Pixels = new Color[Width * Height];
-            for (int i = 0; i < Pixels.Length; i++)
-            {
-                Pixels[i] = img.Pixels[i];
-            }
+        Width = img.Width;
+        Height = img.Height;
+        Pixels = new Color[Width * Height];
+        for (int i = 0; i < Pixels.Length; i++)
+        {
+            Pixels[i] = img.Pixels[i];
         }
     }
 
@@ -235,37 +216,39 @@ public class HDRImage
 
     //Constructors - End
 
-    //meglio usare stringBuilder qua
     /// <summary>
     /// Returns a human-readable string representation of the HDR image,
     /// including dimensions and the full pixel matrix.
     /// </summary>
     public override string ToString()
     {
-        string str = $"Height: {Height}, Width: {Width}\n" +
-                     "Pixel's matrix:\n" +
-                     "\tColumns ->\n" +
-                     "Rows";
+        StringBuilder sb = new StringBuilder(
+            $"Height: {Height}, Width: {Width}\n" +
+            "Pixel's matrix:\n" +
+            "\tColumns ->\n" +
+            "Rows"
+        );
+
         for (int j = 0; j < Width; j++)
         {
-            str += $"\t{j}";
+            sb.Append($"\t{j}");
         }
 
-        str += "\n";
+        sb.Append("\n");
 
         for (int i = 0; i < Height; i++)
         {
-            str += $"{i}";
+            sb.Append($"{i}");
             for (int j = 0; j < Width; j++)
             {
-                str += "\t";
-                str += Pixels[_PixelOffset(j, i)].ToString();
+                sb.Append("\t");
+                sb.Append(Pixels[_PixelOffset(j, i)].ToString());
             }
 
-            str += "\n";
+            sb.Append("\n");
         }
 
-        return str;
+        return sb.ToString();
     }
 
     /// <summary>
@@ -277,7 +260,7 @@ public class HDRImage
     }
 
     /// <summary>
-    /// Returns a clone of this HDRImage
+    /// Returns a clone of this HDRImage.
     /// </summary>
     /// <returns></returns>
     public HDRImage Clone()
@@ -301,6 +284,7 @@ public class HDRImage
     public static void _ParseImgSize(string stringImgSize, out int width, out int height)
     {
         string[] stringSizeArray = stringImgSize.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
         if (stringSizeArray.Length != 2)
         {
             throw new InvalidPfmFileFormatException(
@@ -357,7 +341,7 @@ public class HDRImage
     /// <summary>
     /// Reads a single ASCII line from a binary stream in PFM format.
     /// </summary>
-    /// /// <param name="br">The binary reader used to read the stream.</param>
+    /// <param name="br">The binary reader used to read the stream.</param>
     /// <returns>The line content, or null if the end of the stream is reached before reading any data.</returns>
     public static string? _ReadLine(BinaryReader br)
     {
@@ -484,12 +468,7 @@ public class HDRImage
 
         endianness = _ParseEndianness(endiannessLine);
 
-        /*Console.WriteLine($"POS BEFORE PIXELS: {br.BaseStream.Position}");
-        long expectedBytes = width * height * 3 * 4;
-        Console.WriteLine($"EXPECTED PIXEL BYTES: {expectedBytes}"); */
-
         image = new HDRImage(width, height);
-        //Console.WriteLine($"Width = {result.Width}, Height = {result.Height}");
     }
 
     /// <summary>
@@ -501,20 +480,17 @@ public class HDRImage
     /// Thrown when the file does not conform to the expected PFM format (invalid header,
     /// missing metadata lines, or malformed image size/endianness information).
     /// </exception>
-    public static HDRImage ReadPFM_File(Stream stream)
+    public static HDRImage ReadPFM(Stream stream)
     {
         using BinaryReader br = new BinaryReader(stream);
 
-        HDRImage.ReadPFM_Header(br, out HDRImage image, out Endianness endianness);
+        ReadPFM_Header(br, out HDRImage image, out Endianness endianness);
 
         // the matrix of colors in PFM files is saved bottom to top and left to right
         for (int row = image.Height - 1; row >= 0; row--)
         {
             for (int col = 0; col < image.Width; col++)
             {
-                //Console.WriteLine($"Column = {j}, Row = {i}");
-                //Console.WriteLine($"Offset = {result._PixelOffset(j,i)}");
-                //Console.WriteLine($"Offset 2 = {i * result.Width + j}");
                 Color color = new Color
                 {
                     R = _ReadFloat(br, endianness),
@@ -525,8 +501,6 @@ public class HDRImage
             }
         }
 
-        //if (result.Pixels != null) Console.WriteLine($"W={result.Width}, H={result.Height}, Pixels={result.Pixels.Length}");
-
         return image;
     }
 
@@ -535,12 +509,10 @@ public class HDRImage
     /// </summary>
     /// <param name="filePath">The path of the PFM file.</param>
     /// <returns>An <see cref="HDRImage"/> containing the decoded floating-point RGB image.</returns>
-    public static HDRImage ReadPFM_File(string filePath)
+    public static HDRImage ReadPFM(string filePath)
     {
-        using (Stream filestream = File.OpenRead(filePath))
-        {
-            return ReadPFM_File(filestream);
-        }
+        using Stream filestream = File.OpenRead(filePath);
+        return ReadPFM(filestream);
     }
 
     /// <summary>
@@ -582,12 +554,10 @@ public class HDRImage
     /// </remarks>
     /// <param name="img">The HDR image to write.</param>
     /// <param name="filePath">The path of the output file where the PFM data will be written.</param>
-    public static void WritePFM_File(HDRImage img, string filePath)
+    public static void WritePFM(HDRImage img, string filePath)
     {
-        using (Stream filestream = File.OpenWrite(filePath))
-        {
-            WritePFM(img, filestream);
-        }
+        using Stream filestream = File.OpenWrite(filePath);
+        WritePFM(img, filestream);
     }
 
     #endregion
@@ -601,7 +571,7 @@ public class HDRImage
     /// <summary>
     /// Computes the logarithmic average luminosity of the image.
     /// The luminosity of each pixel is evaluated according to the specified <see cref="LumFunction"/>
-    /// (Shirley = Shirley and Morley method, Weighted = Weighted Average)
+    /// (Shirley = Shirley and Morley method, Weighted = Weighted Average).
     /// </summary>
     /// <param name="luminosityFunction">The pixel luminosity algorithm to use.</param>
     /// <param name="delta">Small positive value added to pixel luminosity to avoid
@@ -641,25 +611,35 @@ public class HDRImage
     /// Scales all pixels so that their RGB values are normalized with respect
     /// to the image average luminosity.
     /// Each pixel is multiplied by factor / averageLuminosity.
-    /// The luminosityFunction tells which of function of the color class to use to compute the luminosity of the pixel, see <c>LumFunction</c>
     /// If <paramref name="averageLuminosity"/> is not provided, it is computed
     /// using <see cref="_AverageLuminosity"/> and the specified
     /// <paramref name="luminosityFunction"/>.
     /// </summary>
-    /// <param name="luminosityFunction">Function used to compute pixel luminosity when the average luminosity
+    /// <param name="luminosityFunction">
+    /// Function used to compute pixel luminosity when the average luminosity
     /// needs to be calculated.</param>
     /// <param name="factor"> An empirical value.</param>
     /// <param name="averageLuminosity">Optional precomputed average luminosity.</param>
     /// <param name="delta">Small positive value added to pixel luminosity to avoid
-    /// logarithm singularities in the computation of <see cref="_AverageLuminosity"/></param>
+    /// logarithm singularities in the computation of <see cref="_AverageLuminosity"/>.</param>
     public void _Normalize(LumFunction luminosityFunction, float factor, float? averageLuminosity = null,
         float delta = 1e-10f)
     {
-        //if averageLuminosity is null compute it with the _AverageLuminosity function
+        if (factor < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(factor), factor, nameof(factor) + " must be non-negative");
+        }
+        
         averageLuminosity ??= _AverageLuminosity(luminosityFunction, delta);
+
+        if (averageLuminosity <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(averageLuminosity), averageLuminosity,
+                nameof(averageLuminosity) + " must be greater than 0.");
+        }
+
         for (int i = 0; i < Pixels.Length; i++)
         {
-            //averageLuminosity is a nullable type so we must explicitly cast it from float? to float
             Pixels[i] = Pixels[i] * (factor / averageLuminosity.Value);
         }
     }
@@ -689,22 +669,22 @@ public class HDRImage
             Pixels[i] = Pixels[i].To8BitRGB(gamma);
         }
     }
-
-    //Questa non è tecnicamente un HDR. Rivedere in futuro
+    
     /// <summary>
-    /// Returns Creates an LDR representation of the current HDR image.
-    /// It accounts for the gamma correction of the display and of the empirical factor here named "factor"
-    /// The luminosityFunction parameter allow to choose between some possible ways to compute the luminosity of a pixel.
-    /// averageLuminosity is an optional parameter you can use if you've already computed it previously.
+    /// Returns an LDR representation of the current HDR image.
     /// </summary>
-    /// <param name="luminosityFunction">Function used to compute pixel luminosity.</param>
+    /// <param name="luminosityFunction">Function used to compute pixel luminosity.
+    /// If null, it will be computed internally.</param>
     /// <param name="factor">Empirical scaling factor used in normalization.</param>
     /// <param name="gamma">Gamma exponent used for power-law correction (must be > 0).
     /// It's characteristic of the display used.</param>
     /// <param name="averageLuminosity">Optional precomputed average luminosity.</param>
     /// <param name="delta">Small positive value added to pixel luminosity to avoid
-    /// logarithm singularities in the computation of <see cref="_AverageLuminosity"/></param>
-    /// <returns>The LDR image (0–255 range per channel).</returns>
+    /// logarithm singularities in the computation of <see cref="_AverageLuminosity"/>.</param>
+    /// <returns>HDRImage containing LDR data (typically in 0–255 range per channel).</returns>
+    /// <remarks>
+    /// Although the output is LDR, it is returned as an <see cref="HDRImage"/> to avoid introducing a redundant LDR-specific type.
+    /// </remarks>
     public HDRImage CreateLDR(LumFunction luminosityFunction, float factor, float gamma,
         float? averageLuminosity = null,
         float delta = 1e-10f)
@@ -722,9 +702,6 @@ public class HDRImage
 
     /// <summary>
     /// Writes on the outputStream the corresponding LDR image.
-    /// It applies the gamma correction of the display and of the empirical factor here named "factor".
-    /// The luminosityFunction parameter allow to choose between some possible ways to compute the luminosity of a pixel.
-    /// averageLuminosity is an optional parameter you can use if you've already computed it previously.
     /// </summary>
     /// <param name="outputStream">Destination stream where the PNG image will be written.</param>
     /// <param name="luminosityFunction">Function used to compute pixel luminosity for tone mapping.</param>
@@ -733,7 +710,7 @@ public class HDRImage
     /// It's characteristic of the display used.</param>
     /// <param name="averageLuminosity">Optional precomputed average luminosity.</param>
     /// <param name="delta">Small positive value added to pixel luminosity to avoid
-    /// logarithm singularities in the computation of <see cref="_AverageLuminosity"/></param>
+    /// logarithm singularities in the computation of <see cref="_AverageLuminosity"/>.</param>
     public void WritePNG(Stream outputStream, LumFunction luminosityFunction, float factor, float gamma,
         float? averageLuminosity = null,
         float delta = 1e-10f)
@@ -746,7 +723,7 @@ public class HDRImage
         {
             for (int j = 0; j < Height; j++)
             {
-                //the Rgb format requires 3 numbers of the type byte
+                //the Rgb24 format requires 3 numbers of the type byte
                 //so we must convert the RGB values to bytes
                 bitmap[i, j] = new Rgb24((byte)LDRimage[i, j].R, (byte)LDRimage[i, j].G, (byte)LDRimage[i, j].B);
             }
@@ -756,25 +733,22 @@ public class HDRImage
     }
 
     /// <summary>
-    /// Creates a PNG file of the corresponding LDR image
-    /// It accounts for the gamma correction of the display and of the empirical factor here named "factor"
-    /// The luminosityFunction parameter allow to choose between some possible ways to compute the luminosity of a pixel
+    /// Creates a PNG file of the corresponding LDR image.
     /// </summary>
-    /// <param name="outputFilePath"></param>
-    /// <param name="luminosityFunction"></param>
-    /// <param name="factor"></param>
-    /// <param name="gamma"></param>
-    /// <param name="averageLuminosity"></param>
-    /// <param name="delta"></param>
+    /// <param name="outputFilePath">Destination path where the PNG image will be saved.</param>
+    /// <param name="luminosityFunction">Function used to compute pixel luminosity for tone mapping.</param>
+    /// <param name="factor">Empirical scaling factor used in normalization.</param>
+    /// <param name="gamma">Gamma exponent used for power-law correction (must be > 0).
+    /// It's characteristic of the display used.</param>
+    /// <param name="averageLuminosity">Optional precomputed average luminosity.</param>
+    /// <param name="delta">Small positive value added to pixel luminosity to avoid
+    /// logarithm singularities in the computation of <see cref="_AverageLuminosity"/>.</param>
     public void WritePNG(string outputFilePath, LumFunction luminosityFunction, float factor, float gamma,
         float? averageLuminosity = null,
         float delta = 1e-10f)
     {
-        //using (Stream fileStream = File.OpenWrite(outputFilename))
-        using (Stream fileStream = new FileStream(outputFilePath, FileMode.Create))
-        {
-            WritePNG(fileStream, luminosityFunction, factor, gamma, averageLuminosity, delta);
-        }
+        using Stream fileStream = new FileStream(outputFilePath, FileMode.Create);
+        WritePNG(fileStream, luminosityFunction, factor, gamma, averageLuminosity, delta);
     }
 }
 

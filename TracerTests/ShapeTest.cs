@@ -1,8 +1,7 @@
-
 using System.Runtime.InteropServices.JavaScript;
 using TracerLib;
-namespace TracerTests;
 
+namespace TracerTests;
 
 public class ShapeTest
 {
@@ -14,27 +13,27 @@ public class ShapeTest
         {
             float phi = pcg.RandomFloat() * 2 * MathF.PI;
             float theta = MathF.Acos(pcg.RandomFloat());
-            
+
             float x = MathF.Sin(theta) * MathF.Cos(phi);
             float y = MathF.Sin(theta) * MathF.Sin(phi);
             float z = MathF.Cos(theta);
-            Normal normal = new Normal(x,y,z);
+            Normal normal = new Normal(x, y, z);
 
             Vector e1, e2, e3;
             Shape.CreateONB(normal, out e1, out e2, out e3);
-            
+
             Assert.Equal(normal.X, e3.X);
             Assert.Equal(normal.Y, e3.Y);
             Assert.Equal(normal.Z, e3.Z);
-            
-            Assert.True(Functions.AreClose(0, e1*e2));
-            Assert.True(Functions.AreClose(0, e2*e3));
-            Assert.True(Functions.AreClose(0, e3*e1));
-            
+
+            Assert.True(Functions.AreClose(0, e1 * e2));
+            Assert.True(Functions.AreClose(0, e2 * e3));
+            Assert.True(Functions.AreClose(0, e3 * e1));
+
             Assert.True(Functions.AreClose(1, e1.SquaredNorm()));
             Assert.True(Functions.AreClose(1, e2.SquaredNorm()));
             Assert.True(Functions.AreClose(1, e3.SquaredNorm()));
-            
+
             Assert.True(Normal._AreNormalsClose(e3.ToNormal(), Vector.CrossProduct(e1, e2)));
         }
     }
@@ -140,21 +139,39 @@ public class SphereTest
         Assert.Equal(ray, hit?.IncomingRay);
         Assert.Equal(1, hit?.T);
 
-        Ray ray2 = new Ray(new Point(13, 0, 0), new Vector(-1, 0, 0));
-        hit = sphere.FindIntersection(ray2);
+        ray = new Ray(new Point(13, 0, 0), new Vector(-1, 0, 0));
+        hit = sphere.FindIntersection(ray);
         Assert.Equal(new Point(11, 0, 0), hit?.WorldPoint);
         Assert.Equal(new Normal(1, 0, 0), hit?.SurfaceNormal);
         Assert.Equal(new Vector2D(0, 0.5f), hit?.SurfacePosition);
-        Assert.Equal(ray2, hit?.IncomingRay);
+        Assert.Equal(ray, hit?.IncomingRay);
         Assert.Equal(2, hit?.T);
 
-        Ray ray3 = new Ray(new Point(0, 0, 2), new Vector(0, 0, -1));
-        hit = sphere.FindIntersection(ray3);
+        ray = new Ray(new Point(0, 0, 2), new Vector(0, 0, -1));
+        hit = sphere.FindIntersection(ray);
         Assert.Null(hit);
-        
-        Ray ray4 = new Ray(new Point(-10, 0, 0), new Vector(0, 0, -1));
-        hit = sphere.FindIntersection(ray4);
+
+        ray = new Ray(new Point(-10, 0, 0), new Vector(0, 0, -1));
+        hit = sphere.FindIntersection(ray);
         Assert.Null(hit);
+
+        // test with very far and very small sphere
+        // (bug with floating point precision)
+        float t = 2049f;
+        ray = new Ray(new Point(-t, 0, 0), new Vector(1, 0, 0));
+        translate = new Transformation(new Vector(t, 0, 0));
+        sphere = new Sphere(translate);
+        Assert.NotNull(sphere.FindIntersection(ray));
+
+        ray = new Ray(new Point(-1, 0, 0), new Vector(1, 0, 0));
+        Transformation scaling = new Transformation(0.0001f, 0.0001f, 0.0001f);
+        sphere = new Sphere(scaling);
+        Assert.NotNull(sphere.FindIntersection(ray));
+
+        ray = new Ray(new Point(-3, 0, 0), new Vector(1, 0, 0));
+        translate = new Transformation(new Vector(2, 0.9999999f, 0));
+        sphere = new Sphere(translate);
+        Assert.NotNull(sphere.FindIntersection(ray));
     }
 }
 
@@ -170,7 +187,7 @@ public class PlaneTest
     [Fact]
     public void TestPlaneConstructorWithTransformation()
     {
-        Transformation transformation = new Transformation(Axis.X, MathF.PI / 2); 
+        Transformation transformation = new Transformation(Axis.X, MathF.PI / 2);
         Plane plane = new Plane(transformation);
 
         Assert.True(Transformation.AreTransformationsClose(transformation, plane.Transform));

@@ -11,7 +11,7 @@ public class PointTest
         Vector v = new Vector(101.0f, 102.0f, 103.0f);
 
         Assert.Equal(new Point(102.0f, 104.0f, 106.0f), p + v);
-       //Assert.Equal(new Point(102.0f, 104.0f, 106.0f), v + p);
+        //Assert.Equal(new Point(102.0f, 104.0f, 106.0f), v + p);
 
         Assert.True(Point._ArePointsClose(new Point(102.0f, 104.0f, 106.0f), p + v));
         //Assert.True(Point._ArePointsClose(new Point(102.0f, 104.0f, 106.0f), v + p));

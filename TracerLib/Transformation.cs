@@ -5,7 +5,7 @@ using System.Globalization;
 namespace TracerLib;
 
 /// <summary>
-/// A Homogeneous Matrix is a 4x4 matrix with the last row = (0,0,0,1)
+/// A Homogeneous Matrix is a 4x4 matrix with the last row = (0,0,0,1).
 /// It allows to represent scaling transformations, rotations and translations in 3D space.
 /// The matrix is indexed in row-major order.
 /// </summary>
@@ -172,7 +172,7 @@ public struct HomMatrix
     /// <param name="b">The second matrix to compare.</param>
     /// <param name="epsilon">The tolerance used when comparing each coefficient of the matrices.</param>
     /// <returns>
-    /// /// True if the absolute difference between corresponding coefficients of the two matrices
+    /// True if the absolute difference between corresponding coefficients of the two matrices
     /// is less than or equal to the specified tolerance; otherwise, false.
     /// </returns>
     public static bool AreMatricesClose(HomMatrix a, HomMatrix b, float epsilon = 1e-5f)
@@ -188,7 +188,7 @@ public struct HomMatrix
             str += "(";
             for (int j = 0; j < 4; j++)
             {
-                // F2 for the fixed point format
+                // F2 for the fixed point format with 2 digits
                 str += this[i, j].ToString("F2", CultureInfo.InvariantCulture);
                 if (j < 3)
                 {
@@ -276,38 +276,6 @@ public struct HomMatrix
 
         return new HomMatrix(m3);
     }
-
-    // old product function without optimization
-    /* /// <summary>
-     /// Returns the product of the 2 homogeneous matrices.
-     /// </summary>
-     /// <param name="m1"></param>
-     /// <param name="m2"></param>
-     /// <returns></returns>
-     public static HomMatrix operator *(HomMatrix m1, HomMatrix m2)
-     {
-         float[] m3 =
-         [
-             0, 0, 0, 0,
-             0, 0, 0, 0,
-             0, 0, 0, 0,
-             0, 0, 0, 0
-         ];
-
-         //usual row-by-column multiplication between matrices.
-         for (int row = 0; row < 4; row++)
-         {
-             for (int col = 0; col < 4; col++)
-             {
-                 for (int k = 0; k < 4; k++)
-                 {
-                     m3[row * 4 + col] += m1[row * 4 + k] * m2[k * 4 + col];
-                 }
-             }
-         }
-
-         return new HomMatrix(m3);
-     }*/
 }
 
 /// <summary>
@@ -360,7 +328,7 @@ public struct Transformation
          _CheckConsistency();
      }*/
 
-    public Transformation(in HomMatrix m, in HomMatrix invM)
+    public Transformation(HomMatrix m, HomMatrix invM)
     {
         M = m;
         InvM = invM;
@@ -490,7 +458,7 @@ public struct Transformation
     //Constructors - End
 
     /// <summary>
-    /// 1D index for the transformation atrix
+    /// 1D index for the transformation matrix
     /// (coefficients are stored in row-major order).
     /// Valid range: 0–15.
     /// </summary>
@@ -498,7 +466,7 @@ public struct Transformation
     public float this[Index index] => M[index];
 
     /// <summary>
-    /// 2D read only index for the transformation matrix M
+    /// 2D read only index for the transformation matrix M.
     /// </summary>
     /// <param name="row"></param>
     /// <param name="col"></param>
@@ -532,7 +500,7 @@ public struct Transformation
     /// True if both the transformation matrices and inverse matrices are
     /// approximately equal; otherwise false.
     /// </returns>
-    public static bool AreTransformationsClose(in Transformation t1, in Transformation t2, float epsilon = 1e-5f)
+    public static bool AreTransformationsClose(Transformation t1, Transformation t2, float epsilon = 1e-5f)
     {
         return HomMatrix.AreMatricesClose(t1.M, t2.M, epsilon)
                && HomMatrix.AreMatricesClose(t1.InvM, t2.InvM, epsilon);
@@ -577,13 +545,13 @@ public struct Transformation
     /// matrix <c>t2.InvM * t1.InvM</c>, according to
     /// (AB)<sup>-1</sup> = B<sup>-1</sup>A<sup>-1</sup>.
     /// </summary>
-    public static Transformation operator *(in Transformation t1, in Transformation t2)
+    public static Transformation operator *(Transformation t1, Transformation t2)
     {
         HomMatrix prod = t1.M * t2.M;
         HomMatrix invProd = t2.InvM * t1.InvM;
         return new Transformation(prod, invProd);
     }
-    
+
     /// <summary>
     /// Transforms a vector using the specified transformation matrix.
     /// We use homogeneous coordinates, so the vectors are expected to have their 4th coordinate equal to 0.
@@ -592,7 +560,7 @@ public struct Transformation
     /// <param name="v">The vector to transform.</param>
     /// <returns>A new vector resulting from the matrix–vector multiplication.
     /// </returns>
-    public static Vector operator *(in Transformation t, Vector v)
+    public static Vector operator *(Transformation t, Vector v)
     {
         Vector v2 = new Vector
         (
@@ -602,7 +570,7 @@ public struct Transformation
         );
         return v2;
     }
-    
+
     /// <summary>
     /// Applies the transformation to a point.
     /// We use homogeneous coordinates, so the points have their 4th coordinate equal to 1.
@@ -610,7 +578,7 @@ public struct Transformation
     /// <param name="t">The transformation to apply.</param>
     /// <param name="p">The point to transform.</param>
     /// <returns></returns>
-    public static Point operator *(in Transformation t, Point p)
+    public static Point operator *(Transformation t, Point p)
     {
         Point p2 = new Point
         (
@@ -627,7 +595,7 @@ public struct Transformation
 
         return p2 * (1.0f / w);
     }
-    
+
     /// <summary>
     /// Transforms a normal vector using the inverse transpose of the
     /// transformation matrix.
@@ -635,7 +603,7 @@ public struct Transformation
     /// <param name="t">The transformation to apply.</param>
     /// <param name="n1">The normal to transform.</param>
     /// <returns>The transformed normal.</returns>
-    public static Normal operator *(in Transformation t, Normal n1)
+    public static Normal operator *(Transformation t, Normal n1)
     {
         Normal n2 = new Normal
         (

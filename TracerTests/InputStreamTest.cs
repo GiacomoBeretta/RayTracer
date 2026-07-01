@@ -159,7 +159,7 @@ public class InputStreamTest
 
         File.Delete(filePath);
     }
-    
+
     [Fact]
     public void TestSkipLine()
     {
@@ -668,7 +668,7 @@ public class InputStreamTest
                                plane(sky_material, translation([0, 0, 100]) * rotation_y(clock))
 
                                # Define a camera
-                               camera(perspective, rotation_z(30) * translation([-4, 0, 1]), 1.0, 1.0)
+                               camera(perspective, rotation_z(30) * translation([-4, 0, 1]), 1.0, 1.0, 1.0)
                                """;
         string filePath = Path.GetTempFileName();
         File.WriteAllText(filePath, content);
@@ -1451,12 +1451,22 @@ public class InputStreamTest
             Assert.Equal(67, numberToken.Location.column);
 
             symbolToken = (SymbolToken)stream.ReadNextToken();
-            Assert.Equal(")", symbolToken.Symbol);
+            Assert.Equal(",", symbolToken.Symbol);
             Assert.Equal(34, symbolToken.Location.line);
             Assert.Equal(70, symbolToken.Location.column);
+            
+            numberToken = (LiteralNumberToken)stream.ReadNextToken();
+            Assert.Equal(1.0f, numberToken.Value);
+            Assert.Equal(34, numberToken.Location.line);
+            Assert.Equal(72, numberToken.Location.column);
+
+            symbolToken = (SymbolToken)stream.ReadNextToken();
+            Assert.Equal(")", symbolToken.Symbol);
+            Assert.Equal(34, symbolToken.Location.line);
+            Assert.Equal(75, symbolToken.Location.column);
 
             Assert.Equal(34, stream.Location.line);
-            Assert.Equal(71, stream.Location.column);
+            Assert.Equal(76, stream.Location.column);
 
             #endregion
 

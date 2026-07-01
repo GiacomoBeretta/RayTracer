@@ -2,9 +2,6 @@
 
 namespace TracerLib;
 
-//Verificare se modificare {token} in {type(token)} nei messaggi d'errore cambia qualcosa
-//Considerare di cambiare ExpectSymbol(InputStream, string) in ExpecteSymbol(InputStream, char)
-
 /// <summary>
 /// Represents a scene parsed from a scene description file.
 /// </summary>
@@ -28,7 +25,7 @@ public class Scene
     /// The camera used to render the scene.
     /// See <see cref="Camera"/> for more information.
     /// </summary>
-    public ICamera? Camera { get; set; } = null;
+    public Camera? Camera { get; set; } = null;
 
     /// <summary>
     /// Maps variable names to their values.
@@ -54,7 +51,9 @@ public class Scene
     /// </summary>
     /// <param name="inputStream">The input stream providing tokens to read.</param>
     /// <param name="symbol">The expected symbol value to match against the next token.</param>
-    /// <exception cref="SceneSyntaxException">Thrown when the next token is not a symbol token or its value does not match the expected symbol.</exception>
+    /// <exception cref="SceneSyntaxException">
+    /// Thrown when the next token is not a symbol token or its value does not match the expected symbol.
+    /// </exception>
     public void ExpectSymbol(InputStream inputStream, string symbol)
     {
         Token token = inputStream.ReadNextToken();
@@ -72,7 +71,7 @@ public class Scene
     /// <param name="keywords">The list of valid keywords that are allowed at this position.</param>
     /// <returns>The parsed <see cref="Keyword"/> value.</returns>
     /// <exception cref="SceneSyntaxException">
-    ///  Thrown when the next token is not a keyword, or when the keyword is not contained in <paramref name="keywords"/>.
+    /// Thrown when the next token is not a keyword, or when the keyword is not contained in <paramref name="keywords"/>.
     /// </exception>
     public Keyword ExpectKeyword(InputStream inputStream, List<Keyword> keywords)
     {
@@ -250,7 +249,7 @@ public class Scene
                 string texturePath = Path.Combine(currentPath, "../../../../PfmImages", fileName);
                 using (FileStream imageFile = File.OpenRead(texturePath))
                 {
-                    HDRImage image = HDRImage.ReadPFM_File(imageFile);
+                    HDRImage image = HDRImage.ReadPFM(imageFile);
                     result = new ImagePigment(image);
                 }
 
@@ -303,8 +302,6 @@ public class Scene
 
         return result;
     }
-
-    //??? perché questi parametri out?
 
     /// <summary>
     /// Parses a material definition from the input stream.
@@ -498,43 +495,48 @@ public class Scene
     /// </summary>
     /// <remarks>
     /// Expected grammar:
-    /// camera_decl ::= "camera" "(" camera_type "," transformation "," number "," number ")"
-    /// camera_type ::= "perspective" | "orthogonal"
+    /// camera_decl ::= "camera" "(" camera_type "," camera_params ")"
+    /// camera_type ::= "orthogonal" | "perspective"
+    /// camera_params ::= orthogonal_params | perspective_params
+    /// orthogonal_params ::= transformation "," number "," number
+    /// perspective_params ::= transformation "," number "," number "," number
     /// </remarks>
     /// <param name="inputStream">The input stream providing tokens to read.</param>
     /// <returns>
-    /// An <see cref="ICamera"/> instance of the appropriate type
+    /// An <see cref="TracerLib.Camera"/> instance of the appropriate type
     /// (<see cref="PerspectiveCamera"/> or <see cref="OrthogonalCamera"/>).
     /// </returns>
     /// <exception cref="SceneSyntaxException">
     /// Thrown if the input does not match the expected syntax or if the camera type is invalid.
     /// </exception>
-    public ICamera ParseCamera(InputStream inputStream)
+    public Camera ParseCamera(InputStream inputStream)
     {
+        Camera result;
+        
         ExpectSymbol(inputStream, "(");
         Keyword cameraKeyword = ExpectKeyword(inputStream, [Keyword.Perspective, Keyword.Orthogonal]);
         ExpectSymbol(inputStream, ",");
         Transformation transformation = ParseTransformation(inputStream);
         ExpectSymbol(inputStream, ",");
-        float aspectRatio = ExpectNumber(inputStream);
+        float width = ExpectNumber(inputStream);
         ExpectSymbol(inputStream, ",");
-        float distance = ExpectNumber(inputStream);
-        ExpectSymbol(inputStream, ")");
-
-        ICamera result;
-
+        float height = ExpectNumber(inputStream);
+            
         switch (cameraKeyword)
         {
             case Keyword.Perspective:
-                result = new PerspectiveCamera(transformation, distance, aspectRatio);
+                ExpectSymbol(inputStream, ",");
+                float distance = ExpectNumber(inputStream);
+                result = new PerspectiveCamera(transformation, width, height, distance);
                 break;
             case Keyword.Orthogonal:
-                result = new OrthogonalCamera(transformation, aspectRatio);
+                result = new OrthogonalCamera(transformation, width, height);
                 break;
             default:
                 throw new SceneSyntaxException(inputStream.Location, "Keyword doesn't match any of the Cameras types");
         }
-
+        ExpectSymbol(inputStream, ")");
+        
         return result;
     }
 
@@ -555,7 +557,7 @@ public class Scene
                 $"{variableName} cannot be redefined");
         if (!ExternalVariables.Contains(variableName)) Variables[variableName] = variableValue;
     }
-    
+
     /// <summary>
     /// Populates this <see cref="Scene"/> by parsing a scene description from the input stream,
     /// taking into account external variables that override values defined in the scene file.

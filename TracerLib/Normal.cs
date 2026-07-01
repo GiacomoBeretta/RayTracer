@@ -3,22 +3,20 @@
 namespace TracerLib;
 
 /// <summary>
-/// A class that represents a Normalized 3D Vector
+/// A class that represents a Normalized 3D Vector.
 /// </summary>
 public struct Normal
 {
     public float X { get; }
     public float Y { get; }
     public float Z { get; }
-
-    // Constructor -start
+    
     public Normal(float x, float y, float z)
     {
         X = x;
         Y = y;
         Z = z;
     }
-    // Constructor -end
 
     /// <summary>
     /// Returns a string representation of the vector in the format:
@@ -80,7 +78,7 @@ public struct Normal
             throw new ArgumentOutOfRangeException($"Normal is not normalized within epsilon={epsilon}");
         }
     }
-    
+
     /// <summary>
     /// Negates the normal vector, reversing its direction.
     /// </summary>

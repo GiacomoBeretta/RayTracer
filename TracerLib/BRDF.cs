@@ -10,13 +10,10 @@ namespace TracerLib;
 public abstract class BRDF
 {
     /// <summary>
-    /// The Pigment property represents the texture of the surface
+    /// The Pigment property represents the texture of the surface.
     /// </summary>
     public Pigment Pigment;
 
-    // forse questo si può togliere?
-    //public abstract Color Eval(Normal normal, Vector Vin, Vector Vout, Vector2D uv);
-    
     /// <summary>
     /// Base abstract class constructor that initialize a BRDF with a uniform black color.
     /// </summary>
@@ -30,34 +27,33 @@ public abstract class BRDF
         Pigment = pigment;
     }
 
-    public virtual Color Eval(Normal normal, Vector Vin, Vector Vout, Vector2D uv)
+    public virtual Color Eval(Normal normal, Vector vin, Vector vout, Vector2D uv)
     {
         return Pigment.GetColor(uv);
     }
-    
-    // public abstract Ray ScatterRay(PCG pcg, Ray incidentRay, Point interactionPoint, Normal normal);
+
     /// <summary>
-    /// Returns a <c>Ray</c> generated according to the type of <see cref="BRDF"/>.
-    /// The new ray will have the provided <c>depth</c>.
+    /// Returns a <see cref="Ray"/> generated according to the type of <see cref="BRDF"/>.
+    /// The new ray will have the provided <paramref name="depth"/>.
     /// </summary>
     /// <param name="pcg"> Random number generator used for Monte Carlo sampling.</param>
-    /// <param name="incidentVector">Direction of the incoming <c>Ray</c>.</param>
-    /// <param name="interactionPoint"><c>Point</c> on the surface where the scattering event occurs.</param>
-    /// <param name="normal"> Surface <c>Normal</c> used to orient the new ray.</param>
+    /// <param name="incidentVector">Direction of the incoming ray.</param>
+    /// <param name="interactionPoint"><see cref="Point"/> on the surface where the scattering event occurs.</param>
+    /// <param name="normal"> Surface <see cref="Normal"/> used to orient the new ray.</param>
     /// <param name="depth"> Number of reflections of the new ray.</param>
-    /// <returns> A new <c>Ray</c> originating from the interaction point.</returns>
+    /// <returns> A new <see cref="Ray"/> originating from the interaction point.</returns>
     public abstract Ray ScatterRay(PCG pcg, Vector incidentVector, Point interactionPoint, Normal normal, int depth);
 }
 
 /// <summary>
-/// <c>BRDF</c> in which all incoming radiation is distributed uniformly over the 2π hemisphere.
+/// <see cref="BRDF"/> in which all incoming radiation is distributed uniformly over the 2π hemisphere.
 /// </summary>
 public class DiffuseBRDF : BRDF
 {
     private float _reflectance;
 
     /// <summary>
-    /// Constructs a <c>DiffuseBRDF</c> with a uniform black <c>Pigment</c> and unity reflectance.
+    /// Constructs a <see cref="DiffuseBRDF"/> with a uniform black <see cref="Pigment"/> and unity reflectance.
     /// </summary>
     public DiffuseBRDF() : base()
     {
@@ -65,7 +61,7 @@ public class DiffuseBRDF : BRDF
     }
 
     /// <summary>
-    /// Constructs a <c>DiffuseBRDF</c> with a specified <c>Pigment</c> and unity reflectance.
+    /// Constructs a <see cref="DiffuseBRDF"/> with a specified <see cref="Pigment"/> and unity reflectance.
     /// </summary>
     /// <param name="pigment">
     /// The pigment that defines the surface color.
@@ -76,7 +72,7 @@ public class DiffuseBRDF : BRDF
     }
 
     /// <summary>
-    /// Constructs a <c>DiffuseBRDF</c> with a specified <c>Pigment</c> and reflectance.
+    /// Constructs a <see cref="DiffuseBRDF"/>with a specified <see cref="Pigment"/> and reflectance.
     /// </summary>
     /// <param name="pigment">
     /// The pigment that defines the surface color.
@@ -89,22 +85,22 @@ public class DiffuseBRDF : BRDF
         _reflectance = reflectance;
     }
 
-    public override Color Eval(Normal normal, Vector Vin, Vector Vout, Vector2D uv)
+    public override Color Eval(Normal normal, Vector vin, Vector vout, Vector2D uv)
     {
         return Pigment.GetColor(uv) * _reflectance * (1.0f / MathF.PI);
     }
 
     /// <summary>
-    /// Returns a <c>Ray</c> randomly generated over the hemisphere oriented by the surface <c>normal</c>
-    /// and originating at the <c>interactionPoint</c>.
-    /// The new ray will have the provided <c>depth</c>.
+    /// Returns a <see cref="Ray"/> randomly generated over the hemisphere oriented by the surface <see cref="Normal"/>
+    /// and originating at the <paramref name="interactionPoint"/>.
+    /// The new ray will have the provided <paramref name="depth"/>.
     /// </summary>
     /// <param name="pcg"> Random number generator used for Monte Carlo sampling.</param>
-    /// <param name="incidentVector">Direction of the incoming <c>Ray</c>.</param>
-    /// <param name="interactionPoint"><c>Point</c> on the surface where the scattering event occurs.</param>
-    /// <param name="normal"> Surface <c>Normal</c> used to orient the new ray.</param>
+    /// <param name="incidentVector">Direction of the incoming ray.</param>
+    /// <param name="interactionPoint"><see cref="Point"/> on the surface where the scattering event occurs.</param>
+    /// <param name="normal"> Surface <see cref="Normal"/> used to orient the new ray.</param>
     /// <param name="depth"> Number of reflections of the new ray.</param>
-    /// <returns> A new <c>Ray</c> originating from the interaction point and traveling in the sampled direction.</returns>
+    /// <returns> A new <see cref="Ray"/> originating from the interaction point and traveling in the sampled direction.</returns>
     public override Ray ScatterRay(PCG pcg, Vector incidentVector, Point interactionPoint, Normal normal, int depth)
     {
         Shape.CreateONB(normal, out Vector e1, out Vector e2, out Vector e3);
@@ -130,45 +126,46 @@ public class DiffuseBRDF : BRDF
 }
 
 /// <summary>
-/// <c>BRDF</c> in which the incoming radiation is reflected along the direction given by the reflection law.
+/// <see cref="BRDF"/> in which the incoming radiation is reflected along the direction given by the reflection law.
 /// </summary>
 public class SpecularBRDF : BRDF
 {
-    /* public override Color Eval(Normal normal, Vector Vin, Vector Vout, Vector2D uv)
-     {
-         throw new NotImplementedException();
-     }*/
-    
+    public override Color Eval(Normal normal, Vector vin, Vector vout, Vector2D uv)
+    {
+        throw new NotImplementedException();
+    }
+
     /// <summary>
-    /// Constructs a <c>SpecularBRDF</c> with a uniform black <c>Pigment</c>
+    /// Constructs a <see cref="SpecularBRDF"/>with a uniform black <see cref="Pigment"/>.
     /// </summary>
     public SpecularBRDF() : base()
     {
     }
 
     /// <summary>
-    /// Constructs a <c>SpecularBRDF</c> with a specified <c>Pigment</c>
+    /// Constructs a <see cref="SpecularBRDF"/> with a specified <see cref="Pigment"/>.
     /// </summary>
-    /// <param name="pigment"> The pigment defining the surface color </param>
+    /// <param name="pigment">The pigment defining the surface color.</param>
     public SpecularBRDF(Pigment pigment) : base(pigment)
     {
     }
-    
+
     /// <summary>
-    /// Returns a <c>Ray</c> generated accordingly to the reflection's law and originating at the <c>interactionPoint</c>.
-    /// The new ray will have the provided <c>depth</c>.
+    /// Returns a <see cref="Ray"/> generated accordingly to the reflection's law
+    /// and originating at the <paramref name="interactionPoint"/>.
+    /// The new ray will have the provided <paramref name="depth"/>.
     /// </summary>
     /// <param name="pcg">Parameter not used.</param>
-    /// <param name="incidentVector">Direction of the incoming <c>Ray</c>.</param>
-    /// <param name="interactionPoint"><c>Point</c> on the surface where the scattering event occurs.</param>
-    /// <param name="normal"> Surface <c>Normal</c> used to orient the new ray.</param>
+    /// <param name="incidentVector">Direction of the incoming Ray.</param>
+    /// <param name="interactionPoint"><see cref="Point"/> on the surface where the scattering event occurs.</param>
+    /// <param name="normal"> Surface <see cref="Normal"/> used to orient the new ray.</param>
     /// <param name="depth"> Number of reflections of the new ray.</param>
-    /// <returns> A new <c>Ray</c> originating from the interaction point and traveling in the sampled direction.</returns>
+    /// <returns> A new <see cref="Ray"/> originating from the interaction point and traveling in the sampled direction.</returns>
     public override Ray ScatterRay(PCG pcg, Vector incidentVector, Point interactionPoint, Normal normal, int depth)
     {
-        // Maybe it could be advantegeous normalize the incident vector before firing the new ray
+        // Maybe it could be advantageous normalize the incident vector before firing the new ray
         //
-        //Vector rayDir = new Vector(incindentVector.X, incindentVector.Y, incindentVector.Z);
+        //Vector rayDir = new Vector(incidentVector.X, incidentVector.Y, incidentVector.Z);
         //rayDir.Normalize();
         Vector normalVec = normal.ToVector();
 

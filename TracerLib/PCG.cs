@@ -10,9 +10,9 @@ public class PCG
 {
     public ulong State { get; set; }
     public ulong Inc { get; set; }
-    
+
     /// <summary>
-    /// Constructor
+    /// Constructor.
     /// </summary>
     /// <param name="initState"></param>
     /// <param name="initSeq"></param>
@@ -26,7 +26,7 @@ public class PCG
     }
 
     /// <summary>
-    /// Returns a random unsigned integer (32 bit) number between 0 and uint.max
+    /// Returns a random unsigned integer (32 bit) number between 0 and <code>uint.max</code>.
     /// </summary>
     /// <returns></returns>
     public uint Random()
@@ -37,7 +37,7 @@ public class PCG
 
         uint xorshifted = (uint)(((oldstate >> 18) ^ oldstate) >> 27);
 
-        int rot = (int)(oldstate >> 59); 
+        int rot = (int)(oldstate >> 59);
 
         return (xorshifted >> rot) | (xorshifted << ((~rot + 1) & 31)); // Rivedere con 32 - rot al posto di ~rot +1
     }

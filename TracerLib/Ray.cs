@@ -3,7 +3,7 @@
 namespace TracerLib;
 
 /// <summary>
-/// A struct representing a light ray.
+/// Represents a light ray.
 /// 
 /// Intersections are parameterized by a scalar t such that
 /// P = <see cref="Origin"/> + t * <see cref="Dir"/>.
@@ -42,7 +42,7 @@ public struct Ray
 
     /// <summary>
     /// Constructs an invalid/default ray whose origin is at (0, 0, 0),
-    /// whose direction is the zero vector, a intersection range of [1e-5, +∞),
+    /// whose direction is the zero vector, an intersection range of [1e-5, +∞),
     /// and a recursion depth, i.e. the number of reflections, of 0.
     /// </summary>
     public Ray()
@@ -96,7 +96,7 @@ public struct Ray
     {
         Console.WriteLine(ToString());
     }
-    
+
     /// <summary>
     /// Returns the point given by the formula p = Origin + Direction * t
     /// where O is the origin of the ray and v is the direction of the ray.

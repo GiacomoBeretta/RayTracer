@@ -1,14 +1,12 @@
 // This file is release under EUPL_v1.2 license. See LICENSE.md
 
-using System.Diagnostics;
 using System.Globalization;
-using System.Text; //per il metodo cultureInfo
+using System.Text; // for cultureInfo
 
 namespace TracerLib;
 
-//rivedere dopo aver scritto le docstring di tutta la classe
 /// <summary>
-/// A class to parse the tokens in the scene text files written in ASCII.
+/// Reads and tokenizes ASCII scene description files for parsing scene definitions.
 /// </summary>
 public class InputStream : IDisposable
 {
@@ -48,8 +46,9 @@ public class InputStream : IDisposable
     /// Constructs an <see cref="InputStream"/> instance that reads from the specified file path.
     /// </summary>
     /// <param name="filePath">Path of the scene file to read.</param>
-    /// <param name="tabulations">Number of spaces used to expand tab characters during parsing.
-    /// If not specified is 8.</param>
+    /// <param name="tabulations">
+    /// Number of spaces used to expand tab characters during parsing. If not specified is 8.
+    /// </param>
     public InputStream(string filePath, int tabulations = 8)
     {
         Stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
@@ -72,7 +71,7 @@ public class InputStream : IDisposable
     /// Handles line breaks, tab expansion, and standard character advancement.
     /// </summary>
     /// <param name="c">
-    /// Consumed character used to update the current position
+    /// Consumed character used to update the current position.
     /// </param>
     public void UpdateLocation(char c)
     {
@@ -215,7 +214,7 @@ public class InputStream : IDisposable
     }
 
     // Parse_token methods - Begin
-    
+
     /// <summary>
     /// Parses a string literal token starting at the given source location.
     /// Characters are read verbatim until a closing quotation mark (") is encountered.
@@ -224,7 +223,9 @@ public class InputStream : IDisposable
     /// </summary>
     /// <param name="tokenLocation">The source location where the string literal starts.</param>
     /// <returns>A <see cref="StringToken"/> containing the parsed string value.</returns>
-    /// <exception cref="SceneSyntaxException">Thrown if the end of the input is reached before a closing quotation mark is found.</exception>
+    /// <exception cref="SceneSyntaxException">
+    /// Thrown if the end of the input is reached before a closing quotation mark is found.
+    /// </exception>
     public StringToken _ParseStringToken(SourceLocation tokenLocation)
     {
         StringBuilder sb = new StringBuilder();
@@ -241,23 +242,26 @@ public class InputStream : IDisposable
         return new StringToken(tokenLocation, sb.ToString());
     }
 
-    ///  <summary>
+    /// <summary>
     /// Parses a floating-point numeric literal starting with the specified character.
-    ///  Supports optional leading sign (+/-), decimal notation, and scientific
-    ///  notation using an exponent (e.g. 1.23e-4).
-    ///  </summary>
-    ///  <param name="tokenLocation">The source location where the numeric token begins,
-    ///      (used in the constructor of <see cref="LiteralNumberToken"/>, and to throw the exceptions.
-    ///  </param>
-    ///  <param name="firstChar">The first character of the numeric literal that has already been read.
-    ///      This may be a digit or a leading sign (+/-).</param>
-    ///  <returns>A <see cref="LiteralNumberToken"/> containing the parsed floating-point value.</returns>
-    ///  <exception cref="SceneSyntaxException">Thrown when the numeric literal is malformed or reaches the end of the
-    ///  input before a valid number can be completed.</exception>
+    /// Supports optional leading sign (+/-), decimal notation, and scientific
+    /// notation using an exponent (e.g. 1.23e-4).
+    /// </summary>
+    /// <param name="tokenLocation">The source location where the numeric token begins,
+    /// used in the constructor of <see cref="LiteralNumberToken"/>, and to throw the exceptions.
+    /// </param>
+    /// <param name="firstChar">
+    /// The first character of the numeric literal that has already been read.
+    /// This may be a digit or a leading sign (+/-).
+    /// </param>
+    /// <returns>A <see cref="LiteralNumberToken"/> containing the parsed floating-point value.</returns>
+    /// <exception cref="SceneSyntaxException">
+    /// Thrown when the numeric literal is malformed or reaches the end of the
+    /// input before a valid number can be completed.
+    /// </exception>
     public LiteralNumberToken _ParseFloatToken(SourceLocation tokenLocation, char firstChar)
     {
         string floatString = firstChar.ToString();
-        // bool hasReadExpSign = false;
         bool hasReadExpChar = false;
         bool hasReadDot = false; // the decimal point
         float value;
@@ -429,7 +433,7 @@ public class InputStream : IDisposable
     }
 
     // Parse_Token methods - End 
-    
+
     /// <summary>
     /// Reads the next token from the input stream, skipping whitespace,
     /// newlines, and comments.
@@ -465,7 +469,7 @@ public class InputStream : IDisposable
         {
             return new StopToken(tokenLocation);
         }
-        
+
         switch (ch.Value)
         {
             case '(':
@@ -494,7 +498,7 @@ public class InputStream : IDisposable
 
         throw new SceneSyntaxException(tokenLocation, $"invalid character '{ch}'");
     }
-    
+
     /// <summary>
     /// Saves a token to be returned by the next call to <see cref="ReadNextToken"/>.
     /// Only one unread token can be saved at a time.
@@ -506,50 +510,10 @@ public class InputStream : IDisposable
     {
         if (SavedToken != null)
         {
-            throw new SceneSyntaxException(token.Location, $"Tried to unread the token {token}, but there was already a saved token {SavedToken}.");
+            throw new SceneSyntaxException(token.Location,
+                $"Tried to unread the token {token}, but there was already a saved token {SavedToken}.");
         }
+
         SavedToken = token;
     }
 }
-
-
-/*
-
-//prova con stream.Position e senza unreadChar
-public class InputStream
-{
-    private Stream _stream;
-    private SourceLocation _location;
-
-   //public InputStream(Stream stream)
-    {
-        _stream = stream;
-        _location = new SourceLocation();
-    }
-
-   // public InputStream(Stream stream, SourceLocation location)
-    {
-        _stream = stream;
-        _location = location;
-    }
-
-   public InputStream(string fileName)
-   {
-       _stream = new  FileStream(fileName, FileMode.Open, FileAccess.Read);
-       _location = new SourceLocation(fileName, 0,0);
-   }
-
-   public char ReadChar()
-   {
-       if (_savedChar == null)
-       {
-           return (char)_stream.ReadByte();
-       }
-       else
-       {
-           char c = _savedChar.Value;
-           _savedChar = null;
-           return c;
-       }
-   }
-}*/

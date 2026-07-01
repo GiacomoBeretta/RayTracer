@@ -11,7 +11,7 @@ public class Vector2DTest
         Assert.Equal(9.33409f, v1.U);
         Assert.Equal(5.67803f, v1.V);
     }
-    
+
     [Fact]
     public void TestToString()
     {

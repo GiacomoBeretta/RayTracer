@@ -4,10 +4,6 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace TracerLib;
 
-//forse un controllo sul prodotto per scalare è troppo?
-//forse è meglio passare by value per efficienza certi argomenti, meglio chiedere a Tomasi
-//magari si può migliorare lo struct usando i primary constructor?
-
 /// <summary>
 /// The Color type is identified by 3 float positive values R,G,B.
 /// Some basic implemented operations: sum, product of a color by a scalar, product between 2 colors.
@@ -17,9 +13,9 @@ public struct Color
     public float R { get; set; }
     public float G { get; set; }
     public float B { get; set; }
-    
+
     /// <summary>
-    /// Basic <see cref="Color"/> constructor which accepts 3 positive parameters between 0 and 1 : R,G,B 
+    /// Basic <see cref="Color"/> constructor which accepts 3 positive parameters R,G,B between 0 and 1.
     /// </summary>
     /// <param name="r"></param>
     /// <param name="g"></param>
@@ -48,7 +44,7 @@ public struct Color
     }
 
     /// <summary>
-    /// Sum per component between two <see cref="Color"/>
+    /// Sum per component between two <see cref="Color"/>.
     /// </summary>
     /// <param name="c1"></param>
     /// <param name="c2"></param>
@@ -59,10 +55,10 @@ public struct Color
     }
 
     /// <summary>
-    /// Product between a <see cref="Color"/> and a float scalar
+    /// Product between a <see cref="Color"/> and a float scalar.
     /// </summary>
-    /// <param name="a">Color</param>
-    /// <param name="alpha">Scalar</param>
+    /// <param name="a">Color.</param>
+    /// <param name="alpha">Scalar.</param>
     /// <returns></returns>
     public static Color operator *(Color a, float alpha)
     {
@@ -70,14 +66,15 @@ public struct Color
         {
             throw new ArgumentOutOfRangeException(nameof(alpha), alpha, nameof(alpha) + " must be non-negative");
         }
+
         return new Color(a.R * alpha, a.G * alpha, a.B * alpha);
     }
-    
+
     /// <summary>
-    /// Product between a <see cref="Color"/> and a float scalar
+    /// Product between a <see cref="Color"/> and a float scalar.
     /// </summary>
-    /// <param name="alpha">Scalar</param>
-    /// <param name="a">Color</param>
+    /// <param name="alpha">Scalar.</param>
+    /// <param name="a">Color.</param>
     /// <returns></returns>
     public static Color operator *(float alpha, Color a)
     {
@@ -85,10 +82,10 @@ public struct Color
     }
 
     /// <summary>
-    /// Hadamard's product: Product oper component between two <see cref="Color"/> (used in RenderFunction).
+    /// Hadamard's product: Product per component between two <see cref="Color"/> (used in RenderFunction).
     /// </summary>
-    /// <param name="c1">First Color</param>
-    /// <param name="c2">Second Color</param>
+    /// <param name="c1">First Color.</param>
+    /// <param name="c2">Second Color.</param>
     /// <returns></returns>
     public static Color operator *(Color c1, Color c2)
     {
@@ -98,8 +95,8 @@ public struct Color
     /// <summary>
     /// Returns whether the 2 Colors passed are exactly equal.
     /// </summary>
-    /// <param name="c1">First Color</param>
-    /// <param name="c2">Second Color</param>
+    /// <param name="c1">First Color.</param>
+    /// <param name="c2">Second Color.</param>
     /// <returns></returns>
     [SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]
     public static bool _AreSameColor(Color c1, Color c2)
@@ -113,9 +110,9 @@ public struct Color
     /// Returns whether the 2 Colors passed are equal
     /// within a difference given by the epsilon parameter to deal with floating numbers.
     /// </summary>
-    /// <param name="c1">First Color</param>
-    /// <param name="c2">Second Color</param>
-    /// <param name="epsilon">Epsilon parameter</param>
+    /// <param name="c1">First Color.</param>
+    /// <param name="c2">Second Color.</param>
+    /// <param name="epsilon">Epsilon parameter.</param>
     /// <returns></returns>
     public static bool _AreColorsClose(Color c1, Color c2, float epsilon = 1e-5f)
     {
@@ -132,9 +129,9 @@ public struct Color
     {
         return $"(R={R}, G={G}, B={B})";
     }
-    
+
     /// <summary>
-    /// Prints the formatted string with RGB colors
+    /// Prints the formatted string with RGB colors.
     /// </summary>
     /// <returns></returns>
     public void Print()
@@ -142,13 +139,8 @@ public struct Color
         Console.WriteLine(ToString());
     }
 
-    // public bool _AreColorsValid(float R, float G, float B)
-    // {
-    //     return R >= 0 && G >= 0 && B >= 0;
-    // }
-
     /// <summary>
-    /// Returns the luminosity of a pixel using the formula given by Shirley and Morley 
+    /// Returns the luminosity of a pixel using the formula given by Shirley and Morley.
     /// </summary>
     /// <returns></returns>
     public float LuminosityShirleyMorley()
@@ -157,11 +149,11 @@ public struct Color
     }
 
     /// <summary>
-    /// Returns the luminosity of a pixel using the ITU-R BT.709 standard
-    /// see https://en.wikipedia.org/wiki/Rec._709
+    /// Returns the luminosity of a pixel using the ITU-R BT.709 standard.
+    /// See https://en.wikipedia.org/wiki/Rec._709
     /// </summary>
     /// <returns></returns>
-    public float LuminosityWeightedAverage() //VERIFICARE I PESI
+    public float LuminosityWeightedAverage()
     {
         const float wR = 0.2126f;
         const float wG = 0.7152f;
@@ -188,11 +180,11 @@ public struct Color
     /// </summary>
     public void _Clamp()
     {
-        R = Color._Clamp(R);
-        G = Color._Clamp(G);
-        B = Color._Clamp(B);
+        R = _Clamp(R);
+        G = _Clamp(G);
+        B = _Clamp(B);
     }
-    
+
     /// <summary>
     /// Applies gamma correction using a power-law function
     /// and maps the resulting color to the 0–255 range.
@@ -208,13 +200,13 @@ public struct Color
     {
         if (gamma <= 0)
         {
-            throw new ArgumentOutOfRangeException(nameof(gamma), gamma, nameof(gamma) + " must be greater than 0");
+            throw new ArgumentOutOfRangeException(nameof(gamma), gamma, nameof(gamma) + " must be greater than 0.");
         }
+
         float r = (float)Math.Round(255 * MathF.Pow(R, 1.0f / gamma));
         float g = (float)Math.Round(255 * MathF.Pow(G, 1.0f / gamma));
         float b = (float)Math.Round(255 * MathF.Pow(B, 1.0f / gamma));
-        
+
         return new Color(r, g, b);
     }
-    
 }

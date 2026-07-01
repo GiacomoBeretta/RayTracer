@@ -1,3 +1,9 @@
+#v1.0.0
+Fix sphere bug. (PR[#16](https://github.com/GiacomoBeretta/RayTracer/pull/16), it fixes [#13](https://github.com/GiacomoBeretta/RayTracer/issues/13))
+
+#v0.7.0
+Add imageplane dimensions. (PR[#15](https://github.com/GiacomoBeretta/RayTracer/pull/15))
+
 #v0.6.0
 Add InputStream and Scene class to interpret the text files with the scene description. (PR [#11](https://github.com/GiacomoBeretta/RayTracer/pull/11))
 

@@ -5,6 +5,70 @@ namespace TracerLib;
 public static class Functions
 {
     /// <summary>
+    /// Ensures that the specified value is greater than the given threshold.
+    /// Throws an <see cref="ArgumentOutOfRangeException"/> if the condition is not met.
+    /// </summary>
+    /// <typeparam name="T">A comparable type used for threshold validation.</typeparam>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="paramName">The name of the parameter used in the exception message.</param>
+    /// <param name="threshold">The exclusive lower bound.</param>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown when <paramref name="value"/> is less than or equal to <paramref name="threshold"/>.
+    /// </exception>
+    public static void EnsureGreaterThan<T>(T value, string paramName, T threshold) where T : IComparable<T>
+    {
+        if (value.CompareTo(threshold) <= 0)
+        {
+            throw new ArgumentOutOfRangeException(paramName, value, $"{paramName} must be greater than {threshold}");
+        }
+    }
+
+    /// <summary>
+    /// Ensures that the specified value is greater than or equal to the given threshold.
+    /// Throws an <see cref="ArgumentOutOfRangeException"/> if the condition is not met.
+    /// </summary>
+    /// <typeparam name="T">A comparable type used for threshold validation.</typeparam>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="paramName">The name of the parameter used in the exception message.</param>
+    /// <param name="threshold">The inclusive lower bound.</param>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown when <paramref name="value"/> is less than <paramref name="threshold"/>.
+    /// </exception>
+    public static void EnsureGreaterThanOrEqual<T>(T value, string paramName, T threshold) where T : IComparable<T>
+    {
+        if (value.CompareTo(threshold) < 0)
+        {
+            throw new ArgumentOutOfRangeException(paramName, value,
+                $"{paramName} must be greater than or equal to {threshold}");
+        }
+    }
+
+    /// <summary>
+    /// Ensures that the specified value is within the inclusive range [min, max].
+    /// Throws an <see cref="ArgumentOutOfRangeException"/> if the condition is not met.
+    /// </summary>
+    /// <typeparam name="T">A comparable type used for range validation.</typeparam>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="paramName">The name of the parameter used in the exception message.</param>
+    /// <param name="min">The inclusive lower bound.</param>
+    /// <param name="max">The inclusive upper bound.</param>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown when <paramref name="value"/> is less than <paramref name="min"/> or greater than <paramref name="max"/>.
+    /// </exception>
+    public static void EnsureInRange<T>(T value, string paramName, T min, T max) where T : IComparable<T>
+    {
+        if (min.CompareTo(max) > 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(min), min, $"{nameof(min)} must be less than {nameof(max)}");
+        }
+
+        if (value.CompareTo(min) < 0 || value.CompareTo(max) > 0)
+        {
+            throw new ArgumentOutOfRangeException(paramName, value, $"{paramName} must be in [{min}, {max}]");
+        }
+    }
+
+    /// <summary>
     /// Determines whether two floating-point values are approximately equal
     /// within a given tolerance.
     /// </summary>
@@ -18,7 +82,7 @@ public static class Functions
     {
         return MathF.Abs(a - b) < epsilon;
     }
-    
+
     /// <summary>
     /// Determines whether two arrays of floats are approximately equal
     /// element by element within a given tolerance.
@@ -38,13 +102,15 @@ public static class Functions
         int length = a.Length;
         if (length != b.Length)
         {
-            throw new ArgumentOutOfRangeException(nameof(b), b, "the "+ nameof(b)+ " array has not the same length as the "+nameof(a)+ " array");
+            throw new ArgumentOutOfRangeException(nameof(b), b,
+                "the " + nameof(b) + " array has not the same length as the " + nameof(a) + " array");
         }
+
         bool areArrayClose = true;
         for (int i = 0; i < length; i++)
         {
             areArrayClose = areArrayClose
-                             && Functions.AreClose(a[i], b[i], epsilon);
+                            && Functions.AreClose(a[i], b[i], epsilon);
         }
 
         return areArrayClose;
@@ -59,7 +125,7 @@ public static class Functions
     {
         return deg * MathF.PI / 180f;
     }
-    
+
     /// <summary>
     /// Parses an array of variable definitions and converts them into a dictionary.
     /// Each definition must follow the format "NAME:VALUE", where NAME is the
@@ -101,5 +167,5 @@ public static class Functions
         }
 
         return variables;
-    } 
+    }
 }

@@ -30,7 +30,7 @@ public class HomMatrixTests
         ];
 
         Assert.Throws<ArgumentException>(() => new HomMatrix(m));
-        
+
         m =
         [
             6, 9, 2.440f, 20,
@@ -74,7 +74,7 @@ public class HomMatrixTests
         HomMatrix expected = new HomMatrix(expectedArray);
         Assert.Equal(expected.M, actual.M);
     }
-    
+
     [Fact]
     public void TestMatrixOffset()
     {
@@ -93,7 +93,7 @@ public class HomMatrixTests
         Assert.Equal(15, matrix._MatrixOffset(3, 3));
         Assert.Throws<ArgumentOutOfRangeException>(() => matrix._MatrixOffset(-1, 16));
     }
-    
+
     [Fact]
     public void Test1DIndex()
     {
@@ -130,7 +130,7 @@ public class HomMatrixTests
         Assert.Equal(7.0f, matrix[2, 3]);
         Assert.Equal(0, matrix[3, 2]);
     }
-    
+
     [Fact]
     public void TestCheckCoordinates()
     {
@@ -151,7 +151,7 @@ public class HomMatrixTests
         Assert.Throws<ArgumentOutOfRangeException>(() => matrix._CheckCoordinates(19, 20));
         Assert.Throws<ArgumentOutOfRangeException>(() => matrix._CheckCoordinates(-17, -40));
     }
-    
+
     [Fact]
     public void TestAreMatrixClose()
     {
@@ -312,7 +312,7 @@ public class TransformationTest
             0.0872274f, -0.238318f, -0.345794f, 5.46885f,
             0, 0, 0, 1
         ];
-        
+
         HomMatrix invMatrix = new HomMatrix(invM);
 
         Transformation t = new Transformation(matrix, invMatrix);
@@ -337,7 +337,7 @@ public class TransformationTest
             -0.0124611f, -0.0373832f, -0.0934579f, 1.43302f,
             0.0872274f, -0.238318f, -0.345794f, 5.46885f,
             0, 0, 0, 1
-        ]; 
+        ];
         ;
         Transformation t = new Transformation(m, invM);
         Assert.Equal(m, t.M.M);
@@ -563,8 +563,8 @@ public class TransformationTest
             -0.0124611f, -0.0373832f, -0.0934579f, 1.43302f,
             0.0872274f, -0.238318f, -0.345794f, 5.46885f,
             0, 0, 0, 1
-        ]; 
-        
+        ];
+
         Transformation t1 = new Transformation(m2, invM2);
         t1._CheckConsistency();
     }
@@ -642,7 +642,7 @@ public class TransformationTest
                      "(-0.01,\t-0.04,\t-0.09,\t1.43)\n" +
                      "(0.09,\t-0.24,\t-0.35,\t5.47)\n" +
                      "(0.00,\t0.00,\t0.00,\t1.00))\n";
-                     
+
         Assert.Equal(str, t.ToString());
     }
 
@@ -764,7 +764,7 @@ public class TransformationTest
 
         Assert.Equal(expected, t * v);
     }
-    
+
     [Fact]
     public void TestProductPoint()
     {

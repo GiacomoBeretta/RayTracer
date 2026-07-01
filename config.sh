@@ -1,33 +1,28 @@
-# Global default 
-lumfunction="shirley"
-averageluminosity=0,5
+# Parameters used if not specified during the execution of raytracer.sh
+
+# Default Common options
+outputpfm="demo.pfm" #not used by pfmtopng
+outputpng="demo.png"
+luminosityfunction="shirley"
+averageluminosity=""
 factor=1
 gamma=1
 
-# Default render
-inputrender="scene.txt"
-width=250
-height=250
-algorithm="pathtracer"
-outputpfm="scene_test.pfm"
-outputpng="scene_test.png"
-numrays=10
-maxdepth=2
-initstate=(45)
-initseq=(54)
+# Default render 
+inputscene="scene.txt"
+width=500
+height=500
 sampleside=1
+algorithm="pathtracing"
+numrays=10 #only for pathtracing
+maxdepth=2 #only for pathtracing
+initstate=45 #only for pathtracing
+initseq=54 #only for pathtracing
+roulettestart=3 #only for pathtracing
+rouletteprob=0.5 #only for pathtracing
 declarefloat=()
-roulettestart=3
-rouletteprob=0,5
+
+pcgcycle=false #only for pathtracing
 
 # Default pfmtopng
 inputpfm="dome.pfm"
-output="dome.png"
-
-# Default averageimage
-outputaveragepfm="average.pfm"
-outputaveragepng="average.png"
-
-# Cycle parameters
-pcgcycle=false
-

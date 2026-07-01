@@ -44,7 +44,7 @@ public class OnOffRenderer : Renderer
 
     /// <summary>
     /// Returns a white <see cref="Color"/> if the ray intersects a <see cref="Shape"/> of the scene
-    /// otherwhise returns the <see cref="BackgroundColor"/>.
+    /// otherwise returns the <see cref="BackgroundColor"/>.
     /// </summary>
     /// <param name="ray">The <see cref="Ray"/> that intersects the scene.</param>
     /// <returns></returns>
@@ -160,7 +160,7 @@ public class PathTracingRenderer : Renderer
         MaxDepth = maxDepth;
         RussianRouletteFixedProbability = russianRouletteProbability;
     }
-    
+
     /// <summary>
     /// Evaluates the surface color at the ray intersection point using Monte Carlo integration
     /// and the Russian roulette algorithm.
@@ -180,7 +180,7 @@ public class PathTracingRenderer : Renderer
         Color hitColor = material.Pigment.GetColor(hit.Value.SurfacePosition);
         Color emittedRadiance = material.EmittedRadiance.GetColor(hit.Value.SurfacePosition);
 
-        //maybe it's more efficient to put it inside the if of the russian roulette algorithm
+        //maybe it's more efficient to put it inside the 'if' of the russian roulette algorithm
         //and substitute in
         //if (maxLum > 0.0f)
         //the equivalent condition
@@ -208,9 +208,9 @@ public class PathTracingRenderer : Renderer
             }
         }
 
-        Color newRadiance = new Color();
+        Color newRadiance;
         Color cumRadiance = new Color();
-        Ray newRay = new Ray();
+        Ray newRay;
 
         // if the RGB values of hitColor are 0 then the contribution to cumRadiance is null.
         if (maxLum > 0.0f)

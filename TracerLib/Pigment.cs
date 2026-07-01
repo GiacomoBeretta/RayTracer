@@ -31,14 +31,14 @@ public class UniformPigment : Pigment
     /// </summary>
     public UniformPigment()
     {
-        this.Color = new Color(0,0,0);
+        this.Color = new Color(0, 0, 0);
     }
-    
+
     public UniformPigment(Color color)
     {
         Color = color;
     }
-    
+
     /// <summary>
     /// Returns the uniform color of this pigment regardless of the input UV coordinates.
     /// </summary>
@@ -65,7 +65,6 @@ public class ImagePigment : Pigment
         Image = image;
     }
     
-    //TOGLIERE MATHFLOOR SUL BRANCH AVERAGEIMAGE
     /// <summary>
     /// Returns the color sampled from the image at the specified UV coordinates.
     /// </summary>
@@ -101,7 +100,7 @@ public class CheckeredPigment : Pigment
     /// The first color used by this <see cref="CheckeredPigment"/>.
     /// </summary>
     public Color Color1 { get; }
-    
+
     /// <summary>
     /// The second color used by this <see cref="CheckeredPigment"/>.
     /// </summary>
@@ -112,20 +111,22 @@ public class CheckeredPigment : Pigment
     /// For example, a value of 4 produces a 4x4 checker grid.
     /// </summary>
     public int NumSteps { get; }
-    
+
     /// <summary>
     /// Constructs a new instance of the <see cref="CheckeredPigment"/> class.
     /// </summary>
     /// <param name="color1">The first color of the checkerboard pattern.</param>
     /// <param name="color2">The second color of the checkerboard pattern.</param>
-    /// <param name="numsteps">Number of subdivisions along each UV axis used to generate the checker pattern. Defaults to 10.</param>
+    /// <param name="numsteps">
+    /// Number of subdivisions along each UV axis used to generate the checker pattern. Defaults to 10.
+    /// </param>
     public CheckeredPigment(Color color1, Color color2, int numsteps = 10)
     {
         Color1 = color1;
         Color2 = color2;
         NumSteps = numsteps;
     }
-    
+
     /// <summary>
     /// Returns one of the two colors of the checkered pattern based on the given uv coordinates.
     /// </summary>
@@ -145,7 +146,7 @@ public class CheckeredPigment : Pigment
         int iu = (int)(MathF.Floor(uv.U * NumSteps));
         int iv = (int)(MathF.Floor(uv.V * NumSteps));
 
-        return (iu + iv) % 2 == 0 ? Color1 : Color2; //magari è più veloce
+        return (iu + iv) % 2 == 0 ? Color1 : Color2; // maybe it's faster this
         //return ((iu % 2) == (iv % 2)) ? Color1 : Color2;
     }
 }

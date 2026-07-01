@@ -131,7 +131,7 @@ public class SceneTest
 
         File.Delete(filepath);
     }
-    
+
     [Fact]
     public void ParsePigmentTest()
     {
@@ -226,7 +226,7 @@ public class SceneTest
 
         File.Delete(filepath);
     }
-    
+
     [Fact]
     public void ParseSphereTest()
     {
@@ -287,7 +287,7 @@ public class SceneTest
     [Fact]
     public void ParseCameraTest()
     {
-        const string cam = "(perspective, rotation_z(30) * translation([-4, 0, 1]), 1.0, 1.0)";
+        const string cam = "(perspective, rotation_z(30) * translation([-4, 0, 1]), 10.0, 5.0, 3)";
 
         File.WriteAllText(filepath, cam);
 
@@ -298,8 +298,10 @@ public class SceneTest
             Assert.True(Transformation.AreTransformationsClose(
                 new Transformation(Axis.Z, Functions.DegToRad(30)) * new Transformation(new Vector(-4f, 0f, 1f)),
                 camera.Transformation));
-            Assert.True(Functions.AreClose(1.0f, camera.AspectRatio));
-            Assert.True(Functions.AreClose(1.0f, camera.Distance));
+            Assert.True(Functions.AreClose(10.0f, camera.Width));
+            Assert.True(Functions.AreClose(5.0f, camera.Height));
+            Assert.True(Functions.AreClose(2.0f, camera.AspectRatio));
+            Assert.True(Functions.AreClose(3.0f, camera.Distance));
         }
 
         File.Delete(filepath);

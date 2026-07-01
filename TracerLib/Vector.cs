@@ -76,8 +76,7 @@ public struct Vector
     {
         return new Vector(v1.X * a, v1.Y * a, v1.Z * a);
     }
-
-    //è meglio usare v1*a o scrivere di nuovo v1.X*a, v1.Y*a, v1.Z*a?
+    
     public static Vector operator *(float a, Vector v1)
     {
         return new Vector(v1.X * a, v1.Y * a, v1.Z * a);
@@ -132,7 +131,7 @@ public struct Vector
     }
 
     /// <summary>
-    /// Returns a <see cref="Normal"/>, i.e. a normalized vector with same direction
+    /// Returns a <see cref="Normal"/>, i.e. a normalized vector with same direction.
     /// </summary>
     /// <returns></returns>
     public Normal ToNormal()
