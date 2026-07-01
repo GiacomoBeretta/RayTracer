@@ -139,21 +139,39 @@ public class SphereTest
         Assert.Equal(ray, hit?.IncomingRay);
         Assert.Equal(1, hit?.T);
 
-        Ray ray2 = new Ray(new Point(13, 0, 0), new Vector(-1, 0, 0));
-        hit = sphere.FindIntersection(ray2);
+        ray = new Ray(new Point(13, 0, 0), new Vector(-1, 0, 0));
+        hit = sphere.FindIntersection(ray);
         Assert.Equal(new Point(11, 0, 0), hit?.WorldPoint);
         Assert.Equal(new Normal(1, 0, 0), hit?.SurfaceNormal);
         Assert.Equal(new Vector2D(0, 0.5f), hit?.SurfacePosition);
-        Assert.Equal(ray2, hit?.IncomingRay);
+        Assert.Equal(ray, hit?.IncomingRay);
         Assert.Equal(2, hit?.T);
 
-        Ray ray3 = new Ray(new Point(0, 0, 2), new Vector(0, 0, -1));
-        hit = sphere.FindIntersection(ray3);
+        ray = new Ray(new Point(0, 0, 2), new Vector(0, 0, -1));
+        hit = sphere.FindIntersection(ray);
         Assert.Null(hit);
 
-        Ray ray4 = new Ray(new Point(-10, 0, 0), new Vector(0, 0, -1));
-        hit = sphere.FindIntersection(ray4);
+        ray = new Ray(new Point(-10, 0, 0), new Vector(0, 0, -1));
+        hit = sphere.FindIntersection(ray);
         Assert.Null(hit);
+
+        // test with very far and very small sphere
+        // (bug with floating point precision)
+        float t = 2049f;
+        ray = new Ray(new Point(-t, 0, 0), new Vector(1, 0, 0));
+        translate = new Transformation(new Vector(t, 0, 0));
+        sphere = new Sphere(translate);
+        Assert.NotNull(sphere.FindIntersection(ray));
+
+        ray = new Ray(new Point(-1, 0, 0), new Vector(1, 0, 0));
+        Transformation scaling = new Transformation(0.0001f, 0.0001f, 0.0001f);
+        sphere = new Sphere(scaling);
+        Assert.NotNull(sphere.FindIntersection(ray));
+
+        ray = new Ray(new Point(-3, 0, 0), new Vector(1, 0, 0));
+        translate = new Transformation(new Vector(2, 0.9999999f, 0));
+        sphere = new Sphere(translate);
+        Assert.NotNull(sphere.FindIntersection(ray));
     }
 }
 
