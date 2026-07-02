@@ -40,6 +40,16 @@ public class PointTest
     }
 
     [Fact]
+    public void TestScalarProduct()
+    {
+        float a = 3f;
+        Point p = new Point(2f, 5f, 7f);
+        
+        Assert.True(Point._ArePointsClose(new Point(6f, 15f, 21f), a*p));
+        Assert.True(Point._ArePointsClose(new Point(6f, 15f, 21f), p*a));
+    }
+
+    [Fact]
     public void PointToVectorTest()
     {
         Point p = new Point(1.0f, 2.0f, 3.0f);

@@ -136,7 +136,7 @@ public class SceneTest
     public void ParsePigmentTest()
     {
         const string pigment = "uniform(<0.3, 0.5, 0.1>)\n" +
-                               "checkered(<0.4, 0.6, 0.5>, <0.1, 0, 0.9>, 4)";
+                               "checkered(<0.4, 0.6, 0.5>, <0.1, 0, 0.9>, 4)\n";
 
         File.WriteAllText(filepath, pigment);
 

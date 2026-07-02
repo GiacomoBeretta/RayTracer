@@ -297,7 +297,81 @@ public class HDRImageTest
     [Fact]
     public void TestReadPFMHeader()
     {
+        string header = "PF\n" +
+                        "640 480\n" +
+                        "-1.0\n";
         
+        string header2 = "XX\n" +
+                         "100 100\n" +
+                         "-1.0\n";
+        
+        string header3 = "PF\n";
+        
+        string header4 = "PF\n" +
+                         "10 20\n";
+        
+        string header5 = "PF\n" +
+                         "abc def\n" +
+                         "-1.0\n";
+        
+        string header6 = "PF\n" +
+                         "100 200\n" +
+                         "0.0\n";
+
+        using var ms = new MemoryStream(Encoding.ASCII.GetBytes(header));
+        using var br = new BinaryReader(ms);
+        
+        using var ms2 = new MemoryStream(Encoding.ASCII.GetBytes(header2));
+        using var br2 = new BinaryReader(ms2);
+        
+        using var ms3 = new MemoryStream(Encoding.ASCII.GetBytes(header3));
+        using var br3 = new BinaryReader(ms3);
+        
+        using var ms4 = new MemoryStream(Encoding.ASCII.GetBytes(header4));
+        using var br4 = new BinaryReader(ms4);
+        
+        using var ms5 = new MemoryStream(Encoding.ASCII.GetBytes(header5));
+        using var br5 = new BinaryReader(ms5);
+        
+        using var ms6 = new MemoryStream(Encoding.ASCII.GetBytes(header6));
+        using var br6 = new BinaryReader(ms6);
+        
+        HDRImage.ReadPFM_Header(br, out HDRImage image, out var endianness);
+        
+        //Test valid header
+        Assert.Equal(640, image.Width);
+        Assert.Equal(480, image.Height);
+        Assert.Equal(Endianness.Little, endianness);
+        
+        //Test fail magic number
+        Assert.Throws<InvalidPfmFileFormatException>(() =>
+        {
+            HDRImage.ReadPFM_Header(br2, out _, out _);
+        });
+        
+        //Test missing dimension line
+        Assert.Throws<InvalidPfmFileFormatException>(() =>
+        {
+            HDRImage.ReadPFM_Header(br3, out _, out _);
+        });
+        
+        //Test missing endianness line
+        Assert.Throws<InvalidPfmFileFormatException>(() =>
+        {
+            HDRImage.ReadPFM_Header(br4, out _, out _);
+        });
+        
+        //Test invalid dimension
+        Assert.Throws<InvalidPfmFileFormatException>(() =>
+        {
+            HDRImage.ReadPFM_Header(br5, out _, out _);
+        });
+        
+        //Test inavlid endianness
+        Assert.Throws<InvalidPfmFileFormatException>(() =>
+        {
+            HDRImage.ReadPFM_Header(br6, out _, out _);
+        });
     }
 
     [Fact]
@@ -445,6 +519,39 @@ public class HDRImageTest
     }
     
     [Fact]
+    public void TestWritePFM()
+    {
+        HDRImage original = new HDRImage(2, 2);
+        
+        original[0, 0] = new Color(1f, 2f, 3f);
+        original[1, 0] = new Color(4f, 5f, 6f);
+        
+        original[0, 1] = new Color(7f, 8f, 9f);
+        original[1, 1] = new Color(10f, 11f, 12f);
+
+        using MemoryStream stream = new MemoryStream();
+        
+        HDRImage.WritePFM(original, stream);
+
+        stream.Position = 0;
+
+        HDRImage loaded = HDRImage.ReadPFM(stream);
+        
+        Assert.Equal(original.Width, loaded.Width);
+        Assert.Equal(original.Height, loaded.Height);
+
+        for (int y = 0; y < original.Height; y++)
+        {
+            for (int x = 0; x < original.Width; x++)
+            {
+                Assert.Equal(original[x, y].R, loaded[x, y].R);
+                Assert.Equal(original[x, y].G, loaded[x, y].G);
+                Assert.Equal(original[x, y].B, loaded[x, y].B);
+            }
+        }
+    }
+    
+    [Fact]
     public void TestCreateLDR()
     {
         Color[] colorVector = new Color[3];
@@ -467,9 +574,4 @@ public class HDRImageTest
         Assert.Equal(hdrImage.Height, ldrImage.Height);
         Assert.Equal(hdrImage.Pixels, ldrImage.Pixels);
     }
-
-    /*[Fact]
-    public void TestWritePNG()
-    {
-    }*/
 }

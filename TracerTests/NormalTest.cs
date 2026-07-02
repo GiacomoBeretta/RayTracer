@@ -46,7 +46,6 @@ public class NormalTest
         Assert.True(Vector._AreVectorsClose(new Vector(-3.0f, 6f, -3f), Normal.CrossProduct(n, v)));
         Assert.True(Vector._AreVectorsClose(new Vector(3.0f, -6.0f, 3.0f), Normal.CrossProduct(v, n)));
         Assert.True(Vector._AreVectorsClose(new Vector(6.0f, -12.0f, 6.0f), Normal.CrossProduct(n2, n)));
-        Assert.True(Vector._AreVectorsClose(new Vector(6.0f, -12.0f, 6.0f), Normal.CrossProduct(n2, n)));
     }
 
     //Prima di proseguire con i test del proddoto vettore occorre implementare la _AreCloseVector
@@ -60,5 +59,34 @@ public class NormalTest
 
         //Trovare un vettore che non restituisca una normale troppo complessa una vorlta normalizzata
         //Assert.True(Normal._AreCloseNormal(new Normal(0.29f, 0.43f, 0.86f), n.Normalize()));
+    }
+
+    [Fact]
+    public void TestIsNormalized()
+    {
+        Normal n = new Normal(0f, 0f, 1f);
+        
+        Assert.True(n.IsNormalized());
+    }
+
+    [Fact]
+    public void TestCheckNormalized()
+    {
+        Normal n = new Normal(2f, 0f, 0f);
+
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+        {
+            n.CheckNormalized();
+        });
+    }
+
+    [Fact]
+    public void TestToVector()
+    {
+        Normal n = new Normal(1f, 2f, 3f);
+
+        Vector v = n.ToVector();
+        
+        Assert.True(Vector._AreVectorsClose(new Vector(1f, 2f, 3f), v));
     }
 }

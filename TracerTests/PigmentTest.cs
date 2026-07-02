@@ -44,8 +44,6 @@ public class PigmentTest
         Assert.True(Color._AreColorsClose(new Color(1.0f, 2.0f, 3.0f), up.GetColor(v5)));
     }
 
-    //IMPLEMENTARE TEST PER IL COSTRUTTORE IMAGEPIGMENT
-
     [Fact]
     public void ImageGetColor()
     {
