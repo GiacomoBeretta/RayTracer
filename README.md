@@ -516,7 +516,7 @@ Example:
 ```text
 image("texture.pfm")
 ```
-
+> **Note:** The Image pigment file must be available in the `PfmImages` directory when the program is executed.
 ---
 
 ## Geometric Primitives
@@ -842,11 +842,11 @@ Name of the scene file to be rendered.
 
 The file must be located inside the `Scene` directory.
 
-#### `--width`
+#### `--pixelcolumns`
 
 Number of pixel columns (The physical width of the image plane must be specified in the camera definition in the scene file).
 
-#### `--height`
+#### `--pixelrows`
 
 Number of pixel rows (The physical width of the image plane must be specified in the camera definition in the scene file). 
 
