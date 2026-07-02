@@ -2,6 +2,7 @@
 
 using System.ComponentModel.DataAnnotations;
 using TracerLib;
+using System.Globalization;
 using McMaster.Extensions.CommandLineUtils;
 
 namespace RayTracer;
@@ -11,7 +12,12 @@ namespace RayTracer;
 public class RayTracer
 {
     public static int Main(string[] args)
-        => CommandLineApplication.Execute<RayTracer>(args);
+    {
+        CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
+        CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.InvariantCulture;
+        
+        return CommandLineApplication.Execute<RayTracer>(args);
+    }
 
     internal int OnExecute(CommandLineApplication app)
     {
@@ -37,11 +43,11 @@ public class RenderCommand
     [Required]
     public string OutputPngName { get; init; } = null!;
 
-    [Option("--width", Description = "The width of the image. Must be >= 1 (default: 500).")]
+    [Option("--pixelcolumns", Description = "The width of the image. Must be >= 1 (default: 500).")]
     [Range(1, Int32.MaxValue)]
     public int Width { get; init; } = 500;
 
-    [Option("--height", Description = "The height of the image. Must be >= 1 (default: 500).")]
+    [Option("--pixelrows", Description = "The height of the image. Must be >= 1 (default: 500).")]
     [Range(1, Int32.MaxValue)]
     public int Height { get; init; } = 500;
 
@@ -179,8 +185,8 @@ public class RenderCommand
         Console.WriteLine($"Output PFM name: {OutputPfmName}");
         Console.WriteLine($"Output PNG name: {OutputPngName}");
         Console.WriteLine();
-        Console.WriteLine($"Width: {Width}");
-        Console.WriteLine($"Height: {Height}");
+        Console.WriteLine($"Pixels's columns: {Width}");
+        Console.WriteLine($"Pixels's rows: {Height}");
         Console.WriteLine($"Sample per Side: {SampleSide}");
         Console.WriteLine($"Algorithm: {Algorithm}");
         Console.WriteLine();

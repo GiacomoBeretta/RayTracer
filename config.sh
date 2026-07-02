@@ -10,8 +10,8 @@ gamma=1
 
 # Default render 
 inputscene="scene.txt"
-width=500
-height=500
+pixelcolumns=500
+pixelrows=500
 sampleside=1
 algorithm="pathtracing"
 numrays=10 #only for pathtracing

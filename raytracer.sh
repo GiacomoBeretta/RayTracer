@@ -30,8 +30,8 @@ while [[ $# -gt 0 ]]; do
     --inputscene) inputscene="$2"; shift 2 ;;
 	--outputpfm) outputpfm="$2"; shift 2 ;;
     --outputpng) outputpng="$2"; shift 2 ;;
-    --width) width="$2"; shift 2 ;;
-    --height) height="$2"; shift 2 ;;
+    --pixelcolumns) pixelcolumns="$2"; shift 2 ;;
+    --pixelrows) pixelrows="$2"; shift 2 ;;
 	--sampleside) sampleside="$2"; shift 2 ;;
     --algorithm) algorithm="$2"; shift 2 ;;
     --numrays) numrays="$2"; shift 2 ;;
@@ -59,15 +59,15 @@ done
 
 # Build
 
- dotnet build || exit 1
+# dotnet build || exit 1
 
 # Render
 # (the outputpfm and outputpng, initstate and initseq options are written later)
 
 if [[ "$subcommand" == "render" ]]; then
 	[ -n "$inputscene" ]  	      && cmd+=( --inputscene "$inputscene" )
-	[ -n "$width" ]          	  && cmd+=( --width "$width" )
-	[ -n "$height" ]           	  && cmd+=( --height "$height" )
+	[ -n "$pixelcolumns" ]          	  && cmd+=( --pixelcolumns "$pixelcolumns" )
+	[ -n "$pixelrows" ]           	  && cmd+=( --pixelrows "$pixelrows" )
 	[ -n "$sampleside" ]     	  && cmd+=( --sampleside "$sampleside" )
 	[ -n "$algorithm" ]           && cmd+=( --algorithm "$algorithm" )
 	[ -n "$numrays" ]        	  && cmd+=( --numrays "$numrays" )
