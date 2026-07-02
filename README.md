@@ -718,6 +718,11 @@ camera
 
 ---
 
+> **Note:** By default, Width = 2 and Height = 2 define the standard size of the image plane in the system; changing these values alters the physical scale of the camera.
+
+---
+
+
 ## Comments
 
 Comments can be inserted using the `#` character.
